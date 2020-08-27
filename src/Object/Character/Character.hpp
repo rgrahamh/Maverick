@@ -8,6 +8,8 @@
 #include "../../Armor/Armor.hpp"
 #include "../../Ability/Ability.hpp"
 #include "../Object.hpp"
+#include "./Race/Race.hpp"
+#include "./Style/Style.hpp"
 
 typedef struct InventorySlot{
 	ITEM_TYPE item_type;
@@ -69,9 +71,9 @@ typedef struct EquipmentList{
 	Pants* pants;
 } Equipment;
 
-class Character : Object{
+class Character : public Object, public Race, public Style{
 	public:
-		Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory);
+		Character(float start_x, float start_y, std::string Race, std::string Style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory);
 		~Character();
 
 	protected:

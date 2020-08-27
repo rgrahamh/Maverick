@@ -22,7 +22,7 @@ class Animation{
 	private:
 		//The image sequence and start of image sequence
 		ImgSeq* sequence;
-		ImgSeq* start;
+		ImgSeq* sequence_start;
 
 		//Pointers to the X and Y base coords
 		float* x_orig;

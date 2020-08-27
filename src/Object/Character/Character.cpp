@@ -1,6 +1,9 @@
 #include "./Character.hpp"
 
-Character::Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL){
+Character::Character(float start_x, float start_y, std::string race, std::string style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL)
+	: Object(start_x, start_y),
+	Race(race),
+	Style(style){
 	//Setting the struct pointers; these are the non-optional params
 	this->stats = stats;
 	this->mastery = mastery;
