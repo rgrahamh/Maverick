@@ -1,4 +1,7 @@
-#include <SFML/image.hpp>
+#ifndef ANIMATION_H
+#define ANIMATION_H
+
+#include <SFML/Graphics.hpp>
 
 //The sequence of images in the animation; should be a circularly linked list.
 typedef struct ImageSequence{
@@ -30,4 +33,6 @@ class Animation{
 
 		//If the image is animated (if not, animated is set to false)
 		bool animated;
-}
+};
+
+#endif

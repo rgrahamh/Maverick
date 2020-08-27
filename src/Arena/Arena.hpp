@@ -1,10 +1,10 @@
 #ifndef ARENA_H
 #define ARENA_H
 
-#include "../Character/Character.hpp"
+#include "../Object/Character/Character.hpp"
 
 typedef struct TeamLst{
-	Character* fighter;
+	Character* character;
 	Character* next;
 } Team;
 
@@ -14,6 +14,6 @@ class Arena{
 		~Arena();
 	private:
 		Team** teams;
-}
+};
 
 #endif

@@ -9,7 +9,7 @@ Animation::Animation(ImgSeq* sequence, float* x, float* y, bool animated = true)
 
 void Animation::advance(){
 	if(animated && sequence->frame_len == frame_counter++){
-	`	sequence = sequence->next;
+		sequence = sequence->next;
 		frame_counter = 0;
 	}
 }

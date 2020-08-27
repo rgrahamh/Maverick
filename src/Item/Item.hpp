@@ -1,11 +1,5 @@
-#ifndef CHARACTER_H
-#define CHARACTER_H
-
-enum ITEM_TYPE{
-	WEAPON;
-	ARMOR;
-	CONSUMABLE;
-};
+#ifndef CHARAC_H
+#define CHARAC_H
 
 class Item{
 	public:
@@ -13,6 +7,6 @@ class Item{
 		~Item();
 	protected:
 	private:
-}
+};
 
 #endif

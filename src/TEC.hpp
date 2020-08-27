@@ -1,3 +1,6 @@
+#include <SFML/Graphics.hpp>
+#include "./Zone/Zone.hpp"
+
 void gameLoop();
 
 void inputStep();
@@ -7,12 +10,12 @@ void collisionStep();
 void saveGame();
 
 enum GAME_STATE{
-	TITLE;
-	OVERWORLD;
-	BATTLE;
-	DISCUSSION;
-	PAUSE;
-}
+	TITLE,
+	OVERWORLD,
+	BATTLE,
+	DISCUSSION,
+	PAUSE
+};
 
 Zone** zones;
 

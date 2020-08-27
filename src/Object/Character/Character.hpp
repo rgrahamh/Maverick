@@ -1,9 +1,13 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-#include "../Item/Item.hpp"
-#include "../Item/Weapon/Weapon.hpp"
-#include "../Item/Armor/Armor.hpp"
+#include <stdlib.h>
+
+#include "../../Item/Item.hpp"
+#include "../../Weapon/Weapon.hpp"
+#include "../../Armor/Armor.hpp"
+#include "../../Ability/Ability.hpp"
+#include "../Object.hpp"
 
 typedef struct InventorySlot{
 	ITEM_TYPE item_type;
@@ -65,19 +69,18 @@ typedef struct EquipmentList{
 	Pants* pants;
 } Equipment;
 
-class Character{
+class Character : Object{
 	public:
-		Character(Stats* stats, Inventory* inventory, Mastery* mastery, Equipment* equipment, Abilities* abilities);
+		Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory);
 		~Character();
 
 	protected:
 		bool overdrive;
 		Stats* stats;
-		BattleStats* battle_stats;
-		InvSlot* inventory[128];
+		InvSlot** inventory;
 		Mastery* mastery;
 		Equipment* equipment;
 		Abilities* abilities;
-}
+};
 
 #endif

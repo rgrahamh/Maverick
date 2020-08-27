@@ -1,4 +1,6 @@
-Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, Inventory* inventory = NULL){
+#include "./Character.hpp"
+
+Character::Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL){
 	//Setting the struct pointers; these are the non-optional params
 	this->stats = stats;
 	this->mastery = mastery;
@@ -7,11 +9,13 @@ Character(Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equip
 	if(inventory != NULL){
 		this->inventory = inventory;
 	}else{
-		this->inventory = (InvSlot*)calloc(sizeof(InvSlot), 128);
+		this->inventory = (InvSlot**)calloc(sizeof(InvSlot), 128);
 	}
-	this->equipment = equipment;
-
-	this->battle_stats = (BattleStats*)malloc(sizeof(BattleStats));
+	if(equipment != NULL){
+		this->equipment = equipment;
+	}else{
+		this->equipment = (Equipment*)calloc(sizeof(Equipment), 1);
+	}
 
 	this->overdrive=false;
 }
