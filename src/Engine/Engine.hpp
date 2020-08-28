@@ -6,13 +6,14 @@
 
 class Engine{
 	public:
-		Engine(Zone** zones);
+		Engine(ZoneLst* zones);
 		~Engine();
 
+		void draw();
 
 	private:
-		Zone** zones;
-		Zone** active_zones;
+		ZoneLst* zones;
+		ZoneLst* active_zones;
 		Camera* camera;
 };
 

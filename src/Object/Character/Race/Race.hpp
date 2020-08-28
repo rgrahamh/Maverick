@@ -1,12 +1,14 @@
 #ifndef RACE_H
 #define RACE_H
 
+#include <string>
+
 class Race{
 	public:
-		Race();
+		Race(std::string race);
 		~Race();
 	protected:
-	private:
+		std::string race;
 };
 
 #endif

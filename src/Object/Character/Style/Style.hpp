@@ -8,7 +8,7 @@ class Style{
 		Style(std::string style);
 		~Style();
 	protected:
-		std::string style_name;
+		std::string style;
 };
 
 #endif

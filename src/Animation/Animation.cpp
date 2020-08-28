@@ -20,3 +20,7 @@ void Animation::start(){
 	sequence = sequence_start;
 	frame_counter = 0;
 }
+
+sf::Sprite* Animation::getSprite(){
+	return this->sequence->sprite;
+}

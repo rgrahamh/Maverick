@@ -5,11 +5,12 @@
 
 class Camera{
 	public:
+		Camera();
 		Camera(Object* reference);
 		~Camera();
 
 		void setReference(Object* reference);
-		void _draw(Object** obj_lst);
+		void _draw(ObjLst* obj_lst);
 
 	private:
 		Object* reference;

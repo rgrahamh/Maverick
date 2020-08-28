@@ -1,5 +1,8 @@
 #include "./Camera.hpp"
 
+Camera::Camera(){
+}
+
 Camera::Camera(Object* reference){
     this->reference = reference;
     this->default_x = reference->getX();

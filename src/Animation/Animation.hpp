@@ -19,6 +19,7 @@ class Animation{
 
 		void advance();
 		void start();
+		sf::Sprite* getSprite();
 	private:
 		//The image sequence and start of image sequence
 		ImgSeq* sequence;

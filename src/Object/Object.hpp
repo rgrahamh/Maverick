@@ -11,20 +11,23 @@ typedef struct ObjectList{
 
 class Object{
 	public:
-		Object(float start_x, float start_y);
+		Object(float start_x, float start_y, unsigned int draw_layer);
 		~Object();
 		float getX();
 		float getY();
+
+		float getWidth();
+		float getHeight();
 
 		//Processing functions
 		void _process();
 		//Need this for custom processing (like input)
 		void process();
 
-		//Drawing functions
-		void _draw();
+		void _draw(sf::RenderWindow* window, unsigned int draw_layer);
+
 		//Need this later for drawing weapons and armor (calling their draw functions)
-		void draw();
+		virtual void draw(sf::RenderWindow* window);
 
 		
 	protected:
@@ -39,6 +42,10 @@ class Object{
 		//Acceleration
 		float xA;
 		float yA;
+
+		//Height and width values
+		float height;
+		float width;
 
 		unsigned int draw_layer;
 
