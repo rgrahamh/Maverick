@@ -1,7 +1,12 @@
-#include "../Character.hpp"
+#ifndef PLAYER_H
+#define PLAYER_H
 
-class Player() : public Character{
+#include "../Character/Character.hpp"
+
+class Player : public Character{
     public:
-        Character();
-        ~Character();
-}
+        Player(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer);
+        ~Player();
+};
+
+#endif

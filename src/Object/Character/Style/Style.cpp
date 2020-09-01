@@ -1,5 +1,5 @@
 #include "./Style.hpp"
 
-Style::Style(std::string style){
+Style::Style(STYLE style){
     this->style = style;
 }

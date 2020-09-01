@@ -1,23 +1,11 @@
 #include <SFML/Graphics.hpp>
-#include "./Zone/Zone.hpp"
+#include "./Engine/Engine.hpp"
 
-void gameLoop();
+Engine* engine;
 
-void inputStep();
-void drawStep(sf::RenderWindow* window);
-void collisionStep();
+Zone* initZones(unsigned char zone_num);
 
-void saveGame();
-
-enum GAME_STATE{
-	TITLE,
-	OVERWORLD,
-	BATTLE,
-	DISCUSSION,
-	PAUSE
-};
-
-Zone** zones;
+ZoneLst* zones;
 
 float X_SCALE = sf::VideoMode::getDesktopMode().width;
 float Y_SCALE = sf::VideoMode::getDesktopMode().height;

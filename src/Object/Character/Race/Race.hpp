@@ -3,12 +3,18 @@
 
 #include <string>
 
+enum RACE{
+	HUMAN,
+	ROBOT,
+	LATIMUS
+};
+
 class Race{
 	public:
-		Race(std::string race);
+		Race(RACE race);
 		~Race();
 	protected:
-		std::string race;
+		RACE race;
 };
 
 #endif

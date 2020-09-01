@@ -1,26 +1,68 @@
 #include "./Engine.hpp"
 
+/** Engine's parameterized constructor
+ * @param zones The zones that the game engine is initialized with
+ */
 Engine::Engine(ZoneLst* zones){
+    //Initialization of window and camera
+	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().width), "SFML Window");
+    this->camera = new Camera();
+
     this->zones = zones;
-    Camera* camera = new Camera();
+
+    //Set to the title screen
+    this->state = TITLE;
 }
 
+/** Engine's destructor
+ */
 Engine::~Engine(){
+    window->close();
+    delete window;
     delete camera;
 }
 
-void Engine::draw(){
+
+Zone* Engine::loadZone(unsigned char zone_num){
+	if(zone_num == 1){
+		Zone* zone = new Zone();
+        Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), new InvSlot(), 1);
+    	zone->addObject(player);
+	}
+	else{
+		return NULL;
+	}
+}
+
+/** The function that is called to start the game engine's operation
+ */
+void Engine::start(){
+    bool exit_game = 1;
+	while(exit_game == 0){
+		inputStep();
+		physicsStep();
+		collisionStep();
+		drawStep();
+	}
+}
+
+/** The draw step of the game engine
+ */
+void Engine::drawStep(){
     //Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
-    ObjLst* all_objects = new ObjLst;
-    ObjLst* obj_iter = all_objects;
+    ObjectLst* all_objects = new ObjectLst;
+    ObjectLst* obj_iter = all_objects;
+
+    ZoneLst* zone_iter = this->active_zones;
     while(this->active_zones != NULL){
-        ObjLst* new_objects = active_zones->zone->getObjects();
+        ObjectLst* new_objects = active_zones->zone->getObjects();
         while(new_objects != NULL){
-            obj_iter->next = new ObjLst;
+            obj_iter->next = new ObjectLst;
             obj_iter = obj_iter->next;
             obj_iter->obj = new_objects->obj;
             new_objects = new_objects->next;
         }
+        zone_iter = zone_iter->next;
     }
     obj_iter->next = NULL;
 

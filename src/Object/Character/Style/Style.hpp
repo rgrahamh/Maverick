@@ -3,12 +3,18 @@
 
 #include <string>
 
+enum STYLE{
+	SUPPORT,
+	ATTACKER,
+	DEFENDER
+};
+
 class Style{
 	public:
-		Style(std::string style);
+		Style(STYLE style);
 		~Style();
 	protected:
-		std::string style;
+		STYLE style;
 };
 
 #endif

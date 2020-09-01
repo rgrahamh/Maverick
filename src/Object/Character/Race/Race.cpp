@@ -1,5 +1,5 @@
 #include "./Race.hpp"
 
-Race::Race(std::string race){
+Race::Race(RACE race){
     this->race = race;
 }

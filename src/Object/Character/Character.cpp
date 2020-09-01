@@ -1,6 +1,6 @@
 #include "./Character.hpp"
 
-Character::Character(float start_x, float start_y, std::string race, std::string style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int draw_layer = 1)
+Character::Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int draw_layer = 1)
 	: Object(start_x, start_y, draw_layer),
 	Race(race),
 	Style(style){

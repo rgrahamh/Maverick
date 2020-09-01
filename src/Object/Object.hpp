@@ -6,8 +6,8 @@
 
 typedef struct ObjectList{
 	Object* obj;
-	ObjLst* next;
-} ObjLst;
+	ObjectLst* next;
+} ObjectLst;
 
 class Object{
 	public:

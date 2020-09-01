@@ -13,9 +13,10 @@ class Zone{
         Zone();
         ~Zone();
 
-        ObjLst* getObjects();
+        ObjectLst* getObjects();
+        void addObject(Object* object);
     private:
-        ObjLst* objects;
+        ObjectLst* objects;
 };
 
 #endif
