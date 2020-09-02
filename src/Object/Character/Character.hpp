@@ -12,7 +12,6 @@
 #include "./Style/Style.hpp"
 
 typedef struct InventorySlot{
-	ITEM_TYPE item_type;
 	Item* item;
 	unsigned int amnt;
 } InvSlot;
@@ -64,16 +63,17 @@ typedef struct BattleStatsList{
 
 //The equipment list (what the character is currently wearing)
 typedef struct EquipmentList{
-	Helmet* helmet;
-	Suit* suit;
-	Guards* guards;
-	Gloves* gloves;
-	Pants* pants;
+	Item* item;
+	//Helmet* helmet;
+	//Suit* suit;
+	//Guards* guards;
+	//Gloves* gloves;
+	//Pants* pants;
 } Equipment;
 
 class Character : public Object, public Race, public Style{
 	public:
-		Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer);
+		Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer, unsigned int animation_num);
 		~Character();
 
 	protected:

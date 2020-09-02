@@ -5,6 +5,7 @@
 #include "../Camera/Camera.hpp"
 
 #include "../Object/Character/Character.hpp"
+#include "../Object/Character/Player/Player.hpp"
 
 enum GAME_STATE{
 	TITLE,

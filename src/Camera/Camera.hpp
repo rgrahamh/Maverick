@@ -6,16 +6,22 @@
 class Camera{
 	public:
 		Camera();
-		Camera(Object* reference);
+		Camera(sf::RenderWindow* window, Object* reference);
 		~Camera();
 
 		void setReference(Object* reference);
-		void _draw(ObjLst* obj_lst);
+		void _draw(ObjectLst* obj_lst);
+		void setWindow(sf::RenderWindow window);
 
 	private:
 		Object* reference;
 		float default_x;
 		float default_y;
+
+		sf::RenderWindow* window;
+		sf::View* view;
+
+		void recenter();
 };
 
 #endif

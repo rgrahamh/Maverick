@@ -11,13 +11,17 @@ typedef struct ObjectList{
 
 class Object{
 	public:
-		Object(float start_x, float start_y, unsigned int draw_layer);
+		Object(float start_x, float start_y, unsigned int draw_layer, unsigned int animation_num);
 		~Object();
 		float getX();
 		float getY();
 
 		float getWidth();
 		float getHeight();
+
+		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+
+		int getDrawLayer();
 
 		//Processing functions
 		void _process();
@@ -48,6 +52,7 @@ class Object{
 		float width;
 
 		unsigned int draw_layer;
+		unsigned int active_animation;
 
 		//Coefficient of friction
 		float friction;
@@ -56,7 +61,7 @@ class Object{
 		Hitbox** hitboxes;
 
 		//Animation
-		Animation* animation;
+		Animation** animations;
 };
 
 #endif

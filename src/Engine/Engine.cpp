@@ -6,7 +6,7 @@
 Engine::Engine(ZoneLst* zones){
     //Initialization of window and camera
 	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().width), "SFML Window");
-    this->camera = new Camera();
+    this->camera = new Camera(window, NULL);
 
     this->zones = zones;
 
@@ -23,20 +23,19 @@ Engine::~Engine(){
 }
 
 
-Zone* Engine::loadZone(unsigned char zone_num){
-	if(zone_num == 1){
-		Zone* zone = new Zone();
-        Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), new InvSlot(), 1);
-    	zone->addObject(player);
-	}
-	else{
-		return NULL;
-	}
-}
 
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
+    //Create initial zone (TAKE OUT LATER!)
+    Zone* zone = new Zone();
+    Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1, 12);
+    player->addSprite(0, "../../assets/man.png", 16, 0, 0);
+    zone->addObject(player);
+
+    //Setting the reference
+    camera->setReference(player);
+
     bool exit_game = 1;
 	while(exit_game == 0){
 		inputStep();
@@ -81,7 +80,7 @@ void Engine::drawStep(){
             obj_iter = obj_iter->next;
         }
     }
-    camera->_draw(active_zones->zone->getObjects());
+    camera->_draw(all_objects);
 
     //TODO: DON'T FORGET TO WRITE CODE TO FREE THE MEMORY USED FOR THE NEW ALL_OBJECTS!!!
 }

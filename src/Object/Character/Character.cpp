@@ -1,7 +1,7 @@
 #include "./Character.hpp"
 
-Character::Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int draw_layer = 1)
-	: Object(start_x, start_y, draw_layer),
+Character::Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int draw_layer = 1, unsigned animation_num = 1)
+	: Object(start_x, start_y, draw_layer, animation_num),
 	Race(race),
 	Style(style){
 	//Setting the struct pointers; these are the non-optional params
