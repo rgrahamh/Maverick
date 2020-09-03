@@ -1,5 +1,10 @@
 #include "./Animation.hpp"
 
+/** The parameterized constructor of the Animation
+ * @param x_base A pointer to the int of the base object's X location
+ * @param y_base A pointer to the int of the base object's Y location
+ * @param animated If the animation progresses
+ */
 Animation::Animation(float* x_base, float* y_base, bool animated = true){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
@@ -9,8 +14,26 @@ Animation::Animation(float* x_base, float* y_base, bool animated = true){
 	this->animated = animated;
 }
 
-//MAKE SURE TO IMPLEMENT THIS AS CIRCULARLY LINKED
-void Animation::addFrame(sf::Sprite* sprite, unsigned int keyframe, float x_offset, float y_offset){
+/** Adds a frame to an animation
+ * @param sprite_path The filepath of the sprite
+ * @param keyframe The number of frames before the key continues
+ * @param x_offset The X offset of the new sprite
+ * @param y_offset The Y offset of the new sprite
+ */
+void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
+	//Getting the sprite
+	sf::Sprite* sprite;
+	if((sprite = sprite_hash->get(sprite_path)) == NULL){
+		sf::Texture texture;
+		if(!texture.loadFromFile(sprite_path)){
+			printf("Cannot find image %s!\n", sprite_path);
+			return;
+		}
+		sprite = new sf::Sprite(texture);
+
+		sprite_hash->add(sprite_path, sprite);
+	}
+
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
 		this->sequence_end = new SpriteLst;
@@ -22,6 +45,7 @@ void Animation::addFrame(sf::Sprite* sprite, unsigned int keyframe, float x_offs
 		this->sequence_end->next = new SpriteLst;
 		this->sequence_end = this->sequence_end->next;
 	}
+	//Regardless
 	this->sequence_end->sprite = sprite;
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->x_offset = x_offset;
@@ -31,6 +55,8 @@ void Animation::addFrame(sf::Sprite* sprite, unsigned int keyframe, float x_offs
 	this->sequence_end->next = this->sequence_start;
 }
 
+/** Advances the animation by a frame
+ */
 void Animation::advance(){
 	if(animated && sequence->keyframe == frame_counter++){
 		sequence = sequence->next;
@@ -38,11 +64,15 @@ void Animation::advance(){
 	}
 }
 
+/** Starts the animation over again
+ */
 void Animation::start(){
 	sequence = sequence_start;
 	frame_counter = 0;
 }
 
+/** Gets the current sprite
+ */
 sf::Sprite* Animation::getSprite(){
 	return this->sequence->sprite;
 }

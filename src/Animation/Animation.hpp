@@ -1,26 +1,10 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include <SFML/Graphics.hpp>
+#include "./SpriteHash/SpriteHash.hpp"
 
-enum ANIMATION_TYPE{
-	UP_IDLE,
-	DOWN_IDLE,
-	LEFT_IDLE,
-	RIGHT_IDLE,
-	UP_WALK,
-	DOWN_WALK,
-	LEFT_WALK,
-	RIGHT_WALK,
-	UP_FIGHT_IDLE,
-	DOWN_FIGHT_IDLE,
-	LEFT_FIGHT_IDLE,
-	RIGHT_FIGHT_IDLE,
-	SWING_RIGHT,
-	SWING_LEFT,
-	SWING_UP,
-	SWING_DOWN
-};
+#include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 //The sequence of images in the animation; should be a circularly linked list.
 
@@ -33,6 +17,8 @@ typedef struct SpriteList{
 	SpriteLst* next;
 } SpriteLst;
 
+SpriteHash* sprite_hash;
+
 class Animation{
 	public:
 		Animation(float* x_base, float* y_base, bool animated);
@@ -40,7 +26,7 @@ class Animation{
 
 		void advance();
 		void start();
-		void addFrame(sf::Sprite* sprite, unsigned int keyframe, float x_offset, float y_offset);
+		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 		sf::Sprite* getSprite();
 
 	private:

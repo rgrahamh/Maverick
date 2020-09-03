@@ -36,6 +36,9 @@ void Engine::start(){
     //Setting the reference
     camera->setReference(player);
 
+    //Setting up the sprite hash table
+    sprite_hash = new SpriteHash(2048);
+
     bool exit_game = 1;
 	while(exit_game == 0){
 		inputStep();
