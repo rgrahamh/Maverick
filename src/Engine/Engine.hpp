@@ -17,7 +17,7 @@ enum GAME_STATE{
 
 class Engine{
 	public:
-		Engine(ZoneLst* zones);
+		Engine();
 		~Engine();
 
 		//Game engine run

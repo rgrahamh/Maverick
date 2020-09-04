@@ -3,12 +3,13 @@
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
-Engine::Engine(ZoneLst* zones){
+Engine::Engine(){
     //Initialization of window and camera
 	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().width), "SFML Window");
     this->camera = new Camera(window, NULL);
 
-    this->zones = zones;
+    this->zones = NULL;
+    this->active_zones = NULL;
 
     //Set to the title screen
     this->state = TITLE;
@@ -137,12 +138,12 @@ void Engine::drawStep(){
     }
 
     //Draw operation
-    camera->_draw(all_objects);
+    this->camera->_draw(all_objects);
 
-    ObjectLst* free_objects = all_objects;
+    ObjectLst* free_objects;
     while(all_objects != NULL){
         free_objects = all_objects->next;
-        free(all_objects);
+        delete all_objects;
         all_objects = free_objects;
     }
 }

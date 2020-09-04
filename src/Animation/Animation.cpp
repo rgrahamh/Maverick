@@ -8,6 +8,7 @@
 Animation::Animation(float* x_base, float* y_base, bool animated = true){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
+	this->sequence_end = NULL;
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->frame_counter = 0;
