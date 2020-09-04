@@ -22,30 +22,93 @@ Engine::~Engine(){
     delete camera;
 }
 
-
-
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
+    //Setting up the sprite hash table
+    sprite_hash = new SpriteHash(2048);
+
     //Create initial zone (TAKE OUT LATER!)
-    Zone* zone = new Zone();
+    Zone* zone = new Zone("Zone 1");
     Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1, 12);
-    player->addSprite(0, "../../assets/man.png", 16, 0, 0);
+    player->addSprite(0, "assets/Tails.png", 16, 0, 0);
     zone->addObject(player);
+    this->addZone(zone);
+    this->activateZone(zone->getName());
 
     //Setting the reference
     camera->setReference(player);
 
-    //Setting up the sprite hash table
-    sprite_hash = new SpriteHash(2048);
-
-    bool exit_game = 1;
+    bool exit_game = 0;
 	while(exit_game == 0){
 		inputStep();
 		physicsStep();
 		collisionStep();
 		drawStep();
 	}
+}
+
+void Engine::addZone(Zone* zone){
+    ZoneLst* new_zone = new ZoneLst;
+    new_zone->zone = zone;
+    new_zone->next = this->zones;
+    zones = new_zone;
+}
+
+void Engine::activateZone(char* zone_name){
+    //If it's the first zone
+    if(strcmp(this->zones->zone->getName(), zone_name) == 0){
+        ZoneLst* moved_zone = this->zones;
+        zones = this->zones->next;
+        moved_zone->next = this->active_zones;
+        this->active_zones = moved_zone;
+    }
+    else{
+        ZoneLst* zone_lst = this->zones;
+        //If it's anything after the first zone
+        while(zone_lst->next != NULL){
+            if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
+                ZoneLst* moved_zone = zone_lst->next;
+                zone_lst->next = moved_zone->next;
+                moved_zone->next = this->active_zones;
+                this->active_zones = moved_zone;
+            }
+        }
+    }
+}
+
+void Engine::deactivateZone(char* zone_name){
+    //If it's the first zone
+    if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
+        ZoneLst* moved_zone = this->active_zones;
+        active_zones = this->active_zones->next;
+        moved_zone->next = this->zones;
+        this->zones = moved_zone;
+    }
+    else{
+        //If it's anything after the first zone
+        ZoneLst* zone_lst = this->active_zones;
+        while(zone_lst->next != NULL){
+            if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
+                ZoneLst* moved_zone = zone_lst->next;
+                zone_lst->next = moved_zone->next;
+                moved_zone->next = this->zones;
+                this->zones = moved_zone;
+            }
+        }
+    }
+}
+
+void Engine::inputStep(){
+    return;
+}
+
+void Engine::physicsStep(){
+    return;
+}
+
+void Engine::collisionStep(){
+    return;
 }
 
 /** The draw step of the game engine
@@ -56,8 +119,8 @@ void Engine::drawStep(){
     ObjectLst* obj_iter = all_objects;
 
     ZoneLst* zone_iter = this->active_zones;
-    while(this->active_zones != NULL){
-        ObjectLst* new_objects = active_zones->zone->getObjects();
+    while(zone_iter != NULL){
+        ObjectLst* new_objects = zone_iter->zone->getObjects();
         while(new_objects != NULL){
             obj_iter->next = new ObjectLst;
             obj_iter = obj_iter->next;
@@ -68,21 +131,6 @@ void Engine::drawStep(){
     }
     obj_iter->next = NULL;
 
-    //Bubble sort by height (since things aren't typically changing order that much between frames). That way we don't have to compare objects outside of its height scope.
-    bool done = false;
-    while(!done){
-        obj_iter = all_objects;
-        done = true;
-        while(obj_iter != NULL){
-            if ((obj_iter->obj->getY() + obj_iter->obj->getHeight()) > (obj_iter->next->obj->getY() + obj_iter->next->obj->getHeight())){
-                done = false;
-                Object* tmp = obj_iter->next->obj;
-                obj_iter->next->obj = obj_iter->obj;
-                obj_iter->obj = tmp;
-            }
-            obj_iter = obj_iter->next;
-        }
-    }
     camera->_draw(all_objects);
 
     //TODO: DON'T FORGET TO WRITE CODE TO FREE THE MEMORY USED FOR THE NEW ALL_OBJECTS!!!

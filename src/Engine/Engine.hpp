@@ -35,6 +35,10 @@ class Engine{
 		void saveGame();
 		void loadGame();
 
+		void addZone(Zone* zone);
+		void activateZone(char* zone_name);
+		void deactivateZone(char* zone_name);
+
 		Zone* loadZone(unsigned char zone_num);
 
 		//Zones

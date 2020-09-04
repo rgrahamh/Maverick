@@ -20,4 +20,9 @@ class Hitbox{
         float width;
 };
 
+typedef struct HitboxList{
+    Hitbox* hitbox;
+    struct HitboxList* next;
+} HitboxLst;
+
 #endif

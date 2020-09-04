@@ -14,10 +14,10 @@ typedef struct SpriteList{
 	float x_offset;
 	float y_offset;
 	unsigned int keyframe;
-	SpriteLst* next;
+	struct SpriteList* next;
 } SpriteLst;
 
-SpriteHash* sprite_hash;
+extern SpriteHash* sprite_hash;
 
 class Animation{
 	public:

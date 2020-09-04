@@ -4,7 +4,7 @@
 typedef struct SpriteHashEntry{
 	char* key;
 	sf::Sprite* sprite;
-	SHEntry* next;
+	struct SpriteHashEntry* next;
 } SHEntry;
 
 class SpriteHash{

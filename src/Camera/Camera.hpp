@@ -5,7 +5,6 @@
 
 class Camera{
 	public:
-		Camera();
 		Camera(sf::RenderWindow* window, Object* reference);
 		~Camera();
 

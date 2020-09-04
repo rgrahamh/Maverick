@@ -11,6 +11,26 @@ Object::Object(float start_x, float start_y, unsigned int draw_layer, unsigned i
     this->y = start_y;
     this->draw_layer = draw_layer;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
+    for(int i = 0; i < animation_num; i++){
+        animations[i] = new Animation(&x, &y, true);
+    }
+}
+
+/** Destructor for objects
+ */
+Object::~Object(){
+    int hitbox_num = sizeof(this->hitboxes)/sizeof(Hitbox*);
+    for(int i = 0; i < hitbox_num; i++){
+        if(hitboxes[i] != NULL){
+            free(hitboxes[i]);
+        }
+    }
+    free(hitboxes);
+
+    for(int i = 0; i < animation_num; i++){
+        delete animations[i];
+    }
+    free(animations);
 }
 
 /** Gets the X value of the object
@@ -27,19 +47,6 @@ float Object::getY(){
     return this->y;
 }
 
-/** Gets the width of the object
- * @return The width of the object
- */
-float Object::getWidth(){
-    return this->width;
-}
-
-/** Gets the height of the object
- * @return The height of the object
- */
-float Object::getHeight(){
-    return this->height;
-}
 
 /** Gets the draw layer of the object
  * @return The draw layer of the object

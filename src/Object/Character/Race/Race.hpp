@@ -12,7 +12,6 @@ enum RACE{
 class Race{
 	public:
 		Race(RACE race);
-		~Race();
 	protected:
 		RACE race;
 };

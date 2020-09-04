@@ -4,20 +4,12 @@
 #include "../Animation/Animation.hpp"
 #include "./Hitbox/Hitbox.hpp"
 
-typedef struct ObjectList{
-	Object* obj;
-	ObjectLst* next;
-} ObjectLst;
-
 class Object{
 	public:
 		Object(float start_x, float start_y, unsigned int draw_layer, unsigned int animation_num);
 		~Object();
 		float getX();
 		float getY();
-
-		float getWidth();
-		float getHeight();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 
@@ -47,12 +39,9 @@ class Object{
 		float xA;
 		float yA;
 
-		//Height and width values
-		float height;
-		float width;
-
 		unsigned int draw_layer;
 		unsigned int active_animation;
+		unsigned int animation_num;
 
 		//Coefficient of friction
 		float friction;
@@ -63,5 +52,10 @@ class Object{
 		//Animation
 		Animation** animations;
 };
+
+typedef struct ObjectList{
+	Object* obj;
+	struct ObjectList* next;
+} ObjectLst;
 
 #endif

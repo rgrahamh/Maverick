@@ -14,6 +14,15 @@ Animation::Animation(float* x_base, float* y_base, bool animated = true){
 	this->animated = animated;
 }
 
+Animation::~Animation(){
+	SpriteLst* tmp;
+	while(sequence_start != NULL){
+		tmp = sequence_start->next;
+		free(sequence_start);
+		sequence_start = tmp;
+	}
+}
+
 /** Adds a frame to an animation
  * @param sprite_path The filepath of the sprite
  * @param keyframe The number of frames before the key continues

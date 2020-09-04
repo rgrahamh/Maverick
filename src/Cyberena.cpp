@@ -1,4 +1,4 @@
-#include "./TEC.hpp"
+#include "./Cyberena.hpp"
 
 int main(int argc, char** argv){
 	engine = new Engine(zones);

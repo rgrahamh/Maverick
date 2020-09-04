@@ -12,7 +12,6 @@ enum STYLE{
 class Style{
 	public:
 		Style(STYLE style);
-		~Style();
 	protected:
 		STYLE style;
 };

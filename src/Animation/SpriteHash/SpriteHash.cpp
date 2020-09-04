@@ -1,5 +1,8 @@
 #include "./SpriteHash.hpp"
 
+//The instance of the sprite hash table
+SpriteHash* sprite_hash;
+
 /** The paramterized constructor for the SpriteHash
  * @param size The size of the hash table
  */
@@ -54,7 +57,7 @@ void SpriteHash::add(const char* key, sf::Sprite* sprite){
 	//Storing in the table
 	SHEntry* new_entry = (SHEntry*)malloc(sizeof(SHEntry));
 	new_entry->key = perm_key;
-	new_entry->sprite - sprite;
+	new_entry->sprite = sprite;
 
 	//Setting it as the first thing in the linked list (for constant-time insertion)
 	if(table[hash_val] == NULL){
@@ -64,7 +67,6 @@ void SpriteHash::add(const char* key, sf::Sprite* sprite){
 		new_entry->next = table[hash_val];
 	}
 	table[hash_val] = new_entry;
-	SHEntry* cursor = table[hash_val];
 }
 
 /** Gets the sprite from the hash table
@@ -83,4 +85,6 @@ sf::Sprite* SpriteHash::get(const char* key){
 	while(cursor != NULL && strcmp(cursor->key, key) != 0){
 		cursor = cursor->next;
 	}
+
+	return cursor->sprite;
 }
