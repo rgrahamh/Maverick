@@ -38,7 +38,7 @@ unsigned int SpriteHash::hash(const char* key){
 	for(int i = 0; key[i] != '\0'; i++){
 		hash += key[i];
 	}
-	return hash % this->size;
+	return (hash >> sizeof(int)) % this->size;
 }
 
 /** Adds a new entry to the hash table

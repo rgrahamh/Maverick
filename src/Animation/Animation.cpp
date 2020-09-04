@@ -14,6 +14,8 @@ Animation::Animation(float* x_base, float* y_base, bool animated = true){
 	this->animated = animated;
 }
 
+/** Animation destructor
+ */
 Animation::~Animation(){
 	SpriteLst* tmp;
 	while(sequence_start != NULL){
@@ -33,12 +35,12 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	//Getting the sprite
 	sf::Sprite* sprite;
 	if((sprite = sprite_hash->get(sprite_path)) == NULL){
-		sf::Texture texture;
-		if(!texture.loadFromFile(sprite_path)){
+		sf::Texture* texture = new sf::Texture();
+		if(!texture->loadFromFile(sprite_path)){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
-		sprite = new sf::Sprite(texture);
+		sprite = new sf::Sprite(*texture);
 
 		sprite_hash->add(sprite_path, sprite);
 	}
@@ -62,6 +64,18 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 
 	//Set up the circular link
 	this->sequence_end->next = this->sequence_start;
+}
+
+/** Sets the scale of the animation
+ * @param x_scale The X scale factor
+ * @param y_scale the Y scale factor
+ */
+void Animation::setScale(float x_scale, float y_scale){
+	SpriteLst* cursor = sequence_start;
+	do{
+		cursor->sprite->setScale(x_scale, y_scale);
+		cursor = cursor->next;
+	} while(cursor != sequence_end);
 }
 
 /** Advances the animation by a frame

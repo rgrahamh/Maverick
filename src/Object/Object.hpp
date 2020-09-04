@@ -10,19 +10,21 @@ class Object{
 		~Object();
 		float getX();
 		float getY();
+		float getWidth();
+		float getHeight();
+		unsigned int getDrawLayer();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 
-		unsigned int getDrawLayer();
+		void setAnimation(unsigned int animation_num);
+		void setScale(unsigned int animation_num, float x_scale, float y_scale);
+		void setScale(float x_scale, float y_scale);
 
 		//Processing functions
 		void _process();
 		//Need this for custom processing (like input)
 		void process();
 
-		void _draw(sf::RenderWindow* window);
-
-		//Need this later for drawing weapons and armor (calling their draw functions)
 		virtual void draw(sf::RenderWindow* window);
 
 		

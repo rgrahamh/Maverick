@@ -27,6 +27,7 @@ class Animation{
 		void advance();
 		void start();
 		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void setScale(float x_scale, float y_scale);
 		sf::Sprite* getSprite();
 
 	private:

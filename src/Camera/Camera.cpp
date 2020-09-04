@@ -10,9 +10,9 @@ Camera::Camera(sf::RenderWindow* window, Object* reference = NULL){
         this->default_x = reference->getX();
         this->default_y = reference->getY();
     }
-    this->view = new sf::View(sf::FloatRect(0.f, 0.f, (float)sf::VideoMode::getDesktopMode().width, (float)sf::VideoMode::getDesktopMode().height));
+    this->view = new sf::View(window->getDefaultView());
     this->window = window;
-    this->window->setView(*this->view);
+    this->window->setView(*(this->view));
 }
 
 Camera::~Camera(){
@@ -48,7 +48,7 @@ void Camera::_draw(ObjectLst* obj_lst){
         cursor = obj_lst;
         while(cursor != NULL){
             if(cursor->obj->getDrawLayer() == i){
-                cursor->obj->_draw(window);
+                cursor->obj->draw(window);
             }
             cursor = cursor->next;
         }

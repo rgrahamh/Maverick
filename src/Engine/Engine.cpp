@@ -32,6 +32,7 @@ void Engine::start(){
     Zone* zone = new Zone("Zone 1");
     Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1, 12);
     player->addSprite(0, "assets/Tails.png", 16, 0, 0);
+    player->setScale(0, 0.1, 0.1);
     zone->addObject(player);
     this->addZone(zone);
     this->activateZone(zone->getName());
@@ -118,20 +119,30 @@ void Engine::drawStep(){
     ObjectLst* all_objects = new ObjectLst;
     ObjectLst* obj_iter = all_objects;
 
+    bool first_run = true;
     ZoneLst* zone_iter = this->active_zones;
     while(zone_iter != NULL){
         ObjectLst* new_objects = zone_iter->zone->getObjects();
-        while(new_objects != NULL){
-            obj_iter->next = new ObjectLst;
-            obj_iter = obj_iter->next;
+        while(new_objects->next != NULL){
+            if(first_run != true){
+                obj_iter->next = new ObjectLst;
+                obj_iter = obj_iter->next;
+            }
             obj_iter->obj = new_objects->obj;
             new_objects = new_objects->next;
+
+            first_run = false;
         }
         zone_iter = zone_iter->next;
     }
-    obj_iter->next = NULL;
 
+    //Draw operation
     camera->_draw(all_objects);
 
-    //TODO: DON'T FORGET TO WRITE CODE TO FREE THE MEMORY USED FOR THE NEW ALL_OBJECTS!!!
+    ObjectLst* free_objects = all_objects;
+    while(all_objects != NULL){
+        free_objects = all_objects->next;
+        free(all_objects);
+        all_objects = free_objects;
+    }
 }

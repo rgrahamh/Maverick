@@ -10,6 +10,7 @@ Object::Object(float start_x, float start_y, unsigned int draw_layer, unsigned i
     this->x = start_x;
     this->y = start_y;
     this->draw_layer = draw_layer;
+    this->active_animation = 0;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&x, &y, true);
@@ -47,6 +48,19 @@ float Object::getY(){
     return this->y;
 }
 
+/** Gets the width of the object
+ * @return The width of the object
+ */
+float Object::getWidth(){
+    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+}
+
+/** Gets the width of the object
+ * @return The width of the object
+ */
+float Object::getHeight(){
+    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+}
 
 /** Gets the draw layer of the object
  * @return The draw layer of the object
@@ -66,15 +80,34 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
     this->animations[animation_num]->addFrame(sprite_path, keyframe, x_offset, y_offset);
 }
 
-/** Draws the object
- * @param window The window to draw to
+/** Sets the animation number
+ * @param animation_num The animation number
  */
-void Object::_draw(sf::RenderWindow* window){
-    this->animations[active_animation]->advance();
-    
-    window->draw(*(this->animations[active_animation]->getSprite()));
-    this->draw(window);
+void Object::setAnimation(unsigned int animation_num){
+    this->active_animation = animation_num;
+    this->animations[active_animation]->start();
+}
+
+/** Sets the scale for a single animation
+ * @param animation_num The animation number
+ * @param x_scale The x scale factor
+ * @param y_scale The y scale factor
+ */
+void Object::setScale(unsigned int animation_num, float x_scale, float y_scale){
+    this->animations[animation_num]->setScale(x_scale, y_scale);
+}
+
+/** Sets the scale for all animations
+ * @param x_scale The x scale factor
+ * @param y_scale The y scale factor
+ */
+void Object::setScale(float x_scale, float y_scale){
+    for(unsigned int i = 0; i < animation_num; i++){
+        this->animations[i]->setScale(x_scale, y_scale);
+    }
 }
 
 void Object::draw(sf::RenderWindow* window){
+    this->animations[active_animation]->advance();
+    window->draw(*(this->animations[active_animation]->getSprite()));
 }
