@@ -21,6 +21,22 @@ Engine::~Engine(){
     window->close();
     delete window;
     delete camera;
+
+    ZoneLst* zone_cursor = zones;
+    while(zones != NULL){
+        zone_cursor = zones->next;
+        delete zones->zone;
+        delete zones;
+        zones = zone_cursor;
+    }
+
+    zone_cursor = active_zones;
+    while(active_zones != NULL){
+        zone_cursor = active_zones->next;
+        delete active_zones->zone;
+        delete active_zones;
+        active_zones = zone_cursor;
+    }
 }
 
 /** The function that is called to start the game engine's operation
@@ -41,15 +57,94 @@ void Engine::start(){
     //Setting the reference
     camera->setReference(player);
 
-    bool exit_game = 0;
-	while(exit_game == 0){
-		inputStep();
-		physicsStep();
-		collisionStep();
-		drawStep();
+    gameLoop();
+}
+
+void Engine::gameLoop(){
+	while(this->state != EXIT){
+        ObjectLst* all_objects = buildFullObjLst();
+
+		this->actionStep(all_objects);
+		this->physicsStep(all_objects);
+		this->collisionStep(all_objects);
+		this->drawStep(all_objects);
+
+        freeFullObjLst(all_objects);
 	}
 }
 
+void Engine::actionStep(ObjectLst* all_objects){
+    sf::Event event;
+    ObjectLst* cursor;
+    while(window->pollEvent(event)){
+        if(event.type == sf::Event::Closed){
+            this->state = EXIT;
+            return;
+        }
+        cursor = all_objects;
+        while(cursor != NULL){
+            cursor->obj->action(event);
+            cursor = cursor->next;
+        }
+    }
+}
+
+void Engine::physicsStep(ObjectLst* all_objects){
+    return;
+}
+
+void Engine::collisionStep(ObjectLst* all_objects){
+    return;
+}
+
+/** The draw step of the game engine
+ */
+void Engine::drawStep(ObjectLst* all_objects){
+    //Draw operation
+    this->camera->_draw(all_objects);
+}
+
+/** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
+ * @return A full list of all active objects in the engine
+ */
+ObjectLst* Engine::buildFullObjLst(){
+    ObjectLst* all_objects = (ObjectLst*)calloc(sizeof(ObjectLst), 1);
+    ObjectLst* obj_iter = all_objects;
+
+    bool first_run = true;
+    ZoneLst* zone_iter = this->active_zones;
+    while(zone_iter != NULL){
+        ObjectLst* new_objects = zone_iter->zone->getObjects();
+        while(new_objects->next != NULL){
+            if(first_run != true){
+                obj_iter->next = new ObjectLst;
+                obj_iter = obj_iter->next;
+            }
+            obj_iter->obj = new_objects->obj;
+            new_objects = new_objects->next;
+
+            first_run = false;
+        }
+        zone_iter = zone_iter->next;
+    }
+    return all_objects;
+}
+
+/** Frees the full list of objects generated for each step
+ * @param all_objects The full list of objects
+ */
+void Engine::freeFullObjLst(ObjectLst* all_objects){
+    ObjectLst* free_objects;
+    while(all_objects != NULL){
+        free_objects = all_objects->next;
+        free(all_objects);
+        all_objects = free_objects;
+    }
+}
+
+/** Adds a new zone to the game
+ * @param zone The zone to add
+ */
 void Engine::addZone(Zone* zone){
     ZoneLst* new_zone = new ZoneLst;
     new_zone->zone = zone;
@@ -57,6 +152,9 @@ void Engine::addZone(Zone* zone){
     zones = new_zone;
 }
 
+/** Moves a Zone to the active_zones ZoneLst
+ * @param zone_name The name of the zone you wish to move
+ */
 void Engine::activateZone(char* zone_name){
     //If it's the first zone
     if(strcmp(this->zones->zone->getName(), zone_name) == 0){
@@ -79,6 +177,9 @@ void Engine::activateZone(char* zone_name){
     }
 }
 
+/** Moves a zone from active_zone to zones
+ * @param zone_name The name of the zone you wish to deactivate
+ */
 void Engine::deactivateZone(char* zone_name){
     //If it's the first zone
     if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
@@ -98,52 +199,5 @@ void Engine::deactivateZone(char* zone_name){
                 this->zones = moved_zone;
             }
         }
-    }
-}
-
-void Engine::inputStep(){
-    return;
-}
-
-void Engine::physicsStep(){
-    return;
-}
-
-void Engine::collisionStep(){
-    return;
-}
-
-/** The draw step of the game engine
- */
-void Engine::drawStep(){
-    //Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
-    ObjectLst* all_objects = new ObjectLst;
-    ObjectLst* obj_iter = all_objects;
-
-    bool first_run = true;
-    ZoneLst* zone_iter = this->active_zones;
-    while(zone_iter != NULL){
-        ObjectLst* new_objects = zone_iter->zone->getObjects();
-        while(new_objects->next != NULL){
-            if(first_run != true){
-                obj_iter->next = new ObjectLst;
-                obj_iter = obj_iter->next;
-            }
-            obj_iter->obj = new_objects->obj;
-            new_objects = new_objects->next;
-
-            first_run = false;
-        }
-        zone_iter = zone_iter->next;
-    }
-
-    //Draw operation
-    this->camera->_draw(all_objects);
-
-    ObjectLst* free_objects;
-    while(all_objects != NULL){
-        free_objects = all_objects->next;
-        delete all_objects;
-        all_objects = free_objects;
     }
 }

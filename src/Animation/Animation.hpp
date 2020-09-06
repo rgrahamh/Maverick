@@ -29,6 +29,7 @@ class Animation{
 		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 		void setScale(float x_scale, float y_scale);
 		sf::Sprite* getSprite();
+		void draw(sf::RenderWindow* window);
 
 	private:
 		//The image sequence and start of image sequence

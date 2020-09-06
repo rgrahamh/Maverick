@@ -23,3 +23,8 @@ Character::Character(float start_x, float start_y, RACE race, STYLE style, Stats
 
 	this->overdrive=false;
 }
+
+Character::~Character(){
+	free(inventory);
+	free(equipment);
+}

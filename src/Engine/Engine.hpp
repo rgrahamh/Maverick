@@ -12,7 +12,8 @@ enum GAME_STATE{
 	OVERWORLD,
 	BATTLE,
 	DISCUSSION,
-	PAUSE
+	PAUSE,
+	EXIT
 };
 
 class Engine{
@@ -27,18 +28,25 @@ class Engine{
 		void gameLoop();
 
 		//Engine steps
-		void inputStep();
-		void drawStep();
-		void collisionStep();
-		void physicsStep();
+		void actionStep(ObjectLst* all_objects);
+		void drawStep(ObjectLst* all_objects);
+		void collisionStep(ObjectLst* all_objects);
+		void physicsStep(ObjectLst* all_objects);
 
+		//Object list building/destruction
+		ObjectLst* buildFullObjLst();
+		void freeFullObjLst(ObjectLst* all_objects);
+
+		//Saving logic
 		void saveGame();
 		void loadGame();
 
+		//Zone addition/state handling
 		void addZone(Zone* zone);
 		void activateZone(char* zone_name);
 		void deactivateZone(char* zone_name);
 
+		//Loading a zone from file
 		Zone* loadZone(unsigned char zone_num);
 
 		//Zones

@@ -20,13 +20,13 @@ Object::Object(float start_x, float start_y, unsigned int draw_layer, unsigned i
 /** Destructor for objects
  */
 Object::~Object(){
-    int hitbox_num = sizeof(this->hitboxes)/sizeof(Hitbox*);
+    /*int hitbox_num = sizeof(this->hitboxes)/sizeof(Hitbox*);
     for(int i = 0; i < hitbox_num; i++){
         if(hitboxes[i] != NULL){
             free(hitboxes[i]);
         }
     }
-    free(hitboxes);
+    free(hitboxes);*/
 
     for(int i = 0; i < animation_num; i++){
         delete animations[i];
@@ -107,7 +107,25 @@ void Object::setScale(float x_scale, float y_scale){
     }
 }
 
+void Object::action(sf::Event){
+
+}
+
+void Object::_process(){
+    //Updating X values
+    this->xV = (this->xV + this->xA) * this->cof;
+    this->x += this->xV;
+    this->xA = 0;
+
+    //Updating Y values
+    this->yV = (this->yV + this->yA) * this->cof;
+    this->y += this->yV;
+    this->yV = 0;
+}
+
+void Object::process(){
+}
+
 void Object::draw(sf::RenderWindow* window){
-    this->animations[active_animation]->advance();
-    window->draw(*(this->animations[active_animation]->getSprite()));
+    this->animations[active_animation]->draw(window);
 }

@@ -100,3 +100,15 @@ void Animation::start(){
 sf::Sprite* Animation::getSprite(){
 	return this->sequence->sprite;
 }
+
+void Animation::draw(sf::RenderWindow* window){
+	//Advance the animation
+	this->advance();
+
+	//Update the sprite position
+	sf::Sprite* curr_sprite = this->sequence->sprite;
+	//curr_sprite->setPosition(*this->x_base + this->sequence->x_offset, *this->y_base + this->sequence->y_offset);
+
+	//Draw the sprite
+	window->draw(*curr_sprite);
+}

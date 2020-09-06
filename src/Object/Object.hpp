@@ -7,7 +7,7 @@
 class Object{
 	public:
 		Object(float start_x, float start_y, unsigned int draw_layer, unsigned int animation_num);
-		~Object();
+		virtual ~Object();
 		float getX();
 		float getY();
 		float getWidth();
@@ -23,7 +23,10 @@ class Object{
 		//Processing functions
 		void _process();
 		//Need this for custom processing (like input)
-		void process();
+		virtual void process();
+
+		//Useful for actions on other objects & input
+		virtual void action(sf::Event event);
 
 		virtual void draw(sf::RenderWindow* window);
 
@@ -40,6 +43,9 @@ class Object{
 		//Acceleration
 		float xA;
 		float yA;
+
+		//Coefficient of Friction
+		float cof;
 
 		unsigned int draw_layer;
 		unsigned int active_animation;

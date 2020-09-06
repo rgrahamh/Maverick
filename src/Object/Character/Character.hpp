@@ -74,7 +74,7 @@ typedef struct EquipmentList{
 class Character : public Object, public Race, public Style{
 	public:
 		Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer, unsigned int animation_num);
-		~Character();
+		virtual ~Character();
 
 	protected:
 		bool overdrive;

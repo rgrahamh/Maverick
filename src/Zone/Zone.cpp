@@ -7,6 +7,16 @@ Zone::Zone(char* name){
     this->objects->next = NULL;
 }
 
+Zone::~Zone(){
+    ObjectLst* obj_cursor = objects;
+    while(objects != NULL){
+        obj_cursor = objects->next;
+        delete objects->obj;
+        delete objects;
+        objects = obj_cursor;
+    }
+}
+
 ObjectLst* Zone::getObjects(){
     return this->objects;
 }
