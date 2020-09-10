@@ -16,7 +16,6 @@ Camera::Camera(sf::RenderWindow* window, Object* reference = NULL){
 }
 
 Camera::~Camera(){
-    this->window->setView(this->window->getDefaultView());
     delete this->view;
 }
 
@@ -41,7 +40,7 @@ void Camera::recenter(){
 void Camera::_draw(ObjectLst* obj_lst){
     window->clear();
 
-    recenter();
+    //recenter();
 
     ObjectLst* cursor = obj_lst;
     for(unsigned int i = 0; i < 3; i++){

@@ -107,7 +107,7 @@ void Animation::draw(sf::RenderWindow* window){
 
 	//Update the sprite position
 	sf::Sprite* curr_sprite = this->sequence->sprite;
-	//curr_sprite->setPosition(*this->x_base + this->sequence->x_offset, *this->y_base + this->sequence->y_offset);
+	curr_sprite->setPosition(*this->x_base + this->sequence->x_offset, *this->y_base + this->sequence->y_offset);
 
 	//Draw the sprite
 	window->draw(*curr_sprite);

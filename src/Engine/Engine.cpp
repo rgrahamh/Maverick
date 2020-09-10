@@ -6,6 +6,7 @@
 Engine::Engine(){
     //Initialization of window and camera
 	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().width), "SFML Window");
+    window->setFramerateLimit(60);
     this->camera = new Camera(window, NULL);
 
     this->zones = NULL;
@@ -47,7 +48,7 @@ void Engine::start(){
 
     //Create initial zone (TAKE OUT LATER!)
     Zone* zone = new Zone("Zone 1");
-    Player* player = new Player(0.0f, 0.0f, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1, 12);
+    Player* player = new Player(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1, 12);
     player->addSprite(0, "assets/Tails.png", 16, 0, 0);
     player->setScale(0, 0.1, 0.1);
     zone->addObject(player);
@@ -90,7 +91,11 @@ void Engine::actionStep(ObjectLst* all_objects){
 }
 
 void Engine::physicsStep(ObjectLst* all_objects){
-    return;
+    ObjectLst* cursor = all_objects;
+    while(cursor != NULL){
+        cursor->obj->_process();
+        cursor = cursor->next;
+    }
 }
 
 void Engine::collisionStep(ObjectLst* all_objects){

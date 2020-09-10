@@ -73,8 +73,12 @@ typedef struct EquipmentList{
 
 class Character : public Object, public Race, public Style{
 	public:
-		Character(float start_x, float start_y, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer, unsigned int animation_num);
+		Character(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer, unsigned int animation_num);
 		virtual ~Character();
+		//Useful for actions on other objects & input
+		virtual void action(sf::Event event);
+		virtual void process();
+		virtual void draw();
 
 	protected:
 		bool overdrive;

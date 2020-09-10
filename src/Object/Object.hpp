@@ -6,7 +6,7 @@
 
 class Object{
 	public:
-		Object(float start_x, float start_y, unsigned int draw_layer, unsigned int animation_num);
+		Object(float start_x, float start_y, float friction, unsigned int draw_layer, unsigned int animation_num);
 		virtual ~Object();
 		float getX();
 		float getY();
@@ -44,15 +44,12 @@ class Object{
 		float xA;
 		float yA;
 
-		//Coefficient of Friction
-		float cof;
+		//Coefficient of friction
+		float friction;
 
 		unsigned int draw_layer;
 		unsigned int active_animation;
 		unsigned int animation_num;
-
-		//Coefficient of friction
-		float friction;
 
 		//Hitboxes
 		Hitbox** hitboxes;

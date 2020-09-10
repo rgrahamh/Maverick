@@ -3,12 +3,14 @@
 /** Object parameterized constructor
  * @param start_x The starting X location of the object
  * @param start_y The starting Y location of the objcet
+ * @param friction The object's coefficient of friction
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(float start_x, float start_y, unsigned int draw_layer, unsigned int animation_num){
+Object::Object(float start_x, float start_y, float friction, unsigned int draw_layer, unsigned int animation_num){
     this->x = start_x;
     this->y = start_y;
+    this->friction = friction;
     this->draw_layer = draw_layer;
     this->active_animation = 0;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
@@ -113,14 +115,16 @@ void Object::action(sf::Event){
 
 void Object::_process(){
     //Updating X values
-    this->xV = (this->xV + this->xA) * this->cof;
+    this->xV = this->xA + (this->xV * (1 - this->friction));
     this->x += this->xV;
     this->xA = 0;
 
     //Updating Y values
-    this->yV = (this->yV + this->yA) * this->cof;
+    this->yV = this->yA + (this->yV * (1 - this->friction));
     this->y += this->yV;
     this->yV = 0;
+
+    this->process();
 }
 
 void Object::process(){
