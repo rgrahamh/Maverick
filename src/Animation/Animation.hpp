@@ -1,7 +1,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "./SpriteHash/SpriteHash.hpp"
+#include "./TextureHash/TextureHash.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
@@ -17,7 +17,7 @@ typedef struct SpriteList{
 	struct SpriteList* next;
 } SpriteLst;
 
-extern SpriteHash* sprite_hash;
+extern TextureHash* texture_hash;
 
 class Animation{
 	public:

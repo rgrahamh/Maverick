@@ -71,6 +71,17 @@ typedef struct EquipmentList{
 	//Pants* pants;
 } Equipment;
 
+enum CHARACTER_ANIMATION{
+	UP_NEUTRAL,
+	DOWN_NEUTRAL,
+	LEFT_NEUTRAL,
+	RIGHT_NEUTRAL,
+	UP_WALK,
+	DOWN_WALK,
+	LEFT_WALK,
+	RIGHT_WALK
+};
+
 class Character : public Object, public Race, public Style{
 	public:
 		Character(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer, unsigned int animation_num);

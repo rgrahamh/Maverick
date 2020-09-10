@@ -1,28 +1,28 @@
-#include "./SpriteHash.hpp"
+#include "./TextureHash.hpp"
 
-//The instance of the sprite hash table
-SpriteHash* sprite_hash;
+//The instance of the texture hash table
+TextureHash* texture_hash;
 
-/** The paramterized constructor for the SpriteHash
+/** The paramterized constructor for the TextureHash
  * @param size The size of the hash table
  */
-SpriteHash::SpriteHash(unsigned int size){
+TextureHash::TextureHash(unsigned int size){
 	this->size = size;
-	this->table = (SHEntry**)calloc(sizeof(SHEntry*), size);
+	this->table = (THEntry**)calloc(sizeof(THEntry*), size);
 }
 
-/** The destructor for the SpriteHash
+/** The destructor for the TextureHash
  */
-SpriteHash::~SpriteHash(){
+TextureHash::~TextureHash(){
 	for(int i = 0; i < this->size; i++){
 		if(table[i] != NULL){
-			SHEntry* cursor = table[i];
+			THEntry* cursor = table[i];
 			while(cursor != NULL){
-				SHEntry* tmp = cursor;
+				THEntry* tmp = cursor;
 				cursor = cursor->next;
 
 				free(cursor->key);
-				free(cursor->sprite);
+				free(cursor->texture);
 				free(tmp);
 			}
 		}
@@ -33,7 +33,7 @@ SpriteHash::~SpriteHash(){
  * @param key The key that we are hashing
  * @return The hash
  */
-unsigned int SpriteHash::hash(const char* key){
+unsigned int TextureHash::hash(const char* key){
 	unsigned int hash = 0;
 	for(int i = 0; key[i] != '\0'; i++){
 		hash += key[i];
@@ -43,9 +43,9 @@ unsigned int SpriteHash::hash(const char* key){
 
 /** Adds a new entry to the hash table
  * @param key The string (filepath) that is being hashed
- * @param sprite The sprite that is being put into the table
+ * @param texture The texture that is being put into the table
  */
-void SpriteHash::add(const char* key, sf::Sprite* sprite){
+void TextureHash::add(const char* key, sf::Texture* texture){
 	unsigned int hash_val = this->hash(key);
 
 	//Copying the key for permanent storage
@@ -55,9 +55,9 @@ void SpriteHash::add(const char* key, sf::Sprite* sprite){
 	perm_key[len] = '\0';
 
 	//Storing in the table
-	SHEntry* new_entry = (SHEntry*)malloc(sizeof(SHEntry));
+	THEntry* new_entry = (THEntry*)malloc(sizeof(THEntry));
 	new_entry->key = perm_key;
-	new_entry->sprite = sprite;
+	new_entry->texture = texture;
 
 	//Setting it as the first thing in the linked list (for constant-time insertion)
 	if(table[hash_val] == NULL){
@@ -69,22 +69,23 @@ void SpriteHash::add(const char* key, sf::Sprite* sprite){
 	table[hash_val] = new_entry;
 }
 
-/** Gets the sprite from the hash table
+/** Gets the texture from the hash table
  * @param key The string (filepath) that is being hashed
- * @return The sprite with the given key
+ * @return The texture with the given key
  */
-sf::Sprite* SpriteHash::get(const char* key){
+sf::Texture* TextureHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	SHEntry* cursor = table[hash_val];
-	if(cursor == NULL){
-		return NULL;
-	}
+	THEntry* cursor = table[hash_val];
 
 	//Iterate until we hit a matching case
 	while(cursor != NULL && strcmp(cursor->key, key) != 0){
 		cursor = cursor->next;
 	}
 
-	return cursor->sprite;
+	if(cursor == NULL){
+		return NULL;
+	}
+
+	return cursor->texture;
 }

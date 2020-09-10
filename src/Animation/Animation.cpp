@@ -33,18 +33,19 @@ Animation::~Animation(){
  * @param y_offset The Y offset of the new sprite
  */
 void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
-	//Getting the sprite
-	sf::Sprite* sprite;
-	if((sprite = sprite_hash->get(sprite_path)) == NULL){
-		sf::Texture* texture = new sf::Texture();
+	//Getting the texture
+	sf::Texture* texture;
+	if((texture = texture_hash->get(sprite_path)) == NULL){
+		texture = new sf::Texture();
 		if(!texture->loadFromFile(sprite_path)){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
-		sprite = new sf::Sprite(*texture);
 
-		sprite_hash->add(sprite_path, sprite);
+		texture_hash->add(sprite_path, texture);
 	}
+	sf::Sprite* sprite;
+	sprite = new sf::Sprite(*texture);
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
@@ -56,6 +57,7 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	else{
 		this->sequence_end->next = new SpriteLst;
 		this->sequence_end = this->sequence_end->next;
+		this->sequence_end->next = this->sequence_start;
 	}
 	//Regardless
 	this->sequence_end->sprite = sprite;
