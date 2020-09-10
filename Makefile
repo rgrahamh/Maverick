@@ -3,7 +3,7 @@ CC=g++
 CFLAGS= -Wall -g -std=c++11
 
 ABILITY= ./src/Ability/Ability.cpp
-ANIMATION= ./src/Animation/Animation.cpp ./src/Animation/SpriteHash/SpriteHash.cpp
+ANIMATION= ./src/Animation/Animation.cpp ./src/Animation/TextureHash/TextureHash.cpp
 CAMERA= ./src/Camera/Camera.cpp
 ENGINE= ./src/Engine/Engine.cpp
 OBJECT= ./src/Object/Object.cpp ./src/Object/Character/Character.cpp ./src/Object/Character/Player/Player.cpp ./src/Object/Character/Race/Race.cpp ./src/Object/Character/Style/Style.cpp

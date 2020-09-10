@@ -29,29 +29,43 @@ void Player::action(sf::Event event){
     if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Up){
             this->keys.up_arrow = 1;
-            if(!(this->keys.left_arrow || this->keys.right_arrow)){
+            //Both on or both off
+            if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
                 this->setAnimation(UP_WALK);
             }
         }
-        if(event.key.code == sf::Keyboard::Down){
+        else if(event.key.code == sf::Keyboard::Down){
             this->keys.down_arrow = 1;
-            if(!(this->keys.left_arrow || this->keys.right_arrow)){
+            //Both on or both off
+            if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
                 this->setAnimation(DOWN_WALK);
             }
         }
-        if(event.key.code == sf::Keyboard::Left){
+        else if(event.key.code == sf::Keyboard::Left){
             this->keys.left_arrow = 1;
-            if(keys.right_arrow){
+            if(keys.right_arrow && !(keys.up_arrow || keys.down_arrow)){
                 this->setAnimation(RIGHT_NEUTRAL);
+            }
+            else if (keys.right_arrow && keys.down_arrow){
+                this->setAnimation(DOWN_WALK);
+            }
+            else if (keys.right_arrow && keys.up_arrow){
+                this->setAnimation(UP_WALK);
             }
             else{
                 this->setAnimation(LEFT_WALK);
             }
         }
-        if(event.key.code == sf::Keyboard::Right){
+        else if(event.key.code == sf::Keyboard::Right){
             this->keys.right_arrow = 1;
-            if(keys.left_arrow){
+            if(keys.left_arrow && !(keys.up_arrow || keys.down_arrow)){
                 this->setAnimation(LEFT_NEUTRAL);
+            }
+            else if (keys.left_arrow && keys.down_arrow){
+                this->setAnimation(DOWN_WALK);
+            }
+            else if (keys.left_arrow && keys.up_arrow){
+                this->setAnimation(UP_WALK);
             }
             else{
                 this->setAnimation(RIGHT_WALK);
@@ -59,11 +73,11 @@ void Player::action(sf::Event event){
         }
     }
 
-    if(event.type == sf::Event::KeyReleased){
+    else if(event.type == sf::Event::KeyReleased){
         if(event.key.code == sf::Keyboard::Up){
             this->keys.up_arrow = 0;
-            //If down and nothing else or down and everything else
 
+            //If down and nothing else or down and everything else
             if((this->keys.down_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
                 this->setAnimation(DOWN_WALK);
             }
@@ -85,7 +99,7 @@ void Player::action(sf::Event event){
             }
         }
 
-        if(event.key.code == sf::Keyboard::Down){
+        else if(event.key.code == sf::Keyboard::Down){
             this->keys.down_arrow = 0;
 
             //If up and nothing else or up and everything else
@@ -109,7 +123,8 @@ void Player::action(sf::Event event){
                 this->setAnimation(DOWN_NEUTRAL);
             }
         }
-        if(event.key.code == sf::Keyboard::Left){
+
+        else if(event.key.code == sf::Keyboard::Left){
             this->keys.left_arrow = 0;
 
             //If right and nothing else or right and everything else
@@ -133,7 +148,8 @@ void Player::action(sf::Event event){
                 this->setAnimation(LEFT_NEUTRAL);
             }
         }
-        if(event.key.code == sf::Keyboard::Right){
+
+        else if(event.key.code == sf::Keyboard::Right){
             this->keys.right_arrow = 0;
 
             //If left and nothing else or left and everything else

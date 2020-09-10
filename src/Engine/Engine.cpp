@@ -72,6 +72,8 @@ void Engine::start(){
     player->addSprite(7, "./assets/sprites/old_game_resources/Right_Neutral.png", 16, 0, 0);
     player->addSprite(7, "./assets/sprites/old_game_resources/Right_Right_Foot.png", 16, 0, 0);
 
+    player->setAnimation(7);
+
     //Set player scale
     player->setScale(0.8, 0.8);
 

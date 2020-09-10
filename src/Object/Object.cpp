@@ -86,8 +86,10 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
  * @param animation_num The animation number
  */
 void Object::setAnimation(unsigned int animation_num){
-    this->active_animation = animation_num;
-    this->animations[active_animation]->start();
+    if(this->active_animation != animation_num){
+        this->active_animation = animation_num;
+        this->animations[active_animation]->start();
+    }
 }
 
 /** Sets the scale for a single animation
