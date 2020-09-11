@@ -36,6 +36,10 @@ class Object{
 		float x;
 		float y;
 
+		//Previous position (used for rollback)
+		float old_x;
+		float old_y;
+
 		//Velocity
 		float xV;
 		float yV;

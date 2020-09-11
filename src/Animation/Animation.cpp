@@ -18,7 +18,7 @@ Animation::Animation(float* x_base, float* y_base, bool animated = true){
 /** Animation destructor
  */
 Animation::~Animation(){
-	SpriteLst* tmp;
+	AnimationSeq* tmp;
 	while(sequence_start != NULL){
 		tmp = sequence_start->next;
 		free(sequence_start);
@@ -32,7 +32,7 @@ Animation::~Animation(){
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
+void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset, HitboxLst* hitboxes = NULL){
 	//Getting the texture
 	sf::Texture* texture;
 	if((texture = texture_hash->get(sprite_path)) == NULL){
@@ -49,18 +49,19 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
-		this->sequence_end = new SpriteLst;
+		this->sequence_end = new AnimationSeq;
 		this->sequence_start = this->sequence_end;
 		this->sequence = this->sequence_end;
 	}
 	//Any additional frames
 	else{
-		this->sequence_end->next = new SpriteLst;
+		this->sequence_end->next = new AnimationSeq;
 		this->sequence_end = this->sequence_end->next;
 		this->sequence_end->next = this->sequence_start;
 	}
 	//Regardless
 	this->sequence_end->sprite = sprite;
+	this->sequence_end->hitboxes = hitboxes;
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->x_offset = x_offset;
 	this->sequence_end->y_offset = y_offset;
@@ -74,9 +75,10 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
  * @param y_scale the Y scale factor
  */
 void Animation::setScale(float x_scale, float y_scale){
-	SpriteLst* cursor = sequence_start;
+	AnimationSeq* cursor = sequence_start;
 	do{
 		cursor->sprite->setScale(x_scale, y_scale);
+		cursor->hitboxes->hitbox->setScale(x_scale, y_scale);
 		cursor = cursor->next;
 	} while(cursor != sequence_end);
 }

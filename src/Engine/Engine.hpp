@@ -7,6 +7,8 @@
 #include "../Object/Character/Character.hpp"
 #include "../Object/Character/Player/Player.hpp"
 
+#include "../Factory/Factory.hpp"
+
 enum GAME_STATE{
 	TITLE,
 	OVERWORLD,

@@ -10,6 +10,8 @@
 Object::Object(float start_x, float start_y, float friction, unsigned int draw_layer, unsigned int animation_num){
     this->x = start_x;
     this->y = start_y;
+    this->old_x = start_x;
+    this->old_y = start_y;
     this->friction = friction;
     this->draw_layer = draw_layer;
     this->active_animation = 0;
