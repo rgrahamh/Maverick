@@ -50,7 +50,7 @@ void Engine::start(){
     Zone* zone = new Zone("Zone 1");
 
     //Create the player
-    Player* player = buildPlayer();
+    Player* player = buildPlayer(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1);
 
     zone->addObject(player);
     this->addZone(zone);

@@ -2,7 +2,11 @@
 #define OBJECT_H
 
 #include "../Animation/Animation.hpp"
-#include "./Hitbox/Hitbox.hpp"
+#include "../Animation/Hitbox/Hitbox.hpp"
+#include "../Animation/Hitbox/HitRect/HitRect.hpp"
+#include "../Animation/Hitbox/HitEllipse/HitEllipse.hpp"
+#include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
+#include "../Animation/Hitbox/HitboxCollision.hpp"
 
 class Object{
 	public:
@@ -15,6 +19,8 @@ class Object{
 		unsigned int getDrawLayer();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, int sprite_num = -1);
+		void addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, float angle, float slice_prop, int sprite_num = -1);
 
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
@@ -54,9 +60,6 @@ class Object{
 		unsigned int draw_layer;
 		unsigned int active_animation;
 		unsigned int animation_num;
-
-		//Hitboxes
-		Hitbox** hitboxes;
 
 		//Animation
 		Animation** animations;

@@ -3,26 +3,33 @@
 
 enum HITBOX_TYPE{
     RECT,
-    CIRCLE,
+    ELLIPSE,
     CONE
 };
 
 class Hitbox{
     public:
-        Hitbox(float x_offset, float y_offset);
+        Hitbox(float* x_base, float* y_base, float x_offset, float y_offset);
         ~Hitbox();
 
         float getX();
         float getY();
+        HITBOX_TYPE getType();
+
+        virtual bool isPointInside(float x_coord, float y_coord);
 
         virtual void setScale(float x_scale, float y_scale);
         
     protected:
-        float base_x_offset;
-        float base_y_offset;
+		//Pointers to the X and Y base coords
+		float* x_base;
+		float* y_base;
 
-        float curr_x_offset;
-        float curr_y_offset;
+        float x_base_offset;
+        float y_base_offset;
+
+        float x_curr_offset;
+        float y_curr_offset;
 
         HITBOX_TYPE type;
 };
@@ -31,5 +38,4 @@ typedef struct HitboxList{
     Hitbox* hitbox;
     struct HitboxList* next;
 } HitboxLst;
-
 #endif

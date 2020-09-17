@@ -5,7 +5,7 @@
  * @param y_base A pointer to the int of the base object's Y location
  * @param animated If the animation progresses
  */
-Animation::Animation(float* x_base, float* y_base, bool animated = true){
+Animation::Animation(float* x_base, float* y_base, bool animated){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -32,7 +32,7 @@ Animation::~Animation(){
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset, HitboxLst* hitboxes = NULL){
+void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
 	//Getting the texture
 	sf::Texture* texture;
 	if((texture = texture_hash->get(sprite_path)) == NULL){
@@ -61,13 +61,44 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	}
 	//Regardless
 	this->sequence_end->sprite = sprite;
-	this->sequence_end->hitboxes = hitboxes;
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->x_offset = x_offset;
 	this->sequence_end->y_offset = y_offset;
 
 	//Set up the circular link
 	this->sequence_end->next = this->sequence_start;
+}
+
+/** Adds a new hitbox to an animation (with an optional sprite number)
+ * @param hitbox The hitbox to add
+ * @param sprite_num The sprite number (default -1 adds to the last sprite)
+ */
+void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
+	if(sprite_num == -1){
+		HitboxLst* new_hitbox = new HitboxLst();
+		new_hitbox->hitbox = hitbox;
+		new_hitbox->next = NULL;
+		if(this->sequence_end != NULL){
+			if(sequence_end->hitboxes == NULL){
+				this->sequence_end->hitboxes = new_hitbox;
+			}
+			else{
+				this->sequence_end->hitboxes->next = new_hitbox;
+			}
+		}
+	}
+	else{
+		HitboxLst* cursor = this->sequence_start->hitboxes;
+		for(int i = 0; i < sprite_num && cursor != NULL; i++){
+			cursor = cursor->next;
+		}
+		if(cursor != NULL){
+			HitboxLst* new_hitbox = new HitboxLst();
+			new_hitbox->hitbox = hitbox;
+			new_hitbox->next = NULL;
+			cursor->next = new_hitbox;
+		}
+	}
 }
 
 /** Sets the scale of the animation

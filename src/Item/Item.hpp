@@ -1,5 +1,5 @@
-#ifndef CHARAC_H
-#define CHARAC_H
+#ifndef ITEM_H
+#define ITEM_H
 
 class Item{
 	public:

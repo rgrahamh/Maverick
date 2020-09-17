@@ -23,12 +23,13 @@ extern TextureHash* texture_hash;
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, bool animated);
+		Animation(float* x_base, float* y_base, bool animated = true);
 		~Animation();
 
 		void advance();
 		void start();
-		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset, HitboxLst* hitboxes);
+		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void addHitbox(Hitbox* hitbox, int hitbox_num = -1);
 		void setScale(float x_scale, float y_scale);
 		sf::Sprite* getSprite();
 		void draw(sf::RenderWindow* window);

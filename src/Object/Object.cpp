@@ -84,6 +84,46 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
     this->animations[animation_num]->addFrame(sprite_path, keyframe, x_offset, y_offset);
 }
 
+/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (by default)
+ * @param animation_num The animation number
+ * @param type The hitbox type
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param sprite_num The sprite number that is being used
+ */
+void Object::addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, int sprite_num){
+    Hitbox* hitbox;
+    switch(type){
+        case RECT:
+            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element);
+            break;
+        case ELLIPSE:
+            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element);
+            break;
+    }
+
+    this->animations[this->animation_num]->addHitbox(hitbox, sprite_num);
+}
+
+/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (by default)
+ * @param animation_num The animation number
+ * @param type The hitbox type
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param slice_prop The slice angle
+ * @param slice_prop The slice proportion for the hitbox
+ * @param sprite_num The sprite number that is being used
+ * @param 
+ */
+void Object::addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, float angle, float slice_prop, int sprite_num){
+    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop);
+    this->animations[this->animation_num]->addHitbox(hitbox, sprite_num);
+}
+
 /** Sets the animation number
  * @param animation_num The animation number
  */
