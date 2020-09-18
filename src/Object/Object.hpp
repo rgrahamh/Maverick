@@ -17,6 +17,7 @@ class Object{
 		float getWidth();
 		float getHeight();
 		unsigned int getDrawLayer();
+		HitboxLst* getHitboxes();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 		void addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, int sprite_num = -1);
@@ -35,6 +36,8 @@ class Object{
 		virtual void action(sf::Event event);
 
 		virtual void draw(sf::RenderWindow* window);
+
+		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
 		
 	protected:

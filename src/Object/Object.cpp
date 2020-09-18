@@ -73,6 +73,10 @@ unsigned int Object::getDrawLayer(){
     return this->draw_layer;
 }
 
+HitboxLst* Object::getHitboxes(){
+    return this->animations[this->animation_num]->getHitboxes();
+}
+
 /** Adds a sprite to a given animation
  * @param animation_num The animation number
  * @param sprite_path The filepath to the sprite you're adding
@@ -176,4 +180,8 @@ void Object::process(){
 
 void Object::draw(sf::RenderWindow* window){
     this->animations[active_animation]->draw(window);
+}
+
+void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
+    return;
 }

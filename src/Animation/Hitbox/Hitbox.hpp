@@ -16,9 +16,10 @@ class Hitbox{
         float getY();
         HITBOX_TYPE getType();
 
-        virtual bool isPointInside(float x_coord, float y_coord);
-
         virtual void setScale(float x_scale, float y_scale);
+
+        virtual bool isPointInside(float x_coord, float y_coord);
+        virtual bool checkCollision(Hitbox* other);
         
     protected:
 		//Pointers to the X and Y base coords

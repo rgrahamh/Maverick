@@ -96,15 +96,126 @@ void Engine::actionStep(ObjectLst* all_objects){
 }
 
 void Engine::physicsStep(ObjectLst* all_objects){
-    ObjectLst* cursor = all_objects;
-    while(cursor != NULL){
-        cursor->obj->_process();
-        cursor = cursor->next;
+    while(all_objects != NULL){
+        all_objects->obj->_process();
+        all_objects = all_objects->next;
     }
 }
 
 void Engine::collisionStep(ObjectLst* all_objects){
-    return;
+    //Sister arrays for the list matricies
+    ObjectLst* object_matrix[16][9] = {NULL};
+    HitboxLst* hitbox_matrix[16][9] = {NULL};
+
+    //While we're not out of objects
+    while(all_objects != NULL){
+        Object* curr_object = all_objects->obj;
+        HitboxLst* object_hitboxes = all_objects->obj->getHitboxes();
+        //While we're not out of object hitboxes
+        while(object_hitboxes != NULL){
+            float top_bound, bot_bound, left_bound, right_bound;
+            Hitbox* curr_hitbox = object_hitboxes->hitbox;
+
+            //Set up the bounds
+            switch(curr_hitbox->getType()){
+                case RECT:{
+                        HitRect* rect_hitbox = (HitRect*)curr_hitbox;
+
+                        top_bound = rect_hitbox->getY();
+                        bot_bound = rect_hitbox->getY() + rect_hitbox->getHeight();
+                        left_bound = rect_hitbox->getX();
+                        right_bound = rect_hitbox->getX() + rect_hitbox->getWidth();
+                    }
+                    break;
+
+                case ELLIPSE:{
+                        HitEllipse* ellipse_hitbox = (HitEllipse*)curr_hitbox;
+
+                        top_bound = ellipse_hitbox->getY() - ellipse_hitbox->getYRadius();
+                        bot_bound = ellipse_hitbox->getY() + ellipse_hitbox->getYRadius();
+                        left_bound = ellipse_hitbox->getX() - ellipse_hitbox->getXRadius();
+                        bot_bound = ellipse_hitbox->getX() + ellipse_hitbox->getXRadius();
+                    }
+                    break;
+
+                case CONE:{
+                        HitCone* cone_hitbox = (HitCone*)curr_hitbox;
+
+                        top_bound = cone_hitbox->getY() - cone_hitbox->getYRadius();
+                        bot_bound = cone_hitbox->getY() + cone_hitbox->getYRadius();
+                        left_bound = cone_hitbox->getX() - cone_hitbox->getXRadius();
+                        bot_bound = cone_hitbox->getX() + cone_hitbox->getXRadius();
+                    }
+                    break;
+            }
+            
+            int win_width = sf::VideoMode::getDesktopMode().width;
+            int win_height = sf::VideoMode::getDesktopMode().height;
+            int x_iter = win_width / 16;
+            int y_iter = win_height / 9;
+            int j = 0;
+            //Set up the object & hitbox matricies
+            //Go by height as the outer loop since it eliminates the most
+            for(int box_y = 0; box_y < win_height; box_y += y_iter){
+                //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
+                if(!(top_bound > box_y + win_height || bot_bound < box_y)){
+                    int i = 0;
+                    for(int box_x = 0; box_x < win_width; box_x += x_iter){
+                        //If the left bound is greater than box_x or the right bound is less than box_x, go to next
+                        if(!(left_bound > box_x + win_width || right_bound < box_x)){
+                            //Insert the object in the list
+                            ObjectLst* new_objectlst = new ObjectLst;
+                            new_objectlst->next = object_matrix[i][j];
+                            new_objectlst->obj = curr_object;
+                            object_matrix[i][j] = new_objectlst;
+
+                            //Insert the hitbox in the list
+                            HitboxLst* new_hitboxlst = new HitboxLst;
+                            new_hitboxlst->next = hitbox_matrix[i][j];
+                            new_hitboxlst->hitbox = curr_hitbox;
+                            hitbox_matrix[i][j] = new_hitboxlst;
+                        }
+                        i++;
+                    }
+                }
+                j++;
+            }
+            object_hitboxes = object_hitboxes->next;
+        }
+        all_objects = all_objects->next;
+    }
+
+    //For each vertical slice
+    for(int i = 0; i < 16; i++){
+        //For each horizontal slice
+        for(int j = 0; j < 9; j++){
+            //Iterate over every item in the list
+            ObjectLst* object_lst = object_matrix[i][j];
+            HitboxLst* hitbox_lst = hitbox_matrix[i][j];
+            while(hitbox_lst != NULL){
+                //Iterate over every item after the hitbox_lst
+                ObjectLst* object_cursor = object_lst->next;
+                HitboxLst* hitbox_cursor = hitbox_lst->next;
+                while(hitbox_cursor != NULL){
+                    if(hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
+                        object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
+                        object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
+                    }
+                    object_cursor = object_cursor->next;
+                    hitbox_cursor = hitbox_cursor->next;
+                }
+
+                //Linked list cleanup
+                ObjectLst* tmp_object = object_lst;
+                object_lst = object_lst->next;
+                delete tmp_object;
+
+                HitboxLst* tmp_hitbox = hitbox_lst;
+                hitbox_lst = hitbox_lst->next;
+                delete tmp_hitbox;
+            }
+        }
+    }
 }
 
 /** The draw step of the game engine

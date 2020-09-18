@@ -31,3 +31,7 @@ void Hitbox::setScale(float x_scale, float y_scale){
 bool Hitbox::isPointInside(float x_coord, float y_coord){
 	return false;
 }
+
+bool Hitbox::checkCollision(Hitbox* other){
+	return false;
+}

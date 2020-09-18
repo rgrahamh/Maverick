@@ -136,6 +136,10 @@ sf::Sprite* Animation::getSprite(){
 	return this->sequence->sprite;
 }
 
+HitboxLst* Animation::getHitboxes(){
+	return this->sequence->hitboxes;
+}
+
 void Animation::draw(sf::RenderWindow* window){
 	//Advance the animation
 	this->advance();
