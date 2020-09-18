@@ -51,9 +51,10 @@ Player* buildPlayer(float start_x, float start_y, float friction, RACE race, STY
 Object* buildPillar(float start_x, float start_y, int draw_layer){
     Object* pillar = new Object(start_x, start_y, 1, 1, 1);
 
-    pillar->addSprite(0, "./assets/sprites/environment/Pillar.png", 0, 0, 0);
+    pillar->addSprite(0, "./assets/sprites/environment/pillar.png", 0, 0, 0);
     pillar->addHitbox(0, ELLIPSE, 16, 98, 8, 8);
 
+    pillar->setAnimation(0);
 
     return pillar;
 }

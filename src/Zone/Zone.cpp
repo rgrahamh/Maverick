@@ -26,7 +26,7 @@ char* Zone::getName(){
 }
 
 void Zone::addObject(Object* object){
-    if(this->objects->obj != NULL){
+    if(this->objects->obj == NULL){
         this->objects->obj = object;
     }
     else{

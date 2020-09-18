@@ -51,8 +51,12 @@ void Engine::start(){
 
     //Create the player
     Player* player = buildPlayer(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1);
-
     zone->addObject(player);
+
+    //Create a pillar
+    Object* pillar_1 = buildPillar(800.0, 700.0, 1);
+    zone->addObject(pillar_1);
+
     this->addZone(zone);
     this->activateZone(zone->getName());
 
@@ -121,10 +125,11 @@ ObjectLst* Engine::buildFullObjLst(){
     ZoneLst* zone_iter = this->active_zones;
     while(zone_iter != NULL){
         ObjectLst* new_objects = zone_iter->zone->getObjects();
-        while(new_objects->next != NULL){
+        while(new_objects != NULL){
             if(first_run != true){
                 obj_iter->next = new ObjectLst;
                 obj_iter = obj_iter->next;
+                obj_iter->next = NULL;
             }
             obj_iter->obj = new_objects->obj;
             new_objects = new_objects->next;
