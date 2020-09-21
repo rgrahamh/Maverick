@@ -3,6 +3,7 @@
 
 #include "./TextureHash/TextureHash.hpp"
 #include "./Hitbox/Hitbox.hpp"
+#include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
@@ -32,11 +33,14 @@ class Animation{
 		sf::Sprite* getSprite();
 		HitboxLst* getHitboxes();
 
+		void setScale(float x_scale, float y_scale);
+
 		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 		void addHitbox(Hitbox* hitbox, int hitbox_num = -1);
 
-		void setScale(float x_scale, float y_scale);
 		void draw(sf::RenderWindow* window);
+
+		void rotate(int direction, float rotation_amnt);
 
 	private:
 		//The image sequence and start of image sequence

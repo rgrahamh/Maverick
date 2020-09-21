@@ -24,14 +24,6 @@ Object::Object(float start_x, float start_y, float friction, unsigned int draw_l
 /** Destructor for objects
  */
 Object::~Object(){
-    /*int hitbox_num = sizeof(this->hitboxes)/sizeof(Hitbox*);
-    for(int i = 0; i < hitbox_num; i++){
-        if(hitboxes[i] != NULL){
-            free(hitboxes[i]);
-        }
-    }
-    free(hitboxes);*/
-
     for(int i = 0; i < animation_num; i++){
         delete animations[i];
     }
@@ -73,6 +65,9 @@ unsigned int Object::getDrawLayer(){
     return this->draw_layer;
 }
 
+/** Gets the hitboxes of the current animation state
+ * @return The HitboxLst containing the object's current hitboxes
+ */
 HitboxLst* Object::getHitboxes(){
     return this->animations[this->animation_num]->getHitboxes();
 }
@@ -157,11 +152,22 @@ void Object::setScale(float x_scale, float y_scale){
     }
 }
 
-void Object::action(sf::Event){
-
+/** Calculates any actions taken; should be overridden by children if used
+ * @param event The event being interpreted
+ */
+void Object::action(sf::Event event){
+    return;
 }
 
+/** Called during the process step; performs object processing calculations
+ */
 void Object::_process(){
+    this->process();
+
+    //Updating old X & Y values
+    this->old_x = this->x;
+    this->old_y = this->y;
+
     //Updating X values
     this->xV = this->xA + (this->xV * (1 - this->friction));
     this->x += this->xV;
@@ -171,17 +177,25 @@ void Object::_process(){
     this->yV = this->yA + (this->yV * (1 - this->friction));
     this->y += this->yV;
     this->yV = 0;
-
-    this->process();
 }
 
+/** Called during the process step by _process; space for users to override with custom processing logics
+ */
 void Object::process(){
 }
 
+/** Called during the draw step
+ * @param window The window that content is being drawn to
+ */
 void Object::draw(sf::RenderWindow* window){
     this->animations[active_animation]->draw(window);
 }
 
+/** Called on object collision; should be overridden by children if you want collision logic.
+ * @param other The other object
+ * @param this_hitbox The hitbox that collided from this object
+ * @param other_hitbox The hitbox that collided from the other object
+ */
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
     return;
 }

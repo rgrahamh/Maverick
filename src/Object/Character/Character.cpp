@@ -34,3 +34,7 @@ void Character::action(sf::Event event){}
 void Character::process(){}
 
 void Character::draw(){}
+
+void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
+	printf("Collided!\n");
+}

@@ -18,12 +18,33 @@ Animation::Animation(float* x_base, float* y_base, bool animated){
 /** Animation destructor
  */
 Animation::~Animation(){
-	AnimationSeq* tmp;
 	while(sequence_start != NULL){
-		tmp = sequence_start->next;
-		free(sequence_start);
-		sequence_start = tmp;
+		HitboxLst* hitboxes = sequence_start->hitboxes;
+		while(hitboxes != NULL){
+			delete hitboxes->hitbox;
+
+			HitboxLst* tmp = hitboxes;
+			hitboxes = hitboxes->next;
+			delete hitboxes;
+		}
+
+		AnimationSeq* tmp;
+		tmp = sequence_start;
+		sequence_start = sequence_start->next;
+		free(tmp);
 	}
+}
+
+/** Gets the current sprite
+ */
+sf::Sprite* Animation::getSprite(){
+	return this->sequence->sprite;
+}
+
+/** Gets the current hitboxes
+ */
+HitboxLst* Animation::getHitboxes(){
+	return this->sequence->hitboxes;
 }
 
 /** Adds a frame to an animation
@@ -130,16 +151,9 @@ void Animation::start(){
 	frame_counter = 0;
 }
 
-/** Gets the current sprite
+/** Called for the animation's draw step
+ * @param window The current window that is being drawn to
  */
-sf::Sprite* Animation::getSprite(){
-	return this->sequence->sprite;
-}
-
-HitboxLst* Animation::getHitboxes(){
-	return this->sequence->hitboxes;
-}
-
 void Animation::draw(sf::RenderWindow* window){
 	//Advance the animation
 	this->advance();
@@ -150,4 +164,24 @@ void Animation::draw(sf::RenderWindow* window){
 
 	//Draw the sprite
 	window->draw(*curr_sprite);
+}
+
+/** Rotates the hitbox slightly to the right (if direction is 0) or left (if direction is 1)
+ * @param direction The direction that things are being rotated to
+ * @param rotate_dist The distance you should rotate
+ */
+void Animation::rotate(int direction, float rotate_amnt){
+	AnimationSeq* animations = sequence_start;
+	while(animations != NULL){
+		animations->sprite->rotate(rotate_amnt * ((direction)? -1 : 1));
+
+		HitboxLst* hitboxes = animations->hitboxes;
+		while(hitboxes != NULL){
+			Hitbox* hitbox = hitboxes->hitbox;
+			if(hitbox->getType() == CONE){
+				((HitCone*)hitbox)->rotate(direction, rotate_amnt);
+				hitboxes = hitboxes->next;
+			}
+		}
+	}
 }

@@ -91,6 +91,8 @@ class Character : public Object, public Race, public Style{
 		virtual void process();
 		virtual void draw();
 
+		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
+
 	protected:
 		bool overdrive;
 		Stats* stats;

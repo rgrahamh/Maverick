@@ -10,7 +10,7 @@ enum HITBOX_TYPE{
 class Hitbox{
     public:
         Hitbox(float* x_base, float* y_base, float x_offset, float y_offset);
-        ~Hitbox();
+        virtual ~Hitbox();
 
         float getX();
         float getY();
