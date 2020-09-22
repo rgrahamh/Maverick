@@ -24,7 +24,7 @@ extern TextureHash* texture_hash;
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, bool animated = true);
+		Animation(float* x_base, float* y_base, unsigned char draw_layer = 1, bool animated = true);
 		~Animation();
 
 		void advance();
@@ -32,6 +32,7 @@ class Animation{
 
 		sf::Sprite* getSprite();
 		HitboxLst* getHitboxes();
+		unsigned char getDrawLayer();
 
 		void setScale(float x_scale, float y_scale);
 
@@ -50,6 +51,9 @@ class Animation{
 
 		//The active animation
 		unsigned int active_animation;
+
+		//The draw layer
+		unsigned int draw_layer;
 
 		//Pointers to the X and Y base coords
 		float* x_base;

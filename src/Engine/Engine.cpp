@@ -50,11 +50,11 @@ void Engine::start(){
     Zone* zone = new Zone("Zone 1");
 
     //Create the player
-    Player* player = buildPlayer(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL, 1);
+    Player* player = buildPlayer(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL);
     zone->addObject(player);
 
     //Create a pillar
-    Object* pillar_1 = buildPillar(800.0, 700.0, 1);
+    Object* pillar_1 = buildPillar(800.0, 700.0);
     zone->addObject(pillar_1);
 
     this->addZone(zone);
@@ -117,7 +117,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
             Hitbox* curr_hitbox = object_hitboxes->hitbox;
 
             //Set up the bounds
-            switch(curr_hitbox->getType()){
+            switch(curr_hitbox->getShape()){
                 case RECT:{
                         HitRect* rect_hitbox = (HitRect*)curr_hitbox;
 
@@ -197,7 +197,8 @@ void Engine::collisionStep(ObjectLst* all_objects){
                 ObjectLst* object_cursor = object_lst->next;
                 HitboxLst* hitbox_cursor = hitbox_lst->next;
                 while(hitbox_cursor != NULL){
-                    if(hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
+                    //If both aren't environment and they collide
+                    if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
                         object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
                         object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
                     }
@@ -259,7 +260,7 @@ void Engine::freeFullObjLst(ObjectLst* all_objects){
     ObjectLst* free_objects;
     while(all_objects != NULL){
         free_objects = all_objects->next;
-        free(all_objects);
+        delete all_objects;
         all_objects = free_objects;
     }
 }
@@ -277,7 +278,7 @@ void Engine::addZone(Zone* zone){
 /** Moves a Zone to the active_zones ZoneLst
  * @param zone_name The name of the zone you wish to move
  */
-void Engine::activateZone(char* zone_name){
+void Engine::activateZone(const char* zone_name){
     //If it's the first zone
     if(strcmp(this->zones->zone->getName(), zone_name) == 0){
         ZoneLst* moved_zone = this->zones;
@@ -302,23 +303,25 @@ void Engine::activateZone(char* zone_name){
 /** Moves a zone from active_zone to zones
  * @param zone_name The name of the zone you wish to deactivate
  */
-void Engine::deactivateZone(char* zone_name){
+void Engine::deactivateZone(const char* zone_name){
     //If it's the first zone
-    if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
-        ZoneLst* moved_zone = this->active_zones;
-        active_zones = this->active_zones->next;
-        moved_zone->next = this->zones;
-        this->zones = moved_zone;
-    }
-    else{
-        //If it's anything after the first zone
-        ZoneLst* zone_lst = this->active_zones;
-        while(zone_lst->next != NULL){
-            if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
-                ZoneLst* moved_zone = zone_lst->next;
-                zone_lst->next = moved_zone->next;
-                moved_zone->next = this->zones;
-                this->zones = moved_zone;
+    if(zone_name != NULL){
+        if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
+            ZoneLst* moved_zone = this->active_zones;
+            active_zones = this->active_zones->next;
+            moved_zone->next = this->zones;
+            this->zones = moved_zone;
+        }
+        else{
+            //If it's anything after the first zone
+            ZoneLst* zone_lst = this->active_zones;
+            while(zone_lst->next != NULL){
+                if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
+                    ZoneLst* moved_zone = zone_lst->next;
+                    zone_lst->next = moved_zone->next;
+                    moved_zone->next = this->zones;
+                    this->zones = moved_zone;
+                }
             }
         }
     }

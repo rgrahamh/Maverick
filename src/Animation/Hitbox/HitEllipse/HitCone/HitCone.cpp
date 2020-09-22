@@ -9,12 +9,13 @@
  * @param y_radius The Y radius component of the cone
  * @param angle The angle in the ellipse that the start of the cone is at
  * @param slice_prop The proportion of the circle
+ * @param type Some HITBOX_TYPE vals or'd together
  */
-HitCone::HitCone(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, float angle, float slice_prop)
-	:HitEllipse(x_base, y_base, x_offset, y_offset, x_radius, y_radius){
+HitCone::HitCone(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, float angle, float slice_prop, unsigned int type)
+	:HitEllipse(x_base, y_base, x_offset, y_offset, x_radius, y_radius, type){
 	this->angle = angle;
 	this->slice_prop = slice_prop;
-	this->type = CONE;
+	this->shape = CONE;
 }
 
 /** HitCone destructor
@@ -44,8 +45,25 @@ float HitCone::getProp(){
 
 /** Checks collision between this and the other specified hitbox
  * @param other The other hibox
+ * @return True if the hitbox is colliding with the other, false otherwise
  */
 bool HitCone::checkCollision(Hitbox* other){
+	switch (other->getShape()){
+		case RECT:{
+			return collisionRectCone((HitRect*)other, this);
+		}
+		break;
+
+		case ELLIPSE:{
+			return collisionEllipseCone((HitEllipse*)other, this);
+		}
+		break;
+
+		case CONE:{
+			return collisionConeCone((HitCone*)other, this);
+		}
+		break;
+	}
 	return false;
 }
 

@@ -1,7 +1,7 @@
 #include "./Character.hpp"
 
-Character::Character(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int draw_layer = 1, unsigned animation_num = 1)
-	: Object(start_x, start_y, friction, draw_layer, animation_num),
+Character::Character(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned animation_num)
+	: Object(start_x, start_y, friction, animation_num),
 	Race(race),
 	Style(style){
 	//Setting the struct pointers; these are the non-optional params
@@ -18,15 +18,15 @@ Character::Character(float start_x, float start_y, float friction, RACE race, ST
 	if(equipment != NULL){
 		this->equipment = equipment;
 	}else{
-		this->equipment = (Equipment*)calloc(sizeof(Equipment), 1);
+		this->equipment = new Equipment();
 	}
 
 	this->overdrive=false;
 }
 
 Character::~Character(){
-	free(inventory);
-	free(equipment);
+	free(this->inventory);
+	delete this->equipment;
 }
 
 void Character::action(sf::Event event){}

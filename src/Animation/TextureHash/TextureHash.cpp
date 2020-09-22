@@ -15,8 +15,8 @@ TextureHash::TextureHash(unsigned int size){
  */
 TextureHash::~TextureHash(){
 	for(int i = 0; i < this->size; i++){
-		if(table[i] != NULL){
-			THEntry* cursor = table[i];
+		if(this->table[i] != NULL){
+			THEntry* cursor = this->table[i];
 			while(cursor != NULL){
 				THEntry* tmp = cursor;
 				cursor = cursor->next;
@@ -34,11 +34,16 @@ TextureHash::~TextureHash(){
  * @return The hash
  */
 unsigned int TextureHash::hash(const char* key){
-	unsigned int hash = 0;
-	for(int i = 0; key[i] != '\0'; i++){
-		hash += key[i];
+	if(this->size == 0){
+		return 0;
 	}
-	return (hash >> sizeof(int)) % this->size;
+	else{
+		unsigned int hash = 0;
+		for(int i = 0; key[i] != '\0'; i++){
+			hash += key[i];
+		}
+		return hash % this->size;
+	}
 }
 
 /** Adds a new entry to the hash table
@@ -51,7 +56,7 @@ void TextureHash::add(const char* key, sf::Texture* texture){
 	//Copying the key for permanent storage
 	unsigned int len = strlen(key);
 	char* perm_key = (char*)malloc(len + 1);
-	strcpy(perm_key, key);
+	strncpy(perm_key, key, len);
 	perm_key[len] = '\0';
 
 	//Storing in the table
@@ -76,7 +81,7 @@ void TextureHash::add(const char* key, sf::Texture* texture){
 sf::Texture* TextureHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	THEntry* cursor = table[hash_val];
+	THEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case
 	while(cursor != NULL && strcmp(cursor->key, key) != 0){

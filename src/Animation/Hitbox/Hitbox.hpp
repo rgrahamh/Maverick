@@ -1,20 +1,31 @@
 #ifndef HITBOX_H
 #define HITBOX_H
 
-enum HITBOX_TYPE{
+//The 
+enum HITBOX_SHAPE{
     RECT,
     ELLIPSE,
     CONE
 };
 
+enum HITBOX_TYPE{
+    ENVIRONMENT = 1,  //Environmental collision (can skip check against other environmental collisions)
+    COLLISION = 2,    //A more general collision hitbox
+    DAMAGEBOX = 4,    //A damaging hitbox
+    HURTBOX = 8,      //A hitbox that you can get damaged
+    PROJECTILE = 16   //A projectile hitbox
+};
+
 class Hitbox{
     public:
-        Hitbox(float* x_base, float* y_base, float x_offset, float y_offset);
+        Hitbox(float* x_base, float* y_base, float x_offset, float y_offset, unsigned int type);
         virtual ~Hitbox();
 
         float getX();
         float getY();
-        HITBOX_TYPE getType();
+
+        HITBOX_SHAPE getShape();
+        unsigned int getType();
 
         virtual void setScale(float x_scale, float y_scale);
 
@@ -32,7 +43,8 @@ class Hitbox{
         float x_curr_offset;
         float y_curr_offset;
 
-        HITBOX_TYPE type;
+        HITBOX_SHAPE shape;
+        unsigned int type;
 };
 
 typedef struct HitboxList{

@@ -6,7 +6,7 @@
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitEllipse/HitEllipse.hpp"
 
-Player* buildPlayer(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int draw_layer);
-Object* buildPillar(float start_x, float start_y, int draw_layer);
+Player* buildPlayer(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory);
+Object* buildPillar(float start_x, float start_y);
 
 #endif

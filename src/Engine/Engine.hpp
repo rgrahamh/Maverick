@@ -45,8 +45,8 @@ class Engine{
 
 		//Zone addition/state handling
 		void addZone(Zone* zone);
-		void activateZone(char* zone_name);
-		void deactivateZone(char* zone_name);
+		void activateZone(const char* zone_name);
+		void deactivateZone(const char* zone_name);
 
 		//Loading a zone from file
 		Zone* loadZone(unsigned char zone_num);

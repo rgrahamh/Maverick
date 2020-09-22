@@ -10,7 +10,7 @@
 
 class Object{
 	public:
-		Object(float start_x, float start_y, float friction, unsigned int draw_layer, unsigned int animation_num);
+		Object(float start_x, float start_y, float friction, unsigned int animation_num, bool animated = true);
 		virtual ~Object();
 		float getX();
 		float getY();
@@ -20,8 +20,8 @@ class Object{
 		HitboxLst* getHitboxes();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
-		void addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, int sprite_num = -1);
-		void addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, float angle, float slice_prop, int sprite_num = -1);
+		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num = -1);
+		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num = -1);
 
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
@@ -37,6 +37,7 @@ class Object{
 
 		virtual void draw(sf::RenderWindow* window);
 
+		void _onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
 		

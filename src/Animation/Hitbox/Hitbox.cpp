@@ -6,13 +6,14 @@
  * @param x_offset The hitbox offset from the base X position
  * @param y_offset The hitbox offset from the base Y position
  */
-Hitbox::Hitbox(float* x_base, float* y_base, float x_offset, float y_offset){
+Hitbox::Hitbox(float* x_base, float* y_base, float x_offset, float y_offset, unsigned int type){
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->x_base_offset = x_offset;
 	this->y_base_offset = y_offset;
 	this->x_curr_offset = x_offset;
 	this->y_curr_offset = y_offset;
+	this->type = type;
 }
 
 /** The hitbox deconstructor
@@ -33,10 +34,17 @@ float Hitbox::getY(){
 	return *this->y_base + this->y_curr_offset;
 }
 
-/** Returns the type of hitbox
- * @return The HITBOX_TYPE that represents the hitbox shape
+/** Returns the shape of hitbox
+ * @return The HITBOX_SHAPE that represents the hitbox shape
  */
-HITBOX_TYPE Hitbox::getType(){
+HITBOX_SHAPE Hitbox::getShape(){
+	return this->shape;
+}
+
+/** Returns the type of the hitbox
+ * @return The HITBOX_TYPE that represents the hitbox type
+ */
+unsigned int Hitbox::getType(){
 	return this->type;
 }
 

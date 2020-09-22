@@ -7,7 +7,7 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(float start_x, float start_y, float friction, unsigned int draw_layer, unsigned int animation_num){
+Object::Object(float start_x, float start_y, float friction, unsigned int animation_num, bool animated){
     this->x = start_x;
     this->y = start_y;
     this->old_x = start_x;
@@ -17,7 +17,7 @@ Object::Object(float start_x, float start_y, float friction, unsigned int draw_l
     this->active_animation = 0;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(int i = 0; i < animation_num; i++){
-        animations[i] = new Animation(&x, &y, true);
+        animations[i] = new Animation(&(this->x), &(this->y), animated);
     }
 }
 
@@ -69,7 +69,7 @@ unsigned int Object::getDrawLayer(){
  * @return The HitboxLst containing the object's current hitboxes
  */
 HitboxLst* Object::getHitboxes(){
-    return this->animations[this->animation_num]->getHitboxes();
+    return this->animations[active_animation]->getHitboxes();
 }
 
 /** Adds a sprite to a given animation
@@ -85,42 +85,43 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (by default)
  * @param animation_num The animation number
- * @param type The hitbox type
+ * @param shape The hitbox shape
  * @param x_offset The X offset of the hitbox
  * @param y_offset The Y offset of the hitbox
  * @param x_element The X width/radius of the hitbox
  * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
  * @param sprite_num The sprite number that is being used
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, int sprite_num){
+void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num){
     Hitbox* hitbox;
-    switch(type){
-        case RECT:
-            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element);
-            break;
-        case ELLIPSE:
-            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element);
-            break;
+    //We should never hit the CONE in this case.
+    if(shape == RECT){
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+    else{
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
     }
 
-    this->animations[this->animation_num]->addHitbox(hitbox, sprite_num);
+    this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
 
-/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (by default)
+/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (by default). Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
  * @param animation_num The animation number
  * @param type The hitbox type
  * @param x_offset The X offset of the hitbox
  * @param y_offset The Y offset of the hitbox
  * @param x_element The X width/radius of the hitbox
  * @param y_element The Y width/radius of the hitbox
- * @param slice_prop The slice angle
+ * @param type The type flags of the hitbox
+ * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  * @param sprite_num The sprite number that is being used
  * @param 
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_TYPE type, float x_offset, float y_offset, float x_element, float y_element, float angle, float slice_prop, int sprite_num){
-    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop);
-    this->animations[this->animation_num]->addHitbox(hitbox, sprite_num);
+void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
+    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+    this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
 
 /** Sets the animation number
@@ -147,7 +148,7 @@ void Object::setScale(unsigned int animation_num, float x_scale, float y_scale){
  * @param y_scale The y scale factor
  */
 void Object::setScale(float x_scale, float y_scale){
-    for(unsigned int i = 0; i < animation_num; i++){
+    for(unsigned int i = 0; i < this->animation_num; i++){
         this->animations[i]->setScale(x_scale, y_scale);
     }
 }
@@ -191,11 +192,44 @@ void Object::draw(sf::RenderWindow* window){
     this->animations[active_animation]->draw(window);
 }
 
+/** Called on object collision; should not be overridden by children. Calls the overriden onCollide stuff.
+ * @param other The other object
+ * @param this_hitbox The hitbox that collided from this object
+ * @param other_hitbox The hitbox that collided from the other object
+ */
+void Object::_onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
+    onCollide(other, this_hitbox, other_hitbox);
+
+    unsigned int our_attr = this_hitbox->getType();
+    unsigned int their_attr = other_hitbox->getType();
+
+    //If we're both collision hitboxes
+    if(our_attr & COLLISION && their_attr & COLLISION){
+        float new_x = this->x;
+        float new_y = this->y;
+
+        this->x = this->old_x;
+
+        if(!this_hitbox->checkCollision(other_hitbox)){
+            return;
+        }
+
+        this->x = new_x;
+        this->y = this->old_y;
+
+        if(!this_hitbox->checkCollision(other_hitbox)){
+            return;
+        }
+
+        this->x = this->old_x;
+    }
+}
+
 /** Called on object collision; should be overridden by children if you want collision logic.
  * @param other The other object
  * @param this_hitbox The hitbox that collided from this object
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-    return;
+	printf("Collided!\n");
 }

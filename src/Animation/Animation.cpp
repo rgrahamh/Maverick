@@ -5,7 +5,7 @@
  * @param y_base A pointer to the int of the base object's Y location
  * @param animated If the animation progresses
  */
-Animation::Animation(float* x_base, float* y_base, bool animated){
+Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer, bool animated){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -13,6 +13,7 @@ Animation::Animation(float* x_base, float* y_base, bool animated){
 	this->y_base = y_base;
 	this->frame_counter = 0;
 	this->animated = animated;
+	this->draw_layer = draw_layer;
 }
 
 /** Animation destructor
@@ -27,6 +28,8 @@ Animation::~Animation(){
 			hitboxes = hitboxes->next;
 			delete hitboxes;
 		}
+
+		delete sequence_start->sprite;
 
 		AnimationSeq* tmp;
 		tmp = sequence_start;
@@ -45,6 +48,10 @@ sf::Sprite* Animation::getSprite(){
  */
 HitboxLst* Animation::getHitboxes(){
 	return this->sequence->hitboxes;
+}
+
+unsigned char Animation::getDrawLayer(){
+	return this->draw_layer;
 }
 
 /** Adds a frame to an animation
@@ -85,6 +92,7 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->x_offset = x_offset;
 	this->sequence_end->y_offset = y_offset;
+	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
 	this->sequence_end->next = this->sequence_start;
@@ -96,11 +104,11 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
  */
 void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 	if(sprite_num == -1){
-		HitboxLst* new_hitbox = new HitboxLst();
+		HitboxLst* new_hitbox = new HitboxLst;
 		new_hitbox->hitbox = hitbox;
 		new_hitbox->next = NULL;
 		if(this->sequence_end != NULL){
-			if(sequence_end->hitboxes == NULL){
+			if(this->sequence_end->hitboxes == NULL){
 				this->sequence_end->hitboxes = new_hitbox;
 			}
 			else{
@@ -114,10 +122,10 @@ void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 			cursor = cursor->next;
 		}
 		if(cursor != NULL){
-			HitboxLst* new_hitbox = new HitboxLst();
+			HitboxLst* new_hitbox = new HitboxLst;
 			new_hitbox->hitbox = hitbox;
-			new_hitbox->next = NULL;
-			cursor->next = new_hitbox;
+			new_hitbox->next = cursor;
+			cursor = new_hitbox;
 		}
 	}
 }
@@ -178,7 +186,7 @@ void Animation::rotate(int direction, float rotate_amnt){
 		HitboxLst* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){
 			Hitbox* hitbox = hitboxes->hitbox;
-			if(hitbox->getType() == CONE){
+			if(hitbox->getShape() == CONE){
 				((HitCone*)hitbox)->rotate(direction, rotate_amnt);
 				hitboxes = hitboxes->next;
 			}

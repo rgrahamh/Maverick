@@ -5,7 +5,7 @@
 
 class HitEllipse : public Hitbox{
 	public:
-		HitEllipse(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius);
+		HitEllipse(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, unsigned int type);
 		virtual ~HitEllipse();
 
 		float getXRadius();

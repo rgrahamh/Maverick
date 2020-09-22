@@ -5,7 +5,7 @@
 
 class HitRect : public Hitbox{
 	public:
-		HitRect(float* x_base, float* y_base, float x_offset, float y_offset, float width, float height);
+		HitRect(float* x_base, float* y_base, float x_offset, float y_offset, float width, float height, unsigned int type);
 		~HitRect();
 
 		float getWidth();
