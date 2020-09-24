@@ -50,7 +50,7 @@ void Engine::start(){
     Zone* zone = new Zone("Zone 1");
 
     //Create the player
-    Player* player = buildPlayer(0.0f, 0.0f, 0.75, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL);
+    Player* player = buildPlayer(0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL);
     zone->addObject(player);
 
     //Create a pillar
@@ -264,29 +264,62 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             mov_obj->setEnvBump();
 
+            float mov_top_bound = mov_box->getTopBound();
+            float mov_bot_bound = mov_box->getBotBound();
+            float mov_left_bound = mov_box->getLeftBound();
+            float mov_right_bound = mov_box->getRightBound();
+
             float env_top_bound = env_box->getTopBound();
             float env_bot_bound = env_box->getBotBound();
             float env_left_bound = env_box->getLeftBound();
             float env_right_bound = env_box->getRightBound();
 
-            if(old_y < env_top_bound && y > env_top_bound){
-                //Have a push out function
-            }
-            else if(old_y > env_bot_bound && y < env_bot_bound){
+            float x_movement = x - old_x;
+            float y_movement = y - old_y;
 
+            //If entering from the top
+            if(mov_bot_bound - y_movement < env_top_bound && mov_bot_bound > env_top_bound){
+                for(int i = x; i > old_x && env_box->checkCollision(mov_box); i -= 2){
+                    mov_obj->setY(i);
+                }
+            }
+            //If entering from the bottom
+            if(mov_top_bound - y_movement > env_bot_bound && mov_top_bound < env_bot_bound){
+                for(int i = y; i < old_y && env_box->checkCollision(mov_box); i += 2){
+                    mov_obj->setY(i);
+                }
             }
             //If entering from the left
-            else if(old_x < env_left_bound && x > env_left_bound){
-
+            if(mov_right_bound - x_movement < env_left_bound && mov_right_bound > env_left_bound){
+                for(int i = x; i > old_x && env_box->checkCollision(mov_box); i -= 2){
+                    mov_obj->setX(i);
+                }
             }
             //If entering from the right
-            else if(old_x > env_right_bound && x > env_right_bound){
-
+            if(mov_left_bound - x_movement > env_right_bound && mov_left_bound > env_right_bound){
+                for(int i = x; i < old_x && env_box->checkCollision(mov_box); i += 2){
+                    mov_obj->setX(i);
+                }
             }
         }
         //If neither are the environment
         else{
-            
+            //Calculating new forces
+            float obj1_x_force = obj1->getXVel() * obj1->getMass();
+            float obj1_y_force = obj1->getYVel() * obj1->getMass();
+            float obj2_x_force = obj2->getXVel() * obj2->getMass();
+            float obj2_y_force = obj2->getYVel() * obj2->getMass();
+
+            float mass_sum = obj1->getMass() + obj2->getMass();
+
+            float x_force = (obj1_x_force + obj2_x_force) / mass_sum;
+            float y_force = (obj1_y_force + obj2_y_force) / mass_sum;
+
+            obj1->setXVel(x_force);
+            obj1->setYVel(y_force);
+
+            obj2->setXVel(x_force);
+            obj2->setYVel(y_force);
         }
     }
 }

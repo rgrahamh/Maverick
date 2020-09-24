@@ -7,7 +7,7 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(float start_x, float start_y, float friction, unsigned int animation_num, bool animated){
+Object::Object(float start_x, float start_y, float friction, float mass, unsigned int animation_num, bool animated){
     this->x = start_x;
     this->y = start_y;
     this->old_x = start_x;
@@ -18,6 +18,7 @@ Object::Object(float start_x, float start_y, float friction, unsigned int animat
     for(int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&(this->x), &(this->y), animated);
     }
+    this->mass = mass;
 }
 
 /** Destructor for objects
@@ -57,6 +58,20 @@ float Object::getOldY(){
     return this->old_y;
 }
 
+/** Gets the X velocity of the object
+ * @return The X velocity of the object
+ */
+float Object::getXVel(){
+    return this->xV;
+}
+
+/** Gets the Y velocity of the object
+ * @return The Y velocity of the object
+ */
+float Object::getYVel(){
+    return this->yV;
+}
+
 /** Gets the width of the object
  * @return The width of the object
  */
@@ -69,6 +84,12 @@ float Object::getWidth(){
  */
 float Object::getHeight(){
     return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+}
+
+/** Gets the mass of the object (in lbs)
+ */
+float Object::getMass(){
+    return this->mass;
 }
 
 /** Gets the draw layer of the object
@@ -158,6 +179,16 @@ void Object::setY(float y){
     this->y = y;
 }
 
+/** Sets the X velocity
+ * @param x The X velocity
+ */
+void Object::setXVel(float xV){
+    this->xV = xV;
+}
+void Object::setYVel(float yV){
+    this->yV = yV;
+}
+
 /** Sets the animation number
  * @param animation_num The animation number
  */
@@ -194,11 +225,11 @@ void Object::setEnvBump(){
 }
 
 /** Applies force to an object
- * @param xA The X acceleration of the force
- * @param yA The Y acceleration of the force
+ * @param xA The X newtons of the force
+ * @param yA The Y newtons of the force
  */
 void Object::applyForce(float xA, float yA){
-    this->xA += xA;
+    this->xA += xA / this->mass;
     this->yA += yA;
 }
 

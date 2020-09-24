@@ -11,15 +11,15 @@ class HitRect : public Hitbox{
 		float getWidth();
 		float getHeight();
 
-        virtual float getRightBound();
-        virtual float getLeftBound();
-        virtual float getTopBound();
-        virtual float getBotBound();
+        float getRightBound() override;
+        float getLeftBound() override;
+        float getTopBound() override;
+        float getBotBound() override;
 
-		void setScale(float x_scale, float y_scale);
-		bool isPointInside(float x_coord, float y_coord);
+		void setScale(float x_scale, float y_scale) override;
+		bool isPointInside(float x_coord, float y_coord) override;
 
-		bool checkCollision(Hitbox* other);
+		bool checkCollision(Hitbox* other) override;
 
 	private:
 		float curr_width;

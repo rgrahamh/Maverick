@@ -10,14 +10,17 @@
 
 class Object{
 	public:
-		Object(float start_x, float start_y, float friction, unsigned int animation_num, bool animated = true);
+		Object(float start_x, float start_y, float friction, float weight, unsigned int animation_num, bool animated = true);
 		virtual ~Object();
 		float getX();
 		float getY();
 		float getOldX();
 		float getOldY();
+		float getXVel();
+		float getYVel();
 		float getWidth();
 		float getHeight();
+		float getMass();
 		unsigned int getDrawLayer();
 		HitboxLst* getHitboxes();
 		bool getEnvBump();
@@ -28,9 +31,12 @@ class Object{
 
 		void setX(float x);
 		void setY(float y);
+		void setXVel(float xV);
+		void setYVel(float yV);
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
+		void setEnvBump();
 
 		void applyForce(float xA, float yA);
 
@@ -65,6 +71,9 @@ class Object{
 
 		//Coefficient of friction
 		float friction;
+
+		//How much the object weighs
+		float mass;
 
 		//Environmental bump
 		bool env_bump;

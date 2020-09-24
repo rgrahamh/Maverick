@@ -84,7 +84,7 @@ enum CHARACTER_ANIMATION{
 
 class Character : public Object, public Race, public Style{
 	public:
-		Character(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
+		Character(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
 		virtual ~Character();
 		//Useful for actions on other objects & input
 		virtual void action(sf::Event event);
@@ -95,6 +95,7 @@ class Character : public Object, public Race, public Style{
 
 	protected:
 		bool overdrive;
+		bool sliding;
 		Stats* stats;
 		InvSlot** inventory;
 		Mastery* mastery;

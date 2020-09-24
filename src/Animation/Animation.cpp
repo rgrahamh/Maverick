@@ -22,7 +22,9 @@ Animation::~Animation(){
 	while(sequence_start != NULL){
 		HitboxLst* hitboxes = sequence_start->hitboxes;
 		while(hitboxes != NULL){
-			delete hitboxes->hitbox;
+			if(hitboxes->hitbox != NULL){
+				delete hitboxes->hitbox;
+			}
 
 			HitboxLst* tmp = hitboxes;
 			hitboxes = hitboxes->next;

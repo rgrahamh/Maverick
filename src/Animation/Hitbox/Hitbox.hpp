@@ -9,7 +9,7 @@ enum HITBOX_SHAPE{
 };
 
 enum HITBOX_TYPE{
-    ENVIRONMENT = 1,  //Environmental collision (can skip check against other environmental collisions)
+    ENVIRONMENT = 1,  //Environmental element (can skip check against other environmental collisions)
     COLLISION = 2,    //A more general collision hitbox
     DAMAGEBOX = 4,    //A damaging hitbox
     HURTBOX = 8,      //A hitbox that you can get damaged

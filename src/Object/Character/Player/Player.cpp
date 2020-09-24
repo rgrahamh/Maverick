@@ -1,7 +1,7 @@
 #include "./Player.hpp"
 
-Player::Player(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int animation_num)
-    : Character(start_x, start_y, friction, race, style, stats, mastery, abilities, equipment, inventory){
+Player::Player(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory, unsigned int animation_num)
+    : Character(start_x, start_y, friction, mass, race, style, stats, mastery, abilities, equipment, inventory){
     keys.up_arrow = 0;
     keys.down_arrow = 0;
     keys.left_arrow = 0;
@@ -11,6 +11,11 @@ Player::Player(float start_x, float start_y, float friction, RACE race, STYLE st
 Player::~Player(){}
 
 void Player::process(){
+    //Calling parent process to update sliding
+    Character::process();
+
+    //If we're not sliding (in an actionable state)
+    if(!this->sliding){
         if(this->keys.up_arrow){
             this->y -= 3;
         }
@@ -23,6 +28,7 @@ void Player::process(){
         if(this->keys.right_arrow){
             this->x += 3;
         }
+    }
 }
 
 void Player::action(sf::Event event){

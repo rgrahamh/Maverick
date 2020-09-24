@@ -5,7 +5,7 @@
 
 class Player : public Character{
     public:
-        Player(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
+        Player(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
         ~Player();
 
         void process();

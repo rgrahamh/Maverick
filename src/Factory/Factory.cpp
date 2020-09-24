@@ -1,8 +1,8 @@
 #include "./Factory.hpp"
 
 
-Player* buildPlayer(float start_x, float start_y, float friction, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory){
-    Player* player = new Player(start_x, start_y, friction, race, style, stats, mastery, abilities, equipment, inventory, 12);
+Player* buildPlayer(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory){
+    Player* player = new Player(start_x, start_y, friction, mass, race, style, stats, mastery, abilities, equipment, inventory, 12);
 
     //Neutral position
     player->addSprite(0, "./assets/sprites/old_game_resources/Up_Neutral.png", 16, 0, 0);
@@ -49,10 +49,10 @@ Player* buildPlayer(float start_x, float start_y, float friction, RACE race, STY
 }
 
 Object* buildPillar(float start_x, float start_y){
-    Object* pillar = new Object(start_x, start_y, 1, 1, 1);
+    Object* pillar = new Object(start_x, start_y, 1, 1000, 1, 1);
 
     pillar->addSprite(0, "./assets/sprites/environment/pillar.png", 0, 0, 0);
-    pillar->addHitbox(0, ELLIPSE, 16, 98, 8, 8, ENVIRONMENT);
+    pillar->addHitbox(0, ELLIPSE, 16, 98, 8, 8, COLLISION | ENVIRONMENT);
 
     pillar->setAnimation(0);
 
