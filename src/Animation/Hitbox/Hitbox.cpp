@@ -71,3 +71,19 @@ bool Hitbox::isPointInside(float x_coord, float y_coord){
 bool Hitbox::checkCollision(Hitbox* other){
 	return false;
 }
+
+float Hitbox::getTopBound(){
+	return *this->y_base + this->y_curr_offset;
+}
+
+float Hitbox::getBotBound(){
+	return *this->y_base + this->y_curr_offset;
+}
+
+float Hitbox::getRightBound(){
+	return *this->x_base + this->x_curr_offset;
+}
+
+float Hitbox::getLeftBound(){
+	return *this->x_base + this->x_curr_offset;
+}

@@ -13,7 +13,6 @@ Object::Object(float start_x, float start_y, float friction, unsigned int animat
     this->old_x = start_x;
     this->old_y = start_y;
     this->friction = friction;
-    this->draw_layer = draw_layer;
     this->active_animation = 0;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(int i = 0; i < animation_num; i++){
@@ -44,6 +43,20 @@ float Object::getY(){
     return this->y;
 }
 
+/** Gets the old X value of the object
+ * @return The old X value of the object
+ */
+float Object::getOldX(){
+    return this->x;
+}
+
+/** Gets the old Y value of the object
+ * @return The old Y value of the object
+ */
+float Object::getOldY(){
+    return this->old_y;
+}
+
 /** Gets the width of the object
  * @return The width of the object
  */
@@ -62,7 +75,7 @@ float Object::getHeight(){
  * @return The draw layer of the object
  */
 unsigned int Object::getDrawLayer(){
-    return this->draw_layer;
+    return this->animations[active_animation]->getDrawLayer();
 }
 
 /** Gets the hitboxes of the current animation state
@@ -70,6 +83,13 @@ unsigned int Object::getDrawLayer(){
  */
 HitboxLst* Object::getHitboxes(){
     return this->animations[active_animation]->getHitboxes();
+}
+
+/** Gets if the object has bumped against the environment (or an entity which has bumped against the environment)
+ * @return If the object has bumped against the environemnt
+ */
+bool Object::getEnvBump(){
+    return this->env_bump;
 }
 
 /** Adds a sprite to a given animation
@@ -124,6 +144,20 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
     this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
 
+/** Sets the X posision
+ * @param x The X coordinate
+ */
+void Object::setX(float x){
+    this->x = x;
+}
+
+/** Sets the Y posision
+ * @param y The Y coordinate
+ */
+void Object::setY(float y){
+    this->y = y;
+}
+
 /** Sets the animation number
  * @param animation_num The animation number
  */
@@ -153,6 +187,21 @@ void Object::setScale(float x_scale, float y_scale){
     }
 }
 
+/** Sets the environmental bump to true
+ */
+void Object::setEnvBump(){
+    this->env_bump = true;
+}
+
+/** Applies force to an object
+ * @param xA The X acceleration of the force
+ * @param yA The Y acceleration of the force
+ */
+void Object::applyForce(float xA, float yA){
+    this->xA += xA;
+    this->yA += yA;
+}
+
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
@@ -169,13 +218,22 @@ void Object::_process(){
     this->old_x = this->x;
     this->old_y = this->y;
 
+    //Updating environmental bump
+    this->env_bump = false;
+
     //Updating X values
     this->xV = this->xA + (this->xV * (1 - this->friction));
+    if(this->xV < 0.01 && this->xV > -0.01){
+        this->xV = 0;
+    }
     this->x += this->xV;
     this->xA = 0;
 
     //Updating Y values
     this->yV = this->yA + (this->yV * (1 - this->friction));
+    if(this->yV < 0.01 && this->yV > -0.01){
+        this->yV = 0;
+    }
     this->y += this->yV;
     this->yV = 0;
 }
@@ -190,39 +248,6 @@ void Object::process(){
  */
 void Object::draw(sf::RenderWindow* window){
     this->animations[active_animation]->draw(window);
-}
-
-/** Called on object collision; should not be overridden by children. Calls the overriden onCollide stuff.
- * @param other The other object
- * @param this_hitbox The hitbox that collided from this object
- * @param other_hitbox The hitbox that collided from the other object
- */
-void Object::_onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-    onCollide(other, this_hitbox, other_hitbox);
-
-    unsigned int our_attr = this_hitbox->getType();
-    unsigned int their_attr = other_hitbox->getType();
-
-    //If we're both collision hitboxes
-    if(our_attr & COLLISION && their_attr & COLLISION){
-        float new_x = this->x;
-        float new_y = this->y;
-
-        this->x = this->old_x;
-
-        if(!this_hitbox->checkCollision(other_hitbox)){
-            return;
-        }
-
-        this->x = new_x;
-        this->y = this->old_y;
-
-        if(!this_hitbox->checkCollision(other_hitbox)){
-            return;
-        }
-
-        this->x = this->old_x;
-    }
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

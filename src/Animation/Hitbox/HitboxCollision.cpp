@@ -18,8 +18,8 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	//Check of rect is outside of the bounding box (common case, so it's faster than going through the rest of the floating point operations)
 	if(rect_x + rect_width < ellipse_x - ellipse_x_radius
 	|| rect_x > ellipse_x + ellipse_x_radius
-	|| rect->getY() + rect->getHeight() < ellipse_y - ellipse_y_radius
-	|| rect->getY() > ellipse_y + ellipse_y_radius){
+	|| rect_y + rect_height < ellipse_y - ellipse_y_radius
+	|| rect_y > ellipse_y + ellipse_y_radius){
 		return false;
 	}
 	//At this point, we know that the rect is at least partially inside of the bounding box. We calc if the square's corners are inside of the ellipse
@@ -41,6 +41,23 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 }
 
 bool collisionRectRect(HitRect* rect1, HitRect* rect2){
+	float rect1_x = rect1->getX();
+	float rect1_y = rect1->getX();
+	float rect1_width = rect1->getWidth();
+	float rect1_height = rect1->getHeight();
+
+	float rect2_x = rect2->getX();
+	float rect2_y = rect2->getX();
+	float rect2_width = rect2->getWidth();
+	float rect2_height = rect2->getHeight();
+	
+	if(rect1_x + rect1_width < rect2_x
+	|| rect1_x > rect2_x + rect2_y
+	|| rect1_y + rect1_height < rect2_y
+	|| rect1_y > rect2_y + rect2_height){
+		return true;
+	}
+
 	return false;
 }
 

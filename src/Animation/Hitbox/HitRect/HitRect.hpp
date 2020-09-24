@@ -11,6 +11,11 @@ class HitRect : public Hitbox{
 		float getWidth();
 		float getHeight();
 
+        virtual float getRightBound();
+        virtual float getLeftBound();
+        virtual float getTopBound();
+        virtual float getBotBound();
+
 		void setScale(float x_scale, float y_scale);
 		bool isPointInside(float x_coord, float y_coord);
 

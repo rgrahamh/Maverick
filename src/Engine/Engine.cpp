@@ -197,8 +197,9 @@ void Engine::collisionStep(ObjectLst* all_objects){
                 ObjectLst* object_cursor = object_lst->next;
                 HitboxLst* hitbox_cursor = hitbox_lst->next;
                 while(hitbox_cursor != NULL){
-                    //If both aren't environment and they collide
-                    if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
+                    //If both aren't environment and they collide, and the object isn't the same
+                    if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox) && object_lst->obj != object_cursor->obj){
+                        handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
                         object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
                         object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
                     }
@@ -224,6 +225,70 @@ void Engine::collisionStep(ObjectLst* all_objects){
 void Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
     this->camera->_draw(all_objects);
+}
+
+/** Handles the default collision between two objects
+ * @param obj1 The first object in the collision
+ * @param box1 The first hitbox in the collision
+ * @param obj2 The second object in the collision
+ * @param box2 The second hitbox in the collision
+ */
+void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2){
+    unsigned int box1_prop = box1->getType();
+    unsigned int box2_prop = box2->getType();
+
+    //If both hotboxes are collision boxes
+    if(box1_prop & COLLISION && box2_prop & COLLISION){
+        //If the either box is the environment (or has been bumped by the environment)
+        if(box1_prop & ENVIRONMENT || box2_prop & ENVIRONMENT || obj1->getEnvBump() || obj2->getEnvBump()){
+            Hitbox* mov_box,* env_box;
+            Object* mov_obj,* env_obj;
+            if(box1_prop & ENVIRONMENT || obj1->getEnvBump()){
+                env_box = box1;
+                env_obj = obj1;
+                mov_box = box2;
+                mov_obj = obj2;
+            }
+            else{
+                env_box = box2;
+                env_obj = obj2;
+                mov_box = box1;
+                mov_obj = obj1;
+            }
+
+            float old_x = mov_obj->getOldX();
+            float old_y = mov_obj->getOldY();
+
+            float x = mov_obj->getX();
+            float y = mov_obj->getY();
+
+            mov_obj->setEnvBump();
+
+            float env_top_bound = env_box->getTopBound();
+            float env_bot_bound = env_box->getBotBound();
+            float env_left_bound = env_box->getLeftBound();
+            float env_right_bound = env_box->getRightBound();
+
+            if(old_y < env_top_bound && y > env_top_bound){
+                //Have a push out function
+            }
+            else if(old_y > env_bot_bound && y < env_bot_bound){
+
+            }
+            //If entering from the left
+            else if(old_x < env_left_bound && x > env_left_bound){
+
+            }
+            //If entering from the right
+            else if(old_x > env_right_bound && x > env_right_bound){
+
+            }
+        }
+        //If neither are the environment
+        else{
+            
+        }
+    }
 }
 
 /** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)

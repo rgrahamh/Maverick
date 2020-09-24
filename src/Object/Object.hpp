@@ -14,18 +14,25 @@ class Object{
 		virtual ~Object();
 		float getX();
 		float getY();
+		float getOldX();
+		float getOldY();
 		float getWidth();
 		float getHeight();
 		unsigned int getDrawLayer();
 		HitboxLst* getHitboxes();
+		bool getEnvBump();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
 		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num = -1);
 		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num = -1);
 
+		void setX(float x);
+		void setY(float y);
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
+
+		void applyForce(float xA, float yA);
 
 		//Processing functions
 		void _process();
@@ -37,9 +44,7 @@ class Object{
 
 		virtual void draw(sf::RenderWindow* window);
 
-		void _onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
-
 		
 	protected:
 		//Position
@@ -61,7 +66,9 @@ class Object{
 		//Coefficient of friction
 		float friction;
 
-		unsigned int draw_layer;
+		//Environmental bump
+		bool env_bump;
+
 		unsigned int active_animation;
 		unsigned int animation_num;
 

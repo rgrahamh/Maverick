@@ -11,6 +11,11 @@ class HitEllipse : public Hitbox{
 		float getXRadius();
 		float getYRadius();
 
+        float getRightBound();
+        float getLeftBound();
+        float getTopBound();
+        float getBotBound();
+
 		void setScale(float x_scale, float y_scale);
 		virtual bool checkCollision(Hitbox* other);
 

@@ -48,6 +48,9 @@ class Engine{
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
 
+		//Handles the default collision between objects
+		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);
+
 		//Loading a zone from file
 		Zone* loadZone(unsigned char zone_num);
 

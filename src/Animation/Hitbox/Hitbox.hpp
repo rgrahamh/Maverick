@@ -24,6 +24,11 @@ class Hitbox{
         float getX();
         float getY();
 
+        virtual float getRightBound();
+        virtual float getLeftBound();
+        virtual float getTopBound();
+        virtual float getBotBound();
+
         HITBOX_SHAPE getShape();
         unsigned int getType();
 

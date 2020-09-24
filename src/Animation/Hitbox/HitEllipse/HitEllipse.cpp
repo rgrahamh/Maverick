@@ -67,3 +67,27 @@ bool HitEllipse::checkCollision(Hitbox* other){
 	}
 	return false;
 }
+
+/** Gets the top bound of the rectangle
+ */
+float HitEllipse::getTopBound(){
+	return *this->y_base + this->y_curr_offset - this->y_curr_radius;
+}
+
+/** Gets the bottom bound of the rectangle
+ */
+float HitEllipse::getBotBound(){
+	return *this->y_base + this->y_curr_offset + this->y_curr_radius;
+}
+
+/** Gets the left bound of the rectangle
+ */
+float HitEllipse::getLeftBound(){
+	return *this->x_base + this->x_curr_offset - this->x_curr_radius;
+}
+
+/** Gets the right bound of the rectangle
+ */
+float HitEllipse::getRightBound(){
+	return *this->x_base + this->x_curr_offset + this->x_curr_radius;
+}
