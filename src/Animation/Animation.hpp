@@ -37,7 +37,8 @@ class Animation{
 		void setScale(float x_scale, float y_scale);
 
 		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
-		void addHitbox(Hitbox* hitbox, int hitbox_num = -1);
+		void addHitbox(Hitbox* hitbox);
+		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
 		void draw(sf::RenderWindow* window);
 

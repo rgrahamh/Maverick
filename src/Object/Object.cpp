@@ -125,7 +125,7 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
     this->animations[animation_num]->addFrame(sprite_path, keyframe, x_offset, y_offset);
 }
 
-/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (by default)
+/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
  * @param animation_num The animation number
  * @param shape The hitbox shape
  * @param x_offset The X offset of the hitbox
@@ -148,7 +148,29 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
     this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
 
-/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (by default). Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
+/** Adds a hitbox to a given animation on all sprites
+ * @param animation_num The animation number
+ * @param shape The hitbox shape
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
+ */
+void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+    Hitbox* hitbox;
+    //We should never hit the CONE in this case.
+    if(shape == RECT){
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+    else{
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+
+    this->animations[animation_num]->addHitbox(hitbox);
+}
+
+/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1). Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
  * @param animation_num The animation number
  * @param type The hitbox type
  * @param x_offset The X offset of the hitbox
@@ -159,11 +181,27 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  * @param sprite_num The sprite number that is being used
- * @param 
  */
 void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+}
+
+/** Adds a hitbox to a given animation (including angles and ratios) on all sprites. Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
+ * @param animation_num The animation number
+ * @param type The hitbox type
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
+ * @param angle The slice angle
+ * @param slice_prop The slice proportion for the hitbox
+ * @param sprite_num The sprite number that is being used
+ */
+void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+    this->animations[animation_num]->addHitbox(hitbox);
 }
 
 /** Sets the X posision

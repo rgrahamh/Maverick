@@ -100,9 +100,26 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	this->sequence_end->next = this->sequence_start;
 }
 
-/** Adds a new hitbox to an animation (with an optional sprite number)
+/** Adds a new hitbox to an animation (to all sprites)
  * @param hitbox The hitbox to add
- * @param sprite_num The sprite number (default -1 adds to the last sprite)
+ */
+void Animation::addHitbox(Hitbox* hitbox){
+	AnimationSeq* cursor = this->sequence_start;
+	if(cursor != NULL){
+		do{
+			HitboxLst* new_hitbox = new HitboxLst;
+			new_hitbox->hitbox = hitbox;
+			new_hitbox->next = cursor->hitboxes;
+			cursor->hitboxes = new_hitbox;
+
+			cursor = cursor->next;
+		} while (cursor != this->sequence_start);
+	}
+}
+
+/** Adds a new hitbox to an animation (with sprite number)
+ * @param hitbox The hitbox to add
+ * @param sprite_num The sprite number (-1 adds to the last sprite)
  */
 void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 	if(sprite_num == -1){
