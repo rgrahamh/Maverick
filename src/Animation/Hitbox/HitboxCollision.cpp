@@ -6,7 +6,7 @@
 
 bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	float rect_x = rect->getX();
-	float rect_y = rect->getX();
+	float rect_y = rect->getY();
 	float rect_width = rect->getWidth();
 	float rect_height = rect->getHeight();
 
@@ -15,18 +15,28 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	float ellipse_x_radius = ellipse->getXRadius();
 	float ellipse_y_radius = ellipse->getYRadius();
 
-	//Check of rect is outside of the bounding box (common case, so it's faster than going through the rest of the floating point operations)
-	if(rect_x + rect_width < ellipse_x - ellipse_x_radius
-	|| rect_x > ellipse_x + ellipse_x_radius
-	|| rect_y + rect_height < ellipse_y - ellipse_y_radius
-	|| rect_y > ellipse_y + ellipse_y_radius){
-		return false;
-	}
+	//Quicker to look up than to compute
+	float ellipse_60 = 0.86602540378;
+	float ellipse_45 = 0.70710678118;
+	float ellipse_30 = 0.5;
+
 	//At this point, we know that the rect is at least partially inside of the bounding box. We calc if the square's corners are inside of the ellipse
-	else if(rect->isPointInside(ellipse_x - ellipse_x_radius, ellipse_y)
+	if(rect->isPointInside(ellipse_x - ellipse_x_radius, ellipse_y)
 			|| rect->isPointInside(ellipse_x + ellipse_x_radius, ellipse_y)
 			|| rect->isPointInside(ellipse_x, ellipse_y + ellipse_y_radius)
-			|| rect->isPointInside(ellipse_x, ellipse_y - ellipse_y_radius)){
+			|| rect->isPointInside(ellipse_x, ellipse_y - ellipse_y_radius)
+			/*|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_30), ellipse_y + (ellipse_y_radius * ellipse_60))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_30), ellipse_y - (ellipse_y_radius * ellipse_60))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_30), ellipse_y + (ellipse_y_radius * ellipse_60))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_30), ellipse_y - (ellipse_y_radius * ellipse_60))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))*/){
 		return true;
 	}
 	//We test if the ellipse's points of interest are inside of the square 

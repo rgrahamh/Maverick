@@ -262,44 +262,20 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             float x = mov_obj->getX();
             float y = mov_obj->getY();
 
+            float x_movement = old_x - x;
+            float y_movement = old_y - y;
+
             mov_obj->setEnvBump();
 
-            float mov_top_bound = mov_box->getTopBound();
-            float mov_bot_bound = mov_box->getBotBound();
-            float mov_left_bound = mov_box->getLeftBound();
-            float mov_right_bound = mov_box->getRightBound();
+            float x_iter = x_movement / ROLLBACK_STEP;
+            float y_iter = y_movement / ROLLBACK_STEP;
 
-            float env_top_bound = env_box->getTopBound();
-            float env_bot_bound = env_box->getBotBound();
-            float env_left_bound = env_box->getLeftBound();
-            float env_right_bound = env_box->getRightBound();
-
-            float x_movement = x - old_x;
-            float y_movement = y - old_y;
-
-            //If entering from the top
-            if(mov_bot_bound - y_movement < env_top_bound && mov_bot_bound > env_top_bound){
-                for(int i = x; i > old_x && env_box->checkCollision(mov_box); i -= 2){
-                    mov_obj->setY(i);
-                }
-            }
-            //If entering from the bottom
-            if(mov_top_bound - y_movement > env_bot_bound && mov_top_bound < env_bot_bound){
-                for(int i = y; i < old_y && env_box->checkCollision(mov_box); i += 2){
-                    mov_obj->setY(i);
-                }
-            }
-            //If entering from the left
-            if(mov_right_bound - x_movement < env_left_bound && mov_right_bound > env_left_bound){
-                for(int i = x; i > old_x && env_box->checkCollision(mov_box); i -= 2){
-                    mov_obj->setX(i);
-                }
-            }
-            //If entering from the right
-            if(mov_left_bound - x_movement > env_right_bound && mov_left_bound > env_right_bound){
-                for(int i = x; i < old_x && env_box->checkCollision(mov_box); i += 2){
-                    mov_obj->setX(i);
-                }
+            //Rollback to the point where we're no longer colliding
+            for(int i = 0; mov_box->checkCollision(env_box); i++){
+                x += x_iter;
+                y += y_iter;
+                mov_obj->setX(x);
+                mov_obj->setY(y);
             }
         }
         //If neither are the environment

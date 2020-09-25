@@ -19,7 +19,7 @@ Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer, boo
 /** Animation destructor
  */
 Animation::~Animation(){
-	while(sequence_start != NULL){
+	/*while(sequence_start != NULL){
 		HitboxLst* hitboxes = sequence_start->hitboxes;
 		while(hitboxes != NULL){
 			if(hitboxes->hitbox != NULL){
@@ -37,7 +37,7 @@ Animation::~Animation(){
 		tmp = sequence_start;
 		sequence_start = sequence_start->next;
 		free(tmp);
-	}
+	}*/
 }
 
 /** Gets the current sprite
@@ -144,7 +144,9 @@ void Animation::setScale(float x_scale, float y_scale){
 				cursor->sprite->setScale(x_scale, y_scale);
 			}
 			if(cursor->hitboxes != NULL){
-				cursor->hitboxes->hitbox->setScale(x_scale, y_scale);
+				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
+					hitboxlst->hitbox->setScale(x_scale, y_scale);
+				}
 			}
 			cursor = cursor->next;
 		} while(cursor != sequence_start);

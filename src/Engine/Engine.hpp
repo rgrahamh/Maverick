@@ -1,6 +1,8 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#define ROLLBACK_STEP 6.0
+
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
 

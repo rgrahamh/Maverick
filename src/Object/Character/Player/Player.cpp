@@ -17,16 +17,16 @@ void Player::process(){
     //If we're not sliding (in an actionable state)
     if(!this->sliding){
         if(this->keys.up_arrow){
-            this->y -= 3;
+            this->yA -= 2;
         }
         if(this->keys.down_arrow){
-            this->y += 3;
+            this->yA += 2;
         }
         if(this->keys.left_arrow){
-            this->x -= 3;
+            this->xA -= 2;
         }
         if(this->keys.right_arrow){
-            this->x += 3;
+            this->xA += 2;
         }
     }
 }

@@ -49,7 +49,7 @@ float Object::getY(){
  * @return The old X value of the object
  */
 float Object::getOldX(){
-    return this->x;
+    return this->old_x;
 }
 
 /** Gets the old Y value of the object
@@ -255,7 +255,7 @@ void Object::_process(){
 
     //Updating X values
     this->xV = this->xA + (this->xV * (1 - this->friction));
-    if(this->xV < 0.01 && this->xV > -0.01){
+    if(this->xV < 0.1 && this->xV > -0.1){
         this->xV = 0;
     }
     this->x += this->xV;
@@ -263,11 +263,11 @@ void Object::_process(){
 
     //Updating Y values
     this->yV = this->yA + (this->yV * (1 - this->friction));
-    if(this->yV < 0.01 && this->yV > -0.01){
+    if(this->yV < 0.1 && this->yV > -0.1){
         this->yV = 0;
     }
     this->y += this->yV;
-    this->yV = 0;
+    this->yA = 0;
 }
 
 /** Called during the process step by _process; space for users to override with custom processing logics
