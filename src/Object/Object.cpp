@@ -14,6 +14,7 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->old_y = start_y;
     this->friction = friction;
     this->active_animation = 0;
+    this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&(this->x), &(this->y), animated);

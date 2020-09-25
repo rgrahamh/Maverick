@@ -43,7 +43,7 @@ Player* buildPlayer(float start_x, float start_y, float friction, float mass, RA
     player->setAnimation(1);
 
     //Set player scale
-    player->setScale(0.8, 0.8);
+    player->setScale(0.4, 0.4);
 
     return player;
 }

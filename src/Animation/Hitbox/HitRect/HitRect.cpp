@@ -56,10 +56,9 @@ bool HitRect::isPointInside(float x_coord, float y_coord){
  * @param y_scale The Y scale of the hitbox
  */
 void HitRect::setScale(float x_scale, float y_scale){
-	this->x_curr_offset = x_scale * this->x_base_offset;
-	this->y_curr_offset = y_scale * this->y_base_offset;
-	this->curr_height = y_scale * this->base_height ;
-	this->curr_width = y_scale * this->base_width;
+	Hitbox::setScale(x_scale, y_scale);
+	this->curr_height = y_scale * this->base_height;
+	this->curr_width = x_scale * this->base_width;
 }
 
 /** Checks collision with another hitbox

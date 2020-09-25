@@ -138,11 +138,17 @@ void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
  */
 void Animation::setScale(float x_scale, float y_scale){
 	AnimationSeq* cursor = sequence_start;
-	do{
-		cursor->sprite->setScale(x_scale, y_scale);
-		cursor->hitboxes->hitbox->setScale(x_scale, y_scale);
-		cursor = cursor->next;
-	} while(cursor != sequence_end);
+	if(cursor != NULL){
+		do{
+			if(cursor->sprite != NULL){
+				cursor->sprite->setScale(x_scale, y_scale);
+			}
+			if(cursor->hitboxes != NULL){
+				cursor->hitboxes->hitbox->setScale(x_scale, y_scale);
+			}
+			cursor = cursor->next;
+		} while(cursor != sequence_start);
+	}
 }
 
 /** Advances the animation by a frame
