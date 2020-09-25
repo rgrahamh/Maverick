@@ -25,7 +25,7 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 			|| rect->isPointInside(ellipse_x + ellipse_x_radius, ellipse_y)
 			|| rect->isPointInside(ellipse_x, ellipse_y + ellipse_y_radius)
 			|| rect->isPointInside(ellipse_x, ellipse_y - ellipse_y_radius)
-			/*|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
+			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
@@ -36,7 +36,7 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
-			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))*/){
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))){
 		return true;
 	}
 	//We test if the ellipse's points of interest are inside of the square 
@@ -51,20 +51,18 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 }
 
 bool collisionRectRect(HitRect* rect1, HitRect* rect2){
-	float rect1_x = rect1->getX();
-	float rect1_y = rect1->getX();
-	float rect1_width = rect1->getWidth();
-	float rect1_height = rect1->getHeight();
+	float rect1_top_bound = rect1->getTopBound();
+	float rect1_bot_bound = rect1->getBotBound();
+	float rect1_left_bound = rect1->getLeftBound();
+	float rect1_right_bound = rect1->getRightBound();
 
-	float rect2_x = rect2->getX();
-	float rect2_y = rect2->getX();
-	float rect2_width = rect2->getWidth();
-	float rect2_height = rect2->getHeight();
+	float rect2_top_bound = rect2->getTopBound();
+	float rect2_bot_bound = rect2->getBotBound();
+	float rect2_left_bound = rect2->getLeftBound();
+	float rect2_right_bound = rect2->getRightBound();
 	
-	if(rect1_x + rect1_width < rect2_x
-	|| rect1_x > rect2_x + rect2_y
-	|| rect1_y + rect1_height < rect2_y
-	|| rect1_y > rect2_y + rect2_height){
+	if(((rect1_left_bound < rect2_left_bound && rect1_right_bound > rect2_left_bound) || (rect2_left_bound < rect1_left_bound && rect2_right_bound > rect1_left_bound))
+	&& ((rect1_top_bound < rect2_top_bound && rect1_bot_bound > rect2_top_bound) || (rect2_top_bound < rect1_top_bound && rect2_bot_bound > rect1_top_bound))){
 		return true;
 	}
 

@@ -44,9 +44,12 @@ Object* buildPillar(float start_x, float start_y){
     Object* pillar = new Object(start_x, start_y, 1, 1000, 1, 1);
 
     pillar->addSprite(0, "./assets/sprites/environment/pillar.png", 0, 0, 0);
-    pillar->addHitbox(0, ELLIPSE, 16, 98, 8, 8, COLLISION | ENVIRONMENT);
+    //pillar->addHitbox(0, RECT, 16, 120, 16, 8, COLLISION | ENVIRONMENT);
+    pillar->addHitbox(0, RECT, 0, 112, 32, 16, COLLISION | ENVIRONMENT);
 
     pillar->setAnimation(0);
+
+    pillar->setScale(2.0, 2.0);
 
     return pillar;
 }

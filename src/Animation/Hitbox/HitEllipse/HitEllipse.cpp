@@ -42,8 +42,8 @@ float HitEllipse::getYRadius(){
  */
 void HitEllipse::setScale(float x_scale, float y_scale){
 	Hitbox::setScale(x_scale, y_scale);
-	this->x_curr_radius = (x_scale / 2.0f) * this->x_base_radius;
-	this->y_curr_radius = (y_scale / 2.0f) * this->y_base_radius;
+	this->x_curr_radius = x_scale * this->x_base_radius;
+	this->y_curr_radius = y_scale * this->y_base_radius;
 }
 
 /** Checks collision against the other hitbox
