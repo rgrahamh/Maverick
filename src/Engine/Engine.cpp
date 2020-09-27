@@ -158,11 +158,11 @@ void Engine::collisionStep(ObjectLst* all_objects){
             //Go by height as the outer loop since it eliminates the most
             for(int box_y = 0; box_y < win_height; box_y += y_iter){
                 //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
-                if(!(top_bound > box_y + win_height || bot_bound < box_y)){
+                if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
                     int i = 0;
                     for(int box_x = 0; box_x < win_width; box_x += x_iter){
                         //If the left bound is greater than box_x or the right bound is less than box_x, go to next
-                        if(!(left_bound > box_x + win_width || right_bound < box_x)){
+                        if(!(left_bound > box_x + x_iter || right_bound < box_x)){
                             //Insert the object in the list
                             ObjectLst* new_objectlst = new ObjectLst;
                             new_objectlst->next = object_matrix[i][j];
