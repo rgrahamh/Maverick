@@ -28,6 +28,7 @@ class Hitbox{
         virtual float getLeftBound();
         virtual float getTopBound();
         virtual float getBotBound();
+        virtual float getDrawAxis();
 
         HITBOX_SHAPE getShape();
         unsigned int getType();

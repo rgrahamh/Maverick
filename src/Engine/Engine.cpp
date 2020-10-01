@@ -134,7 +134,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
                         top_bound = ellipse_hitbox->getY() - ellipse_hitbox->getYRadius();
                         bot_bound = ellipse_hitbox->getY() + ellipse_hitbox->getYRadius();
                         left_bound = ellipse_hitbox->getX() - ellipse_hitbox->getXRadius();
-                        bot_bound = ellipse_hitbox->getX() + ellipse_hitbox->getXRadius();
+                        right_bound = ellipse_hitbox->getX() + ellipse_hitbox->getXRadius();
                     }
                     break;
 
@@ -144,7 +144,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
                         top_bound = cone_hitbox->getY() - cone_hitbox->getYRadius();
                         bot_bound = cone_hitbox->getY() + cone_hitbox->getYRadius();
                         left_bound = cone_hitbox->getX() - cone_hitbox->getXRadius();
-                        bot_bound = cone_hitbox->getX() + cone_hitbox->getXRadius();
+                        right_bound = cone_hitbox->getX() + cone_hitbox->getXRadius();
                     }
                     break;
             }

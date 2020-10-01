@@ -29,14 +29,14 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y + (ellipse_y_radius * ellipse_45))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_45), ellipse_y - (ellipse_y_radius * ellipse_45))
-			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_30), ellipse_y + (ellipse_y_radius * ellipse_60))
+			/*|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_30), ellipse_y + (ellipse_y_radius * ellipse_60))
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_30), ellipse_y - (ellipse_y_radius * ellipse_60))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_30), ellipse_y + (ellipse_y_radius * ellipse_60))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_30), ellipse_y - (ellipse_y_radius * ellipse_60))
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
 			|| rect->isPointInside(ellipse_x + (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))
 			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y + (ellipse_y_radius * ellipse_30))
-			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))){
+			|| rect->isPointInside(ellipse_x - (ellipse_x_radius * ellipse_60), ellipse_y - (ellipse_y_radius * ellipse_30))*/){
 		return true;
 	}
 	//We test if the ellipse's points of interest are inside of the square 
@@ -75,6 +75,42 @@ bool collisionRectCone(HitRect* rect, HitCone* cone){
 
 //Ellipse-base collision
 bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
+	float ellipse1_x = ellipse1->getX();
+	float ellipse1_y = ellipse1->getY();
+	float ellipse1_x_radius = ellipse1->getXRadius();
+	float ellipse1_y_radius = ellipse1->getYRadius();
+
+	float ellipse2_x = ellipse2->getX();
+	float ellipse2_y = ellipse2->getY();
+	float ellipse2_x_radius = ellipse2->getXRadius();
+	float ellipse2_y_radius = ellipse2->getYRadius();
+
+	//Quicker to look up than to compute
+	float ellipse_45 = 0.70710678118;
+
+	//At this point, we know that the rect is at least partially inside of the bounding box. We calc if the square's corners are inside of the ellipse
+	if(ellipse2->isPointInside(ellipse1_x - ellipse1_x_radius, ellipse1_y)
+			|| ellipse2->isPointInside(ellipse1_x + ellipse1_x_radius, ellipse1_y)
+			|| ellipse2->isPointInside(ellipse1_x, ellipse1_y + ellipse1_y_radius)
+			|| ellipse2->isPointInside(ellipse1_x, ellipse1_y - ellipse1_y_radius)
+			|| ellipse2->isPointInside(ellipse1_x + (ellipse1_x_radius * ellipse_45), ellipse1_y + (ellipse1_y_radius * ellipse_45))
+			|| ellipse2->isPointInside(ellipse1_x + (ellipse1_x_radius * ellipse_45), ellipse1_y - (ellipse1_y_radius * ellipse_45))
+			|| ellipse2->isPointInside(ellipse1_x - (ellipse1_x_radius * ellipse_45), ellipse1_y + (ellipse1_y_radius * ellipse_45))
+			|| ellipse2->isPointInside(ellipse1_x - (ellipse1_x_radius * ellipse_45), ellipse1_y - (ellipse1_y_radius * ellipse_45))){
+		return true;
+	}
+	//We test if the ellipse's points of interest are inside of the square 
+	else if(ellipse1->isPointInside(ellipse2_x - ellipse2_x_radius, ellipse2_y)
+			|| ellipse1->isPointInside(ellipse2_x + ellipse2_x_radius, ellipse2_y)
+			|| ellipse1->isPointInside(ellipse2_x, ellipse2_y + ellipse2_y_radius)
+			|| ellipse1->isPointInside(ellipse2_x, ellipse2_y - ellipse2_y_radius)
+			|| ellipse1->isPointInside(ellipse2_x + (ellipse2_x_radius * ellipse_45), ellipse2_y + (ellipse2_y_radius * ellipse_45))
+			|| ellipse1->isPointInside(ellipse2_x + (ellipse2_x_radius * ellipse_45), ellipse2_y - (ellipse2_y_radius * ellipse_45))
+			|| ellipse1->isPointInside(ellipse2_x - (ellipse2_x_radius * ellipse_45), ellipse2_y + (ellipse2_y_radius * ellipse_45))
+			|| ellipse1->isPointInside(ellipse2_x - (ellipse2_x_radius * ellipse_45), ellipse2_y - (ellipse2_y_radius * ellipse_45))){
+		return true;
+	}
+
 	return false;
 }
 

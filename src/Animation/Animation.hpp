@@ -14,9 +14,16 @@
 typedef struct AnimationSequence{
 	sf::Sprite* sprite;
 	HitboxLst* hitboxes;
-	float x_offset;
-	float y_offset;
+
+	float base_x_offset;
+	float base_y_offset;
+	float curr_x_offset;
+	float curr_y_offset;
+
+	float draw_axis;
+	
 	unsigned int keyframe;
+
 	struct AnimationSequence* next;
 } AnimationSeq;
 

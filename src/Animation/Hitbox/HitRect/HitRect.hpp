@@ -15,6 +15,7 @@ class HitRect : public Hitbox{
         float getLeftBound() override;
         float getTopBound() override;
         float getBotBound() override;
+		float getDrawAxis() override;
 
 		void setScale(float x_scale, float y_scale) override;
 		bool isPointInside(float x_coord, float y_coord) override;

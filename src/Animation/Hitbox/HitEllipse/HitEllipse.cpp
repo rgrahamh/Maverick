@@ -90,3 +90,35 @@ float HitEllipse::getLeftBound(){
 float HitEllipse::getRightBound(){
 	return *this->x_base + this->x_curr_offset + this->x_curr_radius;
 }
+
+float HitEllipse::getDrawAxis(){
+	return *this->y_base + this->y_curr_offset;
+}
+
+/** Get if a point is inside of the hitbox
+ * @param x_coord The X coordinate being tested against
+ * @param y_coord The Y coordinate being tested against
+ * @return If the point is inside of the hitbox
+ */
+bool HitEllipse::isPointInside(float x_coord, float y_coord){
+	float x_center = this->getX();
+	float y_center = this->getY();
+
+	float x_diff = abs(x_center - x_coord);
+	float y_diff = abs(y_center - y_coord);
+
+	//Avoiding divide by zero
+	if(x_diff == 0){
+		if(y_diff < y_curr_radius){
+			return true;
+		}
+	}
+	else{
+		float angle = atan(y_diff / x_diff);
+
+		if(x_curr_radius * cos(angle) > x_diff && y_curr_radius * sin(angle) > y_diff){
+			return true;
+		}
+	}
+	return false;
+}

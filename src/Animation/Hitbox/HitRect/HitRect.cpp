@@ -105,3 +105,7 @@ float HitRect::getLeftBound(){
 float HitRect::getRightBound(){
 	return *this->x_base + this->x_curr_offset + this->curr_width;
 }
+
+float HitRect::getDrawAxis(){
+	return *this->y_base + this->y_curr_offset + (this->curr_height / 2);
+}

@@ -87,3 +87,7 @@ float Hitbox::getRightBound(){
 float Hitbox::getLeftBound(){
 	return *this->x_base + this->x_curr_offset;
 }
+
+float Hitbox::getDrawAxis(){
+	return *this->y_base + this->y_curr_offset;
+}

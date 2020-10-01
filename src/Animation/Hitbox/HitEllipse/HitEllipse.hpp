@@ -2,6 +2,7 @@
 #define HITCIRCLE_H
 
 #include "../Hitbox.hpp"
+#include <math.h>
 
 class HitEllipse : public Hitbox{
 	public:
@@ -11,13 +12,16 @@ class HitEllipse : public Hitbox{
 		float getXRadius();
 		float getYRadius();
 
-        float getRightBound();
-        float getLeftBound();
-        float getTopBound();
-        float getBotBound();
+        float getRightBound() override;
+        float getLeftBound() override;
+        float getTopBound() override;
+        float getBotBound() override;
+		float getDrawAxis() override;
 
-		void setScale(float x_scale, float y_scale);
-		virtual bool checkCollision(Hitbox* other);
+		void setScale(float x_scale, float y_scale) override;
+		virtual bool checkCollision(Hitbox* other) override;
+
+		virtual bool isPointInside(float x_coord, float y_coord) override;
 
 	protected:
 		float x_base_radius;

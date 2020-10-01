@@ -92,8 +92,11 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	//Regardless
 	this->sequence_end->sprite = sprite;
 	this->sequence_end->keyframe = keyframe;
-	this->sequence_end->x_offset = x_offset;
-	this->sequence_end->y_offset = y_offset;
+	this->sequence_end->base_x_offset = x_offset;
+	this->sequence_end->base_y_offset = y_offset;
+	this->sequence_end->curr_x_offset = x_offset;
+	this->sequence_end->curr_y_offset = y_offset;
+	this->sequence_end->draw_axis = sprite->getTexture()->getSize().y + y_offset;
 	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
@@ -165,6 +168,10 @@ void Animation::setScale(float x_scale, float y_scale){
 					hitboxlst->hitbox->setScale(x_scale, y_scale);
 				}
 			}
+			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
+			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
+			cursor->draw_axis = (cursor->sprite->getTexture()->getSize().y * y_scale) + cursor->curr_y_offset;
+
 			cursor = cursor->next;
 		} while(cursor != sequence_start);
 	}
@@ -195,7 +202,7 @@ void Animation::draw(sf::RenderWindow* window){
 
 	//Update the sprite position
 	sf::Sprite* curr_sprite = this->sequence->sprite;
-	curr_sprite->setPosition(*this->x_base + this->sequence->x_offset, *this->y_base + this->sequence->y_offset);
+	curr_sprite->setPosition(*this->x_base + this->sequence->curr_x_offset, *this->y_base + this->sequence->curr_y_offset);
 
 	//Draw the sprite
 	window->draw(*curr_sprite);
