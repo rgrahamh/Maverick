@@ -41,19 +41,36 @@ Animation::~Animation(){
 }
 
 /** Gets the current sprite
+ * @return The current sprite
  */
 sf::Sprite* Animation::getSprite(){
 	return this->sequence->sprite;
 }
 
 /** Gets the current hitboxes
+ * @return The current hitboxes
  */
 HitboxLst* Animation::getHitboxes(){
 	return this->sequence->hitboxes;
 }
 
+/** Gets the current draw layer
+ * @return The current draw layer
+ */
 unsigned char Animation::getDrawLayer(){
 	return this->draw_layer;
+}
+
+/** Gets the draw axis
+ * @return The draw axis
+ */
+float Animation::getDrawAxis(){
+	if(this->sequence->hitboxes != NULL){
+		return this->sequence->hitboxes->hitbox->getBotBound();
+	}
+	else{
+		return this->sequence->sprite->getTexture()->getSize().y + this->sequence->curr_y_offset;
+	}
 }
 
 /** Adds a frame to an animation
@@ -96,7 +113,6 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	this->sequence_end->base_y_offset = y_offset;
 	this->sequence_end->curr_x_offset = x_offset;
 	this->sequence_end->curr_y_offset = y_offset;
-	this->sequence_end->draw_axis = sprite->getTexture()->getSize().y + y_offset;
 	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
@@ -139,15 +155,15 @@ void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 		}
 	}
 	else{
-		HitboxLst* cursor = this->sequence_start->hitboxes;
+		AnimationSeq* cursor = this->sequence_start;
 		for(int i = 0; i < sprite_num && cursor != NULL; i++){
 			cursor = cursor->next;
 		}
 		if(cursor != NULL){
 			HitboxLst* new_hitbox = new HitboxLst;
 			new_hitbox->hitbox = hitbox;
-			new_hitbox->next = cursor;
-			cursor = new_hitbox;
+			new_hitbox->next = cursor->hitboxes;
+			cursor->hitboxes = new_hitbox;
 		}
 	}
 }
@@ -160,6 +176,9 @@ void Animation::setScale(float x_scale, float y_scale){
 	AnimationSeq* cursor = sequence_start;
 	if(cursor != NULL){
 		do{
+			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
+			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
+
 			if(cursor->sprite != NULL){
 				cursor->sprite->setScale(x_scale, y_scale);
 			}
@@ -168,9 +187,6 @@ void Animation::setScale(float x_scale, float y_scale){
 					hitboxlst->hitbox->setScale(x_scale, y_scale);
 				}
 			}
-			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
-			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
-			cursor->draw_axis = (cursor->sprite->getTexture()->getSize().y * y_scale) + cursor->curr_y_offset;
 
 			cursor = cursor->next;
 		} while(cursor != sequence_start);

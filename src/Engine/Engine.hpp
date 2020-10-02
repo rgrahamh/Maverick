@@ -33,9 +33,12 @@ class Engine{
 
 		//Engine steps
 		void actionStep(ObjectLst* all_objects);
-		void drawStep(ObjectLst* all_objects);
+		ObjectLst* drawStep(ObjectLst* all_objects);
 		void collisionStep(ObjectLst* all_objects);
 		void physicsStep(ObjectLst* all_objects);
+
+		//Sorts an object list by draw axis
+		ObjectLst* drawSort(ObjectLst* all_objects);
 
 		//Object list building/destruction
 		ObjectLst* buildFullObjLst();

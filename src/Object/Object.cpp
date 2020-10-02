@@ -100,6 +100,13 @@ unsigned int Object::getDrawLayer(){
     return this->animations[active_animation]->getDrawLayer();
 }
 
+/** Gets the draw axis of the object
+ * @return The draw axis of the object
+ */
+float Object::getDrawAxis(){
+    return this->animations[active_animation]->getDrawAxis();
+}
+
 /** Gets the hitboxes of the current animation state
  * @return The HitboxLst containing the object's current hitboxes
  */

@@ -8,24 +8,6 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
-//The sequence of images in the animation; should be a circularly linked list.
-
-//MAKE SURE TO IMPLEMENT THIS AS CIRCULARLY LINKED
-typedef struct AnimationSequence{
-	sf::Sprite* sprite;
-	HitboxLst* hitboxes;
-
-	float base_x_offset;
-	float base_y_offset;
-	float curr_x_offset;
-	float curr_y_offset;
-
-	float draw_axis;
-	
-	unsigned int keyframe;
-
-	struct AnimationSequence* next;
-} AnimationSeq;
 
 extern TextureHash* texture_hash;
 
@@ -40,6 +22,7 @@ class Animation{
 		sf::Sprite* getSprite();
 		HitboxLst* getHitboxes();
 		unsigned char getDrawLayer();
+		float getDrawAxis();
 
 		void setScale(float x_scale, float y_scale);
 
@@ -52,6 +35,20 @@ class Animation{
 		void rotate(int direction, float rotation_amnt);
 
 	private:
+		typedef struct AnimationSequence{
+			sf::Sprite* sprite;
+			HitboxLst* hitboxes;
+
+			float base_x_offset;
+			float base_y_offset;
+			float curr_x_offset;
+			float curr_y_offset;
+			
+			unsigned int keyframe;
+
+			struct AnimationSequence* next;
+		} AnimationSeq;
+
 		//The image sequence and start of image sequence
 		AnimationSeq* sequence;
 		AnimationSeq* sequence_end;

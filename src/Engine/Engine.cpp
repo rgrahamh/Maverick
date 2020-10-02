@@ -57,6 +57,14 @@ void Engine::start(){
     Object* pillar_1 = buildPillar(800.0, 700.0);
     zone->addObject(pillar_1);
 
+    //Create a pillar
+    Object* pillar_2 = buildPillar(800.0, 600.0);
+    zone->addObject(pillar_2);
+
+    //Create a pillar
+    Object* pillar_3 = buildPillar(800.0, 500.0);
+    zone->addObject(pillar_3);
+
     this->addZone(zone);
     this->activateZone(zone->getName());
 
@@ -73,7 +81,8 @@ void Engine::gameLoop(){
 		this->actionStep(all_objects);
 		this->physicsStep(all_objects);
 		this->collisionStep(all_objects);
-		this->drawStep(all_objects);
+        //Different because we need to adjust the object list for draw order
+		all_objects = this->drawStep(all_objects);
 
         freeFullObjLst(all_objects);
 	}
@@ -222,9 +231,30 @@ void Engine::collisionStep(ObjectLst* all_objects){
 
 /** The draw step of the game engine
  */
-void Engine::drawStep(ObjectLst* all_objects){
+ObjectLst* Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
+    all_objects = this->drawSort(all_objects);
     this->camera->_draw(all_objects);
+    return all_objects;
+}
+
+ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
+    //Case where it's the first iteration (nothing linking to this)
+    if(curr_obj->next == NULL){
+        return curr_obj;
+    }
+    else{
+        ObjectLst* next_obj = this->drawSort(curr_obj->next);
+        if(curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
+            curr_obj->next = next_obj->next;
+            next_obj->next = this->drawSort(curr_obj);
+            return next_obj;
+        }
+        else{
+            curr_obj->next = next_obj;
+            return curr_obj;
+        }
+    }
 }
 
 /** Handles the default collision between two objects

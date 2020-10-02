@@ -22,6 +22,7 @@ class Object{
 		float getHeight();
 		float getMass();
 		unsigned int getDrawLayer();
+		float getDrawAxis();
 		HitboxLst* getHitboxes();
 		bool getEnvBump();
 
