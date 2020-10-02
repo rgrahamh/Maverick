@@ -238,6 +238,10 @@ ObjectLst* Engine::drawStep(ObjectLst* all_objects){
     return all_objects;
 }
 
+/** Recursively sorts the objects in the order of draw
+ * @param curr_obj The current object that you're sorting through
+ * @return The current draw object
+ */
 ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
     //Case where it's the first iteration (nothing linking to this)
     if(curr_obj->next == NULL){
@@ -246,6 +250,7 @@ ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
     else{
         ObjectLst* next_obj = this->drawSort(curr_obj->next);
         if(curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
+            //Swap node positions & send curr_obj up the draw chain
             curr_obj->next = next_obj->next;
             next_obj->next = this->drawSort(curr_obj);
             return next_obj;
