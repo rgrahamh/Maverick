@@ -25,7 +25,8 @@ Player* buildPlayer(float start_x, float start_y, float friction, float mass, RA
     player->addSprite(7, "./assets/sprites/old_game_resources/Right_Right_Foot.png", 16, 0, 0);
 
     //Adding the walking hitbox
-    player->addHitbox(0, 7, ELLIPSE, 87, 165, 45, 21, COLLISION | HURTBOX);
+    //player->addHitbox(0, 7, ELLIPSE, 87, 165, 45, 21, COLLISION | HURTBOX);
+    player->addHitbox(0, 7, RECT, 0, 165, 174, 42, COLLISION | HURTBOX);
 
     //Setting the starting animation
     player->setAnimation(1);
