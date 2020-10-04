@@ -43,5 +43,35 @@ void Character::process(){
 void Character::draw(){}
 
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	printf("Collided!\n");
+	unsigned int other_type = other_hitbox->getType();
+	unsigned int this_type = this_hitbox->getType();
+
+	if(this_type & COLLISION){
+		if(other_type & COLLISION && other_type & MOVABLE){
+			float x_diff = this->x - this->old_x;
+			float y_diff = this->y - this->old_y;
+
+			other->setX(other->getX() + x_diff);
+			other->setY(other->getY() + y_diff);
+		}
+		else if(other_type & COLLISION){
+			//Make a rollback class?
+			float new_x = this->x;
+			float new_y = this->y;
+
+			this->y = this->old_y;
+
+			if(this_hitbox->checkCollision(other_hitbox)){
+				this->y = new_y;
+				this->x = this->old_x;
+				if(this_hitbox->checkCollision(other_hitbox)){
+					this->y = this->old_y;
+					this->x = new_x;
+					if(this_hitbox->checkCollision(other_hitbox)){
+						this->y = this->old_y;
+					}
+				}
+			}
+		}
+	}
 }

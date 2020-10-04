@@ -208,9 +208,10 @@ void Engine::collisionStep(ObjectLst* all_objects){
                 while(hitbox_cursor != NULL){
                     //If both aren't environment and they collide, and the object isn't the same
                     if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox) && object_lst->obj != object_cursor->obj){
-                        handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
+                        //We want the default collision handling to go last since it's the harshest (and might inhibit special collision cases)
                         object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
                         object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
+                        handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
                     }
                     object_cursor = object_cursor->next;
                     hitbox_cursor = hitbox_cursor->next;

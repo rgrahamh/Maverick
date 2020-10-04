@@ -11,9 +11,10 @@ enum HITBOX_SHAPE{
 enum HITBOX_TYPE{
     ENVIRONMENT = 1,  //Environmental element (can skip check against other environmental collisions)
     COLLISION = 2,    //A more general collision hitbox
-    DAMAGEBOX = 4,    //A damaging hitbox
-    HURTBOX = 8,      //A hitbox that you can get damaged
-    PROJECTILE = 16   //A projectile hitbox
+    MOVABLE = 4,      //Bumping into this collision hitbox will cause the object to move
+    DAMAGEBOX = 8,    //A damaging hitbox
+    HURTBOX = 16,      //A hitbox that you can get damaged
+    PROJECTILE = 32   //A projectile hitbox
 };
 
 class Hitbox{
