@@ -4,6 +4,11 @@
 #include "./HitEllipse/HitEllipse.hpp"
 #include "./HitEllipse/HitCone/HitCone.hpp"
 
+/** Rect-Ellipse-based collision detection
+ * @param rect The rectangle
+ * @param ellipse The ellipse
+ * @return If the rect and ellipse are colliding
+ */
 bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	float rect_top_bound = rect->getTopBound();
 	float rect_bot_bound = rect->getBotBound();
@@ -64,6 +69,11 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	return false;
 }
 
+/** AABB collision detection
+ * @param rect1 The first rectangle
+ * @param rect2 The second rectangle
+ * @return If the two rects are colliding
+ */
 bool collisionRectRect(HitRect* rect1, HitRect* rect2){
 	float rect1_top_bound = rect1->getTopBound();
 	float rect1_bot_bound = rect1->getBotBound();
@@ -87,7 +97,11 @@ bool collisionRectCone(HitRect* rect, HitCone* cone){
 	return false;
 }
 
-//Ellipse-base collision
+/** Ellipse-ellipse-based collision
+ * @param ellipse1 The first ellipse
+ * @param ellipse2 The second ellipse
+ * @return If the two ellipses are colliding
+ */
 bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
 	float ellipse1_top_bound = ellipse1->getTopBound();
 	float ellipse1_bot_bound = ellipse1->getBotBound();

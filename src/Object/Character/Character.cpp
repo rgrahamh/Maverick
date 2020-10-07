@@ -29,6 +29,9 @@ Character::~Character(){
 	delete this->equipment;
 }
 
+/** Calculates any actions taken; should be overridden by children if used
+ * @param event The event being interpreted
+ */
 void Character::action(sf::Event event){}
 
 void Character::process(){
@@ -40,8 +43,16 @@ void Character::process(){
     }
 }
 
+/** Called during the draw step
+ * @param window The window that content is being drawn to
+ */
 void Character::draw(){}
 
+/** Called on object collision; should be overridden by children if you want collision logic.
+ * @param other The other object
+ * @param this_hitbox The hitbox that collided from this object
+ * @param other_hitbox The hitbox that collided from the other object
+ */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();

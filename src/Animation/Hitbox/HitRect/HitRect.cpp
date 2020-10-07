@@ -82,30 +82,37 @@ bool HitRect::checkCollision(Hitbox* other){
 	return false;
 }
 
-/** Gets the top bound of the rectangle
+/** Gets the top hitbox bound
+ * @return The top hitbox bound
  */
 float HitRect::getTopBound(){
 	return *this->y_base + this->y_curr_offset;
 }
 
-/** Gets the bottom bound of the rectangle
+/** Gets the bottom hitbox bound
+ * @return The bottom hitbox bound
  */
 float HitRect::getBotBound(){
 	return *this->y_base + this->y_curr_offset + this->curr_height;
 }
 
-/** Gets the left bound of the rectangle
+/** Gets the left hitbox bound
+ * @return The left hitbox bound
  */
 float HitRect::getLeftBound(){
 	return *this->x_base + this->x_curr_offset;
 }
 
-/** Gets the right bound of the rectangle
+/** Gets the right hitbox bound
+ * @return The right hitbox bound
  */
 float HitRect::getRightBound(){
 	return *this->x_base + this->x_curr_offset + this->curr_width;
 }
 
+/** Gets the draw axis of the hitbox
+ * @return The draw axis of the hitbox
+ */
 float HitRect::getDrawAxis(){
 	return *this->y_base + this->y_curr_offset + (this->curr_height / 2);
 }

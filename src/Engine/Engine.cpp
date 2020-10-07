@@ -74,6 +74,8 @@ void Engine::start(){
     gameLoop();
 }
 
+/** The primary game loop
+ */
 void Engine::gameLoop(){
 	while(this->state != EXIT){
         ObjectLst* all_objects = buildFullObjLst();
@@ -88,6 +90,9 @@ void Engine::gameLoop(){
 	}
 }
 
+/** The action step of the game engine
+ * @param all_objects All of the objects that should be listening for input
+ */
 void Engine::actionStep(ObjectLst* all_objects){
     sf::Event event;
     ObjectLst* cursor;
@@ -104,6 +109,9 @@ void Engine::actionStep(ObjectLst* all_objects){
     }
 }
 
+/** The physics step of the game engine
+ * @param all_objects All of the objects that physics should be simluated for
+ */
 void Engine::physicsStep(ObjectLst* all_objects){
     while(all_objects != NULL){
         all_objects->obj->_process();
@@ -111,6 +119,9 @@ void Engine::physicsStep(ObjectLst* all_objects){
     }
 }
 
+/** The collision step of the game engine
+ * @param all_objects All of the objects that collisions should be checked for
+ */
 void Engine::collisionStep(ObjectLst* all_objects){
     //Sister arrays for the list matricies
     ObjectLst* object_matrix[16][9] = {NULL};

@@ -89,6 +89,7 @@ class Object{
 
 		//Animation
 		Animation** animations;
+		AnimationLst* ignored_animations;
 };
 
 typedef struct ObjectList{

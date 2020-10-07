@@ -73,6 +73,19 @@ float Animation::getDrawAxis(){
 	}
 }
 
+/** Gets the number of frames left in the animation from the current state
+ * @return The number of frames left in the animation
+ */
+int Animation::getFramesLeft(){
+	AnimationSeq* cursor = this->sequence;
+	int frames_left = cursor->keyframe - this->frame_counter;
+	while(cursor != this->sequence_start){
+		frames_left += cursor->keyframe;
+		cursor = cursor->next;
+	}
+	return frames_left;
+}
+
 /** Adds a frame to an animation
  * @param sprite_path The filepath of the sprite
  * @param keyframe The number of frames before the key continues

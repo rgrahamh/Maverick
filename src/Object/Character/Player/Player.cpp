@@ -8,8 +8,12 @@ Player::Player(float start_x, float start_y, float friction, float mass, RACE ra
     keys.right_arrow = 0;
 }
 
+/** The player deconstructor
+ */
 Player::~Player(){}
 
+/** The player process step
+ */
 void Player::process(){
     //Calling parent process to update sliding
     Character::process();
@@ -31,6 +35,9 @@ void Player::process(){
     }
 }
 
+/** Calculates any actions taken; should be overridden by children if used
+ * @param event The event being interpreted
+ */
 void Player::action(sf::Event event){
     if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Up){

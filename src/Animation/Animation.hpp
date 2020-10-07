@@ -8,6 +8,10 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
+typedef struct AnimationList{
+	Animation* animation;
+	struct AnimationList* next;
+} AnimationLst;
 
 extern TextureHash* texture_hash;
 
@@ -23,6 +27,7 @@ class Animation{
 		HitboxLst* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
+		int getFramesLeft();
 
 		void setScale(float x_scale, float y_scale);
 

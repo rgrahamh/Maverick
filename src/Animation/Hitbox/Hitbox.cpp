@@ -72,22 +72,37 @@ bool Hitbox::checkCollision(Hitbox* other){
 	return false;
 }
 
+/** Gets the top hitbox bound
+ * @return The top hitbox bound
+ */
 float Hitbox::getTopBound(){
 	return *this->y_base + this->y_curr_offset;
 }
 
+/** Gets the bottom hitbox bound
+ * @return The bottom hitbox bound
+ */
 float Hitbox::getBotBound(){
 	return *this->y_base + this->y_curr_offset;
 }
 
-float Hitbox::getRightBound(){
-	return *this->x_base + this->x_curr_offset;
-}
-
+/** Gets the left hitbox bound
+ * @return The left hitbox bound
+ */
 float Hitbox::getLeftBound(){
 	return *this->x_base + this->x_curr_offset;
 }
 
+/** Gets the right hitbox bound
+ * @return The right hitbox bound
+ */
+float Hitbox::getRightBound(){
+	return *this->x_base + this->x_curr_offset;
+}
+
+/** Gets the draw axis of the hitbox
+ * @return The draw axis of the hitbox
+ */
 float Hitbox::getDrawAxis(){
 	return *this->y_base + this->y_curr_offset;
 }

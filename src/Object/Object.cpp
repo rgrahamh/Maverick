@@ -269,11 +269,15 @@ void Object::setY(float y){
 }
 
 /** Sets the X velocity
- * @param x The X velocity
+ * @param xV The X velocity
  */
 void Object::setXVel(float xV){
     this->xV = xV;
 }
+
+/** Sets the Y velocity
+ * @param yV The Y velocity
+ */
 void Object::setYVel(float yV){
     this->yV = yV;
 }
