@@ -16,7 +16,7 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->active_animation = 0;
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
-    for(int i = 0; i < animation_num; i++){
+    for(unsigned int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&(this->x), &(this->y), animated);
     }
     this->mass = mass;
@@ -25,7 +25,7 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
 /** Destructor for objects
  */
 Object::~Object(){
-    for(int i = 0; i < animation_num; i++){
+    for(unsigned int i = 0; i < animation_num; i++){
         delete animations[i];
     }
     free(animations);
@@ -249,7 +249,7 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  */
 void Object::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-    for(int i = animation_start; i <= animation_end && i < animation_num; i++){
+    for(unsigned int i = animation_start; i <= animation_end && i < animation_num; i++){
         this->animations[animation_num]->addHitbox(hitbox);
     }
 }

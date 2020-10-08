@@ -1,8 +1,8 @@
 #include "./Zone.hpp"
 
-Zone::Zone(char* name){
+Zone::Zone(const char* name){
     this->name = name;
-    this->objects = new ObjectLst();
+    this->objects = new ObjectLst;
     this->objects->obj = NULL;
     this->objects->next = NULL;
 }
@@ -21,7 +21,7 @@ ObjectLst* Zone::getObjects(){
     return this->objects;
 }
 
-char* Zone::getName(){
+const char* Zone::getName(){
     return this->name;
 }
 

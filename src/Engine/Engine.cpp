@@ -46,27 +46,17 @@ void Engine::start(){
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
 
-    //Create initial zone (TAKE OUT LATER!)
-    Zone* zone = new Zone("Zone 1");
-
     //Create the player
     Player* player = buildPlayer(0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL);
-    zone->addObject(player);
+    ObjectLst* new_objs = new ObjectLst;
+    new_objs->obj = player;
+    new_objs->next = NULL;
 
-    //Create a pillar
-    Object* pillar_1 = buildPillar(800.0, 700.0);
-    zone->addObject(pillar_1);
-
-    //Create a pillar
-    Object* pillar_2 = buildPillar(800.0, 600.0);
-    zone->addObject(pillar_2);
-
-    //Create a pillar
-    Object* pillar_3 = buildPillar(800.0, 500.0);
-    zone->addObject(pillar_3);
-
-    this->addZone(zone);
-    this->activateZone(zone->getName());
+    //Loading the test zone as the first area
+    std::thread* new_thread = new std::thread(loadZone, "Test Zone", this, new_objs);
+    ThreadLst* thread_entry = new ThreadLst;
+    thread_entry->thread = new_thread;
+    thread_entry->next = threads;
 
     //Setting the reference
     camera->setReference(player);
@@ -80,6 +70,11 @@ void Engine::gameLoop(){
 	while(this->state != EXIT){
         ObjectLst* all_objects = buildFullObjLst();
 
+        //Cleanup threads every second
+        if(this->timer % 60){
+            this->threadCleanup();
+        }
+
 		this->actionStep(all_objects);
 		this->physicsStep(all_objects);
 		this->collisionStep(all_objects);
@@ -87,6 +82,8 @@ void Engine::gameLoop(){
 		all_objects = this->drawStep(all_objects);
 
         freeFullObjLst(all_objects);
+
+        this->timer++;
 	}
 }
 
@@ -217,6 +214,8 @@ void Engine::collisionStep(ObjectLst* all_objects){
                 ObjectLst* object_cursor = object_lst->next;
                 HitboxLst* hitbox_cursor = hitbox_lst->next;
                 while(hitbox_cursor != NULL){
+                    //Possible place for multi-threading!
+
                     //If both aren't environment and they collide, and the object isn't the same
                     if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox) && object_lst->obj != object_cursor->obj){
                         //We want the default collision handling to go last since it's the harshest (and might inhibit special collision cases)
@@ -255,21 +254,49 @@ ObjectLst* Engine::drawStep(ObjectLst* all_objects){
  * @return The current draw object
  */
 ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
-    //Case where it's the first iteration (nothing linking to this)
-    if(curr_obj->next == NULL){
-        return curr_obj;
-    }
-    else{
-        ObjectLst* next_obj = this->drawSort(curr_obj->next);
-        if(curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
-            //Swap node positions & send curr_obj up the draw chain
-            curr_obj->next = next_obj->next;
-            next_obj->next = this->drawSort(curr_obj);
-            return next_obj;
+    //Checking if we have any objects
+    if(curr_obj != NULL){
+        //Case where it's the first iteration (nothing linking to this)
+        if(curr_obj->next == NULL){
+            return curr_obj;
         }
         else{
-            curr_obj->next = next_obj;
-            return curr_obj;
+            ObjectLst* next_obj = this->drawSort(curr_obj->next);
+            if(curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
+                //Swap node positions & send curr_obj up the draw chain
+                curr_obj->next = next_obj->next;
+                next_obj->next = this->drawSort(curr_obj);
+                return next_obj;
+            }
+            else{
+                curr_obj->next = next_obj;
+                return curr_obj;
+            }
+        }
+    }
+    else{
+        return NULL;
+    }
+}
+
+/** Goes through all active threads and cleans them up
+ */
+void Engine::threadCleanup(){
+    ThreadLst* cursor = this->threads;
+    ThreadLst* prev_cursor = this->threads;
+    while(cursor != NULL){
+        if(cursor->thread->joinable()){
+            cursor->thread->join();
+            delete cursor->thread;
+            
+            ThreadLst* curr_entry = cursor;
+            cursor = cursor->next;
+            prev_cursor->next = cursor;
+            delete curr_entry;
+        }
+        else{
+            prev_cursor = cursor;
+            cursor = cursor->next;
         }
     }
 }
@@ -370,6 +397,10 @@ ObjectLst* Engine::buildFullObjLst(){
             first_run = false;
         }
         zone_iter = zone_iter->next;
+    }
+    if(all_objects->obj == NULL){
+        free(all_objects);
+        return NULL;
     }
     return all_objects;
 }

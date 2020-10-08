@@ -5,15 +5,15 @@
 
 class Zone{
     public:
-        Zone(char* name);
+        Zone(const char* name);
         ~Zone();
 
         ObjectLst* getObjects();
         void addObject(Object* object);
-        char* getName();
+        const char* getName();
     private:
         ObjectLst* objects;
-        char* name;
+        const char* name;
 };
 
 typedef struct ZoneList{

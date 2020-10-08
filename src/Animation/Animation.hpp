@@ -8,11 +8,6 @@
 #include <SFML/Graphics.hpp>
 #include <unordered_map>
 
-typedef struct AnimationList{
-	Animation* animation;
-	struct AnimationList* next;
-} AnimationLst;
-
 extern TextureHash* texture_hash;
 
 class Animation{
@@ -75,5 +70,10 @@ class Animation{
 		//If the image is animated (if not, animated is set to false)
 		bool animated;
 };
+
+typedef struct AnimationList{
+	Animation* animation;
+	struct AnimationList* next;
+} AnimationLst;
 
 #endif
