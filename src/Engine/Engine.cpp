@@ -14,6 +14,8 @@ Engine::Engine(){
 
     //Set to the title screen
     this->state = TITLE;
+
+    this->threads = NULL;
 }
 
 /** Engine's destructor
@@ -57,6 +59,7 @@ void Engine::start(){
     ThreadLst* thread_entry = new ThreadLst;
     thread_entry->thread = new_thread;
     thread_entry->next = threads;
+    threads = thread_entry;
 
     //Setting the reference
     camera->setReference(player);
@@ -71,7 +74,7 @@ void Engine::gameLoop(){
         ObjectLst* all_objects = buildFullObjLst();
 
         //Cleanup threads every second
-        if(this->timer % 60){
+        if(this->timer % 60 == 0){
             this->threadCleanup();
         }
 
@@ -289,10 +292,17 @@ void Engine::threadCleanup(){
             cursor->thread->join();
             delete cursor->thread;
             
-            ThreadLst* curr_entry = cursor;
-            cursor = cursor->next;
-            prev_cursor->next = cursor;
-            delete curr_entry;
+            if(cursor == threads){
+                cursor = cursor->next;
+                delete threads;
+                threads = cursor;
+            }
+            else{
+                ThreadLst* curr_entry = cursor;
+                cursor = cursor->next;
+                prev_cursor->next = cursor;
+                delete curr_entry;
+            }
         }
         else{
             prev_cursor = cursor;
