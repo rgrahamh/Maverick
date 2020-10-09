@@ -1,8 +1,8 @@
 #include "./Factory.hpp"
 
 
-Player* buildPlayer(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment, InvSlot** inventory){
-    Player* player = new Player(start_x, start_y, friction, mass, race, style, stats, mastery, abilities, equipment, inventory, 12);
+Character* buildCharacter(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory){
+    Character* player = new Character(start_x, start_y, friction, mass, race, style, stats, mastery, abilities, control, equipment, inventory, 12);
 
     //Neutral position
     player->addSprite(0, "./assets/sprites/old_game_resources/Up_Neutral.png", 16, 0, 0);

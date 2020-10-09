@@ -14,7 +14,7 @@ TextureHash::TextureHash(unsigned int size){
 /** The destructor for the TextureHash
  */
 TextureHash::~TextureHash(){
-	for(int i = 0; i < this->size; i++){
+	for(unsigned int i = 0; i < this->size; i++){
 		if(this->table[i] != NULL){
 			THEntry* cursor = this->table[i];
 			while(cursor != NULL){

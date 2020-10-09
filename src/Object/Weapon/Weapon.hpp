@@ -1,6 +1,8 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
+#include "../Object.hpp"
+
 enum WEAPON_TYPE{
 	axe,
 	blaster,
@@ -10,7 +12,7 @@ enum WEAPON_TYPE{
 	sword
 };
 
-class Weapon{
+class Weapon : public Object{
 	public:
 		Weapon();
 		~Weapon();

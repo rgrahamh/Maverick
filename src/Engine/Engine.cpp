@@ -49,7 +49,7 @@ void Engine::start(){
     texture_hash = new TextureHash(2048);
 
     //Create the player
-    Player* player = buildPlayer(0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), new Equipment(), NULL);
+    Character* player = buildCharacter(0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     ObjectLst* new_objs = new ObjectLst;
     new_objs->obj = player;
     new_objs->next = NULL;

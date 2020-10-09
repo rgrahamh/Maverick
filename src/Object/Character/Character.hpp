@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "../../Item/Item.hpp"
-#include "../../Weapon/Weapon.hpp"
+#include "../../Object/Weapon/Weapon.hpp"
 #include "../../Armor/Armor.hpp"
 #include "../../Ability/Ability.hpp"
 #include "../Object.hpp"
@@ -82,9 +82,17 @@ enum CHARACTER_ANIMATION{
 	RIGHT_WALK
 };
 
+enum CONTROL_TYPE{
+	KEYBOARD,
+	AI,
+	NETWORK,
+	WANDERING,
+	STATIC
+};
+
 class Character : public Object, public Race, public Style{
 	public:
-		Character(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
+		Character(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
 		virtual ~Character();
 		//Useful for actions on other objects & input
 		virtual void action(sf::Event event);
@@ -96,11 +104,21 @@ class Character : public Object, public Race, public Style{
 	protected:
 		bool overdrive;
 		bool sliding;
+		CONTROL_TYPE control;
 		Stats* stats;
 		InvSlot** inventory;
 		Mastery* mastery;
 		Equipment* equipment;
 		Abilities* abilities;
+
+        typedef struct KeyboardState{
+            bool up_arrow;
+            bool down_arrow;
+            bool left_arrow;
+            bool right_arrow;
+        } KeyState;
+
+        KeyState keys;
 };
 
 #endif

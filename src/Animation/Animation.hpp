@@ -65,7 +65,7 @@ class Animation{
 		float* y_base;
 
 		//The frame counter
-		int frame_counter;
+		unsigned int frame_counter;
 
 		//If the image is animated (if not, animated is set to false)
 		bool animated;

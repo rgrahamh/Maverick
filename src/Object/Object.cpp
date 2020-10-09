@@ -8,18 +8,27 @@
  * @param animation_num The number of animations
  */
 Object::Object(float start_x, float start_y, float friction, float mass, unsigned int animation_num, bool animated){
+    //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
     this->old_x = start_x;
     this->old_y = start_y;
+    this->xV = 0;
+    this->yV = 0;
+    this->xA = 0;
+    this->yA = 0;
+
+    //Initializing various physics elements
     this->friction = friction;
+    this->mass = mass;
+
+    //Initializing animation attributes
     this->active_animation = 0;
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(unsigned int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&(this->x), &(this->y), animated);
     }
-    this->mass = mass;
 }
 
 /** Destructor for objects
