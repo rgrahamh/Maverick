@@ -24,6 +24,7 @@ class Object{
 		unsigned int getDrawLayer();
 		float getDrawAxis();
 		HitboxLst* getHitboxes();
+		bool getVisible();
 		bool getEnvBump();
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
@@ -42,6 +43,7 @@ class Object{
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
+		void setVisible(bool visible);
 		void setEnvBump();
 
 		void applyForce(float xA, float yA);
@@ -81,9 +83,13 @@ class Object{
 		//How much the object weighs
 		float mass;
 
+		//Visibility
+		bool visible;
+
 		//Environmental bump
 		bool env_bump;
 
+		//Animation tracking
 		unsigned int active_animation;
 		unsigned int animation_num;
 

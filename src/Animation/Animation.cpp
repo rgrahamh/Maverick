@@ -3,16 +3,14 @@
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
- * @param animated If the animation progresses
  */
-Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer, bool animated){
+Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->frame_counter = 0;
-	this->animated = animated;
 	this->draw_layer = draw_layer;
 }
 
@@ -84,6 +82,13 @@ int Animation::getFramesLeft(){
 		cursor = cursor->next;
 	}
 	return frames_left;
+}
+
+/** If the animation is animated
+ * @return If the animation is animated (if it has multiple frames)
+ */
+bool Animation::isAnimated(){
+	return (this->sequence_start == this->sequence_end)? false : true;
 }
 
 /** Adds a frame to an animation
@@ -209,7 +214,7 @@ void Animation::setScale(float x_scale, float y_scale){
 /** Advances the animation by a frame
  */
 void Animation::advance(){
-	if(animated && sequence->keyframe == frame_counter++){
+	if(this->isAnimated() && sequence->keyframe == frame_counter++){
 		sequence = sequence->next;
 		frame_counter = 0;
 	}

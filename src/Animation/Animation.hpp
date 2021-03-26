@@ -12,7 +12,7 @@ extern TextureHash* texture_hash;
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, unsigned char draw_layer = 1, bool animated = true);
+		Animation(float* x_base, float* y_base, unsigned char draw_layer = 1);
 		~Animation();
 
 		void advance();
@@ -67,8 +67,7 @@ class Animation{
 		//The frame counter
 		unsigned int frame_counter;
 
-		//If the image is animated (if not, animated is set to false)
-		bool animated;
+		bool isAnimated();
 };
 
 typedef struct AnimationList{

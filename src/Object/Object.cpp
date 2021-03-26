@@ -22,7 +22,8 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->friction = friction;
     this->mass = mass;
 
-    //Initializing animation attributes
+    //Initializing animation/visibility attributes
+    this->visible = false;
     this->active_animation = 0;
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
@@ -121,6 +122,13 @@ float Object::getDrawAxis(){
  */
 HitboxLst* Object::getHitboxes(){
     return this->animations[active_animation]->getHitboxes();
+}
+
+/** Sets the visibility of the current animation state
+ * @return If the object is visible
+ */
+bool Object::getVisible(){
+    return this->visible;
 }
 
 /** Gets if the object has bumped against the environment (or an entity which has bumped against the environment)
@@ -318,6 +326,13 @@ void Object::setScale(float x_scale, float y_scale){
     for(unsigned int i = 0; i < this->animation_num; i++){
         this->animations[i]->setScale(x_scale, y_scale);
     }
+}
+
+/** Sets the visibility of the current animation state
+ * @return If the object is visible
+ */
+void Object::setVisible(bool visible){
+    this->visible = visible;
 }
 
 /** Sets the environmental bump to true
