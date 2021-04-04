@@ -23,7 +23,8 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->mass = mass;
 
     //Initializing animation/visibility attributes
-    this->visible = false;
+    this->active = true;
+    this->visible = true;
     this->active_animation = 0;
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
@@ -124,10 +125,17 @@ HitboxLst* Object::getHitboxes(){
     return this->animations[active_animation]->getHitboxes();
 }
 
-/** Sets the visibility of the current animation state
- * @return If the object is visible
+/** Sets if the current object is active (can be interacted with)
+ * @return If the object is active
  */
-bool Object::getVisible(){
+bool Object::isActive(){
+    return this->active;
+}
+
+/** Sets if the current object is visible (will/won't be drawn)
+ * @return If the object is active
+ */
+bool Object::isVisible(){
     return this->visible;
 }
 
@@ -329,7 +337,14 @@ void Object::setScale(float x_scale, float y_scale){
 }
 
 /** Sets the visibility of the current animation state
- * @return If the object is visible
+ * @return If the object is active
+ */
+void Object::setActive(bool active){
+    this->active = active;
+}
+
+/** Sets the visibility of the current animation state
+ * @return If the object is active
  */
 void Object::setVisible(bool visible){
     this->visible = visible;

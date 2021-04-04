@@ -46,7 +46,7 @@ void Camera::_draw(ObjectLst* obj_lst){
     for(unsigned int i = 0; i < 3; i++){
         cursor = obj_lst;
         while(cursor != NULL){
-            if(cursor->obj->getDrawLayer() == i && cursor->obj->getVisible()){
+            if(cursor->obj->getDrawLayer() == i && cursor->obj->isVisible()){
                 cursor->obj->draw(window);
             }
             cursor = cursor->next;

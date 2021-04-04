@@ -130,6 +130,10 @@ void Engine::collisionStep(ObjectLst* all_objects){
     //While we're not out of objects
     while(all_objects != NULL){
         Object* curr_object = all_objects->obj;
+        if(unlikely(curr_object->isActive() == false)){
+            all_objects = all_objects->next;
+            continue;
+        }
         HitboxLst* object_hitboxes = all_objects->obj->getHitboxes();
         //While we're not out of object hitboxes
         while(object_hitboxes != NULL){
