@@ -31,6 +31,7 @@ void Camera::setReference(Object* reference){
 void Camera::recenter(){
     if(this->reference != NULL){
         this->view->setCenter(reference->getX() + (reference->getWidth() / 2), reference->getY() + (reference->getHeight() / 2));
+        this->window->setView(*(this->view));
     }
 }
 
@@ -40,7 +41,7 @@ void Camera::recenter(){
 void Camera::_draw(ObjectLst* obj_lst){
     window->clear();
 
-    //recenter();
+    recenter();
 
     ObjectLst* cursor = obj_lst;
     for(unsigned int i = 0; i < NUM_DRAW_LAYERS; i++){
