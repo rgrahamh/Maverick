@@ -34,6 +34,9 @@ class Animation{
 
 		void rotate(int direction, float rotation_amnt);
 
+		void setPaused(bool paused);
+		bool getPaused();
+
 	private:
 		typedef struct AnimationSequence{
 			sf::Sprite* sprite;
@@ -66,6 +69,9 @@ class Animation{
 
 		//The frame counter
 		unsigned int frame_counter;
+
+		//If the animation is paused
+		bool paused;
 
 		bool isAnimated();
 };

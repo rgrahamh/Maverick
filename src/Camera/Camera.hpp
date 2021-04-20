@@ -3,6 +3,8 @@
 
 #include "../Object/Object.hpp"
 
+#define NUM_DRAW_LAYERS 3
+
 class Camera{
 	public:
 		Camera(sf::RenderWindow* window, Object* reference);

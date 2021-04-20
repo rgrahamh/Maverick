@@ -12,6 +12,7 @@ Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer){
 	this->y_base = y_base;
 	this->frame_counter = 0;
 	this->draw_layer = draw_layer;
+	this->paused = false;
 }
 
 /** Animation destructor
@@ -82,6 +83,20 @@ int Animation::getFramesLeft(){
 		cursor = cursor->next;
 	}
 	return frames_left;
+}
+
+/** Gets if the animation is paused
+ * @return If the animation is paused
+ */
+bool Animation::getPaused(){
+	return this->paused;
+}
+
+/** Sets if the animation is paused
+ * @param paused If the animation is paused
+ */
+void Animation::setPaused(bool paused){
+	this->paused = paused;
 }
 
 /** If the animation is animated
@@ -214,7 +229,7 @@ void Animation::setScale(float x_scale, float y_scale){
 /** Advances the animation by a frame
  */
 void Animation::advance(){
-	if(this->isAnimated() && sequence->keyframe == frame_counter++){
+	if(this->isAnimated() && !this->paused && sequence->keyframe == frame_counter++){
 		sequence = sequence->next;
 		frame_counter = 0;
 	}
