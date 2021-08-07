@@ -44,13 +44,19 @@ class Engine{
 		void gameLoop();
 
 		//Engine steps
+		//Action step
 		void actionStep(ObjectLst* all_objects);
-		ObjectLst* drawStep(ObjectLst* all_objects);
-		void collisionStep(ObjectLst* all_objects);
-		void physicsStep(ObjectLst* all_objects);
+		void globalAction(sf::Event);
 
-		//Sorts an object list by draw axis
+		//Draw step
+		void drawStep(ObjectLst* all_objects);
 		ObjectLst* drawSort(ObjectLst* all_objects);
+
+		//Collision step
+		void collisionStep(ObjectLst* all_objects);
+
+		//Physics step
+		void physicsStep(ObjectLst* all_objects);
 
 		//Cleaning up threads
 		void threadCleanup();

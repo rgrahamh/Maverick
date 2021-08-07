@@ -78,13 +78,13 @@ void Engine::gameLoop(){
             this->threadCleanup();
         }
 
-		this->actionStep(all_objects);
-		this->physicsStep(all_objects);
-		this->collisionStep(all_objects);
+        if(this->state != PAUSE){
+            this->actionStep(all_objects);
+            this->physicsStep(all_objects);
+            this->collisionStep(all_objects);
+        }
         //Different because we need to adjust the object list for draw order
-		all_objects = this->drawStep(all_objects);
-
-        freeFullObjLst(all_objects);
+		this->drawStep(all_objects);
 
         this->timer++;
 	}
@@ -106,6 +106,15 @@ void Engine::actionStep(ObjectLst* all_objects){
             cursor->obj->action(event);
             cursor = cursor->next;
         }
+        this->globalAction(event);
+    }
+}
+
+/** Handles object-nonspecific actions (like menuing for example)
+ */
+void Engine::globalAction(sf::Event event){
+    if(event.key.code == sf::Keyboard::Escape && (this->state == OVERWORLD || this->state == PAUSE)){
+        this->state = (this->state == PAUSE)? OVERWORLD : PAUSE;
     }
 }
 
@@ -249,11 +258,11 @@ void Engine::collisionStep(ObjectLst* all_objects){
 
 /** The draw step of the game engine
  */
-ObjectLst* Engine::drawStep(ObjectLst* all_objects){
+void Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
     all_objects = this->drawSort(all_objects);
     this->camera->_draw(all_objects);
-    return all_objects;
+    freeFullObjLst(all_objects);
 }
 
 /** Recursively sorts the objects in the order of draw

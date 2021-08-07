@@ -7,8 +7,8 @@
 Camera::Camera(sf::RenderWindow* window, Object* reference = NULL){
     this->reference = reference;
     if(reference != NULL){
-        this->default_x = reference->getX();
-        this->default_y = reference->getY();
+        this->current_x = reference->getX();
+        this->current_y = reference->getY();
     }
     this->view = new sf::View(window->getDefaultView());
     this->window = window;
@@ -30,7 +30,11 @@ void Camera::setReference(Object* reference){
  */
 void Camera::recenter(){
     if(this->reference != NULL){
-        this->view->setCenter(reference->getX() + (reference->getWidth() / 2), reference->getY() + (reference->getHeight() / 2));
+        float obj_x = reference->getX() + (reference->getWidth() / 2);
+        float obj_y = reference->getY() + (reference->getHeight() / 2);
+        current_x += (obj_x - current_x) * FOLLOW_RATE;
+        current_y += (obj_y - current_y) * FOLLOW_RATE;
+        this->view->setCenter(current_x, current_y);
         this->window->setView(*(this->view));
     }
 }
