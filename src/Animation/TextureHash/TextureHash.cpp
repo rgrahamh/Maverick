@@ -1,5 +1,7 @@
 #include "./TextureHash.hpp"
 
+extern SDL_Renderer* renderer;
+
 //The instance of the texture hash table
 TextureHash* texture_hash;
 
@@ -50,7 +52,7 @@ unsigned int TextureHash::hash(const char* key){
  * @param key The string (filepath) that is being hashed
  * @param texture The texture that is being put into the table
  */
-void TextureHash::add(const char* key, sf::Texture* texture){
+void TextureHash::add(const char* key, SDL_Texture* texture){
 	unsigned int hash_val = this->hash(key);
 
 	//Copying the key for permanent storage
@@ -78,18 +80,29 @@ void TextureHash::add(const char* key, sf::Texture* texture){
  * @param key The string (filepath) that is being hashed
  * @return The texture with the given key
  */
-sf::Texture* TextureHash::get(const char* key){
+SDL_Texture* TextureHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
 	THEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case
-	while(cursor != NULL && strcmp(cursor->key, key) != 0){
+	if(strcmp(cursor->key, key)){
+		return cursor->texture;
+	}
+	while(cursor->next != NULL && strcmp(cursor->next->key, key) != 0){
 		cursor = cursor->next;
 	}
 
-	if(cursor == NULL){
-		return NULL;
+	if(cursor->next == NULL){
+		SDL_Surface* new_surface = SDL_LoadBMP(key);
+		if(new_surface == nullptr){
+			printf("Can't load the file: %s as a surface\n", key);
+		}
+		SDL_Texture* new_texture = SDL_CreateTextureFromSurface(renderer, new_surface);
+		SDL_FreeSurface(new_surface);
+
+		this->add(key, new_texture);
+		return new_texture;
 	}
 
 	return cursor->texture;

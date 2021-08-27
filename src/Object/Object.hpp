@@ -8,6 +8,8 @@
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitboxCollision.hpp"
 
+#include <SDL2/SDL.h>
+
 class Object{
 	public:
 		Object(float start_x, float start_y, float friction, float weight, unsigned int animation_num, bool animated = true);
@@ -58,7 +60,7 @@ class Object{
 		//Useful for actions on other objects & input
 		virtual void action(sf::Event event);
 
-		virtual void draw(sf::RenderWindow* window);
+		virtual void draw(SDL_Renderer* renderer);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		

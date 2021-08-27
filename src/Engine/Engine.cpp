@@ -4,10 +4,18 @@
  * @param zones The zones that the game engine is initialized with
  */
 Engine::Engine(){
+    //Init SDL
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
+
     //Initialization of window and camera
-	this->window = new sf::RenderWindow(sf::VideoMode(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().width), "SFML Window");
-    window->setFramerateLimit(60);
-    this->camera = new Camera(window, NULL);
+	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    if(window == nullptr){
+        printf("Could not create window; exiting");
+        return;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    this->camera = new Camera(renderer, NULL);
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -21,8 +29,6 @@ Engine::Engine(){
 /** Engine's destructor
  */
 Engine::~Engine(){
-    window->close();
-    delete window;
     delete camera;
 
     ZoneLst* zone_cursor = zones;
@@ -40,6 +46,10 @@ Engine::~Engine(){
         delete active_zones;
         active_zones = zone_cursor;
     }
+
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 /** The function that is called to start the game engine's operation
@@ -94,7 +104,7 @@ void Engine::gameLoop(){
  * @param all_objects All of the objects that should be listening for input
  */
 void Engine::actionStep(ObjectLst* all_objects){
-    sf::Event event;
+    /*sf::Event event;
     ObjectLst* cursor;
     while(window->pollEvent(event)){
         if(event.type == sf::Event::Closed){
@@ -107,7 +117,7 @@ void Engine::actionStep(ObjectLst* all_objects){
             cursor = cursor->next;
         }
         this->globalAction(event);
-    }
+    }*/
 }
 
 /** Handles object-nonspecific actions (like menuing for example)

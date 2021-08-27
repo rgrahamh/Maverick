@@ -409,8 +409,8 @@ void Object::process(){
 /** Called during the draw step
  * @param window The window that content is being drawn to
  */
-void Object::draw(sf::RenderWindow* window){
-    this->animations[active_animation]->draw(window);
+void Object::draw(SDL_Renderer* renderer){
+    this->animations[active_animation]->draw(renderer);
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

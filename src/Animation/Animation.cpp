@@ -114,18 +114,15 @@ bool Animation::isAnimated(){
  */
 void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
 	//Getting the texture
-	sf::Texture* texture;
-	if((texture = texture_hash->get(sprite_path)) == NULL){
-		texture = new sf::Texture();
-		if(!texture->loadFromFile(sprite_path)){
+	SDL_Texture* new_texture;
+	if((new_texture = texture_hash->get(sprite_path)) == NULL){
+		if(new_texture == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
-
-		texture_hash->add(sprite_path, texture);
 	}
-	sf::Sprite* sprite;
-	sprite = new sf::Sprite(*texture);
+	SDL_Rect* rect;
+	rect = new SDL_Rect();
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
@@ -140,7 +137,8 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 		this->sequence_end->next = this->sequence_start;
 	}
 	//Regardless
-	this->sequence_end->sprite = sprite;
+	this->sequence_end->rect = rect;
+	this->sequence_end->texture = new_texture;
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->base_x_offset = x_offset;
 	this->sequence_end->base_y_offset = y_offset;
@@ -212,8 +210,9 @@ void Animation::setScale(float x_scale, float y_scale){
 			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
 			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
 
-			if(cursor->sprite != NULL){
-				cursor->sprite->setScale(x_scale, y_scale);
+			if(cursor->rect != NULL){
+				cursor->rect->w = cursor->rect->w * x_scale;
+				cursor->rect->h = cursor->rect->h * y_scale;
 			}
 			if(cursor->hitboxes != NULL){
 				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
@@ -245,16 +244,16 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(sf::RenderWindow* window){
+void Animation::draw(SDL_Renderer* renderer){
 	//Advance the animation
 	this->advance();
 
 	//Update the sprite position
-	sf::Sprite* curr_sprite = this->sequence->sprite;
+	SDL_Texture* curr_sprite = this->sequence->sprite;
 	curr_sprite->setPosition(*this->x_base + this->sequence->curr_x_offset, *this->y_base + this->sequence->curr_y_offset);
 
 	//Draw the sprite
-	window->draw(*curr_sprite);
+	SDL_RenderCopy(renderer, *curr_sprite, NULL, NULL);
 }
 
 /** Rotates the hitbox slightly to the right (if direction is 0) or left (if direction is 1)

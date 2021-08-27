@@ -1,9 +1,9 @@
-#include <SFML/Graphics.hpp>
 #include <string.h>
+#include <SDL2/SDL.h>
 
 typedef struct TextureHashEntry{
 	char* key;
-	sf::Texture* texture;
+	SDL_Texture* texture;
 	struct TextureHashEntry* next;
 } THEntry;
 
@@ -12,8 +12,8 @@ class TextureHash{
 		TextureHash(unsigned int size);
 		~TextureHash();
 
-		void add(const char* key, sf::Texture* texture);
-		sf::Texture* get(const char* key);
+		void add(const char* key, SDL_Texture* texture);
+		SDL_Texture* get(const char* key);
 	
 	private:
 		unsigned int size;

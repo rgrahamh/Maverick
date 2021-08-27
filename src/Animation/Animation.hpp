@@ -6,6 +6,7 @@
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
 
 #include <SFML/Graphics.hpp>
+#include <SDL2/SDL.h>
 #include <unordered_map>
 
 extern TextureHash* texture_hash;
@@ -18,7 +19,7 @@ class Animation{
 		void advance();
 		void start();
 
-		sf::Sprite* getSprite();
+		SDL_Texture* getSprite();
 		HitboxLst* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
@@ -30,7 +31,7 @@ class Animation{
 		void addHitbox(Hitbox* hitbox);
 		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
-		void draw(sf::RenderWindow* window);
+		void draw(SDL_Renderer* window);
 
 		void rotate(int direction, float rotation_amnt);
 
@@ -39,7 +40,9 @@ class Animation{
 
 	private:
 		typedef struct AnimationSequence{
-			sf::Sprite* sprite;
+			SDL_Texture* texture;
+			SDL_Rect* rect;
+
 			HitboxLst* hitboxes;
 
 			float base_x_offset;

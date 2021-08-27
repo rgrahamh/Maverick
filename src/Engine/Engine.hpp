@@ -13,6 +13,11 @@
 
 #include "../Object/Character/Character.hpp"
 
+#include <SDL2/SDL.h>
+
+// TEMP global 'til we make the engine a singleton
+SDL_Renderer* renderer;
+
 enum GAME_STATE{
 	TITLE,
 	OVERWORLD,
@@ -80,7 +85,8 @@ class Engine{
 
 		//Render
 		Camera* camera;
-		sf::RenderWindow* window;
+		SDL_Window* window;
+		SDL_Renderer* renderer;
 
 		//State tracking
 		GAME_STATE state;
