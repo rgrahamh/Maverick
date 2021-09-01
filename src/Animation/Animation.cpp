@@ -1,5 +1,7 @@
 #include "./Animation.hpp"
 
+extern SDL_Renderer* renderer;
+
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
@@ -10,6 +12,8 @@ Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer){
 	this->sequence_end = NULL;
 	this->x_base = x_base;
 	this->y_base = y_base;
+	this->x_scale = 1.0;
+	this->y_scale = 1.0;
 	this->frame_counter = 0;
 	this->draw_layer = draw_layer;
 	this->paused = false;
@@ -42,15 +46,25 @@ Animation::~Animation(){
 /** Gets the current sprite
  * @return The current sprite
  */
-sf::Sprite* Animation::getSprite(){
-	return this->sequence->sprite;
+Sprite* Animation::getSprite(){
+	if(this->sequence){
+		return this->sequence->sprite;
+	}
+	else{
+		return nullptr;
+	}
 }
 
 /** Gets the current hitboxes
  * @return The current hitboxes
  */
 HitboxLst* Animation::getHitboxes(){
-	return this->sequence->hitboxes;
+	if(this->sequence){
+		return this->sequence->hitboxes;
+	}
+	else{
+		return nullptr;
+	}
 }
 
 /** Gets the current draw layer
@@ -64,11 +78,11 @@ unsigned char Animation::getDrawLayer(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
-	if(this->sequence->hitboxes != NULL){
+	if(this->sequence != NULL && this->sequence->hitboxes != NULL){
 		return this->sequence->hitboxes->hitbox->getBotBound();
 	}
 	else{
-		return this->sequence->sprite->getTexture()->getSize().y + this->sequence->curr_y_offset;
+		return this->sequence->sprite->rect->y + this->sequence->sprite->curr_y_offset;
 	}
 }
 
@@ -114,15 +128,21 @@ bool Animation::isAnimated(){
  */
 void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
 	//Getting the texture
-	SDL_Texture* new_texture;
-	if((new_texture = texture_hash->get(sprite_path)) == NULL){
-		if(new_texture == nullptr){
+	SDL_Surface* new_surface;
+	if((new_surface = texture_hash->get(sprite_path)) == NULL){
+		if(new_surface == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
 	}
-	SDL_Rect* rect;
-	rect = new SDL_Rect();
+
+	//Create the rect
+	SDL_Rect* new_rect = new SDL_Rect();
+	new_rect->h = new_surface->h;
+	new_rect->w = new_surface->w;
+
+	//Create the sprite
+	Sprite* new_sprite = new Sprite();
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
@@ -137,13 +157,14 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 		this->sequence_end->next = this->sequence_start;
 	}
 	//Regardless
-	this->sequence_end->rect = rect;
-	this->sequence_end->texture = new_texture;
+	this->sequence_end->sprite = new_sprite;
+	this->sequence_end->sprite->rect = new_rect;
+	this->sequence_end->sprite->texture = SDL_CreateTextureFromSurface(renderer, new_surface);
 	this->sequence_end->keyframe = keyframe;
-	this->sequence_end->base_x_offset = x_offset;
-	this->sequence_end->base_y_offset = y_offset;
-	this->sequence_end->curr_x_offset = x_offset;
-	this->sequence_end->curr_y_offset = y_offset;
+	this->sequence_end->sprite->base_x_offset = x_offset;
+	this->sequence_end->sprite->base_y_offset = y_offset;
+	this->sequence_end->sprite->curr_x_offset = x_offset;
+	this->sequence_end->sprite->curr_y_offset = y_offset;
 	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
@@ -207,12 +228,12 @@ void Animation::setScale(float x_scale, float y_scale){
 	AnimationSeq* cursor = sequence_start;
 	if(cursor != NULL){
 		do{
-			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
-			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
+			cursor->sprite->curr_x_offset = cursor->sprite->base_x_offset * x_scale;
+			cursor->sprite->curr_y_offset = cursor->sprite->base_y_offset * y_scale;
 
-			if(cursor->rect != NULL){
-				cursor->rect->w = cursor->rect->w * x_scale;
-				cursor->rect->h = cursor->rect->h * y_scale;
+			if(cursor->sprite->rect != NULL){
+				cursor->sprite->rect->w = cursor->sprite->rect->w * x_scale;
+				cursor->sprite->rect->h = cursor->sprite->rect->h * y_scale;
 			}
 			if(cursor->hitboxes != NULL){
 				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
@@ -248,12 +269,20 @@ void Animation::draw(SDL_Renderer* renderer){
 	//Advance the animation
 	this->advance();
 
+	Sprite* sprite = this->sequence->sprite;
+
 	//Update the sprite position
-	SDL_Texture* curr_sprite = this->sequence->sprite;
-	curr_sprite->setPosition(*this->x_base + this->sequence->curr_x_offset, *this->y_base + this->sequence->curr_y_offset);
+	SDL_Rect* curr_rect = sprite->rect;
+	curr_rect->x = *this->x_base + sprite->curr_x_offset;
+	curr_rect->y = *this->y_base + sprite->curr_y_offset;
 
 	//Draw the sprite
-	SDL_RenderCopy(renderer, *curr_sprite, NULL, NULL);
+	if(sprite->rotation){
+		SDL_RenderCopyEx(renderer, sprite->texture, NULL, curr_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE);
+	}
+	else{
+		SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect);
+	}
 }
 
 /** Rotates the hitbox slightly to the right (if direction is 0) or left (if direction is 1)
@@ -263,7 +292,7 @@ void Animation::draw(SDL_Renderer* renderer){
 void Animation::rotate(int direction, float rotate_amnt){
 	AnimationSeq* animations = sequence_start;
 	while(animations != NULL){
-		animations->sprite->rotate(rotate_amnt * ((direction)? -1 : 1));
+		animations->sprite->rotation += rotate_amnt * ((direction)? -1 : 1);
 
 		HitboxLst* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){

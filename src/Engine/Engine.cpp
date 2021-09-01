@@ -1,5 +1,8 @@
 #include "./Engine.hpp"
 
+// TEMP global 'til we make the engine a singleton
+SDL_Renderer* renderer;
+
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -11,10 +14,16 @@ Engine::Engine(){
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
+        fflush(stdout);
         return;
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    if(renderer == NULL){
+        printf("Renderer is null; exiting");
+        fflush(stdout);
+        return;
+    }
     this->camera = new Camera(renderer, NULL);
 
     this->zones = NULL;
@@ -192,8 +201,9 @@ void Engine::collisionStep(ObjectLst* all_objects){
                     break;
             }
             
-            int win_width = sf::VideoMode::getDesktopMode().width;
-            int win_height = sf::VideoMode::getDesktopMode().height;
+            //CHANGE THESE BACK TO VARIABLE WITH WINDOW SIZE
+            int win_width = 1920;
+            int win_height = 1080;
             int x_iter = win_width / 16;
             int y_iter = win_height / 9;
             int j = 0;

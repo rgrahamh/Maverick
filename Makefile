@@ -1,4 +1,4 @@
-INCLUDE_SFML= -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -I/usr/include/SFML
+INCLUDE_SDL= -lSDL2
 CC=g++
 CFLAGS= -Wall -std=c++17 -pthread
 
@@ -24,10 +24,10 @@ CYBERENA= ./src/Cyberena.cpp
 ALL_OBJECTS= $(RPG) $(MOTOR) $(CYBERENA)
 
 cyberena_test:
-	$(CC) -O0 $(ALL_OBJECTS) -o Cyberena $(CFLAGS) -g $(INCLUDE_SFML)
+	$(CC) -O0 $(ALL_OBJECTS) -o Cyberena $(CFLAGS) -g $(INCLUDE_SDL)
 
 cyberena_release:
-	$(CC) -O3 $(ALL_OBJECTS) -o Cyberena $(CFLAGS) $(INCLUDE_SFML)
+	$(CC) -O3 $(ALL_OBJECTS) -o Cyberena $(CFLAGS) $(INCLUDE_SDL)
 
 basics:
-	${CC} sfml_basics.cpp -o sfmlb ${CFLAGS} ${INCLUDE_SFML}
+	${CC} sfml_basics.cpp -o sfmlb ${CFLAGS} ${INCLUDE_SDL}

@@ -15,9 +15,6 @@
 
 #include <SDL2/SDL.h>
 
-// TEMP global 'til we make the engine a singleton
-SDL_Renderer* renderer;
-
 enum GAME_STATE{
 	TITLE,
 	OVERWORLD,

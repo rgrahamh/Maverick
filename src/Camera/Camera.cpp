@@ -14,7 +14,6 @@ Camera::Camera(SDL_Renderer* renderer, Object* reference = NULL){
 }
 
 Camera::~Camera(){
-    delete this->view;
 }
 
 /** Sets the reference for the center of the camera

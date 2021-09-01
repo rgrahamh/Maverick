@@ -11,6 +11,22 @@
 
 extern TextureHash* texture_hash;
 
+typedef struct Sprite{
+	SDL_Texture* texture;
+	SDL_Rect* rect;
+
+	//X & Y offsets from the object, discluding scale
+	float base_x_offset;
+	float base_y_offset;
+
+	//X & Y offsets from the object, including scale
+	float curr_x_offset;
+	float curr_y_offset;
+
+	//Rotation (clockwise, in degrees)
+	double rotation;
+} Sprite;
+
 class Animation{
 	public:
 		Animation(float* x_base, float* y_base, unsigned char draw_layer = 1);
@@ -19,7 +35,7 @@ class Animation{
 		void advance();
 		void start();
 
-		SDL_Texture* getSprite();
+		Sprite* getSprite();
 		HitboxLst* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
@@ -40,15 +56,9 @@ class Animation{
 
 	private:
 		typedef struct AnimationSequence{
-			SDL_Texture* texture;
-			SDL_Rect* rect;
+			Sprite* sprite;
 
 			HitboxLst* hitboxes;
-
-			float base_x_offset;
-			float base_y_offset;
-			float curr_x_offset;
-			float curr_y_offset;
 			
 			unsigned int keyframe;
 
@@ -69,6 +79,10 @@ class Animation{
 		//Pointers to the X and Y base coords
 		float* x_base;
 		float* y_base;
+
+		//Scale of the height and width
+		float x_scale;
+		float y_scale;
 
 		//The frame counter
 		unsigned int frame_counter;

@@ -88,14 +88,14 @@ float Object::getYVel(){
  * @return The width of the object
  */
 float Object::getWidth(){
-    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+    return this->animations[active_animation]->getSprite()->rect->w;
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
 float Object::getHeight(){
-    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+    return this->animations[active_animation]->getSprite()->rect->h;
 }
 
 /** Gets the mass of the object (in lbs)
