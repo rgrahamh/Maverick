@@ -8,7 +8,7 @@ SDL_Renderer* renderer;
  */
 Engine::Engine(){
     //Init SDL
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_EVERYTHING);
 
     //Initialization of window and camera
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -113,26 +113,26 @@ void Engine::gameLoop(){
  * @param all_objects All of the objects that should be listening for input
  */
 void Engine::actionStep(ObjectLst* all_objects){
-    /*sf::Event event;
+    SDL_Event event;
     ObjectLst* cursor;
-    while(window->pollEvent(event)){
-        if(event.type == sf::Event::Closed){
+    while(SDL_PollEvent(&event)){
+        if(event.type == SDL_QUIT){
             this->state = EXIT;
             return;
         }
         cursor = all_objects;
         while(cursor != NULL){
-            cursor->obj->action(event);
+            cursor->obj->action(&event);
             cursor = cursor->next;
         }
-        this->globalAction(event);
-    }*/
+        this->globalAction(&event);
+    }
 }
 
 /** Handles object-nonspecific actions (like menuing for example)
  */
-void Engine::globalAction(sf::Event event){
-    if(event.key.code == sf::Keyboard::Escape && (this->state == OVERWORLD || this->state == PAUSE)){
+void Engine::globalAction(SDL_Event* event){
+    if(event->key.keysym.sym == SDLK_ESCAPE && (this->state == OVERWORLD || this->state == PAUSE)){
         this->state = (this->state == PAUSE)? OVERWORLD : PAUSE;
     }
 }

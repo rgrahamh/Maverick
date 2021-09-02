@@ -23,6 +23,7 @@ class Camera{
 		float current_y;
 
 		SDL_Renderer* renderer;
+		SDL_Rect* viewport;
 
 		void recenter();
 };

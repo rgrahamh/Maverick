@@ -58,7 +58,7 @@ class Object{
 		virtual void process();
 
 		//Useful for actions on other objects & input
-		virtual void action(sf::Event event);
+		virtual void action(SDL_Event* event);
 
 		virtual void draw(SDL_Renderer* renderer);
 

@@ -41,152 +41,172 @@ Character::~Character(){
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
-void Character::action(sf::Event event){
-    if(event.type == sf::Event::KeyPressed){
-        if(event.key.code == sf::Keyboard::Up){
-            this->keys.up_arrow = 1;
-            //Both on or both off
-            if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
-                this->setAnimation(UP_WALK);
+void Character::action(SDL_Event* event){
+    if(event->type == SDL_KEYDOWN){
+        switch(event->key.keysym.sym){
+            case(SDLK_UP): {
+                this->keys.up_arrow = 1;
+                //Both on or both off
+                if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
+                    this->setAnimation(UP_WALK);
+                }
+
+                break;
             }
-        }
-        else if(event.key.code == sf::Keyboard::Down){
-            this->keys.down_arrow = 1;
-            //Both on or both off
-            if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
-                this->setAnimation(DOWN_WALK);
+            case(SDLK_DOWN): {
+                this->keys.down_arrow = 1;
+                //Both on or both off
+                if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
+                    this->setAnimation(DOWN_WALK);
+                }
+
+                break;
             }
-        }
-        else if(event.key.code == sf::Keyboard::Left){
-            this->keys.left_arrow = 1;
-            if(keys.right_arrow && !(keys.up_arrow || keys.down_arrow)){
-                this->setAnimation(RIGHT_NEUTRAL);
+            case(SDLK_LEFT): {
+                this->keys.left_arrow = 1;
+                if(keys.right_arrow && !(keys.up_arrow || keys.down_arrow)){
+                    this->setAnimation(RIGHT_NEUTRAL);
+                }
+                else if (keys.right_arrow && keys.down_arrow){
+                    this->setAnimation(DOWN_WALK);
+                }
+                else if (keys.right_arrow && keys.up_arrow){
+                    this->setAnimation(UP_WALK);
+                }
+                else{
+                    this->setAnimation(LEFT_WALK);
+                }
+
+                break;
             }
-            else if (keys.right_arrow && keys.down_arrow){
-                this->setAnimation(DOWN_WALK);
-            }
-            else if (keys.right_arrow && keys.up_arrow){
-                this->setAnimation(UP_WALK);
-            }
-            else{
-                this->setAnimation(LEFT_WALK);
-            }
-        }
-        else if(event.key.code == sf::Keyboard::Right){
-            this->keys.right_arrow = 1;
-            if(keys.left_arrow && !(keys.up_arrow || keys.down_arrow)){
-                this->setAnimation(LEFT_NEUTRAL);
-            }
-            else if (keys.left_arrow && keys.down_arrow){
-                this->setAnimation(DOWN_WALK);
-            }
-            else if (keys.left_arrow && keys.up_arrow){
-                this->setAnimation(UP_WALK);
-            }
-            else{
-                this->setAnimation(RIGHT_WALK);
+            case(SDLK_RIGHT): {
+                this->keys.right_arrow = 1;
+                if(keys.left_arrow && !(keys.up_arrow || keys.down_arrow)){
+                    this->setAnimation(LEFT_NEUTRAL);
+                }
+                else if (keys.left_arrow && keys.down_arrow){
+                    this->setAnimation(DOWN_WALK);
+                }
+                else if (keys.left_arrow && keys.up_arrow){
+                    this->setAnimation(UP_WALK);
+                }
+                else{
+                    this->setAnimation(RIGHT_WALK);
+                }
+
+                break;
             }
         }
     }
 
-    else if(event.type == sf::Event::KeyReleased){
-        if(event.key.code == sf::Keyboard::Up){
-            this->keys.up_arrow = 0;
+    else if(event->type == SDL_KEYUP){
+        switch(event->key.keysym.sym){
+            case(SDLK_UP): {
+                this->keys.up_arrow = 0;
 
-            //If down and nothing else or down and everything else
-            if((this->keys.down_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
-                this->setAnimation(DOWN_WALK);
-            }
-            //If left and right
-            else if(this->keys.left_arrow && this->keys.right_arrow){
-                this->setAnimation(UP_NEUTRAL);
-            }
-            //If left
-            else if(this->keys.left_arrow){
-                this->setAnimation(LEFT_WALK);
-            }
-            //If right
-            else if(this->keys.right_arrow){
-                this->setAnimation(RIGHT_WALK);
-            }
-            //If nothing else
-            else{
-                this->setAnimation(UP_NEUTRAL);
-            }
-        }
+                //If down and nothing else or down and everything else
+                if((this->keys.down_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
+                    this->setAnimation(DOWN_WALK);
+                }
+                //If left and right
+                else if(this->keys.left_arrow && this->keys.right_arrow){
+                    this->setAnimation(UP_NEUTRAL);
+                }
+                //If left
+                else if(this->keys.left_arrow){
+                    this->setAnimation(LEFT_WALK);
+                }
+                //If right
+                else if(this->keys.right_arrow){
+                    this->setAnimation(RIGHT_WALK);
+                }
+                //If nothing else
+                else{
+                    this->setAnimation(UP_NEUTRAL);
+                }
 
-        else if(event.key.code == sf::Keyboard::Down){
-            this->keys.down_arrow = 0;
+                break;
+            }
 
-            //If up and nothing else or up and everything else
-            if((this->keys.up_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
-                this->setAnimation(UP_WALK);
-            }
-            //If left and right
-            else if(this->keys.left_arrow && this->keys.right_arrow){
-                this->setAnimation(DOWN_NEUTRAL);
-            }
-            //If left
-            else if(this->keys.left_arrow){
-                this->setAnimation(LEFT_WALK);
-            }
-            //If right
-            else if(this->keys.right_arrow){
-                this->setAnimation(RIGHT_WALK);
-            }
-            //If nothing else
-            else{
-                this->setAnimation(DOWN_NEUTRAL);
-            }
-        }
+            case(SDLK_DOWN): {
+                this->keys.down_arrow = 0;
 
-        else if(event.key.code == sf::Keyboard::Left){
-            this->keys.left_arrow = 0;
+                //If up and nothing else or up and everything else
+                if((this->keys.up_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
+                    this->setAnimation(UP_WALK);
+                }
+                //If left and right
+                else if(this->keys.left_arrow && this->keys.right_arrow){
+                    this->setAnimation(DOWN_NEUTRAL);
+                }
+                //If left
+                else if(this->keys.left_arrow){
+                    this->setAnimation(LEFT_WALK);
+                }
+                //If right
+                else if(this->keys.right_arrow){
+                    this->setAnimation(RIGHT_WALK);
+                }
+                //If nothing else
+                else{
+                    this->setAnimation(DOWN_NEUTRAL);
+                }
 
-            //If right and nothing else or right and everything else
-            if((this->keys.right_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.right_arrow && this->keys.up_arrow && this->keys.down_arrow)){
-                this->setAnimation(RIGHT_WALK);
+                break;
             }
-            //If up and down
-            else if(this->keys.up_arrow && this->keys.down_arrow){
-                this->setAnimation(LEFT_NEUTRAL);
-            }
-            //If up
-            else if(this->keys.up_arrow){
-                this->setAnimation(UP_WALK);
-            }
-            //If down
-            else if(this->keys.down_arrow){
-                this->setAnimation(DOWN_WALK);
-            }
-            //If nothing else
-            else{
-                this->setAnimation(LEFT_NEUTRAL);
-            }
-        }
 
-        else if(event.key.code == sf::Keyboard::Right){
-            this->keys.right_arrow = 0;
+            case(SDLK_LEFT): {
+                this->keys.left_arrow = 0;
 
-            //If left and nothing else or left and everything else
-            if((this->keys.left_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.left_arrow && this->keys.up_arrow && this->keys.down_arrow)){
-                this->setAnimation(LEFT_WALK);
+                //If right and nothing else or right and everything else
+                if((this->keys.right_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.right_arrow && this->keys.up_arrow && this->keys.down_arrow)){
+                    this->setAnimation(RIGHT_WALK);
+                }
+                //If up and down
+                else if(this->keys.up_arrow && this->keys.down_arrow){
+                    this->setAnimation(LEFT_NEUTRAL);
+                }
+                //If up
+                else if(this->keys.up_arrow){
+                    this->setAnimation(UP_WALK);
+                }
+                //If down
+                else if(this->keys.down_arrow){
+                    this->setAnimation(DOWN_WALK);
+                }
+                //If nothing else
+                else{
+                    this->setAnimation(LEFT_NEUTRAL);
+                }
+
+                break;
             }
-            //If up and down
-            else if(this->keys.up_arrow && this->keys.down_arrow){
-                this->setAnimation(RIGHT_NEUTRAL);
-            }
-            //If up
-            else if(this->keys.up_arrow){
-                this->setAnimation(UP_WALK);
-            }
-            //If down
-            else if(this->keys.down_arrow){
-                this->setAnimation(DOWN_WALK);
-            }
-            //If nothing else
-            else{
-                this->setAnimation(RIGHT_NEUTRAL);
+
+            case(SDLK_RIGHT): {
+                this->keys.right_arrow = 0;
+
+                //If left and nothing else or left and everything else
+                if((this->keys.left_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.left_arrow && this->keys.up_arrow && this->keys.down_arrow)){
+                    this->setAnimation(LEFT_WALK);
+                }
+                //If up and down
+                else if(this->keys.up_arrow && this->keys.down_arrow){
+                    this->setAnimation(RIGHT_NEUTRAL);
+                }
+                //If up
+                else if(this->keys.up_arrow){
+                    this->setAnimation(UP_WALK);
+                }
+                //If down
+                else if(this->keys.down_arrow){
+                    this->setAnimation(DOWN_WALK);
+                }
+                //If nothing else
+                else{
+                    this->setAnimation(RIGHT_NEUTRAL);
+                }
+
+                break;
             }
         }
     }

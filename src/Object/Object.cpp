@@ -368,7 +368,7 @@ void Object::applyForce(float xA, float yA){
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
-void Object::action(sf::Event event){
+void Object::action(SDL_Event* event){
     return;
 }
 

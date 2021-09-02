@@ -95,7 +95,7 @@ class Character : public Object, public Race, public Style{
 		Character(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12);
 		virtual ~Character();
 		//Useful for actions on other objects & input
-		virtual void action(sf::Event event);
+		virtual void action(SDL_Event* event);
 		virtual void process();
 		virtual void draw();
 

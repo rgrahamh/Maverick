@@ -11,6 +11,11 @@ Camera::Camera(SDL_Renderer* renderer, Object* reference = NULL){
         this->current_y = reference->getY();
     }
     this->renderer = renderer;
+    this->viewport = new SDL_Rect();
+    this->viewport->x = 0;
+    this->viewport->y = 0;
+    this->viewport->w = 800;
+    this->viewport->y = 600;
 }
 
 Camera::~Camera(){
@@ -38,9 +43,9 @@ void Camera::recenter(){
  * @param obj_lst The object list that you wish to draw
  */
 void Camera::_draw(ObjectLst* obj_lst){
-    SDL_RenderClear(renderer);
-
     recenter();
+
+    SDL_RenderSetViewport(renderer, this->viewport);
 
     ObjectLst* cursor = obj_lst;
     for(unsigned int i = 0; i < NUM_DRAW_LAYERS; i++){
