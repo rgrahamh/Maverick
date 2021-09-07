@@ -374,7 +374,7 @@ void Object::action(SDL_Event* event){
 
 /** Called during the process step; performs object processing calculations
  */
-void Object::_process(){
+void Object::_process(uint32_t delta){
     this->process();
 
     //Updating old X & Y values
@@ -385,7 +385,7 @@ void Object::_process(){
     this->env_bump = false;
 
     //Updating X values
-    this->xV = this->xA + (this->xV * (1 - this->friction));
+    this->xV = this->xA + (this->xV * (1 - this->friction) * delta);
     if(this->xV < 0.1 && this->xV > -0.1){
         this->xV = 0;
     }
@@ -393,7 +393,7 @@ void Object::_process(){
     this->xA = 0;
 
     //Updating Y values
-    this->yV = this->yA + (this->yV * (1 - this->friction));
+    this->yV = this->yA + (this->yV * (1 - this->friction) * delta);
     if(this->yV < 0.1 && this->yV > -0.1){
         this->yV = 0;
     }

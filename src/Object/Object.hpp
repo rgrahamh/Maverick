@@ -53,7 +53,7 @@ class Object{
 		void applyForce(float xA, float yA);
 
 		//Processing functions
-		void _process();
+		void _process(uint32_t delta);
 		//Need this for custom processing (like input)
 		virtual void process();
 

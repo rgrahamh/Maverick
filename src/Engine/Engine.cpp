@@ -93,9 +93,16 @@ void Engine::gameLoop(){
         ObjectLst* all_objects = buildFullObjLst();
 
         //Cleanup threads every second
-        if(this->timer % 60 == 0){
+        if(this->delta % 1000 == 0){
             this->threadCleanup();
         }
+
+        //Cap the framerate (at 60 for debugging purposes)
+        while(SDL_GetTicks() < last_time + MS_PER_FRAME && SDL_GetTicks() > last_time){
+            continue;
+        }
+
+        delta = SDL_GetTicks() - last_time;
 
         if(this->state != PAUSE){
             this->actionStep(all_objects);
@@ -104,8 +111,6 @@ void Engine::gameLoop(){
         }
         //Different because we need to adjust the object list for draw order
 		this->drawStep(all_objects);
-
-        this->timer++;
 	}
 }
 
@@ -142,7 +147,7 @@ void Engine::globalAction(SDL_Event* event){
  */
 void Engine::physicsStep(ObjectLst* all_objects){
     while(all_objects != NULL){
-        all_objects->obj->_process();
+        all_objects->obj->_process(this->delta);
         all_objects = all_objects->next;
     }
 }
