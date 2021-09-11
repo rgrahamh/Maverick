@@ -4,7 +4,7 @@
 
 typedef struct TextureHashEntry{
 	char* key;
-	SDL_Texture* texture;
+	SDL_Surface* surface;
 	struct TextureHashEntry* next;
 } THEntry;
 
@@ -13,8 +13,8 @@ class TextureHash{
 		TextureHash(unsigned int size);
 		~TextureHash();
 
-		void add(const char* key, SDL_Texture* surface);
-		SDL_Texture* get(const char* key);
+		void add(const char* key, SDL_Surface* surface);
+		SDL_Surface* get(const char* key);
 	
 	private:
 		unsigned int size;

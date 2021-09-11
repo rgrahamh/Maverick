@@ -9,15 +9,15 @@ void buildTestZone(Engine* engine, ObjectLst* add_object){
     }
 
     //Create a pillar
-    Object* pillar_1 = buildPillar(800.0, 700.0);
+    Object* pillar_1 = buildPillar("pillar1", 800.0, 700.0);
     zone->addObject(pillar_1);
 
     //Create a pillar
-    Object* pillar_2 = buildPillar(800.0, 600.0);
+    Object* pillar_2 = buildPillar("pillar2", 800.0, 600.0);
     zone->addObject(pillar_2);
 
     //Create a pillar
-    Object* pillar_3 = buildPillar(800.0, 500.0);
+    Object* pillar_3 = buildPillar("pillar3", 800.0, 500.0);
     zone->addObject(pillar_3);
 
     engine->addZone(zone);

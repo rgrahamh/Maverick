@@ -12,6 +12,7 @@
 extern TextureHash* texture_hash;
 
 typedef struct Sprite{
+	SDL_Surface* surface;
 	SDL_Texture* texture;
 	SDL_Rect* rect;
 
@@ -32,22 +33,22 @@ class Animation{
 		Animation(float* x_base, float* y_base, unsigned char draw_layer = 1);
 		~Animation();
 
-		void advance();
+		void advance(uint32_t delta);
 		void start();
 
 		Sprite* getSprite();
 		HitboxLst* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
-		int getFramesLeft();
+		uint32_t getTimeLeft();
 
 		void setScale(float x_scale, float y_scale);
 
-		void addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset);
 		void addHitbox(Hitbox* hitbox);
 		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
-		void draw(SDL_Renderer* renderer);
+		void draw(SDL_Renderer* renderer, uint32_t delta);
 
 		void rotate(int direction, float rotation_amnt);
 
@@ -60,7 +61,7 @@ class Animation{
 
 			HitboxLst* hitboxes;
 			
-			unsigned int keyframe;
+			unsigned int keytime;
 
 			struct AnimationSequence* next;
 		} AnimationSeq;
@@ -84,8 +85,8 @@ class Animation{
 		float x_scale;
 		float y_scale;
 
-		//The frame counter
-		unsigned int frame_counter;
+		//The time counter
+		unsigned int time_counter;
 
 		//If the animation is paused
 		bool paused;

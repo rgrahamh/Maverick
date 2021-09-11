@@ -162,12 +162,12 @@ bool Object::getEnvBump(){
 /** Adds a sprite to a given animation
  * @param animation_num The animation number
  * @param sprite_path The filepath to the sprite you're adding
- * @param keyframe The number of frames until the animation progresses
+ * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
  */ 
-void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
-    this->animations[animation_num]->addFrame(sprite_path, keyframe, x_offset, y_offset);
+void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset){
+    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset);
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
@@ -422,8 +422,8 @@ void Object::process(){
 /** Called during the draw step
  * @param window The window that content is being drawn to
  */
-void Object::draw(SDL_Renderer* renderer){
-    this->animations[active_animation]->draw(renderer);
+void Object::draw(SDL_Renderer* renderer, uint32_t delta){
+    this->animations[active_animation]->draw(renderer, delta);
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

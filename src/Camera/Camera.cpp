@@ -42,7 +42,7 @@ void Camera::recenter(){
 /** Draws all objects in the given object list
  * @param obj_lst The object list that you wish to draw
  */
-void Camera::_draw(ObjectLst* obj_lst){
+void Camera::_draw(ObjectLst* obj_lst, uint32_t delta){
     recenter();
 
     SDL_RenderClear(renderer);
@@ -53,7 +53,7 @@ void Camera::_draw(ObjectLst* obj_lst){
 
     while(obj_lst != NULL){
         if(obj_lst->obj->isVisible()){
-            obj_lst->obj->draw(renderer);
+            obj_lst->obj->draw(renderer, delta);
         }
         obj_lst = obj_lst->next;
     }

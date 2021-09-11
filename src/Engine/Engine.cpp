@@ -24,7 +24,8 @@ Engine::Engine(){
         return;
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+    //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -78,7 +79,7 @@ void Engine::start(){
     texture_hash = new TextureHash(2048);
 
     //Create the player
-    Character* player = buildCharacter(0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
+    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     ObjectLst* new_objs = new ObjectLst;
     new_objs->obj = player;
     new_objs->next = NULL;
@@ -292,7 +293,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
 void Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
     all_objects = this->drawSort(all_objects);
-    this->camera->_draw(all_objects);
+    this->camera->_draw(all_objects, this->delta);
     freeFullObjLst(all_objects);
 }
 

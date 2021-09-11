@@ -31,7 +31,7 @@ class Object{
 		bool isVisible();
 		bool getEnvBump();
 
-		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset);
 
 		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
 		void addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
@@ -61,7 +61,7 @@ class Object{
 		//Useful for actions on other objects & input
 		virtual void action(SDL_Event* event);
 
-		virtual void draw(SDL_Renderer* renderer);
+		virtual void draw(SDL_Renderer* renderer, uint32_t delta);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		
