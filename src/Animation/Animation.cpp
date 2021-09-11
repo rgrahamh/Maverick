@@ -10,7 +10,9 @@ Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer){
 	this->sequence_end = NULL;
 	this->x_base = x_base;
 	this->y_base = y_base;
-	this->frame_counter = 0;
+	this->x_scale = 1.0;
+	this->y_scale = 1.0;
+	this->time_counter = 0;
 	this->draw_layer = draw_layer;
 	this->paused = false;
 }
@@ -42,15 +44,25 @@ Animation::~Animation(){
 /** Gets the current sprite
  * @return The current sprite
  */
-sf::Sprite* Animation::getSprite(){
-	return this->sequence->sprite;
+Sprite* Animation::getSprite(){
+	if(this->sequence){
+		return this->sequence->sprite;
+	}
+	else{
+		return nullptr;
+	}
 }
 
 /** Gets the current hitboxes
  * @return The current hitboxes
  */
 HitboxLst* Animation::getHitboxes(){
-	return this->sequence->hitboxes;
+	if(this->sequence){
+		return this->sequence->hitboxes;
+	}
+	else{
+		return nullptr;
+	}
 }
 
 /** Gets the current draw layer
@@ -64,25 +76,28 @@ unsigned char Animation::getDrawLayer(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
-	if(this->sequence->hitboxes != NULL){
+	if(this->sequence != NULL && this->sequence->hitboxes != NULL){
 		return this->sequence->hitboxes->hitbox->getBotBound();
 	}
+	else if(this->sequence != NULL){
+		return this->sequence->sprite->rect->y + this->sequence->sprite->curr_y_offset;
+	}
 	else{
-		return this->sequence->sprite->getTexture()->getSize().y + this->sequence->curr_y_offset;
+		return 0.0;
 	}
 }
 
 /** Gets the number of frames left in the animation from the current state
  * @return The number of frames left in the animation
  */
-int Animation::getFramesLeft(){
+uint32_t Animation::getTimeLeft(){
 	AnimationSeq* cursor = this->sequence;
-	int frames_left = cursor->keyframe - this->frame_counter;
+	int time_left = cursor->keytime - this->time_counter;
 	while(cursor != this->sequence_start){
-		frames_left += cursor->keyframe;
+		time_left += cursor->keytime;
 		cursor = cursor->next;
 	}
-	return frames_left;
+	return time_left;
 }
 
 /** Gets if the animation is paused
@@ -103,29 +118,33 @@ void Animation::setPaused(bool paused){
  * @return If the animation is animated (if it has multiple frames)
  */
 bool Animation::isAnimated(){
-	return (this->sequence_start == this->sequence_end)? false : true;
+	return (this->sequence_start == this->sequence_end || this->sequence_start == NULL)? false : true;
 }
 
 /** Adds a frame to an animation
  * @param sprite_path The filepath of the sprite
- * @param keyframe The number of frames before the key continues
+ * @param keytime The number of frames before the key continues
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
+void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset){
 	//Getting the texture
-	sf::Texture* texture;
-	if((texture = texture_hash->get(sprite_path)) == NULL){
-		texture = new sf::Texture();
-		if(!texture->loadFromFile(sprite_path)){
+	SDL_Surface* surface;
+	if((surface = texture_hash->get(sprite_path)) == NULL){
+		if(surface == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
-
-		texture_hash->add(sprite_path, texture);
 	}
-	sf::Sprite* sprite;
-	sprite = new sf::Sprite(*texture);
+
+	//Create the rect
+	SDL_Rect* rect = new SDL_Rect();
+	rect->h = surface->h;
+	rect->w = surface->w;
+
+	//Create the sprite
+	Sprite* sprite = new Sprite();
+	sprite->rotation = 0.0;
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
@@ -141,11 +160,14 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	}
 	//Regardless
 	this->sequence_end->sprite = sprite;
-	this->sequence_end->keyframe = keyframe;
-	this->sequence_end->base_x_offset = x_offset;
-	this->sequence_end->base_y_offset = y_offset;
-	this->sequence_end->curr_x_offset = x_offset;
-	this->sequence_end->curr_y_offset = y_offset;
+	this->sequence_end->sprite->rect = rect;
+	this->sequence_end->sprite->surface = surface;
+	this->sequence_end->sprite->texture = NULL;
+	this->sequence_end->keytime = keytime;
+	this->sequence_end->sprite->base_x_offset = x_offset;
+	this->sequence_end->sprite->base_y_offset = y_offset;
+	this->sequence_end->sprite->curr_x_offset = x_offset;
+	this->sequence_end->sprite->curr_y_offset = y_offset;
 	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
@@ -209,11 +231,12 @@ void Animation::setScale(float x_scale, float y_scale){
 	AnimationSeq* cursor = sequence_start;
 	if(cursor != NULL){
 		do{
-			cursor->curr_x_offset = cursor->base_x_offset * x_scale;
-			cursor->curr_y_offset = cursor->base_y_offset * y_scale;
+			cursor->sprite->curr_x_offset *= x_scale / this->x_scale;
+			cursor->sprite->curr_y_offset *= y_scale / this->y_scale;
 
-			if(cursor->sprite != NULL){
-				cursor->sprite->setScale(x_scale, y_scale);
+			if(cursor->sprite->rect != NULL){
+				cursor->sprite->rect->w *= x_scale / this->x_scale;
+				cursor->sprite->rect->h *= y_scale / this->y_scale;
 			}
 			if(cursor->hitboxes != NULL){
 				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
@@ -224,37 +247,62 @@ void Animation::setScale(float x_scale, float y_scale){
 			cursor = cursor->next;
 		} while(cursor != sequence_start);
 	}
+
+	this->x_scale = x_scale;
+	this->y_scale = y_scale;
 }
 
 /** Advances the animation by a frame
  */
-void Animation::advance(){
-	if(this->isAnimated() && !this->paused && sequence->keyframe == frame_counter++){
+void Animation::advance(uint32_t delta){
+	if(this->isAnimated() && !this->paused && sequence->keytime == time_counter){
 		sequence = sequence->next;
-		frame_counter = 0;
+		time_counter = 0;
 	}
+	time_counter += delta;
 }
 
 /** Starts the animation over again
  */
 void Animation::start(){
 	sequence = sequence_start;
-	frame_counter = 0;
+	time_counter = 0;
 }
 
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(sf::RenderWindow* window){
+void Animation::draw(SDL_Renderer* renderer, uint32_t delta){
+	// Check to see if we've been initialized
+	if(this->sequence == NULL){
+		return;
+	}
+
 	//Advance the animation
-	this->advance();
+	this->advance(delta);
+
+	Sprite* sprite = this->sequence->sprite;
 
 	//Update the sprite position
-	sf::Sprite* curr_sprite = this->sequence->sprite;
-	curr_sprite->setPosition(*this->x_base + this->sequence->curr_x_offset, *this->y_base + this->sequence->curr_y_offset);
+	SDL_Rect* curr_rect = sprite->rect;
+	curr_rect->x = *this->x_base + sprite->curr_x_offset;
+	curr_rect->y = *this->y_base + sprite->curr_y_offset;
+
+	if(sprite->texture == NULL && sprite->surface != NULL){
+		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
+	}
 
 	//Draw the sprite
-	window->draw(*curr_sprite);
+	if(sprite->rotation){
+		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, sprite->rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
+			printf(SDL_GetError());
+		}
+	}
+	else{
+		if(SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect)){
+			printf(SDL_GetError());
+		}
+	}
 }
 
 /** Rotates the hitbox slightly to the right (if direction is 0) or left (if direction is 1)
@@ -264,7 +312,7 @@ void Animation::draw(sf::RenderWindow* window){
 void Animation::rotate(int direction, float rotate_amnt){
 	AnimationSeq* animations = sequence_start;
 	while(animations != NULL){
-		animations->sprite->rotate(rotate_amnt * ((direction)? -1 : 1));
+		animations->sprite->rotation += rotate_amnt * ((direction)? -1 : 1);
 
 		HitboxLst* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){

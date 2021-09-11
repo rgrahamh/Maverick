@@ -5,6 +5,7 @@
 
 #define likely(x) __builtin_expect((x),1)
 #define unlikely(x) __builtin_expect((x),0)
+#define MS_PER_FRAME 167
 
 #include <thread>
 
@@ -12,6 +13,8 @@
 #include "../Camera/Camera.hpp"
 
 #include "../Object/Character/Character.hpp"
+
+#include <SDL2/SDL.h>
 
 enum GAME_STATE{
 	TITLE,
@@ -46,7 +49,7 @@ class Engine{
 		//Engine steps
 		//Action step
 		void actionStep(ObjectLst* all_objects);
-		void globalAction(sf::Event);
+		void globalAction(SDL_Event* event);
 
 		//Draw step
 		void drawStep(ObjectLst* all_objects);
@@ -76,17 +79,19 @@ class Engine{
 		ZoneLst* zones;
 		ZoneLst* active_zones;
 
+		//List of all threads
 		ThreadLst* threads;
 
 		//Render
 		Camera* camera;
-		sf::RenderWindow* window;
+		SDL_Window* window;
 
 		//State tracking
 		GAME_STATE state;
 
 		//A frame counter so we can have timed events trigger every X frames
-		unsigned long long timer;
+		uint32_t last_time;
+		uint32_t delta;
 };
 
 #include "../Factory/Factory.hpp"

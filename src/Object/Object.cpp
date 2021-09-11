@@ -7,7 +7,12 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(float start_x, float start_y, float friction, float mass, unsigned int animation_num, bool animated){
+Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer){
+    int name_len = strlen(name);
+    this->name = (char*)malloc(name_len + 1);
+    memcpy(this->name, name, name_len);
+    this->name[name_len] = '\0';
+    
     //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
@@ -29,7 +34,7 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(unsigned int i = 0; i < animation_num; i++){
-        animations[i] = new Animation(&(this->x), &(this->y), animated);
+        animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
     }
 }
 
@@ -40,6 +45,14 @@ Object::~Object(){
         delete animations[i];
     }
     free(animations);
+    free(name);
+}
+
+/** Gets the name of the object
+ * @return The name of the object
+ */
+char* Object::getName(){
+    return this->name;
 }
 
 /** Gets the X value of the object
@@ -88,14 +101,14 @@ float Object::getYVel(){
  * @return The width of the object
  */
 float Object::getWidth(){
-    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+    return this->animations[active_animation]->getSprite()->rect->w;
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
 float Object::getHeight(){
-    return this->animations[active_animation]->getSprite()->getGlobalBounds().width;
+    return this->animations[active_animation]->getSprite()->rect->h;
 }
 
 /** Gets the mass of the object (in lbs)
@@ -149,12 +162,12 @@ bool Object::getEnvBump(){
 /** Adds a sprite to a given animation
  * @param animation_num The animation number
  * @param sprite_path The filepath to the sprite you're adding
- * @param keyframe The number of frames until the animation progresses
+ * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
  */ 
-void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
-    this->animations[animation_num]->addFrame(sprite_path, keyframe, x_offset, y_offset);
+void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset){
+    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset);
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
@@ -368,13 +381,13 @@ void Object::applyForce(float xA, float yA){
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
-void Object::action(sf::Event event){
+void Object::action(SDL_Event* event){
     return;
 }
 
 /** Called during the process step; performs object processing calculations
  */
-void Object::_process(){
+void Object::_process(uint32_t delta){
     this->process();
 
     //Updating old X & Y values
@@ -385,7 +398,7 @@ void Object::_process(){
     this->env_bump = false;
 
     //Updating X values
-    this->xV = this->xA + (this->xV * (1 - this->friction));
+    this->xV = this->xA * delta + (this->xV * (1 - this->friction));
     if(this->xV < 0.1 && this->xV > -0.1){
         this->xV = 0;
     }
@@ -393,7 +406,7 @@ void Object::_process(){
     this->xA = 0;
 
     //Updating Y values
-    this->yV = this->yA + (this->yV * (1 - this->friction));
+    this->yV = this->yA * delta + (this->yV * (1 - this->friction));
     if(this->yV < 0.1 && this->yV > -0.1){
         this->yV = 0;
     }
@@ -409,8 +422,8 @@ void Object::process(){
 /** Called during the draw step
  * @param window The window that content is being drawn to
  */
-void Object::draw(sf::RenderWindow* window){
-    this->animations[active_animation]->draw(window);
+void Object::draw(SDL_Renderer* renderer, uint32_t delta){
+    this->animations[active_animation]->draw(renderer, delta);
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

@@ -8,10 +8,13 @@
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitboxCollision.hpp"
 
+#include <SDL2/SDL.h>
+
 class Object{
 	public:
-		Object(float start_x, float start_y, float friction, float weight, unsigned int animation_num, bool animated = true);
+		Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer = 1);
 		virtual ~Object();
+		char* getName();
 		float getX();
 		float getY();
 		float getOldX();
@@ -28,7 +31,7 @@ class Object{
 		bool isVisible();
 		bool getEnvBump();
 
-		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset);
+		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset);
 
 		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
 		void addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
@@ -51,18 +54,20 @@ class Object{
 		void applyForce(float xA, float yA);
 
 		//Processing functions
-		void _process();
+		void _process(uint32_t delta);
 		//Need this for custom processing (like input)
 		virtual void process();
 
 		//Useful for actions on other objects & input
-		virtual void action(sf::Event event);
+		virtual void action(SDL_Event* event);
 
-		virtual void draw(sf::RenderWindow* window);
+		virtual void draw(SDL_Renderer* renderer, uint32_t delta);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		
 	protected:
+		char* name;
+
 		//Position
 		float x;
 		float y;

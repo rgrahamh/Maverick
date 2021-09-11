@@ -3,25 +3,28 @@
 
 #include "../Object/Object.hpp"
 
-#define NUM_DRAW_LAYERS 3
+#include <SDL2/SDL.h>
+
+#define MIN_DRAW_LAYER -3
+#define MAX_DRAW_LAYER 3
 #define FOLLOW_RATE 0.08
 
 class Camera{
 	public:
-		Camera(sf::RenderWindow* window, Object* reference);
+		Camera(SDL_Renderer* renderer, Object* reference);
 		~Camera();
 
 		void setReference(Object* reference);
-		void _draw(ObjectLst* obj_lst);
-		void setWindow(sf::RenderWindow window);
+		void _draw(ObjectLst* obj_lst, uint32_t delta);
+		void setRenderer(SDL_Renderer* renderer);
 
 	private:
 		Object* reference;
 		float current_x;
 		float current_y;
 
-		sf::RenderWindow* window;
-		sf::View* view;
+		SDL_Renderer* renderer;
+		SDL_Rect* viewport;
 
 		void recenter();
 };

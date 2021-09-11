@@ -4,19 +4,21 @@
  * @param window The window that the camera should be drawing to
  * @param reference The object that the camera is centered on
  */
-Camera::Camera(sf::RenderWindow* window, Object* reference = NULL){
+Camera::Camera(SDL_Renderer* renderer, Object* reference = NULL){
     this->reference = reference;
     if(reference != NULL){
         this->current_x = reference->getX();
         this->current_y = reference->getY();
     }
-    this->view = new sf::View(window->getDefaultView());
-    this->window = window;
-    this->window->setView(*(this->view));
+    this->renderer = renderer;
+    this->viewport = new SDL_Rect();
+    this->viewport->x = 0;
+    this->viewport->y = 0;
+    this->viewport->w = 1920;
+    this->viewport->y = 1080;
 }
 
 Camera::~Camera(){
-    delete this->view;
 }
 
 /** Sets the reference for the center of the camera
@@ -29,34 +31,32 @@ void Camera::setReference(Object* reference){
 /** Recenters the camera on the reference object
  */
 void Camera::recenter(){
-    if(this->reference != NULL){
+    /*if(this->reference != NULL){
         float obj_x = reference->getX() + (reference->getWidth() / 2);
         float obj_y = reference->getY() + (reference->getHeight() / 2);
         current_x += (obj_x - current_x) * FOLLOW_RATE;
         current_y += (obj_y - current_y) * FOLLOW_RATE;
-        this->view->setCenter(current_x, current_y);
-        this->window->setView(*(this->view));
-    }
+    } Figure out how to recenter later*/
 }
 
 /** Draws all objects in the given object list
  * @param obj_lst The object list that you wish to draw
  */
-void Camera::_draw(ObjectLst* obj_lst){
-    window->clear();
-
+void Camera::_draw(ObjectLst* obj_lst, uint32_t delta){
     recenter();
 
-    ObjectLst* cursor = obj_lst;
-    for(unsigned int i = 0; i < NUM_DRAW_LAYERS; i++){
-        cursor = obj_lst;
-        while(cursor != NULL){
-            if(cursor->obj->getDrawLayer() == i && cursor->obj->isVisible()){
-                cursor->obj->draw(window);
-            }
-            cursor = cursor->next;
+    SDL_RenderClear(renderer);
+
+    /*if(SDL_RenderSetViewport(renderer, this->viewport)){
+        printf("Cannot set viewport: %s\n", SDL_GetError());
+    }*/
+
+    while(obj_lst != NULL){
+        if(obj_lst->obj->isVisible()){
+            obj_lst->obj->draw(renderer, delta);
         }
+        obj_lst = obj_lst->next;
     }
 
-    window->display();
+    SDL_RenderPresent(renderer);
 }
