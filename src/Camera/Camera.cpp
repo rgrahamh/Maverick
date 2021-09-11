@@ -14,8 +14,8 @@ Camera::Camera(SDL_Renderer* renderer, Object* reference = NULL){
     this->viewport = new SDL_Rect();
     this->viewport->x = 0;
     this->viewport->y = 0;
-    this->viewport->w = 800;
-    this->viewport->y = 600;
+    this->viewport->w = 1920;
+    this->viewport->y = 1080;
 }
 
 Camera::~Camera(){
@@ -45,17 +45,17 @@ void Camera::recenter(){
 void Camera::_draw(ObjectLst* obj_lst){
     recenter();
 
-    SDL_RenderSetViewport(renderer, this->viewport);
+    SDL_RenderClear(renderer);
 
-    ObjectLst* cursor = obj_lst;
-    for(unsigned int i = 0; i < NUM_DRAW_LAYERS; i++){
-        cursor = obj_lst;
-        while(cursor != NULL){
-            if(cursor->obj->getDrawLayer() == i && cursor->obj->isVisible()){
-                cursor->obj->draw(renderer);
-            }
-            cursor = cursor->next;
+    /*if(SDL_RenderSetViewport(renderer, this->viewport)){
+        printf("Cannot set viewport: %s\n", SDL_GetError());
+    }*/
+
+    while(obj_lst != NULL){
+        if(obj_lst->obj->isVisible()){
+            obj_lst->obj->draw(renderer);
         }
+        obj_lst = obj_lst->next;
     }
 
     SDL_RenderPresent(renderer);

@@ -85,7 +85,6 @@ class Engine{
 		//Render
 		Camera* camera;
 		SDL_Window* window;
-		SDL_Renderer* renderer;
 
 		//State tracking
 		GAME_STATE state;

@@ -7,7 +7,12 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(float start_x, float start_y, float friction, float mass, unsigned int animation_num, bool animated){
+Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer){
+    int name_len = strlen(name);
+    this->name = (char*)malloc(name_len + 1);
+    memcpy(this->name, name, name_len);
+    this->name[name_len] = '\0';
+    
     //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
@@ -29,7 +34,7 @@ Object::Object(float start_x, float start_y, float friction, float mass, unsigne
     this->animation_num = animation_num;
     this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
     for(unsigned int i = 0; i < animation_num; i++){
-        animations[i] = new Animation(&(this->x), &(this->y), animated);
+        animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
     }
 }
 
@@ -40,6 +45,14 @@ Object::~Object(){
         delete animations[i];
     }
     free(animations);
+    free(name);
+}
+
+/** Gets the name of the object
+ * @return The name of the object
+ */
+char* Object::getName(){
+    return this->name;
 }
 
 /** Gets the X value of the object
@@ -385,7 +398,7 @@ void Object::_process(uint32_t delta){
     this->env_bump = false;
 
     //Updating X values
-    this->xV = this->xA + (this->xV * (1 - this->friction) * delta);
+    this->xV = this->xA * delta + (this->xV * (1 - this->friction));
     if(this->xV < 0.1 && this->xV > -0.1){
         this->xV = 0;
     }
@@ -393,7 +406,7 @@ void Object::_process(uint32_t delta){
     this->xA = 0;
 
     //Updating Y values
-    this->yV = this->yA + (this->yV * (1 - this->friction) * delta);
+    this->yV = this->yA * delta + (this->yV * (1 - this->friction));
     if(this->yV < 0.1 && this->yV > -0.1){
         this->yV = 0;
     }

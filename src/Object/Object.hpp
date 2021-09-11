@@ -12,8 +12,9 @@
 
 class Object{
 	public:
-		Object(float start_x, float start_y, float friction, float weight, unsigned int animation_num, bool animated = true);
+		Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer = 1);
 		virtual ~Object();
+		char* getName();
 		float getX();
 		float getY();
 		float getOldX();
@@ -65,6 +66,8 @@ class Object{
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		
 	protected:
+		char* name;
+
 		//Position
 		float x;
 		float y;

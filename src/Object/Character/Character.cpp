@@ -1,7 +1,7 @@
 #include "./Character.hpp"
 
-Character::Character(float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, unsigned animation_num)
-	: Object(start_x, start_y, friction, mass, animation_num),
+Character::Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, unsigned animation_num, int draw_layer)
+	: Object(name, start_x, start_y, friction, mass, animation_num, draw_layer),
 	Race(race),
 	Style(style){
 	//Setting the struct pointers; these are the non-optional params
@@ -9,6 +9,7 @@ Character::Character(float start_x, float start_y, float friction, float mass, R
 	this->mastery = mastery;
 	this->abilities = abilities;
 	this->control = control;
+    this->sliding = false;
 
 	//Initializing inventory
 	if(inventory != NULL){
@@ -224,25 +225,20 @@ void Character::process(){
     if(!this->sliding){
 		if(this->control == CONTROL_TYPE::KEYBOARD){
 			if(this->keys.up_arrow){
-				this->yA -= 2;
+				this->yA -= 0.1;
 			}
 			if(this->keys.down_arrow){
-				this->yA += 2;
+				this->yA += 0.1;
 			}
 			if(this->keys.left_arrow){
-				this->xA -= 2;
+				this->xA -= 0.1;
 			}
 			if(this->keys.right_arrow){
-				this->xA += 2;
+				this->xA += 0.1;
 			}
 		}
     }
 }
-
-/** Called during the draw step
- * @param window The window that content is being drawn to
- */
-void Character::draw(){}
 
 /** Called on object collision; should be overridden by children if you want collision logic.
  * @param other The other object

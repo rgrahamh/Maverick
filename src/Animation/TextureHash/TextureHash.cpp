@@ -24,7 +24,7 @@ TextureHash::~TextureHash(){
 				cursor = cursor->next;
 
 				free(cursor->key);
-				free(cursor->surface);
+				free(cursor->texture);
 				free(tmp);
 			}
 		}
@@ -52,7 +52,7 @@ unsigned int TextureHash::hash(const char* key){
  * @param key The string (filepath) that is being hashed
  * @param surface The texture that is being put into the table
  */
-void TextureHash::add(const char* key, SDL_Surface* surface){
+void TextureHash::add(const char* key, SDL_Texture* texture){
 	unsigned int hash_val = this->hash(key);
 
 	//Copying the key for permanent storage
@@ -64,7 +64,7 @@ void TextureHash::add(const char* key, SDL_Surface* surface){
 	//Storing in the table
 	THEntry* new_entry = (THEntry*)malloc(sizeof(THEntry));
 	new_entry->key = perm_key;
-	new_entry->surface = surface;
+	new_entry->texture = texture;
 
 	//Setting it as the first thing in the linked list (for constant-time insertion)
 	if(table[hash_val] == NULL){
@@ -74,35 +74,43 @@ void TextureHash::add(const char* key, SDL_Surface* surface){
 		new_entry->next = table[hash_val];
 	}
 	table[hash_val] = new_entry;
+
+	printf("Loaded texture %s\n", key);
 }
 
 /** Gets the texture from the hash table
  * @param key The string (filepath) that is being hashed
  * @return The texture with the given key
  */
-SDL_Surface* TextureHash::get(const char* key){
+SDL_Texture* TextureHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
+
+	printf("Getting texture %s\n", key);
 
 	THEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case
-	if(cursor != NULL){
-		if(strcmp(cursor->key, key)){
-			return cursor->surface;
-		}
-		while(cursor->next != NULL && strcmp(cursor->next->key, key) != 0){
-			cursor = cursor->next;
-		}
-	} 
-	if(cursor == NULL || cursor->next == NULL){
-		SDL_Surface* new_surface = SDL_LoadBMP(key);
+	while(cursor != NULL && strcmp(cursor->key, key) != 0){
+		cursor = cursor->next;
+	}
+	if(cursor == NULL){
+		SDL_Surface* new_surface = IMG_Load(key);
 		if(new_surface == nullptr){
 			printf("Can't load the file: %s as a surface\n", key);
+			return NULL;
 		}
 
-		this->add(key, new_surface);
-		return new_surface;
+		SDL_Texture* new_texture = SDL_CreateTextureFromSurface(renderer, new_surface);
+		if(new_texture == nullptr){
+			printf("Can't create the texture: %s", key);
+		}
+		else{
+			add(key, new_texture);
+		}
+
+		SDL_FreeSurface(new_surface);
+		return new_texture;
 	}
 
-	return cursor->surface;
+	return cursor->texture;
 }

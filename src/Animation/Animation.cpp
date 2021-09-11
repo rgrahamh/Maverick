@@ -1,7 +1,5 @@
 #include "./Animation.hpp"
 
-extern SDL_Renderer* renderer;
-
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
@@ -81,8 +79,11 @@ float Animation::getDrawAxis(){
 	if(this->sequence != NULL && this->sequence->hitboxes != NULL){
 		return this->sequence->hitboxes->hitbox->getBotBound();
 	}
-	else{
+	else if(this->sequence != NULL){
 		return this->sequence->sprite->rect->y + this->sequence->sprite->curr_y_offset;
+	}
+	else{
+		return 0.0;
 	}
 }
 
@@ -117,7 +118,7 @@ void Animation::setPaused(bool paused){
  * @return If the animation is animated (if it has multiple frames)
  */
 bool Animation::isAnimated(){
-	return (this->sequence_start == this->sequence_end)? false : true;
+	return (this->sequence_start == this->sequence_end || this->sequence_start == NULL)? false : true;
 }
 
 /** Adds a frame to an animation
@@ -128,21 +129,36 @@ bool Animation::isAnimated(){
  */
 void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x_offset, float y_offset){
 	//Getting the texture
-	SDL_Surface* new_surface;
-	if((new_surface = texture_hash->get(sprite_path)) == NULL){
-		if(new_surface == nullptr){
+	SDL_Texture* new_texture;
+	if((new_texture = texture_hash->get(sprite_path)) == NULL){
+		if(new_texture == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return;
 		}
 	}
 
+	int height;
+	int width;
+	uint32_t format;
+	int access;
+	SDL_QueryTexture(new_texture, &format, &access, &width, &height);
 	//Create the rect
 	SDL_Rect* new_rect = new SDL_Rect();
-	new_rect->h = new_surface->h;
-	new_rect->w = new_surface->w;
+	new_rect->h = height;
+	new_rect->w = width;
+	if(format == SDL_TEXTUREACCESS_STATIC){
+		printf("Static\n");
+	}
+	else if(format == SDL_TEXTUREACCESS_STREAMING){
+		printf("Steaming\n");
+	}
+	else if(format == SDL_TEXTUREACCESS_TARGET){
+		printf("Bullseye\n");
+	}
 
 	//Create the sprite
 	Sprite* new_sprite = new Sprite();
+	new_sprite->rotation = 0.0;
 
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
@@ -159,7 +175,10 @@ void Animation::addFrame(const char* sprite_path, unsigned int keyframe, float x
 	//Regardless
 	this->sequence_end->sprite = new_sprite;
 	this->sequence_end->sprite->rect = new_rect;
-	this->sequence_end->sprite->texture = SDL_CreateTextureFromSurface(renderer, new_surface);
+	this->sequence_end->sprite->texture = new_texture;
+	if(this->sequence_end->sprite->texture == 0){
+		printf("Bad texture: %s\n", SDL_GetError());
+	}
 	this->sequence_end->keyframe = keyframe;
 	this->sequence_end->sprite->base_x_offset = x_offset;
 	this->sequence_end->sprite->base_y_offset = y_offset;
@@ -228,12 +247,12 @@ void Animation::setScale(float x_scale, float y_scale){
 	AnimationSeq* cursor = sequence_start;
 	if(cursor != NULL){
 		do{
-			cursor->sprite->curr_x_offset = cursor->sprite->base_x_offset * x_scale;
-			cursor->sprite->curr_y_offset = cursor->sprite->base_y_offset * y_scale;
+			cursor->sprite->curr_x_offset *= x_scale / this->x_scale;
+			cursor->sprite->curr_y_offset *= y_scale / this->y_scale;
 
 			if(cursor->sprite->rect != NULL){
-				cursor->sprite->rect->w = cursor->sprite->rect->w * x_scale;
-				cursor->sprite->rect->h = cursor->sprite->rect->h * y_scale;
+				cursor->sprite->rect->w *= x_scale / this->x_scale;
+				cursor->sprite->rect->h *= y_scale / this->y_scale;
 			}
 			if(cursor->hitboxes != NULL){
 				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
@@ -244,6 +263,9 @@ void Animation::setScale(float x_scale, float y_scale){
 			cursor = cursor->next;
 		} while(cursor != sequence_start);
 	}
+
+	this->x_scale = x_scale;
+	this->y_scale = y_scale;
 }
 
 /** Advances the animation by a frame
@@ -266,6 +288,11 @@ void Animation::start(){
  * @param window The current window that is being drawn to
  */
 void Animation::draw(SDL_Renderer* renderer){
+	// Check to see if we've been initialized
+	if(this->sequence == NULL){
+		return;
+	}
+
 	//Advance the animation
 	this->advance();
 
@@ -278,10 +305,14 @@ void Animation::draw(SDL_Renderer* renderer){
 
 	//Draw the sprite
 	if(sprite->rotation){
-		SDL_RenderCopyEx(renderer, sprite->texture, NULL, curr_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE);
+		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, sprite->rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
+			printf(SDL_GetError());
+		}
 	}
 	else{
-		SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect);
+		if(SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect)){
+			printf(SDL_GetError());
+		}
 	}
 }
 

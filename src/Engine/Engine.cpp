@@ -8,7 +8,13 @@ SDL_Renderer* renderer;
  */
 Engine::Engine(){
     //Init SDL
-    SDL_Init(SDL_INIT_EVERYTHING);
+    if(SDL_Init(SDL_INIT_EVERYTHING)){
+        printf("Failed to init everything!\n");
+    }
+    if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
+        printf("Failed to init IMG!\n");
+        printf("IMG_Init: %s\n", IMG_GetError());
+    }
 
     //Initialization of window and camera
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -24,6 +30,7 @@ Engine::Engine(){
         fflush(stdout);
         return;
     }
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
     this->camera = new Camera(renderer, NULL);
 
     this->zones = NULL;
@@ -33,6 +40,8 @@ Engine::Engine(){
     this->state = TITLE;
 
     this->threads = NULL;
+
+    this->delta = 1;
 }
 
 /** Engine's destructor
@@ -58,6 +67,7 @@ Engine::~Engine(){
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    IMG_Quit();
     SDL_Quit();
 }
 
@@ -97,12 +107,8 @@ void Engine::gameLoop(){
             this->threadCleanup();
         }
 
-        //Cap the framerate (at 60 for debugging purposes)
-        while(SDL_GetTicks() < last_time + MS_PER_FRAME && SDL_GetTicks() > last_time){
-            continue;
-        }
-
         delta = SDL_GetTicks() - last_time;
+        last_time = SDL_GetTicks();
 
         if(this->state != PAUSE){
             this->actionStep(all_objects);
@@ -297,13 +303,13 @@ void Engine::drawStep(ObjectLst* all_objects){
 ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
     //Checking if we have any objects
     if(curr_obj != NULL){
-        //Case where it's the first iteration (nothing linking to this)
+        //Case where it's the last iteration (everything is sorted)
         if(curr_obj->next == NULL){
             return curr_obj;
         }
         else{
             ObjectLst* next_obj = this->drawSort(curr_obj->next);
-            if(curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
+            if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() || curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
                 //Swap node positions & send curr_obj up the draw chain
                 curr_obj->next = next_obj->next;
                 next_obj->next = this->drawSort(curr_obj);
@@ -426,7 +432,9 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
  * @return A full list of all active objects in the engine
  */
 ObjectLst* Engine::buildFullObjLst(){
-    ObjectLst* all_objects = (ObjectLst*)calloc(sizeof(ObjectLst), 1);
+    ObjectLst* all_objects = new ObjectLst;
+    all_objects->obj = NULL;
+    all_objects->next = NULL;
     ObjectLst* obj_iter = all_objects;
 
     bool first_run = true;
@@ -447,7 +455,7 @@ ObjectLst* Engine::buildFullObjLst(){
         zone_iter = zone_iter->next;
     }
     if(all_objects->obj == NULL){
-        free(all_objects);
+        delete all_objects;
         return NULL;
     }
     return all_objects;

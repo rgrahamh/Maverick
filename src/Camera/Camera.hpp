@@ -5,7 +5,8 @@
 
 #include <SDL2/SDL.h>
 
-#define NUM_DRAW_LAYERS 3
+#define MIN_DRAW_LAYER -3
+#define MAX_DRAW_LAYER 3
 #define FOLLOW_RATE 0.08
 
 class Camera{

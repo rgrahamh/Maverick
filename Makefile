@@ -1,4 +1,4 @@
-INCLUDE_SDL= -lSDL2 -lGL
+INCLUDE_SDL= -lSDL2 -lSDL2_image -lGL
 CC=g++
 CFLAGS= -Wall -std=c++17 -pthread
 
