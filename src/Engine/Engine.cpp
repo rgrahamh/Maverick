@@ -25,7 +25,7 @@ Engine::Engine(){
     }
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
