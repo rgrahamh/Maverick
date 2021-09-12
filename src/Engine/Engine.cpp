@@ -1,8 +1,5 @@
 #include "./Engine.hpp"
 
-// TEMP global 'til we make the engine a singleton
-SDL_Renderer* renderer;
-
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -25,7 +22,7 @@ Engine::Engine(){
     }
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -42,14 +39,12 @@ Engine::Engine(){
 
     this->threads = NULL;
 
-    this->delta = 1;
+    this->delta = 0;
 }
 
 /** Engine's destructor
  */
 Engine::~Engine(){
-    delete camera;
-
     ZoneLst* zone_cursor = zones;
     while(zones != NULL){
         zone_cursor = zones->next;
@@ -66,8 +61,9 @@ Engine::~Engine(){
         active_zones = zone_cursor;
     }
 
-    SDL_DestroyRenderer(renderer);
+    SDL_DestroyRenderer(camera->getRenderer());
     SDL_DestroyWindow(window);
+    delete camera;
     IMG_Quit();
     SDL_Quit();
 }
@@ -472,6 +468,47 @@ void Engine::freeFullObjLst(ObjectLst* all_objects){
         delete all_objects;
         all_objects = free_objects;
     }
+}
+
+/** Gets the first object by name in any zone (slower than specifying zone)
+ * @param obj_name The name of the object
+ * @return A pointer to the object, or NULL if it can't be found
+ */
+Object* Engine::getObject(const char* obj_name){
+    ZoneLst* zone_cursor = this->active_zones;
+    while(zone_cursor != NULL){
+        ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+        while(obj_cursor != NULL){
+            if(strcmp(obj_cursor->obj->getName(), obj_name)){
+                return obj_cursor->obj;
+            }
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return NULL;
+}
+
+/** Gets the first object found by name from a specific zone
+ * @param obj_name The name of the object
+ * @param zone_name The name of the zone
+ * @return A pointer to the object
+ */
+Object* Engine::getObject(const char* obj_name, const char* zone_name){
+    ZoneLst* zone_cursor = this->active_zones;
+    while(zone_cursor != NULL){
+        if(!strcmp(zone_cursor->zone->getName(), zone_name)){
+            ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+            while(obj_cursor != NULL){
+                if(strcmp(obj_cursor->obj->getName(), obj_name)){
+                    return obj_cursor->obj;
+                }
+            }
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return NULL;
 }
 
 /** Adds a new zone to the game

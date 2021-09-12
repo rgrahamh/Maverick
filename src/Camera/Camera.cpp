@@ -60,3 +60,7 @@ void Camera::_draw(ObjectLst* obj_lst, uint32_t delta){
 
     SDL_RenderPresent(renderer);
 }
+
+SDL_Renderer* Camera::getRenderer(){
+    return renderer;
+}

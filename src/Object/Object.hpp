@@ -9,6 +9,7 @@
 #include "../Animation/Hitbox/HitboxCollision.hpp"
 
 #include <SDL2/SDL.h>
+#include <unordered_map>
 
 class Object{
 	public:
@@ -30,6 +31,7 @@ class Object{
 		bool isActive();
 		bool isVisible();
 		bool getEnvBump();
+		void* getAttr(const char* key);
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset);
 
@@ -50,6 +52,7 @@ class Object{
 		void setActive(bool active);
 		void setVisible(bool active);
 		void setEnvBump();
+		void setAttr(const char* key, void* val);
 
 		void applyForce(float xA, float yA);
 
@@ -66,7 +69,11 @@ class Object{
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		
 	protected:
+		//Name
 		char* name;
+
+		//Attributes
+		HashTable* attr;
 
 		//Position
 		float x;

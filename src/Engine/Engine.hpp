@@ -75,6 +75,10 @@ class Engine{
 		//Handles the default collision between objects
 		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);
 
+		//Gets an object
+		Object* getObject(const char* name);
+		Object* getObject(const char* name, const char* zone);
+
 		//Zones
 		ZoneLst* zones;
 		ZoneLst* active_zones;

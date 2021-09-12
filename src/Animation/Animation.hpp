@@ -1,7 +1,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "./TextureHash/TextureHash.hpp"
+#include "../HashTable/TextureHash/TextureHash.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
 

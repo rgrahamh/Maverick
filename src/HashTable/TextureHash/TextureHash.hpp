@@ -1,6 +1,11 @@
+#ifndef TEXTUREHASH_HPP
+#define TEXTUREHASH_HPP
+
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
+#include "../HashTable.hpp"
 
 typedef struct TextureHashEntry{
 	char* key;
@@ -8,7 +13,7 @@ typedef struct TextureHashEntry{
 	struct TextureHashEntry* next;
 } THEntry;
 
-class TextureHash{
+class TextureHash : public HashTable{
 	public:
 		TextureHash(unsigned int size);
 		~TextureHash();
@@ -19,6 +24,5 @@ class TextureHash{
 	private:
 		unsigned int size;
 		THEntry** table;
-
-		unsigned int hash(const char* key);
 };
+#endif

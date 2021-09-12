@@ -36,6 +36,9 @@ Object::Object(const char* name, float start_x, float start_y, float friction, f
     for(unsigned int i = 0; i < animation_num; i++){
         animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
     }
+
+    //Initializing attributes
+    this->attr = new HashTable(64);
 }
 
 /** Destructor for objects
@@ -157,6 +160,14 @@ bool Object::isVisible(){
  */
 bool Object::getEnvBump(){
     return this->env_bump;
+}
+
+/** Gets a pointer to an attribute
+ * @param key The attribute you're looking for
+ * @return A pointer to the var if found, NULL otherwise
+ */
+void* Object::getAttr(const char* key){
+    return this->attr->get(key);
 }
 
 /** Adds a sprite to a given animation
@@ -367,6 +378,14 @@ void Object::setVisible(bool visible){
  */
 void Object::setEnvBump(){
     this->env_bump = true;
+}
+
+/** Sets the attribute key to the specified val
+ * @param key The key you wish to set
+ * @param val The val you wish to set
+ */
+void Object::setAttr(const char* key, void* val){
+    this->attr->add(key, val);
 }
 
 /** Applies force to an object

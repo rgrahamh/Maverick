@@ -16,7 +16,7 @@ class Camera{
 
 		void setReference(Object* reference);
 		void _draw(ObjectLst* obj_lst, uint32_t delta);
-		void setRenderer(SDL_Renderer* renderer);
+		SDL_Renderer* getRenderer();
 
 	private:
 		Object* reference;

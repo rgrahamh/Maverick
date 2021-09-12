@@ -255,9 +255,9 @@ void Animation::setScale(float x_scale, float y_scale){
 /** Advances the animation by a frame
  */
 void Animation::advance(uint32_t delta){
-	if(this->isAnimated() && !this->paused && sequence->keytime == time_counter){
+	if(this->isAnimated() && !this->paused && sequence->keytime <= time_counter){
 		sequence = sequence->next;
-		time_counter = 0;
+		time_counter -= sequence->keytime;
 	}
 	time_counter += delta;
 }
