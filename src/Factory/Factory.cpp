@@ -25,8 +25,8 @@ Character* buildCharacter(char* name, float start_x, float start_y, float fricti
     player->addSprite(7, "./assets/sprites/old_game_resources/Right_Right_Foot.png", 256, 0, 0);
 
     //Adding the walking hitbox
-    //player->addHitbox(0, 7, ELLIPSE, 87, 165, 45, 21, COLLISION | HURTBOX);
-    player->addHitbox(0, 7, RECT, 0, 165, 174, 42, COLLISION | HURTBOX);
+    player->addHitbox(0, 7, ELLIPSE, 87, 165, 45, 21, COLLISION | HURTBOX);
+    //player->addHitbox(0, 7, RECT, 0, 165, 174, 42, COLLISION | HURTBOX);
 
     //Setting the starting animation
     player->setAnimation(1);
@@ -47,4 +47,14 @@ Object* buildPillar(char* name, float start_x, float start_y){
     pillar->setScale(2.0, 2.0);
 
     return pillar;
+}
+
+Object* buildBackground(char* name, float start_x, float start_y){
+    Object* background = new Object("background", start_x, start_y, 1, 1, 1, 0);
+
+    background->addSprite(0, "./assets/sprites/old_game_resources/Floor_Tile.png", 0, 0, 0);
+
+    background->setScale(2.5, 2.5);
+
+    return background;
 }

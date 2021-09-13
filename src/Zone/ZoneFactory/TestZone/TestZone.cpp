@@ -8,17 +8,14 @@ void buildTestZone(Engine* engine, ObjectLst* add_object){
         add_object = add_object->next;
     }
 
-    //Create a pillar
-    Object* pillar_1 = buildPillar("pillar1", 800.0, 700.0);
-    zone->addObject(pillar_1);
+    //Create pillars
+    zone->addObject(buildPillar("pillar1", 800.0, 600.0));
+    zone->addObject(buildPillar("pillar2", 900.0, 450.0));
+    zone->addObject(buildPillar("pillar3", 700.0, 300.0));
+    zone->addObject(buildPillar("pillar4", 750.0, 250.0));
+    zone->addObject(buildPillar("pillar5", 300.0, 200.0));
 
-    //Create a pillar
-    Object* pillar_2 = buildPillar("pillar2", 800.0, 600.0);
-    zone->addObject(pillar_2);
-
-    //Create a pillar
-    Object* pillar_3 = buildPillar("pillar3", 800.0, 500.0);
-    zone->addObject(pillar_3);
+    zone->addObject(buildBackground("background", 0.0, 0.0));
 
     engine->addZone(zone);
     engine->activateZone(zone->getName());
