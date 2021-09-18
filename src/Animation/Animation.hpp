@@ -48,7 +48,7 @@ class Animation{
 		void addHitbox(Hitbox* hitbox);
 		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
-		void draw(SDL_Renderer* renderer, uint32_t delta);
+		void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		void rotate(int direction, float rotation_amnt);
 

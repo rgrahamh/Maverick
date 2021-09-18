@@ -28,8 +28,8 @@ Engine::Engine(){
         fflush(stdout);
         return;
     }
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-    this->camera = new Camera(renderer, NULL);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    this->camera = new Camera(renderer, window, NULL);
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -306,7 +306,8 @@ ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
         }
         else{
             ObjectLst* next_obj = this->drawSort(curr_obj->next);
-            if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() || curr_obj->obj->getDrawAxis() >= next_obj->obj->getDrawAxis()){
+            if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() ||
+              (curr_obj->obj->getDrawAxis() > next_obj->obj->getDrawAxis() && curr_obj->obj->getDrawLayer() == next_obj->obj->getDrawLayer())){
                 //Swap node positions & send curr_obj up the draw chain
                 curr_obj->next = next_obj->next;
                 next_obj->next = this->drawSort(curr_obj);

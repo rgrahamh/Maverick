@@ -64,7 +64,7 @@ class Object{
 		//Useful for actions on other objects & input
 		virtual void action(SDL_Event* event);
 
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta);
+		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 		

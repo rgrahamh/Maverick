@@ -11,7 +11,7 @@
 
 class Camera{
 	public:
-		Camera(SDL_Renderer* renderer, Object* reference);
+		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference);
 		~Camera();
 
 		void setReference(Object* reference);
@@ -20,11 +20,11 @@ class Camera{
 
 	private:
 		Object* reference;
-		float current_x;
-		float current_y;
+		int current_x;
+		int current_y;
 
 		SDL_Renderer* renderer;
-		SDL_Rect* viewport;
+		SDL_Window* window;
 
 		void recenter();
 };
