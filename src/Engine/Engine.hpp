@@ -13,8 +13,10 @@
 #include "../Camera/Camera.hpp"
 
 #include "../Object/Character/Character.hpp"
+#include "../Object/UI/UIElement.hpp"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 enum GAME_STATE{
 	TITLE,
@@ -40,6 +42,7 @@ class Engine{
 
 		//Zone addition/state handling
 		void addZone(Zone* zone);
+		void addUIElement(UIElement* ui);
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
 
@@ -78,6 +81,12 @@ class Engine{
 		//Gets an object
 		Object* getObject(const char* name);
 		Object* getObject(const char* name, const char* zone);
+
+		//UI initialization
+		void InitUI();
+
+		//UI Objects
+		UIElementLst* ui_elements;
 
 		//Zones
 		ZoneLst* zones;

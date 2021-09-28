@@ -12,6 +12,9 @@ Engine::Engine(){
         printf("Failed to init IMG!\n");
         printf("IMG_Init: %s\n", IMG_GetError());
     }
+    if(TTF_Init() < 0){
+        printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
+    }
 
     //Initialization of window and camera
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -30,6 +33,8 @@ Engine::Engine(){
     }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
+
+    this->InitUI();
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -91,6 +96,17 @@ void Engine::start(){
     camera->setReference(player);
 
     gameLoop();
+}
+
+void Engine::InitUI(){
+    ui_elements = new UIElementLst;
+    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
+    pause_menu->setActive(false);
+    pause_menu->addSprite(0, "./assets/ui/shade.png", 0, 0, 0);
+    UIElement* pause_text = new UIElement("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window);
+    pause_menu->addElement(pause_text);
+    ui_elements->element = pause_menu;
+    ui_elements->next = nullptr;
 }
 
 /** The primary game loop
@@ -289,6 +305,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
 void Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
     all_objects = this->drawSort(all_objects);
+    ui_elements = (UIElementLst*)this->drawSort((ObjectLst*)ui_elements);
     this->camera->_draw(all_objects, this->delta);
     freeFullObjLst(all_objects);
 }

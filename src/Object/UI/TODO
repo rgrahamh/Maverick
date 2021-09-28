@@ -1,0 +1,4 @@
+- Separate out into "ElementGroup" and "Element". ElementGroup will be an object with no animations, but contains a list of subelements & other ElementGroups.
+both Element and ElementGroup will inherit directly from Object.
+- Engine->GetUIElement(element_name, group_name) (also Engine->GetUIElement(element_name), although that will be less efficient) will return that UI element; will be
+useful for updating text in textboxes, setting health from within a character, etc.
