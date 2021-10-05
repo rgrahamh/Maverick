@@ -69,6 +69,7 @@ Engine::~Engine(){
     SDL_DestroyRenderer(camera->getRenderer());
     SDL_DestroyWindow(window);
     delete camera;
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -103,7 +104,7 @@ void Engine::InitUI(){
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
     pause_menu->setActive(false);
     pause_menu->addSprite(0, "./assets/ui/shade.png", 0, 0, 0);
-    UIElement* pause_text = new UIElement("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window);
+    UIText* pause_text = new UIText("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window, "Paused", "./assets/fonts/luximr.ttf", 24);
     pause_menu->addElement(pause_text);
     ui_elements->element = pause_menu;
     ui_elements->next = nullptr;

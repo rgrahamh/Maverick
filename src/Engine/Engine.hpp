@@ -14,6 +14,7 @@
 
 #include "../Object/Character/Character.hpp"
 #include "../Object/UI/UIElement.hpp"
+#include "../Object/UI/UIText/UIText.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>

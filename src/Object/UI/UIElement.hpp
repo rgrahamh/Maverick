@@ -27,7 +27,6 @@ class UIElement : public Object{
 
 		virtual void action(SDL_Event* event);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
-		virtual void setAnimation(unsigned int animation_num);
 		virtual void setScale(float x_scale, float y_scale);
 
         void addElement(UIElement* element);
@@ -35,7 +34,7 @@ class UIElement : public Object{
         UIElement* getElement(const char* name);
         UIElementLst* getSubelements();
 
-    private:
+    protected:
         //The UI object type
         enum UI_OBJECT_TYPE type;
         //All elements which are children of this one
@@ -44,10 +43,14 @@ class UIElement : public Object{
         //The window (to calculate sizes)
         SDL_Window* window;
 
+        //The UI offsets/sizing
         float view_x_offset;
         float view_y_offset;
         float view_width;
         float view_height;
+
+        //The UI draw area
+        SDL_Rect draw_area;
 };
 
 

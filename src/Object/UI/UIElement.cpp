@@ -29,7 +29,10 @@ UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset,
     this->x = view_x_offset * win_width;
     this->y = view_y_offset * win_height;
 
-    //TODO: Set a draw rect? Maybe pass that in with animation frame creation?
+    this->draw_area.x = this->x;
+    this->draw_area.y = this->y;
+    this->draw_area.w = view_width * win_width;
+    this->draw_area.h = view_height * win_height;
 
     this->type = obj_type;
     this->subelements = nullptr;

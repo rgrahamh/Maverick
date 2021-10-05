@@ -58,8 +58,8 @@ class Object{
 
 		//Processing functions
 		void _process(uint32_t delta);
-		//Need this for custom processing (like input)
-		virtual void process();
+		//Need this for custom processing
+		virtual void process(uint32_t delta);
 
 		//Useful for actions on other objects & input
 		virtual void action(SDL_Event* event);

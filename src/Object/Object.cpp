@@ -407,7 +407,7 @@ void Object::action(SDL_Event* event){
 /** Called during the process step; performs object processing calculations
  */
 void Object::_process(uint32_t delta){
-    this->process();
+    this->process(delta);
 
     //Updating old X & Y values
     this->old_x = this->x;
@@ -435,7 +435,7 @@ void Object::_process(uint32_t delta){
 
 /** Called during the process step by _process; space for users to override with custom processing logics
  */
-void Object::process(){
+void Object::process(uint32_t delta){
 }
 
 /** Called during the draw step
