@@ -19,6 +19,10 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
     : UIElement(name, view_x_offest, view_y_offset, view_width, view_height, animation_num, draw_layer, obj_type, window){
     this->point = point;
     this->scroll_speed = scroll_speed;
+
+    this->buff = nullptr;
+    this->text = nullptr;
+    this->font = nullptr;
     if(font_path != nullptr){
         this->setFont(font_path);
     }
@@ -94,7 +98,9 @@ void UIText::setPoint(unsigned int point){
  * @param style Any number of TTF_STYLE_* attrs OR'd together
  */
 void UIText::setStyle(uint8_t style){
-    TTF_SetFontStyle(this->font, style);
+    if(this->font != nullptr){
+        TTF_SetFontStyle(this->font, style);
+    }
 }
 
 /** Sets the color of font

@@ -34,6 +34,9 @@ Engine::Engine(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
 
+    //Setting up the texture hash table
+    texture_hash = new TextureHash(2048);
+
     this->InitUI();
 
     this->zones = NULL;
@@ -77,9 +80,6 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
-    //Setting up the texture hash table
-    texture_hash = new TextureHash(2048);
-
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     ObjectLst* new_objs = new ObjectLst;

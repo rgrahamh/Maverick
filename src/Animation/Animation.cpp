@@ -283,6 +283,9 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 	this->advance(delta);
 
 	Sprite* sprite = this->sequence->sprite;
+	if(sprite == nullptr){
+		return;
+	}
 
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
