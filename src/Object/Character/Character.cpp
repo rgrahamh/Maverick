@@ -213,7 +213,7 @@ void Character::action(SDL_Event* event){
     }
 }
 
-void Character::process(){
+void Character::process(uint32_t delta){
     //Checking to see if we're still sliding
     if(this->sliding == true){
         if(this->xV + this->yV < 1){
