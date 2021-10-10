@@ -1,4 +1,4 @@
-INCLUDE_SDL= -lSDL2 -lSDL2_image -lGL
+INCLUDE_SDL= -lSDL2 -lSDL2_image -lSDL2_ttf -lGL
 CC=g++
 CFLAGS= -Wall -std=c++17 -pthread
 
@@ -7,7 +7,8 @@ ANIMATION= ./src/Animation/Animation.cpp
 HASH= ./src/HashTable/HashTable.cpp ./src/HashTable/TextureHash/TextureHash.cpp
 HITBOXES= ./src/Animation/Hitbox/Hitbox.cpp ./src/Animation/Hitbox/HitEllipse/HitEllipse.cpp ./src/Animation/Hitbox/HitEllipse/HitCone/HitCone.cpp ./src/Animation/Hitbox/HitRect/HitRect.cpp ./src/Animation/Hitbox/HitboxCollision.cpp
 CAMERA= ./src/Camera/Camera.cpp
-OBJECT= ./src/Object/Object.cpp ./src/Object/Character/Character.cpp ./src/Object/Character/Race/Race.cpp ./src/Object/Character/Style/Style.cpp
+UI= ./src/Object/UI/UIElement.cpp ./src/Object/UI/UIText/UIText.cpp
+OBJECT= ./src/Object/Object.cpp ./src/Object/Character/Character.cpp ./src/Object/Character/Race/Race.cpp ./src/Object/Character/Style/Style.cpp $(UI)
 ZONE= ./src/Zone/Zone.cpp
 ZONE_FACTORY= ./src/Zone/ZoneFactory/ZoneFactory.cpp ./src/Zone/ZoneFactory/TestZone/TestZone.cpp
 FACTORY= ./src/Factory/Factory.cpp

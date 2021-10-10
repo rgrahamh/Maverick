@@ -1,10 +1,14 @@
 #include "./Animation.hpp"
 
+#include "../Engine/Engine.hpp"
+
+extern Engine* engine;
+
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(float* x_base, float* y_base, unsigned char draw_layer){
+Animation::Animation(float* x_base, float* y_base, char draw_layer, bool relative){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -127,7 +131,7 @@ bool Animation::isAnimated(){
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset){
+void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative){
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = texture_hash->get(sprite_path)) == NULL){
@@ -163,11 +167,12 @@ void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_
 	this->sequence_end->sprite->rect = rect;
 	this->sequence_end->sprite->surface = surface;
 	this->sequence_end->sprite->texture = NULL;
-	this->sequence_end->keytime = keytime;
 	this->sequence_end->sprite->base_x_offset = x_offset;
 	this->sequence_end->sprite->base_y_offset = y_offset;
 	this->sequence_end->sprite->curr_x_offset = x_offset;
 	this->sequence_end->sprite->curr_y_offset = y_offset;
+	this->sequence_end->sprite->relative = isRelative;
+	this->sequence_end->keytime = keytime;
 	this->sequence_end->hitboxes = NULL;
 
 	//Set up the circular link
@@ -278,15 +283,26 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 		return;
 	}
 
-	//Advance the animation
-	this->advance(delta);
+	//Advance the animation if not paused
+	if(!engine->checkState(GAME_STATE::PAUSE)){
+		this->advance(delta);
+	}
 
 	Sprite* sprite = this->sequence->sprite;
+	if(sprite == nullptr){
+		return;
+	}
 
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
-	curr_rect->x = *this->x_base + sprite->curr_x_offset - camera_x;
-	curr_rect->y = *this->y_base + sprite->curr_y_offset - camera_y;
+	if(sprite->relative){
+		curr_rect->x = *this->x_base + sprite->curr_x_offset - camera_x;
+		curr_rect->y = *this->y_base + sprite->curr_y_offset - camera_y;
+	}
+	else{
+		curr_rect->x = *this->x_base;
+		curr_rect->y = *this->y_base;
+	}
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);

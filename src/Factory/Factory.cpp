@@ -1,8 +1,8 @@
 #include "./Factory.hpp"
 
 
-Character* buildCharacter(char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory){
-    Character* player = new Character("player", start_x, start_y, friction, mass, race, style, stats, mastery, abilities, control, equipment, inventory, 12);
+Character* buildCharacter(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory){
+    Character* player = new Character(name, start_x, start_y, friction, mass, race, style, stats, mastery, abilities, control, equipment, inventory, 12);
 
     //Neutral position
     player->addSprite(0, "./assets/sprites/old_game_resources/Up_Neutral.png", 256, 0, 0);
@@ -37,8 +37,8 @@ Character* buildCharacter(char* name, float start_x, float start_y, float fricti
     return player;
 }
 
-Object* buildPillar(char* name, float start_x, float start_y){
-    Object* pillar = new Object("pillar", start_x, start_y, 1, 1000, 1);
+Object* buildPillar(const char* name, float start_x, float start_y){
+    Object* pillar = new Object(name, start_x, start_y, 1, 1000, 1);
 
     pillar->addSprite(0, "./assets/sprites/environment/pillar.png", 0, 0, 0);
     pillar->addHitbox(0, ELLIPSE, 16, 120, 16, 8, COLLISION | ENVIRONMENT);
@@ -49,8 +49,8 @@ Object* buildPillar(char* name, float start_x, float start_y){
     return pillar;
 }
 
-Object* buildBackground(char* name, float start_x, float start_y){
-    Object* background = new Object("background", start_x, start_y, 1, 1, 1, 0);
+Object* buildBackground(const char* name, float start_x, float start_y){
+    Object* background = new Object(name, start_x, start_y, 1, 1, 1, 0);
 
     background->addSprite(0, "./assets/sprites/old_game_resources/Floor_Tile.png", 0, 0, 0);
 

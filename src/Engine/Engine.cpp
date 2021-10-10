@@ -1,5 +1,8 @@
 #include "./Engine.hpp"
 
+#include "../Object/Character/Character.hpp"
+#include "../Object/UI/UIText/UIText.hpp"
+
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -11,6 +14,9 @@ Engine::Engine(){
     if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
         printf("Failed to init IMG!\n");
         printf("IMG_Init: %s\n", IMG_GetError());
+    }
+    if(TTF_Init() < 0){
+        printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
     }
 
     //Initialization of window and camera
@@ -31,11 +37,16 @@ Engine::Engine(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
 
+    //Setting up the texture hash table
+    texture_hash = new TextureHash(2048);
+
+    this->InitUI();
+
     this->zones = NULL;
     this->active_zones = NULL;
 
     //Set to the title screen
-    this->state = TITLE;
+    this->state = GAME_STATE::OVERWORLD;
 
     this->threads = NULL;
 
@@ -64,6 +75,7 @@ Engine::~Engine(){
     SDL_DestroyRenderer(camera->getRenderer());
     SDL_DestroyWindow(window);
     delete camera;
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -71,9 +83,6 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
-    //Setting up the texture hash table
-    texture_hash = new TextureHash(2048);
-
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     ObjectLst* new_objs = new ObjectLst;
@@ -93,10 +102,23 @@ void Engine::start(){
     gameLoop();
 }
 
+void Engine::InitUI(){
+    ui_elements = new UIElementLst;
+    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
+    pause_menu->setActive(false);
+    pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
+    UIText* pause_text = new UIText("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window, "Paused", "./assets/fonts/luximr.ttf", 24.0, 0.0);
+    pause_menu->addElement(pause_text);
+    ui_elements->element = pause_menu;
+    pause_menu->setVisible(false);
+    pause_menu->setActive(false);
+    ui_elements->next = nullptr;
+}
+
 /** The primary game loop
  */
 void Engine::gameLoop(){
-	while(this->state != EXIT){
+	while(this->state != GAME_STATE::EXIT){
         ObjectLst* all_objects = buildFullObjLst();
 
         //Cleanup threads every second
@@ -107,9 +129,9 @@ void Engine::gameLoop(){
         delta = SDL_GetTicks() - last_time;
         last_time = SDL_GetTicks();
 
-        if(this->state != PAUSE){
-            this->actionStep(all_objects);
-            this->physicsStep(all_objects);
+        this->actionStep(all_objects);
+        this->physicsStep(all_objects);
+        if(this->state != GAME_STATE::PAUSE){
             this->collisionStep(all_objects);
         }
         //Different because we need to adjust the object list for draw order
@@ -133,6 +155,10 @@ void Engine::actionStep(ObjectLst* all_objects){
             cursor->obj->action(&event);
             cursor = cursor->next;
         }
+        while(cursor != NULL){
+            cursor->obj->action(&event);
+            cursor = cursor->next;
+        }
         this->globalAction(&event);
     }
 }
@@ -140,8 +166,18 @@ void Engine::actionStep(ObjectLst* all_objects){
 /** Handles object-nonspecific actions (like menuing for example)
  */
 void Engine::globalAction(SDL_Event* event){
-    if(event->key.keysym.sym == SDLK_ESCAPE && (this->state == OVERWORLD || this->state == PAUSE)){
-        this->state = (this->state == PAUSE)? OVERWORLD : PAUSE;
+    if(event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_ESCAPE){
+        if(this->checkState(GAME_STATE::PAUSE)){
+            this->getUIElement("pause_menu")->setVisible(false);
+            this->getUIElement("pause_menu")->setActive(false);
+            this->state &= ~GAME_STATE::PAUSE;
+        }
+        // You may pause in the overworld or in battle
+        else if(this->checkState(GAME_STATE::OVERWORLD | GAME_STATE::BATTLE)){
+            this->getUIElement("pause_menu")->setVisible(true);
+            this->getUIElement("pause_menu")->setActive(true);
+            this->state |= GAME_STATE::PAUSE;
+        }
     }
 }
 
@@ -149,9 +185,17 @@ void Engine::globalAction(SDL_Event* event){
  * @param all_objects All of the objects that physics should be simluated for
  */
 void Engine::physicsStep(ObjectLst* all_objects){
-    while(all_objects != NULL){
-        all_objects->obj->_process(this->delta);
-        all_objects = all_objects->next;
+    if(!this->checkState(GAME_STATE::PAUSE)){
+        while(all_objects != NULL){
+            all_objects->obj->_process(this->delta);
+            all_objects = all_objects->next;
+        }
+    }
+
+    UIElementLst* cursor = ui_elements;
+    while(cursor != NULL){
+        cursor->element->_process(this->delta);
+        cursor = cursor->next;
     }
 }
 
@@ -287,9 +331,18 @@ void Engine::collisionStep(ObjectLst* all_objects){
 /** The draw step of the game engine
  */
 void Engine::drawStep(ObjectLst* all_objects){
+    SDL_Renderer* renderer = this->camera->getRenderer();
+
+    SDL_RenderClear(renderer);
+
     //Draw operation
     all_objects = this->drawSort(all_objects);
     this->camera->_draw(all_objects, this->delta);
+    ui_elements = (UIElementLst*)this->drawSort((ObjectLst*)ui_elements);
+    this->camera->_draw((ObjectLst*)ui_elements, this->delta);
+
+    SDL_RenderPresent(renderer);
+
     freeFullObjLst(all_objects);
 }
 
@@ -322,6 +375,84 @@ ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
     else{
         return NULL;
     }
+}
+
+/** Gets the first object by name in any zone (slower than specifying zone)
+ * @param element_name The name of the object element
+ * @return A pointer to the object, or NULL if it can't be found
+ */
+UIElement* Engine::getUIElement(const char* element_name){
+    UIElementLst* element_cursor = ui_elements;
+    while(element_cursor != NULL){
+        if(element_cursor->element->getElement(element_name) != nullptr){
+            return element_cursor->element;
+        }
+    }
+
+    return NULL;
+}
+
+/** Gets the first object by name in any zone (slower than specifying zone)
+ * @param obj_name The name of the object
+ * @return A pointer to the object, or NULL if it can't be found
+ */
+Object* Engine::getObject(const char* obj_name){
+    ZoneLst* zone_cursor = this->active_zones;
+    while(zone_cursor != NULL){
+        ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+        while(obj_cursor != NULL){
+            if(strcmp(obj_cursor->obj->getName(), obj_name)){
+                return obj_cursor->obj;
+            }
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return NULL;
+}
+
+/** Gets the first object found by name from a specific zone
+ * @param obj_name The name of the object
+ * @param zone_name The name of the zone
+ * @return A pointer to the object
+ */
+Object* Engine::getObject(const char* obj_name, const char* zone_name){
+    ZoneLst* zone_cursor = this->active_zones;
+    while(zone_cursor != NULL){
+        if(!strcmp(zone_cursor->zone->getName(), zone_name)){
+            ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+            while(obj_cursor != NULL){
+                if(strcmp(obj_cursor->obj->getName(), obj_name)){
+                    return obj_cursor->obj;
+                }
+            }
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return NULL;
+}
+
+/** Checks the state of the engine against the passed-in state(s)
+ * @param chk_state The state(s) you wish to check
+ * @return If the engine is in chk_state
+ */
+bool Engine::checkState(uint64_t chk_state){
+    return (this->state & chk_state) != 0;
+}
+
+/** Gets the state of the engine
+ * @return The state of the engine
+ */
+uint64_t Engine::getState(){
+    return this->state;
+}
+
+/** Sets the state of the engine
+ * @param state The new of the engine
+ */
+void Engine::setState(uint64_t state){
+    this->state = state;
 }
 
 /** Goes through all active threads and cleans them up
@@ -469,47 +600,6 @@ void Engine::freeFullObjLst(ObjectLst* all_objects){
         delete all_objects;
         all_objects = free_objects;
     }
-}
-
-/** Gets the first object by name in any zone (slower than specifying zone)
- * @param obj_name The name of the object
- * @return A pointer to the object, or NULL if it can't be found
- */
-Object* Engine::getObject(const char* obj_name){
-    ZoneLst* zone_cursor = this->active_zones;
-    while(zone_cursor != NULL){
-        ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
-        while(obj_cursor != NULL){
-            if(strcmp(obj_cursor->obj->getName(), obj_name)){
-                return obj_cursor->obj;
-            }
-        }
-        zone_cursor = zone_cursor->next;
-    }
-
-    return NULL;
-}
-
-/** Gets the first object found by name from a specific zone
- * @param obj_name The name of the object
- * @param zone_name The name of the zone
- * @return A pointer to the object
- */
-Object* Engine::getObject(const char* obj_name, const char* zone_name){
-    ZoneLst* zone_cursor = this->active_zones;
-    while(zone_cursor != NULL){
-        if(!strcmp(zone_cursor->zone->getName(), zone_name)){
-            ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
-            while(obj_cursor != NULL){
-                if(strcmp(obj_cursor->obj->getName(), obj_name)){
-                    return obj_cursor->obj;
-                }
-            }
-        }
-        zone_cursor = zone_cursor->next;
-    }
-
-    return NULL;
 }
 
 /** Adds a new zone to the game

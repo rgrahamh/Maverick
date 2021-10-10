@@ -96,7 +96,7 @@ class Character : public Object, public Race, public Style{
 		virtual ~Character();
 		//Useful for actions on other objects & input
 		virtual void action(SDL_Event* event);
-		virtual void process();
+		virtual void process(uint32_t delta);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
