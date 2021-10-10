@@ -1,5 +1,9 @@
 #include "./Animation.hpp"
 
+#include "../Engine/Engine.hpp"
+
+extern Engine* engine;
+
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
@@ -279,8 +283,10 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 		return;
 	}
 
-	//Advance the animation
-	this->advance(delta);
+	//Advance the animation if not paused
+	if(!engine->checkState(GAME_STATE::PAUSE)){
+		this->advance(delta);
+	}
 
 	Sprite* sprite = this->sequence->sprite;
 	if(sprite == nullptr){

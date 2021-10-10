@@ -27,10 +27,14 @@ class UIElement : public Object{
 
 		virtual void action(SDL_Event* event);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+
 		virtual void setScale(float x_scale, float y_scale);
+		virtual void setActive(bool active);
+		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
         void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative = false);
+
         UIElement* getElement(const char* name);
         UIElementLst* getSubelements();
 

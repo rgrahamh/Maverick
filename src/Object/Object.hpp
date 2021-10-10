@@ -50,7 +50,7 @@ class Object{
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
 		void setActive(bool active);
-		void setVisible(bool active);
+		void setVisible(bool visible);
 		void setEnvBump();
 		void setAttr(const char* key, void* val);
 

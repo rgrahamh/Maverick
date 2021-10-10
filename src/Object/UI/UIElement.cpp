@@ -106,6 +106,34 @@ void UIElement::setScale(float x_scale, float y_scale){
     }
 }
 
+/** Sets the visibility of the current animation state
+ * @return If the object is active
+ */
+void UIElement::setActive(bool active){
+    this->active = active;
+
+    //Set visible for all child elements
+    UIElementLst* cursor = subelements;
+    while(cursor != nullptr){
+        cursor->element->setActive(active);
+        cursor = cursor->next;
+    }
+}
+
+/** Sets the visibility of the current animation state
+ * @return If the object is active
+ */
+void UIElement::setVisible(bool visible){
+    this->visible = visible;
+
+    //Set active for all child elements
+    UIElementLst* cursor = subelements;
+    while(cursor != nullptr){
+        cursor->element->setVisible(visible);
+        cursor = cursor->next;
+    }
+}
+
 /** Adds a sprite to a given animation
  * @param animation_num The animation number
  * @param sprite_path The filepath to the sprite you're adding

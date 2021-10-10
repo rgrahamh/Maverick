@@ -12,20 +12,18 @@
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
 
-#include "../Object/Character/Character.hpp"
 #include "../Object/UI/UIElement.hpp"
-#include "../Object/UI/UIText/UIText.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-enum GAME_STATE{
-	TITLE,
-	OVERWORLD,
-	BATTLE,
-	DISCUSSION,
-	PAUSE,
-	EXIT
+enum GAME_STATE : uint64_t{
+	TITLE = 1,
+	OVERWORLD = 2,
+	BATTLE = 4,
+	DISCUSSION = 8,
+	PAUSE = 16,
+	EXIT = 32
 };
 
 typedef struct ThreadList{
@@ -43,7 +41,19 @@ class Engine{
 
 		//Zone addition/state handling
 		void addZone(Zone* zone);
+
+		//Gets an object
+		void addObject(Object* object);
 		void addUIElement(UIElement* ui);
+
+		Object* getObject(const char* name);
+		Object* getObject(const char* name, const char* zone);
+		UIElement* getUIElement(const char* name);
+		uint64_t getState();
+		bool checkState(uint64_t state_condition);
+
+		void setState(uint64_t new_state);
+
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
 
@@ -79,10 +89,6 @@ class Engine{
 		//Handles the default collision between objects
 		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);
 
-		//Gets an object
-		Object* getObject(const char* name);
-		Object* getObject(const char* name, const char* zone);
-
 		//UI initialization
 		void InitUI();
 
@@ -101,7 +107,7 @@ class Engine{
 		SDL_Window* window;
 
 		//State tracking
-		GAME_STATE state;
+		uint64_t state;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;
