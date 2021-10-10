@@ -107,10 +107,11 @@ void Engine::InitUI(){
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
     pause_menu->setActive(false);
     pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
-    UIText* pause_text = new UIText("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window, "Paused", "./assets/fonts/luximr.ttf", 24);
+    UIText* pause_text = new UIText("pause_text", 0.25, 0.5, 0.1, 0.05, 1, 1, UI_OBJECT_TYPE::TEXT, window, "Paused", "./assets/fonts/luximr.ttf", 24.0, 0.0);
     pause_menu->addElement(pause_text);
     ui_elements->element = pause_menu;
     pause_menu->setVisible(false);
+    pause_menu->setActive(false);
     ui_elements->next = nullptr;
 }
 
@@ -129,8 +130,8 @@ void Engine::gameLoop(){
         last_time = SDL_GetTicks();
 
         this->actionStep(all_objects);
+        this->physicsStep(all_objects);
         if(this->state != GAME_STATE::PAUSE){
-            this->physicsStep(all_objects);
             this->collisionStep(all_objects);
         }
         //Different because we need to adjust the object list for draw order
@@ -150,6 +151,10 @@ void Engine::actionStep(ObjectLst* all_objects){
             return;
         }
         cursor = all_objects;
+        while(cursor != NULL){
+            cursor->obj->action(&event);
+            cursor = cursor->next;
+        }
         while(cursor != NULL){
             cursor->obj->action(&event);
             cursor = cursor->next;
@@ -180,9 +185,17 @@ void Engine::globalAction(SDL_Event* event){
  * @param all_objects All of the objects that physics should be simluated for
  */
 void Engine::physicsStep(ObjectLst* all_objects){
-    while(all_objects != NULL){
-        all_objects->obj->_process(this->delta);
-        all_objects = all_objects->next;
+    if(!this->checkState(GAME_STATE::PAUSE)){
+        while(all_objects != NULL){
+            all_objects->obj->_process(this->delta);
+            all_objects = all_objects->next;
+        }
+    }
+
+    UIElementLst* cursor = ui_elements;
+    while(cursor != NULL){
+        cursor->element->_process(this->delta);
+        cursor = cursor->next;
     }
 }
 

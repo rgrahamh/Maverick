@@ -17,8 +17,7 @@ class UIText : public UIElement{
         void setFont(const char* font_path);
         void setStyle(uint8_t style);
         void setPoint(unsigned int point);
-        void setFontColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
-        void setBackgroundColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
+        void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
         void setScrollSpeed(float scroll_speed);
 
     private:

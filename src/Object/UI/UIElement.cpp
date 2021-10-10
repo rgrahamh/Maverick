@@ -51,18 +51,59 @@ UIElement::~UIElement(){
     }
 }
 
-/** Handles actions for this UIElement and all children UIElements
- * @param event The event that has occurred
- */
-void UIElement::action(SDL_Event* event){
-    //Perform all actions for child elements (generic element has no default actions)
-    UIElementLst* cursor = this->subelements;
+void UIElement::process(uint32_t delta){
+    return;
+}
+
+void UIElement::_process(uint32_t delta){
+    this->process(delta);
+
+    UIElementLst* cursor = subelements;
     while(cursor != nullptr){
-        cursor->element->action(event);
+        if(cursor->element->isActive()){
+            cursor->element->_process(delta);
+        }
         cursor = cursor->next;
     }
 }
 
+/** Handles actions for this UIElement and all children UIElements
+ * @param event The event that has occurred
+ */
+void UIElement::action(SDL_Event* event){
+    return;
+}
+
+void UIElement::_action(SDL_Event* event){
+    this->action(event);
+
+    //Perform all actions for child elements (generic element has no default actions)
+    UIElementLst* cursor = this->subelements;
+    while(cursor != nullptr){
+        if(cursor->element->isActive()){
+            cursor->element->_action(event);
+        }
+        cursor = cursor->next;
+    }
+}
+
+/** Draws this UIElement and all children UIElements
+ * @param renderer The SDL_Renderer we're drawing to
+ * @param delta The time passed since last draw (in ms)
+ * @param camera_x The X location of the camera
+ * @param camera_y The Y location of the camera
+ */
+void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+    //Draw this element
+    this->draw(renderer, delta, camera_x, camera_y);
+
+    //Draw all children elements (AFTER the parent element)
+    UIElementLst* cursor = this->subelements;
+    while(cursor != nullptr){
+        cursor->element->_draw(renderer, delta, camera_x, camera_y);
+        cursor = cursor->next;
+    }
+}
 
 /** Draws this UIElement and all children UIElements
  * @param renderer The SDL_Renderer we're drawing to
@@ -74,13 +115,6 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
     //Draw this element
     if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
         this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
-    }
-
-    //Draw all children elements (AFTER the parent element)
-    UIElementLst* cursor = this->subelements;
-    while(cursor != nullptr){
-        cursor->element->draw(renderer, delta, camera_x, camera_y);
-        cursor = cursor->next;
     }
 }
 

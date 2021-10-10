@@ -36,7 +36,7 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
  */
 UIText::~UIText(){
     if(this->font != nullptr){
-        free(this->font);
+        TTF_CloseFont(this->font);
     }
     if(this->text != nullptr){
         free(this->text);
@@ -63,11 +63,12 @@ void UIText::setText(const char* text){
     if(this->buff != nullptr){
         free(this->buff);
     }
-    this->buff = (char*)malloc(len + 1);
+    this->buff = (char*)calloc(len + 1, 1);
 
-    for(int i = 0; i < strlen(text); i++){
+    for(size_t i = 0; i < len; i++){
         this->text[i] = text[i];
     }
+    this->text[len] = '\0';
 }
 
 /** Sets the text's font (call upon change of font or point)
@@ -76,7 +77,7 @@ void UIText::setText(const char* text){
 void UIText::setFont(const char* font_path){
     this->setStyle(TTF_STYLE_NORMAL);
     if(this->font != nullptr){
-        delete this->font;
+        TTF_CloseFont(this->font);
     }
 
     this->font_path = font_path;
@@ -109,18 +110,8 @@ void UIText::setStyle(uint8_t style){
  * @param b The blue value of the font
  * @param a The alpha value of the font
  */
-void UIText::setFontColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+void UIText::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
     this->font_color = SDL_Color{r, g, b, a};
-}
-
-/** Sets the background color of text
- * @param r The red value of the background
- * @param g The green value of the background
- * @param b The blue value of the background
- * @param a The alpha value of the background
- */
-void UIText::setBackgroundColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-    this->back_color = SDL_Color{r, g, b, a};
 }
 
 /** Sets the text scroll speed
@@ -138,10 +129,10 @@ void UIText::setScrollSpeed(float scroll_speed){
  */
 void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw this element
-    if(this->font != nullptr && this->text != nullptr){
+    if(this->font != nullptr && this->buff != nullptr){
         //Still need to figure out line breaks in the function; maybe use a buff we populate w/ the normal buff,
         // then call this section repeatedly w/ the new buf once populated?
-        SDL_Surface* surface = TTF_RenderText(this->font, this->buff, this->font_color, this->back_color);
+        SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, this->buff, this->font_color);
         if(surface != nullptr){
             SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
             SDL_RenderCopy(renderer, texture, nullptr, &this->draw_area);
@@ -167,10 +158,11 @@ void UIText::process(uint32_t delta){
         //Determine the current buff len & text len
         unsigned int buff_len = strlen(this->buff);
         unsigned int text_len = strlen(this->text);
+
         if(buff_len < text_len){
             //If we aren't scrolling
             if(this->scroll_speed <= 0.0){
-                for(int i = 0; i < text_len; i++){
+                for(unsigned int i = 0; i < text_len; i++){
                     this->buff[i] = this->text[i];
                 }
             }

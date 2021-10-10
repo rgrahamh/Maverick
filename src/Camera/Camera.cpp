@@ -50,7 +50,7 @@ void Camera::_draw(ObjectLst* obj_lst, uint32_t delta){
 
     while(obj_lst != NULL){
         if(obj_lst->obj->isVisible()){
-            obj_lst->obj->draw(renderer, delta, current_x, current_y);
+            obj_lst->obj->_draw(renderer, delta, current_x, current_y);
         }
         obj_lst = obj_lst->next;
     }

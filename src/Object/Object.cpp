@@ -397,6 +397,13 @@ void Object::applyForce(float xA, float yA){
     this->yA += yA;
 }
 
+/** Called during input step; calls action function
+ * @param event The event being interpreted
+ */
+void Object::_action(SDL_Event* event){
+    this->action(event);
+}
+
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
@@ -436,6 +443,12 @@ void Object::_process(uint32_t delta){
 /** Called during the process step by _process; space for users to override with custom processing logics
  */
 void Object::process(uint32_t delta){
+}
+
+/** Called during the draw step
+ */
+void Object::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+    this->draw(renderer, delta, camera_x, camera_y);
 }
 
 /** Called during the draw step

@@ -25,7 +25,11 @@ class UIElement : public Object{
         UIElement(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window);
         virtual ~UIElement();
 
+		virtual void _process(uint32_t delta);
+		virtual void process(uint32_t delta);
+		virtual void _action(SDL_Event* event);
 		virtual void action(SDL_Event* event);
+        virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void setScale(float x_scale, float y_scale);

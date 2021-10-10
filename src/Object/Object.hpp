@@ -57,13 +57,14 @@ class Object{
 		void applyForce(float xA, float yA);
 
 		//Processing functions
-		void _process(uint32_t delta);
+		virtual void _process(uint32_t delta);
 		//Need this for custom processing
 		virtual void process(uint32_t delta);
 
-		//Useful for actions on other objects & input
+		virtual void _action(SDL_Event* event);
 		virtual void action(SDL_Event* event);
 
+		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
