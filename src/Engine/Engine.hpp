@@ -11,6 +11,7 @@
 
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
+#include "../Control/Control.hpp"
 
 #include "../Object/UI/UIElement.hpp"
 
@@ -105,6 +106,9 @@ class Engine{
 		//Render
 		Camera* camera;
 		SDL_Window* window;
+
+		//Control
+		Control* control;
 
 		//State tracking
 		uint64_t state;

@@ -19,6 +19,9 @@ Engine::Engine(){
         printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
     }
 
+    //Initialization of control system
+    control = new Control();
+
     //Initialization of window and camera
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
@@ -143,6 +146,9 @@ void Engine::gameLoop(){
  * @param all_objects All of the objects that should be listening for input
  */
 void Engine::actionStep(ObjectLst* all_objects){
+    //Update controller/keyboard input
+    control->updateInput();
+
     SDL_Event event;
     ObjectLst* cursor;
     while(SDL_PollEvent(&event)){
