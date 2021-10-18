@@ -65,14 +65,20 @@ int Control::updateControllers(){
             controllers[i].right_stick_button = SDL_GameControllerGetButton(controller_objs[i], SDL_CONTROLLER_BUTTON_RIGHTSTICK);
             controllers[i].left_stick_button = SDL_GameControllerGetButton(controller_objs[i], SDL_CONTROLLER_BUTTON_LEFTSTICK);
 
-            controllers[i].right_trigger_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-            controllers[i].left_trigger_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+            float axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_TRIGGERRIGHT)) / MAX_AXIS_RANGE;
+            controllers[i].right_trigger_axis = (axis > TRIGGER_DEADZONE)? axis : 0.0;
+            axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_TRIGGERLEFT)) / MAX_AXIS_RANGE;
+            controllers[i].left_trigger_axis = (axis > TRIGGER_DEADZONE)? axis : 0.0;
 
-            controllers[i].right_stick_x_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_RIGHTX);
-            controllers[i].right_stick_y_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_RIGHTY);
+            axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_RIGHTX)) / MAX_AXIS_RANGE;
+            controllers[i].right_stick_x_axis = (abs(axis) > STICK_DEADZONE)? axis : 0.0;
+            axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_RIGHTY)) / MAX_AXIS_RANGE;
+            controllers[i].right_stick_y_axis = (abs(axis) > STICK_DEADZONE)? axis : 0.0;
 
-            controllers[i].left_stick_x_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_LEFTX);
-            controllers[i].left_stick_y_axis = SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_LEFTY);
+            axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_LEFTX)) / MAX_AXIS_RANGE;
+            controllers[i].left_stick_x_axis = (abs(axis) > STICK_DEADZONE)? axis : 0.0;
+            axis = ((float)SDL_GameControllerGetAxis(controller_objs[i], SDL_CONTROLLER_AXIS_LEFTY)) / MAX_AXIS_RANGE;
+            controllers[i].left_stick_y_axis = (abs(axis) > STICK_DEADZONE)? axis : 0.0;
         }
     }
 

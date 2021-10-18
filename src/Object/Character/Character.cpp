@@ -14,7 +14,7 @@ Character::Character(const char* name, float start_x, float start_y, float frict
 	this->abilities = abilities;
 	this->control = control;
     this->sliding = false;
-	this->control = CONTROL_TYPE::KEYBOARD;
+	this->control = CONTROL_TYPE::GAMEPAD;
 	this->control_num = 0;
 
 	//Initializing inventory
@@ -51,14 +51,12 @@ bool Character::isWalking(){
  * @param event The event being interpreted
  */
 void Character::action(Control* control){
-    uint64_t state = engine->getState();
-    const uint8_t* old_keys = control->getOldKeys();
     const uint8_t* keys = control->getKeys();
+	const ControllerState* pad = control->getController(this->control_num);
 
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
 		//If the character is in an actionable state
-		if(state != GAME_STATE::PAUSE && state != GAME_STATE::DISCUSSION && state != GAME_STATE::TITLE){
-
+		if(this->control == CONTROL_TYPE::KEYBOARD){
 			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
 			if(((!(keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_D]))
 			|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
@@ -75,16 +73,68 @@ void Character::action(Control* control){
 				setAnimation(DOWN_WALK);
 			}
 			else if((!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
-					|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
-					|| (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
-					|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])){
+				  || (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+				  || (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+				  || (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])){
 				setAnimation(LEFT_WALK);
 			}
 			else if((!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
-					|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
-					|| (!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
-					|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
+				  || (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+				  || (!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+				  || (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
 				setAnimation(RIGHT_WALK);
+			}
+		}
+		else if(this->control == CONTROL_TYPE::GAMEPAD){
+			float x_axis = pad->left_stick_x_axis;
+			float y_axis = pad->left_stick_y_axis;
+			if(x_axis == 0.0 && y_axis == 0.0 && this->isWalking()){
+				setAnimation(active_animation - 4);
+			}
+			else if(x_axis > 0.0 && y_axis > 0.0){
+				if(x_axis > y_axis && this->active_animation != RIGHT_WALK){
+					setAnimation(RIGHT_WALK);
+				}
+				else if(x_axis <= y_axis && this->active_animation != DOWN_WALK){
+					setAnimation(DOWN_WALK);
+				}
+			}
+			else if(x_axis > 0.0 && y_axis < 0.0){
+				if(x_axis > abs(y_axis) && this->active_animation != RIGHT_WALK){
+					setAnimation(RIGHT_WALK);
+				}
+				else if(x_axis <= abs(y_axis) && this->active_animation != UP_WALK){
+					setAnimation(UP_WALK);
+				}
+			}
+			else if(x_axis < 0.0 && y_axis > 0.0){
+				if(abs(x_axis) > y_axis && this->active_animation != LEFT_WALK){
+					setAnimation(LEFT_WALK);
+				}
+				else if(abs(x_axis) <= y_axis && this->active_animation != DOWN_WALK){
+					setAnimation(DOWN_WALK);
+				}
+			}
+			else if(x_axis < 0.0 && y_axis < 0.0){
+				//No abs needed, but more extreme direction will be the lesser
+				if(x_axis < y_axis && this->active_animation != LEFT_WALK){
+					setAnimation(LEFT_WALK);
+				}
+				else if(x_axis >= y_axis && this->active_animation != UP_WALK){
+					setAnimation(UP_WALK);
+				}
+			}
+			else if(x_axis > 0.0 && this->active_animation != RIGHT_WALK){
+				setAnimation(RIGHT_WALK);
+			}
+			else if(y_axis > 0.0 && this->active_animation != DOWN_WALK){
+				setAnimation(DOWN_WALK);
+			}
+			else if(x_axis < 0.0 && this->active_animation != LEFT_WALK){
+				setAnimation(LEFT_WALK);
+			}
+			else if(y_axis < 0.0 && this->active_animation != UP_WALK){
+				setAnimation(UP_WALK);
 			}
 		}
 
@@ -103,6 +153,10 @@ void Character::action(Control* control){
 				if(keys[SDL_SCANCODE_D]){
 					this->xA += 0.1;
 				}
+			}
+			else if(this->control == CONTROL_TYPE::GAMEPAD){
+				this->yA += pad->left_stick_y_axis * 0.1;
+				this->xA += pad->left_stick_x_axis * 0.1;
 			}
 		}
 	}

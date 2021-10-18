@@ -4,6 +4,9 @@
 #include <SDL2/SDL.h>
 
 #define MAX_GAMEPADS 4
+#define MAX_AXIS_RANGE 32767.0
+#define STICK_DEADZONE 0.2
+#define TRIGGER_DEADZONE 0.05
 
 //Tracks the controller state
 typedef struct ControllerState{
@@ -32,16 +35,16 @@ typedef struct ControllerState{
     uint8_t left_stick_button;
 
     //Triggers
-    int16_t right_trigger_axis;
-    int16_t left_trigger_axis;
+    float right_trigger_axis;
+    float left_trigger_axis;
 
     //Right stick axies
-    int16_t right_stick_x_axis;
-    int16_t right_stick_y_axis;
+    float right_stick_x_axis;
+    float right_stick_y_axis;
 
     //Left stick axies
-    int16_t left_stick_x_axis;
-    int16_t left_stick_y_axis;
+    float left_stick_x_axis;
+    float left_stick_y_axis;
 
 } ControllerState;
 
