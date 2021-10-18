@@ -3,6 +3,14 @@
 #include "../Object/Character/Character.hpp"
 #include "../Object/UI/UIText/UIText.hpp"
 
+static int SDLCALL event_listener(void* userdata, SDL_Event* event){
+    if(event->type == SDL_EventType::SDL_QUIT){
+        *(bool*)userdata = true;
+    }
+
+    return 1;
+}
+
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -18,6 +26,9 @@ Engine::Engine(){
     if(TTF_Init() < 0){
         printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
     }
+
+    //Initialization of control system
+    control = new Control();
 
     //Initialization of window and camera
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -118,7 +129,10 @@ void Engine::InitUI(){
 /** The primary game loop
  */
 void Engine::gameLoop(){
-	while(this->state != GAME_STATE::EXIT){
+    bool exit_game = false;
+    SDL_AddEventWatch(event_listener, &exit_game);
+
+	while(!exit_game){
         ObjectLst* all_objects = buildFullObjLst();
 
         //Cleanup threads every second
@@ -134,6 +148,7 @@ void Engine::gameLoop(){
         if(this->state != GAME_STATE::PAUSE){
             this->collisionStep(all_objects);
         }
+
         //Different because we need to adjust the object list for draw order
 		this->drawStep(all_objects);
 	}
@@ -143,30 +158,27 @@ void Engine::gameLoop(){
  * @param all_objects All of the objects that should be listening for input
  */
 void Engine::actionStep(ObjectLst* all_objects){
-    SDL_Event event;
-    ObjectLst* cursor;
-    while(SDL_PollEvent(&event)){
-        if(event.type == SDL_QUIT){
-            this->state = EXIT;
-            return;
-        }
-        cursor = all_objects;
-        while(cursor != NULL){
-            cursor->obj->action(&event);
-            cursor = cursor->next;
-        }
-        while(cursor != NULL){
-            cursor->obj->action(&event);
-            cursor = cursor->next;
-        }
-        this->globalAction(&event);
+    //Update controller/keyboard input
+    control->updateInput();
+
+    ObjectLst* cursor = all_objects;
+    while(cursor != NULL){
+        cursor->obj->action(control);
+        cursor = cursor->next;
     }
+    while(cursor != NULL){
+        cursor->obj->action(control);
+        cursor = cursor->next;
+    }
+    this->globalAction();
 }
 
 /** Handles object-nonspecific actions (like menuing for example)
  */
-void Engine::globalAction(SDL_Event* event){
-    if(event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_ESCAPE){
+void Engine::globalAction(){
+    const uint8_t* keys = control->getKeys();
+    const uint8_t* old_keys = control->getOldKeys();
+    if(keys[SDL_SCANCODE_ESCAPE] && !old_keys[SDL_SCANCODE_ESCAPE]){
         if(this->checkState(GAME_STATE::PAUSE)){
             this->getUIElement("pause_menu")->setVisible(false);
             this->getUIElement("pause_menu")->setActive(false);

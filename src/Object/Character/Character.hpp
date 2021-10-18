@@ -10,6 +10,7 @@
 #include "../Object.hpp"
 #include "./Race/Race.hpp"
 #include "./Style/Style.hpp"
+#include "../../Control/Control.hpp"
 
 typedef struct InventorySlot{
 	Item* item;
@@ -72,19 +73,20 @@ typedef struct EquipmentList{
 } Equipment;
 
 enum CHARACTER_ANIMATION{
-	UP_NEUTRAL,
-	DOWN_NEUTRAL,
-	LEFT_NEUTRAL,
-	RIGHT_NEUTRAL,
-	UP_WALK,
-	DOWN_WALK,
-	LEFT_WALK,
-	RIGHT_WALK
+	UP_NEUTRAL    = 0,
+	DOWN_NEUTRAL  = 1,
+	LEFT_NEUTRAL  = 2,
+	RIGHT_NEUTRAL = 3,
+	UP_WALK       = 4,
+	DOWN_WALK     = 5,
+	LEFT_WALK     = 6,
+	RIGHT_WALK    = 7
 };
 
 enum CONTROL_TYPE{
-	KEYBOARD,
-	AI,
+	KEYBOARD = 1,
+	GAMEPAD  = 2,
+	AI = 4,
 	NETWORK,
 	WANDERING,
 	STATIC
@@ -94,30 +96,26 @@ class Character : public Object, public Race, public Style{
 	public:
 		Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12, int draw_layer = 1);
 		virtual ~Character();
+
 		//Useful for actions on other objects & input
-		virtual void action(SDL_Event* event);
+		virtual void action(Control* control);
 		virtual void process(uint32_t delta);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
+		bool isStanding();
+		bool isWalking();
+
 	protected:
 		bool overdrive;
 		bool sliding;
-		CONTROL_TYPE control;
+		uint8_t control;
+		uint8_t control_num;
 		Stats* stats;
 		InvSlot** inventory;
 		Mastery* mastery;
 		Equipment* equipment;
 		Abilities* abilities;
-
-        typedef struct KeyboardState{
-            bool up_arrow;
-            bool down_arrow;
-            bool left_arrow;
-            bool right_arrow;
-        } KeyState;
-
-        KeyState keys;
 };
 
 #endif

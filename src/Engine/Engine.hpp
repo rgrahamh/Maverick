@@ -11,6 +11,7 @@
 
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
+#include "../Control/Control.hpp"
 
 #include "../Object/UI/UIElement.hpp"
 
@@ -63,7 +64,7 @@ class Engine{
 		//Engine steps
 		//Action step
 		void actionStep(ObjectLst* all_objects);
-		void globalAction(SDL_Event* event);
+		void globalAction();
 
 		//Draw step
 		void drawStep(ObjectLst* all_objects);
@@ -105,6 +106,9 @@ class Engine{
 		//Render
 		Camera* camera;
 		SDL_Window* window;
+
+		//Control
+		Control* control;
 
 		//State tracking
 		uint64_t state;

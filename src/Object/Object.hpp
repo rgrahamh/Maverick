@@ -7,6 +7,7 @@
 #include "../Animation/Hitbox/HitEllipse/HitEllipse.hpp"
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitboxCollision.hpp"
+#include "../Control/Control.hpp"
 
 #include <SDL2/SDL.h>
 #include <unordered_map>
@@ -61,8 +62,8 @@ class Object{
 		//Need this for custom processing
 		virtual void process(uint32_t delta);
 
-		virtual void _action(SDL_Event* event);
-		virtual void action(SDL_Event* event);
+		virtual void _action(Control* control);
+		virtual void action(Control* control);
 
 		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
