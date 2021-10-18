@@ -400,14 +400,14 @@ void Object::applyForce(float xA, float yA){
 /** Called during input step; calls action function
  * @param event The event being interpreted
  */
-void Object::_action(SDL_Event* event){
-    this->action(event);
+void Object::_action(Control* control){
+    this->action(control);
 }
 
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
-void Object::action(SDL_Event* event){
+void Object::action(Control* control){
     return;
 }
 

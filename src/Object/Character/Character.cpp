@@ -14,6 +14,8 @@ Character::Character(const char* name, float start_x, float start_y, float frict
 	this->abilities = abilities;
 	this->control = control;
     this->sliding = false;
+	this->control = CONTROL_TYPE::KEYBOARD;
+	this->control_num = 0;
 
 	//Initializing inventory
 	if(inventory != NULL){
@@ -29,12 +31,6 @@ Character::Character(const char* name, float start_x, float start_y, float frict
 		this->equipment = new Equipment();
 	}
 
-	//Initializing keys
-    keys.up_arrow = 0;
-    keys.down_arrow = 0;
-    keys.left_arrow = 0;
-    keys.right_arrow = 0;
-
 	this->overdrive=false;
 }
 
@@ -43,201 +39,73 @@ Character::~Character(){
 	delete this->equipment;
 }
 
+bool Character::isStanding(){
+    return active_animation >= UP_NEUTRAL && active_animation <= RIGHT_NEUTRAL;
+}
+
+bool Character::isWalking(){
+    return active_animation >= UP_WALK && active_animation <= RIGHT_WALK;
+}
+
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
-void Character::action(SDL_Event* event){
+void Character::action(Control* control){
     uint64_t state = engine->getState();
-    if(state != GAME_STATE::PAUSE && state != GAME_STATE::DISCUSSION && state != GAME_STATE::TITLE){
-        if(event->type == SDL_KEYDOWN){
-            switch(event->key.keysym.sym){
-                case(SDLK_UP): {
-                    this->keys.up_arrow = 1;
+    const uint8_t* old_keys = control->getOldKeys();
+    const uint8_t* keys = control->getKeys();
 
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
-                            this->setAnimation(UP_WALK);
-                        }
-                    }
+    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
+		//If the character is in an actionable state
+		if(state != GAME_STATE::PAUSE && state != GAME_STATE::DISCUSSION && state != GAME_STATE::TITLE){
 
-                    break;
-                }
-                case(SDLK_DOWN): {
-                    this->keys.down_arrow = 1;
+			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
+			if(((!(keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_D]))
+			|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+			|| (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+			|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]))
+			&& this->isWalking()){
+				setAnimation(active_animation - 4);
+			}
+			//Else if up and no other keys
+			else if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+				setAnimation(UP_WALK);
+			}
+			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+				setAnimation(DOWN_WALK);
+			}
+			else if((!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+					|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+					|| (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+					|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])){
+				setAnimation(LEFT_WALK);
+			}
+			else if((!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+					|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+					|| (!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
+					|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
+				setAnimation(RIGHT_WALK);
+			}
+		}
 
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        if(!(this->keys.left_arrow ^ this->keys.right_arrow)){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                    }
-
-                    break;
-                }
-                case(SDLK_LEFT): {
-                    this->keys.left_arrow = 1;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        if(keys.right_arrow && !(keys.up_arrow || keys.down_arrow)){
-                            this->setAnimation(RIGHT_NEUTRAL);
-                        }
-                        else if (keys.right_arrow && keys.down_arrow){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                        else if (keys.right_arrow && keys.up_arrow){
-                            this->setAnimation(UP_WALK);
-                        }
-                        else{
-                            this->setAnimation(LEFT_WALK);
-                        }
-                    }
-
-                    break;
-                }
-                case(SDLK_RIGHT): {
-                    this->keys.right_arrow = 1;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        if(keys.left_arrow && !(keys.up_arrow || keys.down_arrow)){
-                            this->setAnimation(LEFT_NEUTRAL);
-                        }
-                        else if (keys.left_arrow && keys.down_arrow){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                        else if (keys.left_arrow && keys.up_arrow){
-                            this->setAnimation(UP_WALK);
-                        }
-                        else{
-                            this->setAnimation(RIGHT_WALK);
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-
-    if(state != GAME_STATE::DISCUSSION && state != GAME_STATE::TITLE){
-        if(event->type == SDL_KEYUP){
-            switch(event->key.keysym.sym){
-                case(SDLK_UP): {
-                    this->keys.up_arrow = 0;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        //If down and nothing else or down and everything else
-                        if((this->keys.down_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                        //If left and right
-                        else if(this->keys.left_arrow && this->keys.right_arrow){
-                            this->setAnimation(UP_NEUTRAL);
-                        }
-                        //If left
-                        else if(this->keys.left_arrow){
-                            this->setAnimation(LEFT_WALK);
-                        }
-                        //If right
-                        else if(this->keys.right_arrow){
-                            this->setAnimation(RIGHT_WALK);
-                        }
-                        //If nothing else
-                        else{
-                            this->setAnimation(UP_NEUTRAL);
-                        }
-                    }
-
-                    break;
-                }
-
-                case(SDLK_DOWN): {
-                    this->keys.down_arrow = 0;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        //If up and nothing else or up and everything else
-                        if((this->keys.up_arrow && !(this->keys.left_arrow || this->keys.right_arrow)) || (this->keys.up_arrow && this->keys.right_arrow && this->keys.left_arrow)){
-                            this->setAnimation(UP_WALK);
-                        }
-                        //If left and right
-                        else if(this->keys.left_arrow && this->keys.right_arrow){
-                            this->setAnimation(DOWN_NEUTRAL);
-                        }
-                        //If left
-                        else if(this->keys.left_arrow){
-                            this->setAnimation(LEFT_WALK);
-                        }
-                        //If right
-                        else if(this->keys.right_arrow){
-                            this->setAnimation(RIGHT_WALK);
-                        }
-                        //If nothing else
-                        else{
-                            this->setAnimation(DOWN_NEUTRAL);
-                        }
-                    }
-
-                    break;
-                }
-
-                case(SDLK_LEFT): {
-                    this->keys.left_arrow = 0;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        //If right and nothing else or right and everything else
-                        if((this->keys.right_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.right_arrow && this->keys.up_arrow && this->keys.down_arrow)){
-                            this->setAnimation(RIGHT_WALK);
-                        }
-                        //If up and down
-                        else if(this->keys.up_arrow && this->keys.down_arrow){
-                            this->setAnimation(LEFT_NEUTRAL);
-                        }
-                        //If up
-                        else if(this->keys.up_arrow){
-                            this->setAnimation(UP_WALK);
-                        }
-                        //If down
-                        else if(this->keys.down_arrow){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                        //If nothing else
-                        else{
-                            this->setAnimation(LEFT_NEUTRAL);
-                        }
-                    }
-
-                    break;
-                }
-
-                case(SDLK_RIGHT): {
-                    this->keys.right_arrow = 0;
-
-                    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
-                        //If left and nothing else or left and everything else
-                        if((this->keys.left_arrow && !(this->keys.up_arrow && this->keys.down_arrow)) || (this->keys.left_arrow && this->keys.up_arrow && this->keys.down_arrow)){
-                            this->setAnimation(LEFT_WALK);
-                        }
-                        //If up and down
-                        else if(this->keys.up_arrow && this->keys.down_arrow){
-                            this->setAnimation(RIGHT_NEUTRAL);
-                        }
-                        //If up
-                        else if(this->keys.up_arrow){
-                            this->setAnimation(UP_WALK);
-                        }
-                        //If down
-                        else if(this->keys.down_arrow){
-                            this->setAnimation(DOWN_WALK);
-                        }
-                        //If nothing else
-                        else{
-                            this->setAnimation(RIGHT_NEUTRAL);
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
+		//If we're not sliding (in an actionable state)
+		if(!this->sliding){
+			if(this->control == CONTROL_TYPE::KEYBOARD){
+				if(keys[SDL_SCANCODE_W]){
+					this->yA -= 0.1;
+				}
+				if(keys[SDL_SCANCODE_S]){
+					this->yA += 0.1;
+				}
+				if(keys[SDL_SCANCODE_A]){
+					this->xA -= 0.1;
+				}
+				if(keys[SDL_SCANCODE_D]){
+					this->xA += 0.1;
+				}
+			}
+		}
+	}
 }
 
 void Character::process(uint32_t delta){
@@ -246,24 +114,6 @@ void Character::process(uint32_t delta){
         if(this->sliding == true){
             if(this->xV + this->yV < 1){
                 this->sliding = false;
-            }
-        }
-
-        //If we're not sliding (in an actionable state)
-        if(!this->sliding){
-            if(this->control == CONTROL_TYPE::KEYBOARD){
-                if(this->keys.up_arrow){
-                    this->yA -= 0.1;
-                }
-                if(this->keys.down_arrow){
-                    this->yA += 0.1;
-                }
-                if(this->keys.left_arrow){
-                    this->xA -= 0.1;
-                }
-                if(this->keys.right_arrow){
-                    this->xA += 0.1;
-                }
             }
         }
     }

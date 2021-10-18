@@ -3,11 +3,8 @@
 /** Default constructor for the Control object
  */
 Control::Control(){
-    old_keys.num_keys = 0;
-    keys.num_keys = 0;
-
-    memset(keys.keys, '\0', 512);
-    memset(old_keys.keys, '\0', 512);
+    memset(keys, '\0', 512);
+    memset(keys, '\0', 512);
 
     //Try to init controllers
     for(int i = 0; i < MAX_GAMEPADS; i++){
@@ -34,6 +31,8 @@ Control::~Control(){
  * @return number of controllers
  */
 int Control::updateControllers(){
+    SDL_GameControllerUpdate();
+
     uint8_t n_controllers = 0;
     for(int i = 0; i < MAX_GAMEPADS; i++){
         //Try to connect new controllers
@@ -83,25 +82,21 @@ int Control::updateControllers(){
 /** Update keyboard state
  */
 void Control::updateKeyboard(){
+    SDL_PumpEvents();
+
     int num_elements;
     const uint8_t* keyboard = SDL_GetKeyboardState(&num_elements);
 
     //Update the old keyboard state w/ the last keyboard state
-    memcpy(old_keys.keys, keys.keys, old_keys.num_keys);
-    old_keys.num_keys = keys.num_keys;
+    memcpy(old_keys, keys, 512);
 
     //Update the new keyboard state w/ the newly-polled information
-    memcpy(keys.keys, keyboard, num_elements);
-    keys.num_keys = num_elements;
+    memcpy(keys, keyboard, num_elements);
 }
 
 /** Update the controller input (happens once per game loop)
  */
 void Control::updateInput(){
-    //Poll all events
-    SDL_GameControllerUpdate();
-    SDL_PumpEvents();
-
     //Update controllers
     num_controllers = updateControllers();
 
@@ -128,13 +123,13 @@ const ControllerState* Control::getController(uint8_t controller) const{
 /** Gets the keyboard state last frame
  * @return The keyboard state last frame
  */
-const KeyState* Control::getOldKeys() const{
-    return &old_keys;
+const uint8_t* Control::getOldKeys() const{
+    return old_keys;
 }
 
 /** Gets the current keyboard state
  * @return The current keyboard state
  */
-const KeyState* Control::getKeys() const{
-    return &keys;
+const uint8_t* Control::getKeys() const{
+    return keys;
 }

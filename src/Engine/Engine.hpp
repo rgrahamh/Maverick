@@ -64,7 +64,7 @@ class Engine{
 		//Engine steps
 		//Action step
 		void actionStep(ObjectLst* all_objects);
-		void globalAction(SDL_Event* event);
+		void globalAction();
 
 		//Draw step
 		void drawStep(ObjectLst* all_objects);

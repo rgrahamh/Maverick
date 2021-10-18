@@ -5,12 +5,6 @@
 
 #define MAX_GAMEPADS 4
 
-//Tracks the keyboard state
-typedef struct KeyState{
-    uint8_t keys[512];
-    uint16_t num_keys;
-} KeyState;
-
 //Tracks the controller state
 typedef struct ControllerState{
     //Face buttons
@@ -64,8 +58,8 @@ class Control{
         const ControllerState* getController(uint8_t controller) const;
 
         //Sets controller states
-        const KeyState* getOldKeys() const;
-        const KeyState* getKeys() const;
+        const uint8_t* getOldKeys() const;
+        const uint8_t* getKeys() const;
 
     private:
         //Helper update functions
@@ -83,8 +77,8 @@ class Control{
         ControllerState controllers[MAX_GAMEPADS];
 
         //Keyboard states for the prior & current frame
-        KeyState old_keys;
-        KeyState keys;
+        uint8_t old_keys[512];
+        uint8_t keys[512];
 };
 
 #endif
