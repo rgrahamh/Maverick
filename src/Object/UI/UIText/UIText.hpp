@@ -32,10 +32,30 @@ class UIText : public UIElement{
         //(0.0 means it's instant, otherwise it's in units of chars/sec)
         void setScrollSpeed(float scroll_speed);
 
+        //Flushes current buffer, updates to the new one
+        void flushBuffers();
+
+        //Flushes current buffer, updates to the new one
+        void nextPage();
+
+        //If we hit the end of the text
+        bool hitTextEnd();
+
+        //If we hit the character limit
+        bool hitCharLimit();
+
     private:
-        //The text & current printing buffer
+        char* getNextBreak(char* str);
+
+        //The text
         char* text;
-        char** buff;
+        char* text_buff_cursor;
+
+        //The reference buffer (and where it is on the text)
+        char** ref_buff;
+
+        //The printing buffer
+        char** print_buff;
 
         //The font object & filepath
         TTF_Font* font;
@@ -54,7 +74,6 @@ class UIText : public UIElement{
 
         //The foreground & background colors
         SDL_Color font_color;
-        SDL_Color back_color;
 };
 
 #endif

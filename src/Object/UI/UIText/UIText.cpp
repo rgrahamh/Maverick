@@ -23,14 +23,14 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
     this->num_lines = 0;
     this->chars_per_line = 0;
 
-    this->buff = nullptr;
+    this->print_buff = nullptr;
+    this->ref_buff = nullptr;
     this->text = nullptr;
     this->font = nullptr;
 
     this->setFont(font_path);
     this->setPoint(point);
 
-    this->back_color = SDL_Color{0xFF, 0xFF, 0xFF, 0x00};
     this->font_color = SDL_Color{0x00, 0x00, 0x00, 0xFF};
 
     this->setText(text);
@@ -45,8 +45,8 @@ UIText::~UIText(){
     if(this->text != nullptr){
         free(this->text);
     }
-    if(this->buff != nullptr){
-        free(this->buff);
+    if(this->print_buff != nullptr){
+        free(this->print_buff);
     }
 }
 
@@ -59,21 +59,21 @@ void UIText::setText(const char* text){
 
     unsigned int len = strlen(text);
 
+    //Allocate & copy the text
     if(this->text != nullptr){
         free(this->text);
     }
     this->text = (char*)malloc(len + 1);
 
-    if(this->buff != nullptr){
-        for(unsigned int i = 0; i < num_lines; i++){
-            memset(this->buff[i], '\0', this->chars_per_line + 1);
-        }
-    }
-
     for(size_t i = 0; i < len; i++){
         this->text[i] = text[i];
     }
     this->text[len] = '\0';
+
+    //Set buffer cursor to the start of the text
+    this->text_buff_cursor = this->text;
+
+    this->nextPage();
 }
 
 /** Sets the text's font (call upon change of font or point)
@@ -101,36 +101,42 @@ void UIText::setFont(const char* font_path){
  * @param point The point (size) of the font
  */
 void UIText::setPoint(unsigned int point){
-    this->point = point;
-    this->setFont(this->font_path);
+    if(this->font_path != nullptr){
+        this->point = point;
+        this->setFont(this->font_path);
 
-    int char_width = 0;
-    int char_height = 0;
+        int char_width = 0;
+        int char_height = 0;
 
-    //Set line size and num of 
-    if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
-        if(this->window != nullptr){
+        //Set line size and num of 
+        if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
+            if(this->window != nullptr){
 
-            int win_height = 0;
-            int win_width = 0;
-            SDL_GetWindowSize(this->window, &win_height, &win_width);
+                int win_height = 0;
+                int win_width = 0;
+                SDL_GetWindowSize(this->window, &win_height, &win_width);
 
-            //Free the old buffer
-            if(this->buff != nullptr){
-                for(unsigned int i = 0; i < this->num_lines; i++){
-                    free(this->buff[i]);
+                //Free the old buffers
+                if(this->print_buff != nullptr){
+                    for(unsigned int i = 0; i < this->num_lines; i++){
+                        free(this->print_buff[i]);
+                        free(this->ref_buff[i]);
+                    }
+                    free(this->print_buff);
+                    free(this->ref_buff);
                 }
-                free(this->buff);
-            }
 
-            //Calculate the buffer attributes
-            this->num_lines = this->view_height * win_height / char_height;
-            this->chars_per_line = this->view_width * win_width / char_width;
+                //Calculate the print_buffer attributes
+                this->num_lines = this->view_height * win_height / char_height;
+                this->chars_per_line = this->view_width * win_width / char_width;
 
-            //Allocate space for the new buffer
-            this->buff = (char**)malloc(sizeof(char*) * num_lines);
-            for(unsigned int i = 0; i < num_lines; i++){
-                this->buff[i] = (char*)calloc(1, chars_per_line + 1);
+                //Allocate space for the new buffers
+                this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
+                this->ref_buff = (char**)malloc(sizeof(char*) * num_lines);
+                for(unsigned int i = 0; i < num_lines; i++){
+                    this->print_buff[i] = (char*)calloc(1, chars_per_line + 1);
+                    this->ref_buff[i] = (char*)calloc(1, chars_per_line + 1);
+                }
             }
         }
     }
@@ -162,6 +168,112 @@ void UIText::setScrollSpeed(float scroll_speed){
     this->scroll_speed = scroll_speed;
 }
 
+void UIText::flushBuffers(){
+    //Clear the print buffer
+    if(this->print_buff != nullptr){
+        for(unsigned int i = 0; i < num_lines; i++){
+            memset(this->print_buff[i], '\0', this->chars_per_line + 1);
+        }
+    }
+
+    //Clear the reference buffer
+    if(this->ref_buff != nullptr){
+        for(unsigned int i = 0; i < num_lines; i++){
+            memset(this->ref_buff[i], '\0', this->chars_per_line + 1);
+        }
+    }
+
+}
+
+inline char* UIText::getNextBreak(char* str){
+    char* space_break = strchr(str, ' ');
+    char* tab_break   = strchr(str, '\t');
+
+    if(space_break != nullptr && tab_break == nullptr){
+        return space_break;
+    }
+    else if(tab_break != nullptr && space_break == nullptr){
+        return tab_break;
+    }
+    else if(tab_break != nullptr && space_break != nullptr){
+        if(space_break < tab_break){
+            return space_break;
+        }
+        else if(tab_break < space_break){
+            return tab_break;
+        }
+    }
+
+    return nullptr;
+}
+
+void UIText::nextPage(){
+    this->flushBuffers();
+
+    for(unsigned int i = 0; i < this->num_lines && this->text_buff_cursor != nullptr; i++){
+        for(unsigned int j = 0; j < this->chars_per_line && this->text_buff_cursor != nullptr;){
+            //Don't allow a space at the start of a line
+            if(j == 0){
+                while(*this->text_buff_cursor == ' ' || *this->text_buff_cursor == '\t' || *this->text_buff_cursor == '-'){
+                    this->text_buff_cursor++;
+                }
+            }
+
+            //Get next break
+            char* next_break = this->getNextBreak(text_buff_cursor+1);
+
+            //Calculate remaining buffer & text space
+            unsigned int remaining_buff_len = this->chars_per_line - j;
+            unsigned int remaining_text_len = strlen(this->text_buff_cursor);
+
+            //If there are no more breaks
+            if(next_break == nullptr){
+                //If we have enough space left
+                if(remaining_buff_len >= remaining_text_len){
+                    memcpy(ref_buff[i]+j, text_buff_cursor, remaining_text_len);
+                    text_buff_cursor += remaining_text_len;
+                }
+                //If we don't have enough remaining buffer, and have not loaded text on this line
+                else if(remaining_buff_len < remaining_text_len && j == 0){
+                    memcpy(ref_buff[i]+j, text_buff_cursor, remaining_buff_len);
+                    text_buff_cursor += remaining_buff_len;
+                }
+                break;
+            }
+            //If there is a line break, but we have enough room
+            else if(next_break <= this->text_buff_cursor + remaining_buff_len){
+                unsigned int copy_len = (next_break - text_buff_cursor) / sizeof(char);
+                memcpy(ref_buff[i]+j, text_buff_cursor, copy_len);
+                text_buff_cursor += copy_len;
+                j += copy_len;
+            }
+            //If there is a line break, and have not loaded text on this line
+            else if(next_break > this->text_buff_cursor + remaining_buff_len && j == 0){
+                memcpy(ref_buff[i], text_buff_cursor, remaining_buff_len);
+                text_buff_cursor += remaining_buff_len;
+                break;
+            }
+            //If there is a line break, there's no room for the text, and have loaded text on this line
+            else{
+                break;
+            }
+        }
+
+    }
+}
+
+bool UIText::hitTextEnd(){
+    if(text_buff_cursor != nullptr){
+        return *text_buff_cursor == '\0';
+    }
+
+    return false;
+}
+
+bool UIText::hitCharLimit(){
+    return (this->chars_per_line - strlen(ref_buff[num_lines-1])) < strlen(text_buff_cursor);
+}
+
 /** Draws this UIElement and all children UIElements
  * @param renderer The SDL_Renderer we're drawing to
  * @param delta The time passed since last draw (in ms)
@@ -179,15 +291,24 @@ void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
     //Height will remain constant across all lines
     draw_rect.h = height;
 
+    //If we aren't scrolling, use the ref buff rather than print buff
+    char** buff;
+    if(this->scroll_speed == 0.0){
+        buff = ref_buff;
+    }
+    else{
+        buff = print_buff;
+    }
+
     //Draw this element
-    if(this->font != nullptr && this->buff != nullptr){
-        //Still need to figure out line breaks in the function; maybe use a buff we populate w/ the normal buff,
+    if(this->font != nullptr && this->print_buff != nullptr){
+        //Still need to figure out line breaks in the function; maybe use a print_buff we populate w/ the normal print_buff,
         // then call this section repeatedly w/ the new buf once populated?
         for(unsigned int i = 0; i < num_lines; i++){
             //Set width of the rect
-            draw_rect.w = strlen(this->buff[i]) * width;
+            draw_rect.w = strlen(buff[i]) * width;
 
-            SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, this->buff[i], this->font_color);
+            SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, buff[i], this->font_color);
             if(surface != nullptr){
                 SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
                 SDL_RenderCopy(renderer, texture, nullptr, &draw_rect);
@@ -205,36 +326,44 @@ void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
  * @param delta The amount of time that has passed since last processing (in ms)
  */
 void UIText::process(uint32_t delta){
-    if(this->buff != nullptr && this->text != nullptr){
-        //Scrolling the text from the internal text representation to the buffer
-        //Determine the current buff len & text len
-        unsigned int buff_len = 0;
-        for(unsigned int i = 0; i < num_lines; i++){
-            buff_len += strlen(buff[i]);
-        }
-        unsigned int text_len = strlen(this->text);
-        unsigned int max_len = this->num_lines * this->chars_per_line;
-
-        if(buff_len < text_len && buff_len != max_len){
-            //If we aren't scrolling
-            unsigned int remaining_len = max_len;
-
-            //If we are scrolling
-            if(this->scroll_speed > 0.0){
-                //Calculate the max possible index based on the new time
-                this->timer += delta;
-                unsigned int max_index = this->timer * this->scroll_speed / 1000;
-                remaining_len = (max_len < max_index)? max_len : max_index;
+    //Scrolling the text from the internal text representation to the print_buffer
+    if(this->print_buff != nullptr && this->ref_buff != nullptr && this->text != nullptr && this->scroll_speed != 0.0){
+        //Find the first differing character (we're finished if we never hit a differing character)
+        unsigned int line_num, char_num;
+        unsigned int curr_num_chars = 0;
+        bool finished = true;
+        for(line_num = 0; line_num < this->num_lines; line_num++){
+            curr_num_chars += strlen(print_buff[line_num]);
+            for(char_num = 0; char_num < this->chars_per_line; char_num++){
+                if(this->print_buff[line_num][char_num] != this->ref_buff[line_num][char_num]){
+                    finished = false;
+                    break;
+                }
             }
+            if(finished == false){
+                break;
+            }
+        }
 
-            //This value is incremented whenever we're supposed to skip a character in the copy
+        if(!finished){
+            this->timer += delta;
+            unsigned int max_chars = timer * this->scroll_speed / 1000;
 
-            unsigned int text_line_stop = (text_len / chars_per_line) + 1;
-            unsigned int line_stop = (num_lines < text_line_stop)? num_lines : text_line_stop;
-            for(unsigned int i = buff_len / chars_per_line; i < line_stop; i++){
-                unsigned int char_offset = i * chars_per_line;
-                for(unsigned int j = 0; j + char_offset < remaining_len && j + char_offset < text_len; j++){
-                    this->buff[i][j] = this->text[char_offset + j];
+            for(; line_num < num_lines; line_num++){
+                for(; char_num < chars_per_line && curr_num_chars < max_chars; char_num++){
+                    //If we hit end-of-input for the line, move to end-of-line
+                    if(this->ref_buff[line_num][char_num] == '\0'){
+                        char_num = chars_per_line;
+                        break;
+                    }
+
+                    //Copy the character
+                    this->print_buff[line_num][char_num] = this->ref_buff[line_num][char_num];
+                    curr_num_chars++;
+                }
+                //If we hit end-of-line, move to next line
+                if(char_num == chars_per_line){
+                    char_num = 0;
                 }
             }
         }
