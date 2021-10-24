@@ -5,9 +5,14 @@
 
 #include "../UIElement.hpp"
 
+enum ALIGNMENT{
+    CENTER,
+    NORMAL
+};
+
 class UIText : public UIElement{
     public:
-        UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text = "", unsigned int point = 12, float scroll_speed = 0.0);
+        UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::NORMAL, ALIGNMENT y_alignment = ALIGNMENT::NORMAL);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
@@ -74,6 +79,12 @@ class UIText : public UIElement{
 
         //The foreground & background colors
         SDL_Color font_color;
+
+        //The text's horizontal alignment
+        ALIGNMENT x_alignment;
+
+        //The text's vertical alignment
+        ALIGNMENT y_alignment;
 };
 
 #endif

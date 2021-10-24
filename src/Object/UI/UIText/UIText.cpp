@@ -15,8 +15,12 @@
  * @param point The point (size) of the text
  * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
  */
-UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, unsigned int point, float scroll_speed)
+UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
     : UIElement(name, view_x_offest, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT, window){
+    //Setting the text's alignment
+    this->x_alignment = x_alignment;
+    this->y_alignment = y_alignment;
+
     this->point = point;
     this->scroll_speed = scroll_speed;
 
@@ -302,11 +306,26 @@ void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
 
     //Draw this element
     if(this->font != nullptr && this->print_buff != nullptr){
+        unsigned int drawn_lines = 0;
+        for(unsigned int i = 0; i < num_lines; i++){
+            if(buff[i][0] != '\0'){
+                drawn_lines++;
+            }
+        }
+
+        if(this->y_alignment == ALIGNMENT::CENTER){
+            draw_rect.y = draw_area.y + ((draw_area.h - (draw_rect.h * drawn_lines)) / 2);
+        }
+
         //Still need to figure out line breaks in the function; maybe use a print_buff we populate w/ the normal print_buff,
         // then call this section repeatedly w/ the new buf once populated?
         for(unsigned int i = 0; i < num_lines; i++){
             //Set width of the rect
             draw_rect.w = strlen(buff[i]) * width;
+
+            if(this->x_alignment == ALIGNMENT::CENTER){
+                draw_rect.x = draw_area.x + ((draw_area.w - draw_rect.w) / 2);
+            }
 
             SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, buff[i], this->font_color);
             if(surface != nullptr){
