@@ -8,7 +8,7 @@ extern Engine* engine;
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(float* x_base, float* y_base, char draw_layer, bool relative){
+Animation::Animation(float* x_base, float* y_base, char draw_layer){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -130,8 +130,10 @@ bool Animation::isAnimated(){
  * @param keytime The number of frames before the key continues
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
+ * @param width The width of the new sprite 
+ * @param height The height of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative){
+void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width, int height){
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = texture_hash->get(sprite_path)) == NULL){
@@ -143,8 +145,18 @@ void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_
 
 	//Create the rect
 	SDL_Rect* rect = new SDL_Rect();
-	rect->h = surface->h;
-	rect->w = surface->w;
+	if(width == -1){
+		rect->w = surface->w;
+	}
+	else{
+		rect->w = width;
+	}
+	if(height == -1){
+		rect->h = surface->h;
+	}
+	else{
+		rect->h = height;
+	}
 
 	//Create the sprite
 	Sprite* sprite = new Sprite();
@@ -171,7 +183,6 @@ void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_
 	this->sequence_end->sprite->base_y_offset = y_offset;
 	this->sequence_end->sprite->curr_x_offset = x_offset;
 	this->sequence_end->sprite->curr_y_offset = y_offset;
-	this->sequence_end->sprite->relative = isRelative;
 	this->sequence_end->keytime = keytime;
 	this->sequence_end->hitboxes = NULL;
 
@@ -257,6 +268,24 @@ void Animation::setScale(float x_scale, float y_scale){
 	this->y_scale = y_scale;
 }
 
+/** Sets the scale of the animation
+ * @param x_scale The X scale factor
+ * @param y_scale the Y scale factor
+ */
+void Animation::setSize(int width, int height){
+	AnimationSeq* cursor = sequence_start;
+	if(cursor != NULL){
+		do{
+			if(cursor->sprite->rect != NULL){
+				cursor->sprite->rect->w = width;
+				cursor->sprite->rect->h = height;
+			}
+
+			cursor = cursor->next;
+		} while(cursor != sequence_start);
+	}
+}
+
 /** Advances the animation by a frame
  */
 void Animation::advance(uint32_t delta){
@@ -295,14 +324,8 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
-	if(sprite->relative){
-		curr_rect->x = *this->x_base + sprite->curr_x_offset - camera_x;
-		curr_rect->y = *this->y_base + sprite->curr_y_offset - camera_y;
-	}
-	else{
-		curr_rect->x = *this->x_base;
-		curr_rect->y = *this->y_base;
-	}
+	curr_rect->x = *this->x_base;
+	curr_rect->y = *this->y_base;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);

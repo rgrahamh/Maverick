@@ -5,9 +5,14 @@
 
 #include "../UIElement.hpp"
 
+enum ALIGNMENT{
+    CENTER,
+    NORMAL
+};
+
 class UIText : public UIElement{
     public:
-        UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text = "", unsigned int point = 12, float scroll_speed = 0.0);
+        UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::NORMAL, ALIGNMENT y_alignment = ALIGNMENT::NORMAL);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
@@ -28,14 +33,17 @@ class UIText : public UIElement{
         //Sets the text color
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
 
+        //Sets the X alignment
+        void setXAlignment(ALIGNMENT x_alignment);
+
+        //Sets the Y alignment
+        void setYAlignment(ALIGNMENT y_alignment);
+
         //Sets the speed at which text scrolls
         //(0.0 means it's instant, otherwise it's in units of chars/sec)
         void setScrollSpeed(float scroll_speed);
 
-        //Flushes current buffer, updates to the new one
-        void flushBuffers();
-
-        //Flushes current buffer, updates to the new one
+        //Updates to the next page's contents (for continued text on the next "page")
         void nextPage();
 
         //If we hit the end of the text
@@ -45,7 +53,11 @@ class UIText : public UIElement{
         bool hitCharLimit();
 
     private:
+        //Gets the next line break
         char* getNextBreak(char* str);
+
+        //Flushes current print & ref buffers
+        void flushBuffers();
 
         //The text
         char* text;
@@ -74,6 +86,12 @@ class UIText : public UIElement{
 
         //The foreground & background colors
         SDL_Color font_color;
+
+        //The text's horizontal alignment
+        ALIGNMENT x_alignment;
+
+        //The text's vertical alignment
+        ALIGNMENT y_alignment;
 };
 
 #endif

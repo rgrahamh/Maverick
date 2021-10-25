@@ -2,6 +2,7 @@
 
 #include "../Object/Character/Character.hpp"
 #include "../Object/UI/UIText/UIText.hpp"
+#include "../Object/UI/UITextBox/UITextBox.hpp"
 
 static int SDLCALL event_listener(void* userdata, SDL_Event* event){
     if(event->type == SDL_EventType::SDL_QUIT){
@@ -118,13 +119,22 @@ void Engine::InitUI(){
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
     pause_menu->setActive(false);
     pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
-    UIText* pause_text = new UIText("pause_text", 0.45, 0.475, 0.2, 0.2, 1, 1, window, "./assets/fonts/luximr.ttf", "Paused (and here's text to test scrolling)", 24.0, 20.0);
+    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, 1, window, "./assets/fonts/luximr.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
     pause_text->setColor(255, 255, 255);
     pause_menu->addElement(pause_text);
     ui_elements->element = pause_menu;
+
     pause_menu->setVisible(false);
     pause_menu->setActive(false);
     ui_elements->next = nullptr;
+
+    UITextBox* text_box = new UITextBox("text_box", 0.2, 0.8, 0.6, 0.15, 1, 1, window, "./assets/fonts/luximr.ttf", "This is a text box! Here's some sample text. I think this is great and will be pretty long.");
+    text_box->setColor(255, 255, 255);
+    text_box->addSprite(0, "./assets/sprites/ui/black.png", 0, 0, 0, 0.6, 0.15);
+    UIElementLst* new_element = new UIElementLst;
+    new_element->element = text_box;
+    new_element->next = ui_elements;
+    ui_elements = new_element;
 }
 
 /** The primary game loop

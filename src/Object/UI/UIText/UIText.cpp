@@ -12,11 +12,20 @@
  * @param window The current window (used for viewport calculation)
  * @param text The text to display
  * @param font_path The filepath to the .ttf file you wish to use
- * @param point The point (size) of the text
  * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
+ * @param point The point (size) of the text
+ * @param x_alignment The horizontal alignment of the text
+ * @param y_alignment The vertical alignment of the text
  */
-UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, unsigned int point, float scroll_speed)
+UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
     : UIElement(name, view_x_offest, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT, window){
+    //Setting the text's alignment
+    this->x_alignment = x_alignment;
+    this->y_alignment = y_alignment;
+
+    this->view_height = view_height;
+    this->view_width = view_width;
+
     this->point = point;
     this->scroll_speed = scroll_speed;
 
@@ -112,9 +121,9 @@ void UIText::setPoint(unsigned int point){
         if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
             if(this->window != nullptr){
 
-                int win_height = 0;
-                int win_width = 0;
-                SDL_GetWindowSize(this->window, &win_height, &win_width);
+                int win_height;
+                int win_width;
+                SDL_GetWindowSize(this->window, &win_width, &win_height);
 
                 //Free the old buffers
                 if(this->print_buff != nullptr){
@@ -168,6 +177,23 @@ void UIText::setScrollSpeed(float scroll_speed){
     this->scroll_speed = scroll_speed;
 }
 
+
+/** Sets the X alignment
+ * @param x_alignment The X alignment
+ */
+void UIText::setXAlignment(ALIGNMENT x_alignment){
+    this->x_alignment = x_alignment;
+}
+
+/** Sets the Y alignment
+ * @param y_alignment The Y alignment
+ */
+void UIText::setYAlignment(ALIGNMENT y_alignment){
+    this->y_alignment = y_alignment;
+}
+
+/** Helper function that flushes the print & reference buffers
+ */
 void UIText::flushBuffers(){
     //Clear the print buffer
     if(this->print_buff != nullptr){
@@ -185,6 +211,10 @@ void UIText::flushBuffers(){
 
 }
 
+/** Gets the next break point (a tab or space character)
+ * @param str The string we're checking the next break for
+ * @return A char* pointing to the first instance of a break
+ */
 inline char* UIText::getNextBreak(char* str){
     char* space_break = strchr(str, ' ');
     char* tab_break   = strchr(str, '\t');
@@ -207,6 +237,8 @@ inline char* UIText::getNextBreak(char* str){
     return nullptr;
 }
 
+/** Loads the next section of text into the ref buff
+ */
 void UIText::nextPage(){
     this->flushBuffers();
 
@@ -262,6 +294,9 @@ void UIText::nextPage(){
     }
 }
 
+/** If we've hit the end of text
+ * @return If we've hit the end of text
+ */
 bool UIText::hitTextEnd(){
     if(text_buff_cursor != nullptr){
         return *text_buff_cursor == '\0';
@@ -270,8 +305,11 @@ bool UIText::hitTextEnd(){
     return false;
 }
 
+/** If we've hit the end of the draw area
+ * @return If we've hit the end of the draw area
+ */
 bool UIText::hitCharLimit(){
-    return (this->chars_per_line - strlen(ref_buff[num_lines-1])) < strlen(text_buff_cursor);
+    return (this->chars_per_line - strlen(ref_buff[num_lines-1])) <= strlen(text_buff_cursor);
 }
 
 /** Draws this UIElement and all children UIElements
@@ -302,11 +340,26 @@ void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
 
     //Draw this element
     if(this->font != nullptr && this->print_buff != nullptr){
+        unsigned int drawn_lines = 0;
+        for(unsigned int i = 0; i < num_lines; i++){
+            if(buff[i][0] != '\0'){
+                drawn_lines++;
+            }
+        }
+
+        if(this->y_alignment == ALIGNMENT::CENTER){
+            draw_rect.y = draw_area.y + ((draw_area.h - (draw_rect.h * drawn_lines)) / 2);
+        }
+
         //Still need to figure out line breaks in the function; maybe use a print_buff we populate w/ the normal print_buff,
         // then call this section repeatedly w/ the new buf once populated?
         for(unsigned int i = 0; i < num_lines; i++){
             //Set width of the rect
             draw_rect.w = strlen(buff[i]) * width;
+
+            if(this->x_alignment == ALIGNMENT::CENTER){
+                draw_rect.x = draw_area.x + ((draw_area.w - draw_rect.w) / 2);
+            }
 
             SDL_Surface* surface = TTF_RenderUTF8_Blended(this->font, buff[i], this->font_color);
             if(surface != nullptr){

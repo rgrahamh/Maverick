@@ -140,6 +140,30 @@ void UIElement::setScale(float x_scale, float y_scale){
     }
 }
 
+/** Sets the scale of the UIElement
+ * @param width The width
+ * @param height The height
+ */
+void UIElement::setViewSize(float view_width, float view_height){
+    int win_width, win_height;
+    SDL_GetWindowSize(window, &win_width, &win_height);
+    //Set scale for this element
+    if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
+        for(unsigned int i = 0; i < this->animation_num; i++){
+            this->animations[i]->setSize(view_width * win_width, view_height * win_height);
+        }
+    }
+
+    //Set scale for all children elements
+    UIElementLst* cursor = this->subelements;
+    while(cursor != nullptr){
+        for(unsigned int i = 0; i < this->animation_num; i++){
+            this->animations[i]->setSize(view_width * win_width, view_height * win_height);
+        }
+        cursor = cursor->next;
+    }
+}
+
 /** Sets the visibility of the current animation state
  * @return If the object is active
  */
@@ -174,9 +198,20 @@ void UIElement::setVisible(bool visible){
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
+ * @param width The view width of the sprite (default if -1)
+ * @param height The view height of the sprite (default if -1)
  */ 
-void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative){
-    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, isRelative);
+void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
+    int win_width, win_height;
+    SDL_GetWindowSize(window, &win_width, &win_height);
+
+    if(width != -1){
+        width *= (float)win_width;
+    }
+    if(height != -1){
+        height *= (float)win_height;
+    }
+    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }
 
 /** Adds an element to the child element list
