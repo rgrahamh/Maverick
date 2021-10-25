@@ -43,10 +43,7 @@ class UIText : public UIElement{
         //(0.0 means it's instant, otherwise it's in units of chars/sec)
         void setScrollSpeed(float scroll_speed);
 
-        //Flushes current buffer, updates to the new one
-        void flushBuffers();
-
-        //Flushes current buffer, updates to the new one
+        //Updates to the next page's contents (for continued text on the next "page")
         void nextPage();
 
         //If we hit the end of the text
@@ -56,7 +53,11 @@ class UIText : public UIElement{
         bool hitCharLimit();
 
     private:
+        //Gets the next line break
         char* getNextBreak(char* str);
+
+        //Flushes current print & ref buffers
+        void flushBuffers();
 
         //The text
         char* text;

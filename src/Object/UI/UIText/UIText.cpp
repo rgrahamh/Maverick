@@ -12,8 +12,10 @@
  * @param window The current window (used for viewport calculation)
  * @param text The text to display
  * @param font_path The filepath to the .ttf file you wish to use
- * @param point The point (size) of the text
  * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
+ * @param point The point (size) of the text
+ * @param x_alignment The horizontal alignment of the text
+ * @param y_alignment The vertical alignment of the text
  */
 UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
     : UIElement(name, view_x_offest, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT, window){
@@ -190,6 +192,8 @@ void UIText::setYAlignment(ALIGNMENT y_alignment){
     this->y_alignment = y_alignment;
 }
 
+/** Helper function that flushes the print & reference buffers
+ */
 void UIText::flushBuffers(){
     //Clear the print buffer
     if(this->print_buff != nullptr){
@@ -207,6 +211,10 @@ void UIText::flushBuffers(){
 
 }
 
+/** Gets the next break point (a tab or space character)
+ * @param str The string we're checking the next break for
+ * @return A char* pointing to the first instance of a break
+ */
 inline char* UIText::getNextBreak(char* str){
     char* space_break = strchr(str, ' ');
     char* tab_break   = strchr(str, '\t');
@@ -229,6 +237,8 @@ inline char* UIText::getNextBreak(char* str){
     return nullptr;
 }
 
+/** Loads the next section of text into the ref buff
+ */
 void UIText::nextPage(){
     this->flushBuffers();
 
