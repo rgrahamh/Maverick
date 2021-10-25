@@ -21,6 +21,9 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
     this->x_alignment = x_alignment;
     this->y_alignment = y_alignment;
 
+    this->view_height = view_height;
+    this->view_width = view_width;
+
     this->point = point;
     this->scroll_speed = scroll_speed;
 
@@ -116,9 +119,9 @@ void UIText::setPoint(unsigned int point){
         if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
             if(this->window != nullptr){
 
-                int win_height = 0;
-                int win_width = 0;
-                SDL_GetWindowSize(this->window, &win_height, &win_width);
+                int win_height;
+                int win_width;
+                SDL_GetWindowSize(this->window, &win_width, &win_height);
 
                 //Free the old buffers
                 if(this->print_buff != nullptr){
@@ -170,6 +173,21 @@ void UIText::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
  */
 void UIText::setScrollSpeed(float scroll_speed){
     this->scroll_speed = scroll_speed;
+}
+
+
+/** Sets the X alignment
+ * @param x_alignment The X alignment
+ */
+void UIText::setXAlignment(ALIGNMENT x_alignment){
+    this->x_alignment = x_alignment;
+}
+
+/** Sets the Y alignment
+ * @param y_alignment The Y alignment
+ */
+void UIText::setYAlignment(ALIGNMENT y_alignment){
+    this->y_alignment = y_alignment;
 }
 
 void UIText::flushBuffers(){
@@ -266,6 +284,9 @@ void UIText::nextPage(){
     }
 }
 
+/** If we've hit the end of text
+ * @return If we've hit the end of text
+ */
 bool UIText::hitTextEnd(){
     if(text_buff_cursor != nullptr){
         return *text_buff_cursor == '\0';
@@ -274,8 +295,11 @@ bool UIText::hitTextEnd(){
     return false;
 }
 
+/** If we've hit the end of the draw area
+ * @return If we've hit the end of the draw area
+ */
 bool UIText::hitCharLimit(){
-    return (this->chars_per_line - strlen(ref_buff[num_lines-1])) < strlen(text_buff_cursor);
+    return (this->chars_per_line - strlen(ref_buff[num_lines-1])) <= strlen(text_buff_cursor);
 }
 
 /** Draws this UIElement and all children UIElements

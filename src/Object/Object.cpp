@@ -176,9 +176,11 @@ void* Object::getAttr(const char* key){
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
+ * @param width The width of the sprite (default if -1)
+ * @param height The height of the sprite (default if -1)
  */ 
-void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset){
-    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset);
+void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
+    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
@@ -357,6 +359,25 @@ void Object::setScale(unsigned int animation_num, float x_scale, float y_scale){
 void Object::setScale(float x_scale, float y_scale){
     for(unsigned int i = 0; i < this->animation_num; i++){
         this->animations[i]->setScale(x_scale, y_scale);
+    }
+}
+
+/** Sets the scale for a single animation
+ * @param animation_num The animation number
+ * @param x_scale The x scale factor
+ * @param y_scale The y scale factor
+ */
+void Object::setSize(unsigned int animation_num, float width, float height){
+    this->animations[animation_num]->setSize(width, height);
+}
+
+/** Sets the scale for all animations
+ * @param width The x scale factor
+ * @param height The y scale factor
+ */
+void Object::setSize(float width, float height){
+    for(unsigned int i = 0; i < this->animation_num; i++){
+        this->animations[i]->setSize(width, height);
     }
 }
 

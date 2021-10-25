@@ -8,6 +8,7 @@ enum UI_OBJECT_TYPE{
     ELEMENT_GROUP,
     WINDOW,
     TEXT,
+    TEXT_BOX,
     SELECTOR,
     BOX,
     RADIAL
@@ -33,11 +34,12 @@ class UIElement : public Object{
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void setScale(float x_scale, float y_scale);
+        virtual void setViewSize(float view_width, float view_height);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
-        void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative = false);
+        void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width = -1.0, float height = -1.0);
 
         UIElement* getElement(const char* name);
         UIElementLst* getSubelements();

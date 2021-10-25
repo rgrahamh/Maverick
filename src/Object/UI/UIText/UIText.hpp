@@ -33,6 +33,12 @@ class UIText : public UIElement{
         //Sets the text color
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
 
+        //Sets the X alignment
+        void setXAlignment(ALIGNMENT x_alignment);
+
+        //Sets the Y alignment
+        void setYAlignment(ALIGNMENT y_alignment);
+
         //Sets the speed at which text scrolls
         //(0.0 means it's instant, otherwise it's in units of chars/sec)
         void setScrollSpeed(float scroll_speed);

@@ -34,7 +34,7 @@ class Object{
 		bool getEnvBump();
 		void* getAttr(const char* key);
 
-		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset);
+		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
 
 		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
 		void addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
@@ -50,6 +50,8 @@ class Object{
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
+		void setSize(unsigned int animation_num, float width, float height);
+		void setSize(float width, float height);
 		void setActive(bool active);
 		void setVisible(bool visible);
 		void setEnvBump();

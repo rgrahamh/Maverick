@@ -26,14 +26,11 @@ typedef struct Sprite{
 
 	//Rotation (clockwise, in degrees)
 	double rotation;
-
-	//If the sprite is drawn relative to the screen or not
-	bool relative;
 } Sprite;
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, char draw_layer = 1, bool relative = true);
+		Animation(float* x_base, float* y_base, char draw_layer = 1);
 		~Animation();
 
 		void advance(uint32_t delta);
@@ -44,10 +41,13 @@ class Animation{
 		unsigned char getDrawLayer();
 		float getDrawAxis();
 		uint32_t getTimeLeft();
+		bool getPaused();
 
+		void setPaused(bool paused);
+		void setSize(int width, int height);
 		void setScale(float x_scale, float y_scale);
 
-		void addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, bool isRelative = false);
+		void addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
 		void addHitbox(Hitbox* hitbox);
 		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
@@ -55,8 +55,6 @@ class Animation{
 
 		void rotate(int direction, float rotation_amnt);
 
-		void setPaused(bool paused);
-		bool getPaused();
 
 	private:
 		typedef struct AnimationSequence{
@@ -90,7 +88,6 @@ class Animation{
 
 		//If the animation is paused
 		bool paused;
-		bool relative;
 
 		bool isAnimated();
 };

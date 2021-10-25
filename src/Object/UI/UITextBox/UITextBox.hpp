@@ -1,0 +1,24 @@
+#ifndef UITEXTBOX_H
+#define UITEXTBOX_H
+#include "../UIElement.hpp"
+#include "../UIText/UIText.hpp"
+
+class UITextBox : public UIElement{
+    public:
+        UITextBox(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed = 0.0, int point = 24, ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER);
+        UITextBox();
+        ~UITextBox();
+
+        void setText(const char* text);
+        void setFont(const char* font_path);
+        void setStyle(uint8_t style);
+        void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
+        void setScrollSpeed(float scroll_speed);
+        void setXAlignment(ALIGNMENT x_alignment);
+        void setYAlignment(ALIGNMENT y_alignment);
+
+    private:
+        UIText* text;
+};
+
+#endif
