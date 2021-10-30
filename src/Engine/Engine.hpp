@@ -13,7 +13,7 @@
 #include "../Camera/Camera.hpp"
 #include "../Control/Control.hpp"
 
-#include "../Object/UI/UIElement.hpp"
+#include "../Entity/UI/UIElement.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -27,10 +27,10 @@ enum GAME_STATE : uint64_t{
 	EXIT = 32
 };
 
-typedef struct ThreadList{
+struct ThreadList{
 	std::thread* thread;
 	struct ThreadList* next;
-} ThreadLst;
+};
 
 class Engine{
 	public:
@@ -63,25 +63,25 @@ class Engine{
 
 		//Engine steps
 		//Action step
-		void actionStep(ObjectLst* all_objects);
+		void actionStep(ObjectList* all_objects);
 		void globalAction();
 
 		//Draw step
-		void drawStep(ObjectLst* all_objects);
-		ObjectLst* drawSort(ObjectLst* all_objects);
+		void drawStep(ObjectList* all_objects);
+		ObjectList* drawSort(ObjectList* all_objects);
 
 		//Collision step
-		void collisionStep(ObjectLst* all_objects);
+		void collisionStep(ObjectList* all_objects);
 
 		//Physics step
-		void physicsStep(ObjectLst* all_objects);
+		void physicsStep(ObjectList* all_objects);
 
 		//Cleaning up threads
 		void threadCleanup();
 
 		//Object list building/destruction
-		ObjectLst* buildFullObjLst();
-		void freeFullObjLst(ObjectLst* all_objects);
+		ObjectList* buildFullObjList();
+		void freeFullObjList(ObjectList* all_objects);
 
 		//Saving logic
 		void saveGame();
@@ -94,14 +94,14 @@ class Engine{
 		void InitUI();
 
 		//UI Objects
-		UIElementLst* ui_elements;
+		UIElementList* ui_elements;
 
 		//Zones
-		ZoneLst* zones;
-		ZoneLst* active_zones;
+		ZoneList* zones;
+		ZoneList* active_zones;
 
 		//List of all threads
-		ThreadLst* threads;
+		ThreadList* threads;
 
 		//Render
 		Camera* camera;
@@ -117,8 +117,5 @@ class Engine{
 		uint32_t last_time;
 		uint32_t delta;
 };
-
-#include "../Factory/Factory.hpp"
-#include "../Zone/ZoneFactory/ZoneFactory.hpp"
 
 #endif

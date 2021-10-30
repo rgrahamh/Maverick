@@ -1,6 +1,6 @@
 #include "./TestZone.hpp"
 
-void buildTestZone(Engine* engine, ObjectLst* add_object){
+void buildTestZone(Engine* engine, ObjectList* add_object){
     Zone* zone = new Zone("Test Zone");
 
     while(add_object != NULL){

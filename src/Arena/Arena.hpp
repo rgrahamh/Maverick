@@ -1,9 +1,9 @@
 #ifndef ARENA_H
 #define ARENA_H
 
-#include "../Object/Character/Character.hpp"
+#include "../Entity/Object/Character/Character.hpp"
 
-typedef struct TeamLst{
+typedef struct TeamList{
 	Character* character;
 	Character* next;
 } Team;

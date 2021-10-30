@@ -25,13 +25,13 @@ Animation::Animation(float* x_base, float* y_base, char draw_layer){
  */
 Animation::~Animation(){
 	/*while(sequence_start != NULL){
-		HitboxLst* hitboxes = sequence_start->hitboxes;
+		HitboxList* hitboxes = sequence_start->hitboxes;
 		while(hitboxes != NULL){
 			if(hitboxes->hitbox != NULL){
 				delete hitboxes->hitbox;
 			}
 
-			HitboxLst* tmp = hitboxes;
+			HitboxList* tmp = hitboxes;
 			hitboxes = hitboxes->next;
 			delete hitboxes;
 		}
@@ -60,7 +60,7 @@ Sprite* Animation::getSprite(){
 /** Gets the current hitboxes
  * @return The current hitboxes
  */
-HitboxLst* Animation::getHitboxes(){
+HitboxList* Animation::getHitboxes(){
 	if(this->sequence){
 		return this->sequence->hitboxes;
 	}
@@ -197,7 +197,7 @@ void Animation::addHitbox(Hitbox* hitbox){
 	AnimationSeq* cursor = this->sequence_start;
 	if(cursor != NULL){
 		do{
-			HitboxLst* new_hitbox = new HitboxLst;
+			HitboxList* new_hitbox = new HitboxList;
 			new_hitbox->hitbox = hitbox;
 			new_hitbox->next = cursor->hitboxes;
 			cursor->hitboxes = new_hitbox;
@@ -213,7 +213,7 @@ void Animation::addHitbox(Hitbox* hitbox){
  */
 void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 	if(sprite_num == -1){
-		HitboxLst* new_hitbox = new HitboxLst;
+		HitboxList* new_hitbox = new HitboxList;
 		new_hitbox->hitbox = hitbox;
 		new_hitbox->next = NULL;
 		if(this->sequence_end != NULL){
@@ -231,7 +231,7 @@ void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 			cursor = cursor->next;
 		}
 		if(cursor != NULL){
-			HitboxLst* new_hitbox = new HitboxLst;
+			HitboxList* new_hitbox = new HitboxList;
 			new_hitbox->hitbox = hitbox;
 			new_hitbox->next = cursor->hitboxes;
 			cursor->hitboxes = new_hitbox;
@@ -255,7 +255,7 @@ void Animation::setScale(float x_scale, float y_scale){
 				cursor->sprite->rect->h *= y_scale / this->y_scale;
 			}
 			if(cursor->hitboxes != NULL){
-				for(HitboxLst* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
+				for(HitboxList* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
 					hitboxlst->hitbox->setScale(x_scale, y_scale);
 				}
 			}
@@ -353,7 +353,7 @@ void Animation::rotate(int direction, float rotate_amnt){
 	while(animations != NULL){
 		animations->sprite->rotation += rotate_amnt * ((direction)? -1 : 1);
 
-		HitboxLst* hitboxes = animations->hitboxes;
+		HitboxList* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){
 			Hitbox* hitbox = hitboxes->hitbox;
 			if(hitbox->getShape() == CONE){

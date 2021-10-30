@@ -15,7 +15,7 @@ extern Engine* engine;
  * @param window The current window (used for viewport calculation)
  */
 UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
-        :  Object(name, 0, 0, 0, 0, animation_num, draw_layer){
+        :  Entity(name, 0, 0, animation_num, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
     this->view_y_offset = view_y_offset;
@@ -41,9 +41,9 @@ UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset,
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    UIElementLst* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
-        UIElementLst* tmp = cursor;
+        UIElementList* tmp = cursor;
         delete cursor->element;
 
         cursor = cursor->next;
@@ -58,7 +58,7 @@ void UIElement::process(uint32_t delta){
 void UIElement::_process(uint32_t delta){
     this->process(delta);
 
-    UIElementLst* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
         if(cursor->element->isActive()){
             cursor->element->_process(delta);
@@ -70,18 +70,18 @@ void UIElement::_process(uint32_t delta){
 /** Handles actions for this UIElement and all children UIElements
  * @param event The event that has occurred
  */
-void UIElement::action(SDL_Event* event){
+void UIElement::action(Control* control){
     return;
 }
 
-void UIElement::_action(SDL_Event* event){
-    this->action(event);
+void UIElement::_action(Control* control){
+    this->action(control);
 
     //Perform all actions for child elements (generic element has no default actions)
-    UIElementLst* cursor = this->subelements;
+    UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
         if(cursor->element->isActive()){
-            cursor->element->_action(event);
+            cursor->element->_action(control);
         }
         cursor = cursor->next;
     }
@@ -98,7 +98,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
     this->draw(renderer, delta, camera_x, camera_y);
 
     //Draw all children elements (AFTER the parent element)
-    UIElementLst* cursor = this->subelements;
+    UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
         cursor->element->_draw(renderer, delta, camera_x, camera_y);
         cursor = cursor->next;
@@ -131,7 +131,7 @@ void UIElement::setScale(float x_scale, float y_scale){
     }
 
     //Set scale for all children elements
-    UIElementLst* cursor = this->subelements;
+    UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
         for(unsigned int i = 0; i < this->animation_num; i++){
             this->animations[i]->setScale(x_scale, y_scale);
@@ -155,7 +155,7 @@ void UIElement::setViewSize(float view_width, float view_height){
     }
 
     //Set scale for all children elements
-    UIElementLst* cursor = this->subelements;
+    UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
         for(unsigned int i = 0; i < this->animation_num; i++){
             this->animations[i]->setSize(view_width * win_width, view_height * win_height);
@@ -171,7 +171,7 @@ void UIElement::setActive(bool active){
     this->active = active;
 
     //Set visible for all child elements
-    UIElementLst* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
         cursor->element->setActive(active);
         cursor = cursor->next;
@@ -185,7 +185,7 @@ void UIElement::setVisible(bool visible){
     this->visible = visible;
 
     //Set active for all child elements
-    UIElementLst* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
         cursor->element->setVisible(visible);
         cursor = cursor->next;
@@ -218,7 +218,7 @@ void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, u
  * @param element The element to add
  */
 void UIElement::addElement(UIElement* element){
-    UIElementLst* new_element = new UIElementLst;
+    UIElementList* new_element = new UIElementList;
     new_element->element = element;
     new_element->next = subelements;
     subelements = new_element;
@@ -235,7 +235,7 @@ UIElement* UIElement::getElement(const char* name){
     }
 
     //Check children
-    UIElementLst* cursor = this->subelements;
+    UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
         UIElement* element = cursor->element->getElement(name);
         if(element != nullptr){
@@ -250,6 +250,6 @@ UIElement* UIElement::getElement(const char* name){
 /** Gets the subelements
  * @return The subelement list
  */
-UIElementLst* UIElement::getSubelements(){
+UIElementList* UIElement::getSubelements(){
     return this->subelements;
 }

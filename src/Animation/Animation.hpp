@@ -11,7 +11,7 @@
 
 extern TextureHash* texture_hash;
 
-typedef struct Sprite{
+struct Sprite{
 	SDL_Surface* surface;
 	SDL_Texture* texture;
 	SDL_Rect* rect;
@@ -26,7 +26,7 @@ typedef struct Sprite{
 
 	//Rotation (clockwise, in degrees)
 	double rotation;
-} Sprite;
+};
 
 class Animation{
 	public:
@@ -37,7 +37,7 @@ class Animation{
 		void start();
 
 		Sprite* getSprite();
-		HitboxLst* getHitboxes();
+		HitboxList* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
 		uint32_t getTimeLeft();
@@ -60,7 +60,7 @@ class Animation{
 		typedef struct AnimationSequence{
 			Sprite* sprite;
 
-			HitboxLst* hitboxes;
+			HitboxList* hitboxes;
 			
 			unsigned int keytime;
 
@@ -92,9 +92,9 @@ class Animation{
 		bool isAnimated();
 };
 
-typedef struct AnimationList{
+struct AnimationList{
 	Animation* animation;
 	struct AnimationList* next;
-} AnimationLst;
+};
 
 #endif

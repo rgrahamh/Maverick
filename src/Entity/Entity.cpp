@@ -1,4 +1,4 @@
-#include "./Object.hpp"
+#include "./Entity.hpp"
 
 /** Object parameterized constructor
  * @param start_x The starting X location of the object
@@ -7,7 +7,7 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer){
+Entity::Entity(const char* name, float start_x, float start_y, unsigned int animation_num, int draw_layer){
     int name_len = strlen(name);
     this->name = (char*)malloc(name_len + 1);
     memcpy(this->name, name, name_len);
@@ -16,16 +16,6 @@ Object::Object(const char* name, float start_x, float start_y, float friction, f
     //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
-    this->old_x = start_x;
-    this->old_y = start_y;
-    this->xV = 0;
-    this->yV = 0;
-    this->xA = 0;
-    this->yA = 0;
-
-    //Initializing various physics elements
-    this->friction = friction;
-    this->mass = mass;
 
     //Initializing animation/visibility attributes
     this->active = true;
@@ -43,7 +33,7 @@ Object::Object(const char* name, float start_x, float start_y, float friction, f
 
 /** Destructor for objects
  */
-Object::~Object(){
+Entity::~Entity(){
     for(unsigned int i = 0; i < animation_num; i++){
         delete animations[i];
     }
@@ -54,119 +44,78 @@ Object::~Object(){
 /** Gets the name of the object
  * @return The name of the object
  */
-char* Object::getName(){
+char* Entity::getName(){
     return this->name;
 }
 
 /** Gets the X value of the object
  * @return The X value of the object
  */
-float Object::getX(){
+float Entity::getX(){
     return this->x;
 }
 
 /** Gets the Y value of the object
  * @return The Y value of the object
  */
-float Object::getY(){
+float Entity::getY(){
     return this->y;
-}
-
-/** Gets the old X value of the object
- * @return The old X value of the object
- */
-float Object::getOldX(){
-    return this->old_x;
-}
-
-/** Gets the old Y value of the object
- * @return The old Y value of the object
- */
-float Object::getOldY(){
-    return this->old_y;
-}
-
-/** Gets the X velocity of the object
- * @return The X velocity of the object
- */
-float Object::getXVel(){
-    return this->xV;
-}
-
-/** Gets the Y velocity of the object
- * @return The Y velocity of the object
- */
-float Object::getYVel(){
-    return this->yV;
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
-float Object::getWidth(){
+float Entity::getWidth(){
     return this->animations[active_animation]->getSprite()->rect->w;
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
-float Object::getHeight(){
+float Entity::getHeight(){
     return this->animations[active_animation]->getSprite()->rect->h;
-}
-
-/** Gets the mass of the object (in lbs)
- */
-float Object::getMass(){
-    return this->mass;
 }
 
 /** Gets the draw layer of the object
  * @return The draw layer of the object
  */
-unsigned int Object::getDrawLayer(){
+unsigned int Entity::getDrawLayer(){
     return this->animations[active_animation]->getDrawLayer();
 }
 
 /** Gets the draw axis of the object
  * @return The draw axis of the object
  */
-float Object::getDrawAxis(){
+float Entity::getDrawAxis(){
     return this->animations[active_animation]->getDrawAxis();
 }
 
 /** Gets the hitboxes of the current animation state
- * @return The HitboxLst containing the object's current hitboxes
+ * @return The HitboxList containing the object's current hitboxes
  */
-HitboxLst* Object::getHitboxes(){
+HitboxList* Entity::getHitboxes(){
     return this->animations[active_animation]->getHitboxes();
 }
 
 /** Sets if the current object is active (can be interacted with)
  * @return If the object is active
  */
-bool Object::isActive(){
+bool Entity::isActive(){
     return this->active;
 }
 
 /** Sets if the current object is visible (will/won't be drawn)
  * @return If the object is active
  */
-bool Object::isVisible(){
+bool Entity::isVisible(){
     return this->visible;
-}
-
-/** Gets if the object has bumped against the environment (or an entity which has bumped against the environment)
- * @return If the object has bumped against the environemnt
- */
-bool Object::getEnvBump(){
-    return this->env_bump;
 }
 
 /** Gets a pointer to an attribute
  * @param key The attribute you're looking for
  * @return A pointer to the var if found, NULL otherwise
  */
-void* Object::getAttr(const char* key){
+void* Entity::getAttr(const char* key){
     return this->attr->get(key);
 }
 
@@ -179,7 +128,7 @@ void* Object::getAttr(const char* key){
  * @param width The width of the sprite (default if -1)
  * @param height The height of the sprite (default if -1)
  */ 
-void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
+void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
     this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }
 
@@ -193,7 +142,7 @@ void Object::addSprite(unsigned int animation_num, const char* sprite_path, unsi
  * @param type The type flags of the hitbox
  * @param sprite_num The sprite number that is being used
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -215,7 +164,7 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param y_element The Y width/radius of the hitbox
  * @param type The type flags of the hitbox
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -238,7 +187,7 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param y_element The Y width/radius of the hitbox
  * @param type The type flags of the hitbox
  */
-void Object::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -265,7 +214,7 @@ void Object::addHitbox(unsigned int animation_start, unsigned int animation_end,
  * @param slice_prop The slice proportion for the hitbox
  * @param sprite_num The sprite number that is being used
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
@@ -281,7 +230,7 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  */
-void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     this->animations[animation_num]->addHitbox(hitbox);
 }
@@ -298,7 +247,7 @@ void Object::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  */
-void Object::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     for(unsigned int i = animation_start; i <= animation_end && i < animation_num; i++){
         this->animations[animation_num]->addHitbox(hitbox);
@@ -308,35 +257,21 @@ void Object::addHitbox(unsigned int animation_start, unsigned int animation_end,
 /** Sets the X posision
  * @param x The X coordinate
  */
-void Object::setX(float x){
+void Entity::setX(float x){
     this->x = x;
 }
 
 /** Sets the Y posision
  * @param y The Y coordinate
  */
-void Object::setY(float y){
+void Entity::setY(float y){
     this->y = y;
-}
-
-/** Sets the X velocity
- * @param xV The X velocity
- */
-void Object::setXVel(float xV){
-    this->xV = xV;
-}
-
-/** Sets the Y velocity
- * @param yV The Y velocity
- */
-void Object::setYVel(float yV){
-    this->yV = yV;
 }
 
 /** Sets the animation number
  * @param animation_num The animation number
  */
-void Object::setAnimation(unsigned int animation_num){
+void Entity::setAnimation(unsigned int animation_num){
     if(this->active_animation != animation_num){
         this->active_animation = animation_num;
         this->animations[active_animation]->start();
@@ -348,7 +283,7 @@ void Object::setAnimation(unsigned int animation_num){
  * @param x_scale The x scale factor
  * @param y_scale The y scale factor
  */
-void Object::setScale(unsigned int animation_num, float x_scale, float y_scale){
+void Entity::setScale(unsigned int animation_num, float x_scale, float y_scale){
     this->animations[animation_num]->setScale(x_scale, y_scale);
 }
 
@@ -356,7 +291,7 @@ void Object::setScale(unsigned int animation_num, float x_scale, float y_scale){
  * @param x_scale The x scale factor
  * @param y_scale The y scale factor
  */
-void Object::setScale(float x_scale, float y_scale){
+void Entity::setScale(float x_scale, float y_scale){
     for(unsigned int i = 0; i < this->animation_num; i++){
         this->animations[i]->setScale(x_scale, y_scale);
     }
@@ -367,7 +302,7 @@ void Object::setScale(float x_scale, float y_scale){
  * @param x_scale The x scale factor
  * @param y_scale The y scale factor
  */
-void Object::setSize(unsigned int animation_num, float width, float height){
+void Entity::setSize(unsigned int animation_num, float width, float height){
     this->animations[animation_num]->setSize(width, height);
 }
 
@@ -375,7 +310,7 @@ void Object::setSize(unsigned int animation_num, float width, float height){
  * @param width The x scale factor
  * @param height The y scale factor
  */
-void Object::setSize(float width, float height){
+void Entity::setSize(float width, float height){
     for(unsigned int i = 0; i < this->animation_num; i++){
         this->animations[i]->setSize(width, height);
     }
@@ -384,106 +319,21 @@ void Object::setSize(float width, float height){
 /** Sets the visibility of the current animation state
  * @return If the object is active
  */
-void Object::setActive(bool active){
+void Entity::setActive(bool active){
     this->active = active;
 }
 
 /** Sets the visibility of the current animation state
  * @return If the object is active
  */
-void Object::setVisible(bool visible){
+void Entity::setVisible(bool visible){
     this->visible = visible;
-}
-
-/** Sets the environmental bump to true
- */
-void Object::setEnvBump(){
-    this->env_bump = true;
 }
 
 /** Sets the attribute key to the specified val
  * @param key The key you wish to set
  * @param val The val you wish to set
  */
-void Object::setAttr(const char* key, void* val){
+void Entity::setAttr(const char* key, void* val){
     this->attr->add(key, val);
-}
-
-/** Applies force to an object
- * @param xA The X newtons of the force
- * @param yA The Y newtons of the force
- */
-void Object::applyForce(float xA, float yA){
-    this->xA += xA / this->mass;
-    this->yA += yA;
-}
-
-/** Called during input step; calls action function
- * @param event The event being interpreted
- */
-void Object::_action(Control* control){
-    this->action(control);
-}
-
-/** Calculates any actions taken; should be overridden by children if used
- * @param event The event being interpreted
- */
-void Object::action(Control* control){
-    return;
-}
-
-/** Called during the process step; performs object processing calculations
- */
-void Object::_process(uint32_t delta){
-    this->process(delta);
-
-    //Updating old X & Y values
-    this->old_x = this->x;
-    this->old_y = this->y;
-
-    //Updating environmental bump
-    this->env_bump = false;
-
-    //Updating X values
-    this->xV = this->xA * delta + (this->xV * (1 - this->friction));
-    if(this->xV < 0.1 && this->xV > -0.1){
-        this->xV = 0;
-    }
-    this->x += this->xV;
-    this->xA = 0;
-
-    //Updating Y values
-    this->yV = this->yA * delta + (this->yV * (1 - this->friction));
-    if(this->yV < 0.1 && this->yV > -0.1){
-        this->yV = 0;
-    }
-    this->y += this->yV;
-    this->yA = 0;
-}
-
-/** Called during the process step by _process; space for users to override with custom processing logics
- */
-void Object::process(uint32_t delta){
-}
-
-/** Called during the draw step
- */
-void Object::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
-    this->draw(renderer, delta, camera_x, camera_y);
-}
-
-/** Called during the draw step
- * @param window The window that content is being drawn to
- */
-void Object::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
-    this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
-}
-
-/** Called on object collision; should be overridden by children if you want collision logic.
- * @param other The other object
- * @param this_hitbox The hitbox that collided from this object
- * @param other_hitbox The hitbox that collided from the other object
- */
-void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	printf("Collided!\n");
 }

@@ -2,13 +2,13 @@
 
 Zone::Zone(const char* name){
     this->name = name;
-    this->objects = new ObjectLst;
+    this->objects = new ObjectList;
     this->objects->obj = NULL;
     this->objects->next = NULL;
 }
 
 Zone::~Zone(){
-    ObjectLst* obj_cursor = objects;
+    ObjectList* obj_cursor = objects;
     while(objects != NULL){
         obj_cursor = objects->next;
         delete objects->obj;
@@ -17,7 +17,7 @@ Zone::~Zone(){
     }
 }
 
-ObjectLst* Zone::getObjects(){
+ObjectList* Zone::getObjects(){
     return this->objects;
 }
 
@@ -30,7 +30,7 @@ void Zone::addObject(Object* object){
         this->objects->obj = object;
     }
     else{
-        ObjectLst* new_lst = new ObjectLst;
+        ObjectList* new_lst = new ObjectList;
         new_lst->next = this->objects;
         new_lst->obj = object;
         this->objects = new_lst;
