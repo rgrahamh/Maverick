@@ -9,7 +9,7 @@
 #define TRIGGER_DEADZONE 0.05
 
 //Tracks the controller state
-typedef struct ControllerState{
+struct ControllerState{
     //Face buttons
     uint8_t A;
     uint8_t B;
@@ -46,7 +46,7 @@ typedef struct ControllerState{
     float left_stick_x_axis;
     float left_stick_y_axis;
 
-} ControllerState;
+};
 
 class Control{
     public:

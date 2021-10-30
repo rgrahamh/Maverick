@@ -54,8 +54,8 @@ class Hitbox{
         unsigned int type;
 };
 
-typedef struct HitboxList{
+struct HitboxList{
     Hitbox* hitbox;
     struct HitboxList* next;
-} HitboxLst;
+};
 #endif

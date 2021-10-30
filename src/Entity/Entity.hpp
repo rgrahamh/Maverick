@@ -1,5 +1,5 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef ENTITY_H
+#define ENTITY_H
 
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
@@ -12,26 +12,20 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
-class Object{
+class Entity{
 	public:
-		Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer = 1);
-		virtual ~Object();
+		Entity(const char* name, float start_x, float start_y, unsigned int animation_num, int draw_layer = 1);
+		virtual ~Entity();
 		char* getName();
 		float getX();
 		float getY();
-		float getOldX();
-		float getOldY();
-		float getXVel();
-		float getYVel();
 		float getWidth();
 		float getHeight();
-		float getMass();
+		HitboxList* getHitboxes();
 		unsigned int getDrawLayer();
 		float getDrawAxis();
-		HitboxLst* getHitboxes();
 		bool isActive();
 		bool isVisible();
-		bool getEnvBump();
 		void* getAttr(const char* key);
 
 		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
@@ -45,8 +39,6 @@ class Object{
 
 		void setX(float x);
 		void setY(float y);
-		void setXVel(float xV);
-		void setYVel(float yV);
 		void setAnimation(unsigned int animation_num);
 		void setScale(unsigned int animation_num, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
@@ -54,59 +46,33 @@ class Object{
 		void setSize(float width, float height);
 		void setActive(bool active);
 		void setVisible(bool visible);
-		void setEnvBump();
 		void setAttr(const char* key, void* val);
 
-		void applyForce(float xA, float yA);
-
 		//Processing functions
-		virtual void _process(uint32_t delta);
+		virtual void _process(uint32_t delta) = 0;
 		//Need this for custom processing
-		virtual void process(uint32_t delta);
+		virtual void process(uint32_t delta) = 0;
 
-		virtual void _action(Control* control);
-		virtual void action(Control* control);
+		virtual void _action(Control* control) = 0;
+		virtual void action(Control* control) = 0;
 
-		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
-
-		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
+		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
+		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 		
 	protected:
 		//Name
 		char* name;
 
+        //Position
+        float x;
+        float y;
+
 		//Attributes
 		HashTable* attr;
-
-		//Position
-		float x;
-		float y;
-
-		//Previous position (used for rollback)
-		float old_x;
-		float old_y;
-
-		//Velocity
-		float xV;
-		float yV;
-
-		//Acceleration
-		float xA;
-		float yA;
-
-		//Coefficient of friction
-		float friction;
-
-		//How much the object weighs
-		float mass;
 
 		//If the object is active/visible
 		bool active;
 		bool visible;
-
-		//Environmental bump
-		bool env_bump;
 
 		//Animation tracking
 		unsigned int active_animation;
@@ -114,12 +80,12 @@ class Object{
 
 		//Animation
 		Animation** animations;
-		AnimationLst* ignored_animations;
+		AnimationList* ignored_animations;
 };
 
-typedef struct ObjectList{
-	Object* obj;
+struct EntityList{
+	EntityList* obj;
 	struct ObjectList* next;
-} ObjectLst;
+};
 
 #endif

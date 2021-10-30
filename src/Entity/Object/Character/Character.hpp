@@ -3,14 +3,14 @@
 
 #include <stdlib.h>
 
-#include "../../Item/Item.hpp"
-#include "../../Object/Weapon/Weapon.hpp"
-#include "../../Armor/Armor.hpp"
-#include "../../Ability/Ability.hpp"
 #include "../Object.hpp"
+#include "../../../Item/Item.hpp"
+#include "../Weapon/Weapon.hpp"
+#include "../Armor/Armor.hpp"
+#include "../../../Ability/Ability.hpp"
 #include "./Race/Race.hpp"
 #include "./Style/Style.hpp"
-#include "../../Control/Control.hpp"
+#include "../../../Control/Control.hpp"
 
 typedef struct InventorySlot{
 	Item* item;

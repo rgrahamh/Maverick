@@ -1,8 +1,11 @@
 #include "./Engine.hpp"
 
-#include "../Object/Character/Character.hpp"
-#include "../Object/UI/UIText/UIText.hpp"
-#include "../Object/UI/UITextBox/UITextBox.hpp"
+#include "../Entity/Object/Character/Character.hpp"
+#include "../Entity/UI/UIText/UIText.hpp"
+#include "../Entity/UI/UITextBox/UITextBox.hpp"
+#include "../Factory/Factory.hpp"
+#include "../Zone/ZoneFactory/ZoneFactory.hpp"
+
 
 static int SDLCALL event_listener(void* userdata, SDL_Event* event){
     if(event->type == SDL_EventType::SDL_QUIT){
@@ -68,7 +71,7 @@ Engine::Engine(){
 /** Engine's destructor
  */
 Engine::~Engine(){
-    ZoneLst* zone_cursor = zones;
+    ZoneList* zone_cursor = zones;
     while(zones != NULL){
         zone_cursor = zones->next;
         delete zones->zone;
@@ -97,13 +100,13 @@ Engine::~Engine(){
 void Engine::start(){
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
-    ObjectLst* new_objs = new ObjectLst;
+    ObjectList* new_objs = new ObjectList;
     new_objs->obj = player;
     new_objs->next = NULL;
 
     //Loading the test zone as the first area
     std::thread* new_thread = new std::thread(loadZone, "Test Zone", this, new_objs);
-    ThreadLst* thread_entry = new ThreadLst;
+    ThreadList* thread_entry = new ThreadList;
     thread_entry->thread = new_thread;
     thread_entry->next = threads;
     threads = thread_entry;
@@ -115,7 +118,7 @@ void Engine::start(){
 }
 
 void Engine::InitUI(){
-    ui_elements = new UIElementLst;
+    ui_elements = new UIElementList;
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
     pause_menu->setActive(false);
     pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
@@ -131,7 +134,7 @@ void Engine::InitUI(){
     UITextBox* text_box = new UITextBox("text_box", 0.2, 0.8, 0.6, 0.15, 1, 1, window, "./assets/fonts/luximr.ttf", "This is a text box! Here's some sample text. I think this is great and will be pretty long.");
     text_box->setColor(255, 255, 255);
     text_box->addSprite(0, "./assets/sprites/ui/black.png", 0, 0, 0, 0.6, 0.15);
-    UIElementLst* new_element = new UIElementLst;
+    UIElementList* new_element = new UIElementList;
     new_element->element = text_box;
     new_element->next = ui_elements;
     ui_elements = new_element;
@@ -144,7 +147,7 @@ void Engine::gameLoop(){
     SDL_AddEventWatch(event_listener, &exit_game);
 
 	while(!exit_game){
-        ObjectLst* all_objects = buildFullObjLst();
+        ObjectList* all_objects = buildFullObjList();
 
         //Cleanup threads every second
         if(this->delta % 1000 == 0){
@@ -168,11 +171,11 @@ void Engine::gameLoop(){
 /** The action step of the game engine
  * @param all_objects All of the objects that should be listening for input
  */
-void Engine::actionStep(ObjectLst* all_objects){
+void Engine::actionStep(ObjectList* all_objects){
     //Update controller/keyboard input
     control->updateInput();
 
-    ObjectLst* cursor = all_objects;
+    ObjectList* cursor = all_objects;
     while(cursor != NULL){
         cursor->obj->action(control);
         cursor = cursor->next;
@@ -207,7 +210,7 @@ void Engine::globalAction(){
 /** The physics step of the game engine
  * @param all_objects All of the objects that physics should be simluated for
  */
-void Engine::physicsStep(ObjectLst* all_objects){
+void Engine::physicsStep(ObjectList* all_objects){
     if(!this->checkState(GAME_STATE::PAUSE)){
         while(all_objects != NULL){
             all_objects->obj->_process(this->delta);
@@ -215,7 +218,7 @@ void Engine::physicsStep(ObjectLst* all_objects){
         }
     }
 
-    UIElementLst* cursor = ui_elements;
+    UIElementList* cursor = ui_elements;
     while(cursor != NULL){
         cursor->element->_process(this->delta);
         cursor = cursor->next;
@@ -225,10 +228,10 @@ void Engine::physicsStep(ObjectLst* all_objects){
 /** The collision step of the game engine
  * @param all_objects All of the objects that collisions should be checked for
  */
-void Engine::collisionStep(ObjectLst* all_objects){
+void Engine::collisionStep(ObjectList* all_objects){
     //Sister arrays for the list matricies
-    ObjectLst* object_matrix[16][9] = {NULL};
-    HitboxLst* hitbox_matrix[16][9] = {NULL};
+    ObjectList* object_matrix[16][9] = {NULL};
+    HitboxList* hitbox_matrix[16][9] = {NULL};
 
     //While we're not out of objects
     while(all_objects != NULL){
@@ -237,7 +240,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
             all_objects = all_objects->next;
             continue;
         }
-        HitboxLst* object_hitboxes = all_objects->obj->getHitboxes();
+        HitboxList* object_hitboxes = all_objects->obj->getHitboxes();
         //While we're not out of object hitboxes
         while(object_hitboxes != NULL){
             float top_bound, bot_bound, left_bound, right_bound;
@@ -292,13 +295,13 @@ void Engine::collisionStep(ObjectLst* all_objects){
                         //If the left bound is greater than box_x or the right bound is less than box_x, go to next
                         if(!(left_bound > box_x + x_iter || right_bound < box_x)){
                             //Insert the object in the list
-                            ObjectLst* new_objectlst = new ObjectLst;
+                            ObjectList* new_objectlst = new ObjectList;
                             new_objectlst->next = object_matrix[i][j];
                             new_objectlst->obj = curr_object;
                             object_matrix[i][j] = new_objectlst;
 
                             //Insert the hitbox in the list
-                            HitboxLst* new_hitboxlst = new HitboxLst;
+                            HitboxList* new_hitboxlst = new HitboxList;
                             new_hitboxlst->next = hitbox_matrix[i][j];
                             new_hitboxlst->hitbox = curr_hitbox;
                             hitbox_matrix[i][j] = new_hitboxlst;
@@ -318,12 +321,12 @@ void Engine::collisionStep(ObjectLst* all_objects){
         //For each horizontal slice
         for(int j = 0; j < 9; j++){
             //Iterate over every item in the list
-            ObjectLst* object_lst = object_matrix[i][j];
-            HitboxLst* hitbox_lst = hitbox_matrix[i][j];
+            ObjectList* object_lst = object_matrix[i][j];
+            HitboxList* hitbox_lst = hitbox_matrix[i][j];
             while(hitbox_lst != NULL){
                 //Iterate over every item after the hitbox_lst
-                ObjectLst* object_cursor = object_lst->next;
-                HitboxLst* hitbox_cursor = hitbox_lst->next;
+                ObjectList* object_cursor = object_lst->next;
+                HitboxList* hitbox_cursor = hitbox_lst->next;
                 while(hitbox_cursor != NULL){
                     //Possible place for multi-threading!
 
@@ -339,11 +342,11 @@ void Engine::collisionStep(ObjectLst* all_objects){
                 }
 
                 //Linked list cleanup
-                ObjectLst* tmp_object = object_lst;
+                ObjectList* tmp_object = object_lst;
                 object_lst = object_lst->next;
                 delete tmp_object;
 
-                HitboxLst* tmp_hitbox = hitbox_lst;
+                HitboxList* tmp_hitbox = hitbox_lst;
                 hitbox_lst = hitbox_lst->next;
                 delete tmp_hitbox;
             }
@@ -353,7 +356,7 @@ void Engine::collisionStep(ObjectLst* all_objects){
 
 /** The draw step of the game engine
  */
-void Engine::drawStep(ObjectLst* all_objects){
+void Engine::drawStep(ObjectList* all_objects){
     SDL_Renderer* renderer = this->camera->getRenderer();
 
     SDL_RenderClear(renderer);
@@ -361,19 +364,19 @@ void Engine::drawStep(ObjectLst* all_objects){
     //Draw operation
     all_objects = this->drawSort(all_objects);
     this->camera->_draw(all_objects, this->delta);
-    ui_elements = (UIElementLst*)this->drawSort((ObjectLst*)ui_elements);
-    this->camera->_draw((ObjectLst*)ui_elements, this->delta);
+    ui_elements = (UIElementList*)this->drawSort((ObjectList*)ui_elements);
+    this->camera->_draw((ObjectList*)ui_elements, this->delta);
 
     SDL_RenderPresent(renderer);
 
-    freeFullObjLst(all_objects);
+    freeFullObjList(all_objects);
 }
 
 /** Recursively sorts the objects in the order of draw
  * @param curr_obj The current object that you're sorting through
  * @return The current draw object
  */
-ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
+ObjectList* Engine::drawSort(ObjectList* curr_obj){
     //Checking if we have any objects
     if(curr_obj != NULL){
         //Case where it's the last iteration (everything is sorted)
@@ -381,7 +384,7 @@ ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
             return curr_obj;
         }
         else{
-            ObjectLst* next_obj = this->drawSort(curr_obj->next);
+            ObjectList* next_obj = this->drawSort(curr_obj->next);
             if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() ||
               (curr_obj->obj->getDrawAxis() > next_obj->obj->getDrawAxis() && curr_obj->obj->getDrawLayer() == next_obj->obj->getDrawLayer())){
                 //Swap node positions & send curr_obj up the draw chain
@@ -405,7 +408,7 @@ ObjectLst* Engine::drawSort(ObjectLst* curr_obj){
  * @return A pointer to the object, or NULL if it can't be found
  */
 UIElement* Engine::getUIElement(const char* element_name){
-    UIElementLst* element_cursor = ui_elements;
+    UIElementList* element_cursor = ui_elements;
     while(element_cursor != NULL){
         if(element_cursor->element->getElement(element_name) != nullptr){
             return element_cursor->element;
@@ -420,9 +423,9 @@ UIElement* Engine::getUIElement(const char* element_name){
  * @return A pointer to the object, or NULL if it can't be found
  */
 Object* Engine::getObject(const char* obj_name){
-    ZoneLst* zone_cursor = this->active_zones;
+    ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
-        ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+        ObjectList* obj_cursor = zone_cursor->zone->getObjects();
         while(obj_cursor != NULL){
             if(strcmp(obj_cursor->obj->getName(), obj_name)){
                 return obj_cursor->obj;
@@ -440,10 +443,10 @@ Object* Engine::getObject(const char* obj_name){
  * @return A pointer to the object
  */
 Object* Engine::getObject(const char* obj_name, const char* zone_name){
-    ZoneLst* zone_cursor = this->active_zones;
+    ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
         if(!strcmp(zone_cursor->zone->getName(), zone_name)){
-            ObjectLst* obj_cursor = zone_cursor->zone->getObjects();
+            ObjectList* obj_cursor = zone_cursor->zone->getObjects();
             while(obj_cursor != NULL){
                 if(strcmp(obj_cursor->obj->getName(), obj_name)){
                     return obj_cursor->obj;
@@ -481,8 +484,8 @@ void Engine::setState(uint64_t state){
 /** Goes through all active threads and cleans them up
  */
 void Engine::threadCleanup(){
-    ThreadLst* cursor = this->threads;
-    ThreadLst* prev_cursor = this->threads;
+    ThreadList* cursor = this->threads;
+    ThreadList* prev_cursor = this->threads;
     while(cursor != NULL){
         if(cursor->thread->joinable()){
             cursor->thread->join();
@@ -494,7 +497,7 @@ void Engine::threadCleanup(){
                 threads = cursor;
             }
             else{
-                ThreadLst* curr_entry = cursor;
+                ThreadList* curr_entry = cursor;
                 cursor = cursor->next;
                 prev_cursor->next = cursor;
                 delete curr_entry;
@@ -583,19 +586,19 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 /** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
  * @return A full list of all active objects in the engine
  */
-ObjectLst* Engine::buildFullObjLst(){
-    ObjectLst* all_objects = new ObjectLst;
+ObjectList* Engine::buildFullObjList(){
+    ObjectList* all_objects = new ObjectList;
     all_objects->obj = NULL;
     all_objects->next = NULL;
-    ObjectLst* obj_iter = all_objects;
+    ObjectList* obj_iter = all_objects;
 
     bool first_run = true;
-    ZoneLst* zone_iter = this->active_zones;
+    ZoneList* zone_iter = this->active_zones;
     while(zone_iter != NULL){
-        ObjectLst* new_objects = zone_iter->zone->getObjects();
+        ObjectList* new_objects = zone_iter->zone->getObjects();
         while(new_objects != NULL){
             if(first_run != true){
-                obj_iter->next = new ObjectLst;
+                obj_iter->next = new ObjectList;
                 obj_iter = obj_iter->next;
                 obj_iter->next = NULL;
             }
@@ -616,8 +619,8 @@ ObjectLst* Engine::buildFullObjLst(){
 /** Frees the full list of objects generated for each step
  * @param all_objects The full list of objects
  */
-void Engine::freeFullObjLst(ObjectLst* all_objects){
-    ObjectLst* free_objects;
+void Engine::freeFullObjList(ObjectList* all_objects){
+    ObjectList* free_objects;
     while(all_objects != NULL){
         free_objects = all_objects->next;
         delete all_objects;
@@ -629,29 +632,29 @@ void Engine::freeFullObjLst(ObjectLst* all_objects){
  * @param zone The zone to add
  */
 void Engine::addZone(Zone* zone){
-    ZoneLst* new_zone = new ZoneLst;
+    ZoneList* new_zone = new ZoneList;
     new_zone->zone = zone;
     new_zone->next = this->zones;
     zones = new_zone;
 }
 
-/** Moves a Zone to the active_zones ZoneLst
+/** Moves a Zone to the active_zones ZoneList
  * @param zone_name The name of the zone you wish to move
  */
 void Engine::activateZone(const char* zone_name){
     //If it's the first zone
     if(strcmp(this->zones->zone->getName(), zone_name) == 0){
-        ZoneLst* moved_zone = this->zones;
+        ZoneList* moved_zone = this->zones;
         zones = this->zones->next;
         moved_zone->next = this->active_zones;
         this->active_zones = moved_zone;
     }
     else{
-        ZoneLst* zone_lst = this->zones;
+        ZoneList* zone_lst = this->zones;
         //If it's anything after the first zone
         while(zone_lst->next != NULL){
             if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
-                ZoneLst* moved_zone = zone_lst->next;
+                ZoneList* moved_zone = zone_lst->next;
                 zone_lst->next = moved_zone->next;
                 moved_zone->next = this->active_zones;
                 this->active_zones = moved_zone;
@@ -667,17 +670,17 @@ void Engine::deactivateZone(const char* zone_name){
     //If it's the first zone
     if(zone_name != NULL){
         if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
-            ZoneLst* moved_zone = this->active_zones;
+            ZoneList* moved_zone = this->active_zones;
             active_zones = this->active_zones->next;
             moved_zone->next = this->zones;
             this->zones = moved_zone;
         }
         else{
             //If it's anything after the first zone
-            ZoneLst* zone_lst = this->active_zones;
+            ZoneList* zone_lst = this->active_zones;
             while(zone_lst->next != NULL){
                 if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
-                    ZoneLst* moved_zone = zone_lst->next;
+                    ZoneList* moved_zone = zone_lst->next;
                     zone_lst->next = moved_zone->next;
                     moved_zone->next = this->zones;
                     this->zones = moved_zone;

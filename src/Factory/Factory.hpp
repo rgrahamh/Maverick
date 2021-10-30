@@ -1,7 +1,7 @@
 #ifndef FACTORY_H
 #define FACTORY_H
 
-#include "../Object/Character/Character.hpp"
+#include "../Entity/Object/Character/Character.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitEllipse/HitEllipse.hpp"

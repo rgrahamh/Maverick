@@ -45,7 +45,7 @@ void Camera::recenter(){
 /** Draws all objects in the given object list
  * @param obj_lst The object list that you wish to draw
  */
-void Camera::_draw(ObjectLst* obj_lst, uint32_t delta){
+void Camera::_draw(ObjectList* obj_lst, uint32_t delta){
     recenter();
 
     while(obj_lst != NULL){

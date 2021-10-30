@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "../Object/Object.hpp"
+#include "../Entity/Object/Object.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -15,7 +15,7 @@ class Camera{
 		~Camera();
 
 		void setReference(Object* reference);
-		void _draw(ObjectLst* obj_lst, uint32_t delta);
+		void _draw(ObjectList* obj_lst, uint32_t delta);
 		SDL_Renderer* getRenderer();
 
 	private:
