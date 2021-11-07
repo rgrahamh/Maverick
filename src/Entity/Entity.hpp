@@ -83,9 +83,4 @@ class Entity{
 		AnimationList* ignored_animations;
 };
 
-struct EntityList{
-	EntityList* obj;
-	struct ObjectList* next;
-};
-
 #endif

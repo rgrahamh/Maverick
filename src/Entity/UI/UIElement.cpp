@@ -198,8 +198,8 @@ void UIElement::setVisible(bool visible){
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
- * @param width The view width of the sprite (default if -1)
- * @param height The view height of the sprite (default if -1)
+ * @param width The view width of the sprite (scales to element if -1)
+ * @param height The view height of the sprite (scales to element if -1)
  */ 
 void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
     int win_width, win_height;
@@ -208,8 +208,14 @@ void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, u
     if(width != -1){
         width *= (float)win_width;
     }
+    else{
+        width = this->draw_area.w;
+    }
     if(height != -1){
         height *= (float)win_height;
+    }
+    else{
+        height = this->draw_area.h;
     }
     this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }

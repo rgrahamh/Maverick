@@ -55,7 +55,7 @@ Engine::Engine(){
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
 
-    this->InitUI();
+    //this->InitUI();
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -105,11 +105,10 @@ void Engine::start(){
     new_objs->next = NULL;
 
     //Loading the test zone as the first area
-    std::thread* new_thread = new std::thread(loadZone, "Test Zone", this, new_objs);
-    ThreadList* thread_entry = new ThreadList;
-    thread_entry->thread = new_thread;
-    thread_entry->next = threads;
-    threads = thread_entry;
+    this->addThread(new std::thread(loadZone, "Test Zone", this, new_objs));
+
+    //Loading the level editor
+    this->addThread(new std::thread(loadZone, "led", this, nullptr));
 
     //Setting the reference
     camera->setReference(player);
@@ -147,42 +146,46 @@ void Engine::gameLoop(){
     SDL_AddEventWatch(event_listener, &exit_game);
 
 	while(!exit_game){
-        ObjectList* all_objects = buildFullObjList();
+        EntityList* all_entities = buildFullEntityList();
 
-        //Cleanup threads every second
-        if(this->delta % 1000 == 0){
-            this->threadCleanup();
+        if(all_entities != nullptr){
+            //Cleanup threads every second
+            if(this->delta % 1000 == 0){
+                this->threadCleanup();
+            }
+
+            delta = SDL_GetTicks() - last_time;
+            last_time = SDL_GetTicks();
+
+            this->actionStep(all_entities);
+            this->physicsStep(all_entities->obj);
+            if(this->state != GAME_STATE::PAUSE){
+                this->collisionStep(all_entities->obj);
+            }
+
+            //Different because we need to adjust the object list for draw order
+            this->drawStep(all_entities);
         }
-
-        delta = SDL_GetTicks() - last_time;
-        last_time = SDL_GetTicks();
-
-        this->actionStep(all_objects);
-        this->physicsStep(all_objects);
-        if(this->state != GAME_STATE::PAUSE){
-            this->collisionStep(all_objects);
-        }
-
-        //Different because we need to adjust the object list for draw order
-		this->drawStep(all_objects);
 	}
 }
 
 /** The action step of the game engine
  * @param all_objects All of the objects that should be listening for input
  */
-void Engine::actionStep(ObjectList* all_objects){
+void Engine::actionStep(EntityList* all_entities){
     //Update controller/keyboard input
     control->updateInput();
 
-    ObjectList* cursor = all_objects;
-    while(cursor != NULL){
-        cursor->obj->action(control);
-        cursor = cursor->next;
+    ObjectList* obj_cursor = all_entities->obj;
+    while(obj_cursor != NULL){
+        obj_cursor->obj->action(control);
+        obj_cursor = obj_cursor->next;
     }
-    while(cursor != NULL){
-        cursor->obj->action(control);
-        cursor = cursor->next;
+
+    UIElementList* ui_cursor = all_entities->ui;
+    while(ui_cursor != NULL){
+        ui_cursor->element->action(control);
+        ui_cursor = ui_cursor->next;
     }
     this->globalAction();
 }
@@ -356,20 +359,20 @@ void Engine::collisionStep(ObjectList* all_objects){
 
 /** The draw step of the game engine
  */
-void Engine::drawStep(ObjectList* all_objects){
+void Engine::drawStep(EntityList* all_entities){
     SDL_Renderer* renderer = this->camera->getRenderer();
 
     SDL_RenderClear(renderer);
 
     //Draw operation
-    all_objects = this->drawSort(all_objects);
-    this->camera->_draw(all_objects, this->delta);
-    ui_elements = (UIElementList*)this->drawSort((ObjectList*)ui_elements);
-    this->camera->_draw((ObjectList*)ui_elements, this->delta);
+    all_entities->obj = this->drawSort(all_entities->obj);
+    this->camera->_draw(all_entities->obj, this->delta);
+    all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
+    this->camera->_draw((ObjectList*)all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
 
-    freeFullObjList(all_objects);
+    freeFullEntityList(all_entities);
 }
 
 /** Recursively sorts the objects in the order of draw
@@ -459,19 +462,26 @@ Object* Engine::getObject(const char* obj_name, const char* zone_name){
     return NULL;
 }
 
+/** Gets the state of the engine
+ * @return The state of the engine
+ */
+uint64_t Engine::getState(){
+    return this->state;
+}
+
+/** Gets the window the engine is using
+ * @return The window the engine is using
+ */
+SDL_Window* Engine::getWindow(){
+    return this->window;
+}
+
 /** Checks the state of the engine against the passed-in state(s)
  * @param chk_state The state(s) you wish to check
  * @return If the engine is in chk_state
  */
 bool Engine::checkState(uint64_t chk_state){
     return (this->state & chk_state) != 0;
-}
-
-/** Gets the state of the engine
- * @return The state of the engine
- */
-uint64_t Engine::getState(){
-    return this->state;
 }
 
 /** Sets the state of the engine
@@ -586,18 +596,25 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 /** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
  * @return A full list of all active objects in the engine
  */
-ObjectList* Engine::buildFullObjList(){
+EntityList* Engine::buildFullEntityList(){
     ObjectList* all_objects = new ObjectList;
     all_objects->obj = NULL;
     all_objects->next = NULL;
     ObjectList* obj_iter = all_objects;
 
-    bool first_run = true;
+    UIElementList* all_ui = new UIElementList;
+    all_ui->element = NULL;
+    all_ui->next = NULL;
+    UIElementList* ui_iter = all_ui;
+
+    bool obj_init = true;
+    bool ui_init = true;
     ZoneList* zone_iter = this->active_zones;
     while(zone_iter != NULL){
         ObjectList* new_objects = zone_iter->zone->getObjects();
-        while(new_objects != NULL){
-            if(first_run != true){
+        while(new_objects != NULL && new_objects->obj != NULL){
+            //We have to do this for every entry except for the first
+            if(obj_init == false){
                 obj_iter->next = new ObjectList;
                 obj_iter = obj_iter->next;
                 obj_iter->next = NULL;
@@ -605,27 +622,77 @@ ObjectList* Engine::buildFullObjList(){
             obj_iter->obj = new_objects->obj;
             new_objects = new_objects->next;
 
-            first_run = false;
+            obj_init = false;
         }
+
+        UIElementList* new_elements = zone_iter->zone->getUIElements();
+        while(new_elements != NULL && new_elements->element != NULL){
+            //We have to do this for every entry except for the first
+            if(ui_init == false){
+                ui_iter->next = new UIElementList;
+                ui_iter = ui_iter->next;
+                ui_iter->next = NULL;
+            }
+            ui_iter->element = new_elements->element;
+            new_elements = new_elements->next;
+
+            ui_init = false;
+        }
+
         zone_iter = zone_iter->next;
     }
+
     if(all_objects->obj == NULL){
         delete all_objects;
+        all_objects = nullptr;
+    }
+
+    if(all_ui->element == NULL){
+        delete all_ui;
+        all_ui = nullptr;
+    }
+
+    if(all_objects == NULL && all_ui == NULL){
         return NULL;
     }
-    return all_objects;
+
+    EntityList* all_entities = new EntityList;
+    all_entities->obj = all_objects;
+    all_entities->ui = all_ui;
+    return all_entities;
 }
 
 /** Frees the full list of objects generated for each step
  * @param all_objects The full list of objects
  */
-void Engine::freeFullObjList(ObjectList* all_objects){
+void Engine::freeFullEntityList(EntityList* all_entities){
     ObjectList* free_objects;
+    ObjectList* all_objects = all_entities->obj;
     while(all_objects != NULL){
         free_objects = all_objects->next;
         delete all_objects;
         all_objects = free_objects;
     }
+
+    UIElementList* free_ui;
+    UIElementList* all_ui = all_entities->ui;
+    while(all_ui != NULL){
+        free_ui = all_ui->next;
+        delete all_ui;
+        all_ui = free_ui;
+    }
+
+    delete all_entities;
+}
+
+/** Adds a new thread to the engine (to get cleaned up once the thread's execution halts)
+ * @param thread The thread to add
+ */
+void Engine::addThread(std::thread* thread){
+    ThreadList* thread_entry = new ThreadList;
+    thread_entry->thread = thread;
+    thread_entry->next = threads;
+    threads = thread_entry;
 }
 
 /** Adds a new zone to the game

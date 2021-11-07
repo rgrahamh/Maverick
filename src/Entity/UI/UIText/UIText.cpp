@@ -40,7 +40,8 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
     this->setFont(font_path);
     this->setPoint(point);
 
-    this->font_color = SDL_Color{0x00, 0x00, 0x00, 0xFF};
+    //Default color is white
+    this->font_color = SDL_Color{0xFF, 0xFF, 0xFF, 0xFF};
 
     this->setText(text);
 }

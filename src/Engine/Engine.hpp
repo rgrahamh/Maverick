@@ -14,6 +14,7 @@
 #include "../Control/Control.hpp"
 
 #include "../Entity/UI/UIElement.hpp"
+#include "../Entity/Object/Object.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -32,6 +33,11 @@ struct ThreadList{
 	struct ThreadList* next;
 };
 
+struct EntityList{
+	ObjectList* obj;
+	UIElementList* ui;
+};
+
 class Engine{
 	public:
 		Engine();
@@ -43,16 +49,21 @@ class Engine{
 		//Zone addition/state handling
 		void addZone(Zone* zone);
 
-		//Gets an object
+		//Adds an object/UIElement to the engine
 		void addObject(Object* object);
 		void addUIElement(UIElement* ui);
 
+		//Thread creation
+		void addThread(std::thread* thread);
+
+		//Gets an object
 		Object* getObject(const char* name);
 		Object* getObject(const char* name, const char* zone);
 		UIElement* getUIElement(const char* name);
 		uint64_t getState();
-		bool checkState(uint64_t state_condition);
+		SDL_Window* getWindow();
 
+		bool checkState(uint64_t state_condition);
 		void setState(uint64_t new_state);
 
 		void activateZone(const char* zone_name);
@@ -63,11 +74,11 @@ class Engine{
 
 		//Engine steps
 		//Action step
-		void actionStep(ObjectList* all_objects);
+		void actionStep(EntityList* all_entities);
 		void globalAction();
 
 		//Draw step
-		void drawStep(ObjectList* all_objects);
+		void drawStep(EntityList* all_objects);
 		ObjectList* drawSort(ObjectList* all_objects);
 
 		//Collision step
@@ -80,8 +91,8 @@ class Engine{
 		void threadCleanup();
 
 		//Object list building/destruction
-		ObjectList* buildFullObjList();
-		void freeFullObjList(ObjectList* all_objects);
+		EntityList* buildFullEntityList();
+		void freeFullEntityList(EntityList* all_entities);
 
 		//Saving logic
 		void saveGame();
