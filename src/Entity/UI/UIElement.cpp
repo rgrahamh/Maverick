@@ -14,7 +14,7 @@ extern Engine* engine;
  * @param obj_type The object type (a UI_OBJECT_TYPE)
  * @param window The current window (used for viewport calculation)
  */
-UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
         :  Entity(name, 0, 0, animation_num, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
@@ -144,7 +144,7 @@ void UIElement::setScale(float x_scale, float y_scale){
  * @param width The width
  * @param height The height
  */
-void UIElement::setViewSize(float view_width, float view_height){
+void UIElement::setViewSize(double view_width, double view_height){
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element

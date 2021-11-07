@@ -23,7 +23,7 @@ struct UIElementList{
 
 class UIElement : public Entity{
     public:
-        UIElement(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window);
+        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window);
         virtual ~UIElement();
 
 		virtual void _process(uint32_t delta);
@@ -34,7 +34,7 @@ class UIElement : public Entity{
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void setScale(float x_scale, float y_scale);
-        virtual void setViewSize(float view_width, float view_height);
+        virtual void setViewSize(double view_width, double view_height);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);
 
@@ -54,10 +54,10 @@ class UIElement : public Entity{
         SDL_Window* window;
 
         //The UI offsets/sizing
-        float view_x_offset;
-        float view_y_offset;
-        float view_width;
-        float view_height;
+        double view_x_offset;
+        double view_y_offset;
+        double view_width;
+        double view_height;
 
         //The UI draw area
         SDL_Rect draw_area;

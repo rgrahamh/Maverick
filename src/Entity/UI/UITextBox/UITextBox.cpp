@@ -1,6 +1,6 @@
 #include "./UITextBox.hpp"
 
-UITextBox::UITextBox(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed, int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment)
+UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed, int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT_BOX, window){
     this->text = new UIText(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window, font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);
 

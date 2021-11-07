@@ -42,6 +42,8 @@ Engine::Engine(){
         return;
     }
 
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){

@@ -5,7 +5,7 @@
 
 class UITextBox : public UIElement{
     public:
-        UITextBox(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed = 0.0, int point = 24, ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER);
+        UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed = 0.0, int point = 24, ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER);
         UITextBox();
         ~UITextBox();
 
