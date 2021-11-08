@@ -1,7 +1,8 @@
 #include "./Factory.hpp"
 
 
-Character* buildCharacter(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory){
+Character* buildCharacter(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats,
+                          Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory){
     Character* player = new Character(name, start_x, start_y, friction, mass, race, style, stats, mastery, abilities, control, equipment, inventory, 12);
 
     //Neutral position

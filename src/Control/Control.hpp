@@ -45,7 +45,14 @@ struct ControllerState{
     //Left stick axies
     float left_stick_x_axis;
     float left_stick_y_axis;
+};
 
+struct MouseState{
+    //Mouse location
+    int x;
+    int y;
+
+    uint32_t button_state;
 };
 
 class Control{

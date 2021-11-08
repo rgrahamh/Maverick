@@ -14,7 +14,8 @@ extern Engine* engine;
  * @param obj_type The object type (a UI_OBJECT_TYPE)
  * @param window The current window (used for viewport calculation)
  */
-UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
+                     unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
         :  Entity(name, 0, 0, animation_num, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
@@ -41,14 +42,14 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    UIElementList* cursor = subelements;
+    /*UIElementList* cursor = subelements;
     while(cursor != nullptr){
         UIElementList* tmp = cursor;
         delete cursor->element;
 
         cursor = cursor->next;
         delete tmp;
-    }
+    }*/
 }
 
 void UIElement::process(uint32_t delta){

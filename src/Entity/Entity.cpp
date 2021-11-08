@@ -142,7 +142,8 @@ void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsi
  * @param type The type flags of the hitbox
  * @param sprite_num The sprite number that is being used
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element,
+                       float y_element, unsigned int type, int sprite_num){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -187,7 +188,8 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param y_element The Y width/radius of the hitbox
  * @param type The type flags of the hitbox
  */
-void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape,
+                       float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -214,7 +216,8 @@ void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end,
  * @param slice_prop The slice proportion for the hitbox
  * @param sprite_num The sprite number that is being used
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
+                       float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     this->animations[animation_num]->addHitbox(hitbox, sprite_num);
 }
@@ -230,7 +233,8 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
+                       float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     this->animations[animation_num]->addHitbox(hitbox);
 }
@@ -247,7 +251,8 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  */
-void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset,
+                       float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
     for(unsigned int i = animation_start; i <= animation_end && i < animation_num; i++){
         this->animations[animation_num]->addHitbox(hitbox);

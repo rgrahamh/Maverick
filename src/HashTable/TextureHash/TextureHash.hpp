@@ -4,6 +4,7 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <atomic>
 
 #include "../HashTable.hpp"
 
@@ -23,6 +24,6 @@ class TextureHash : public HashTable{
 	
 	private:
 		unsigned int size;
-		THEntry** table;
+		std::atomic<THEntry**> table;
 };
 #endif

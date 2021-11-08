@@ -1,6 +1,6 @@
 INCLUDE_SDL= -lSDL2 -lSDL2_image -lSDL2_ttf -lGL
 CC=g++
-CFLAGS= -Wall -std=c++17 -pthread
+CFLAGS= -Wall -Wno-write-strings -std=c++17 -pthread
 
 #Engine components
 ANIMATION= ./src/Animation/Animation.cpp

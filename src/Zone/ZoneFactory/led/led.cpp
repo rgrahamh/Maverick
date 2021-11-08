@@ -1,20 +1,20 @@
 #include "led.hpp"
 extern Engine* engine;
 
-int buildEditor(){
+void buildEditor(){
     SDL_Window* window = engine->getWindow();
 
     Zone* led = new Zone("led");
 
-    UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, 1, window, "./assets/fonts/luximr.ttf", "Zone Placeholder", 0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
+    UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, 1, window, "./assets/fonts/luximr.ttf", "Zone Placeholder", 0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER, "./assets/sprites/ui/basic_border");
     zone_name->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(zone_name);
 
-    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, 1, window, "./assets/fonts/luximr.ttf", "Objects in zone:", 0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL);
+    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, 1, window, "./assets/fonts/luximr.ttf", "Objects in zone:", 0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL, "./assets/sprites/ui/basic_border");
     object_list->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(object_list);
 
-    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, 1, window, "./assets/fonts/luximr.ttf", "All draw layers", 0.0, 12, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
+    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, 1, window, "./assets/fonts/luximr.ttf", "All draw layers", 0.0, 12, ALIGNMENT::CENTER, ALIGNMENT::CENTER, "./assets/sprites/ui/basic_border");
     layer_display->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(layer_display);
 
@@ -30,7 +30,7 @@ int buildEditor(){
     tool_selection->addSprite(0, "./assets/sprites/ui/black.png");
     led->addUIElement(tool_selection);
 
-    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, 1, window, "./assets/fonts/luximr.ttf", "Selected object attributes", 0.0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL);
+    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, 1, window, "./assets/fonts/luximr.ttf", "Selected object attributes", 0.0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL, "./assets/sprites/ui/basic_border");
     object_attr->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(object_attr);
 
