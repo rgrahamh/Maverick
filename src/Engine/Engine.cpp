@@ -57,8 +57,6 @@ Engine::Engine(){
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
 
-    //this->InitUI();
-
     this->zones = NULL;
     this->active_zones = NULL;
 
@@ -112,33 +110,13 @@ void Engine::start(){
     //Loading the level editor
     this->addThread(new std::thread(loadZone, "led", this, nullptr));
 
+    //Loading the test zone as the first area
+    this->addThread(new std::thread(loadZone, "global", this, nullptr));
+
     //Setting the reference
     camera->setReference(player);
 
     gameLoop();
-}
-
-void Engine::InitUI(){
-    ui_elements = new UIElementList;
-    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
-    pause_menu->setActive(false);
-    pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
-    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, 1, window, "./assets/fonts/luximr.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
-    pause_text->setColor(255, 255, 255);
-    pause_menu->addElement(pause_text);
-    ui_elements->element = pause_menu;
-
-    pause_menu->setVisible(false);
-    pause_menu->setActive(false);
-    ui_elements->next = nullptr;
-
-    UITextBox* text_box = new UITextBox("text_box", 0.2, 0.8, 0.6, 0.15, 1, 1, window, "./assets/fonts/luximr.ttf", "This is a text box! Here's some sample text. I think this is great and will be pretty long.");
-    text_box->setColor(255, 255, 255);
-    text_box->addSprite(0, "./assets/sprites/ui/black.png", 0, 0, 0, 0.6, 0.15);
-    UIElementList* new_element = new UIElementList;
-    new_element->element = text_box;
-    new_element->next = ui_elements;
-    ui_elements = new_element;
 }
 
 /** The primary game loop
@@ -413,11 +391,16 @@ ObjectList* Engine::drawSort(ObjectList* curr_obj){
  * @return A pointer to the object, or NULL if it can't be found
  */
 UIElement* Engine::getUIElement(const char* element_name){
-    UIElementList* element_cursor = ui_elements;
-    while(element_cursor != NULL){
-        if(element_cursor->element->getElement(element_name) != nullptr){
-            return element_cursor->element;
+    ZoneList* zone_cursor = this->active_zones;
+    while(zone_cursor != NULL){
+        UIElementList* ui_cursor = zone_cursor->zone->getUIElements();
+        while(ui_cursor != NULL && ui_cursor->element != NULL){
+            if(strcmp(ui_cursor->element->getName(), element_name) == 0){
+                return ui_cursor->element;
+            }
+            ui_cursor = ui_cursor->next;
         }
+        zone_cursor = zone_cursor->next;
     }
 
     return NULL;
@@ -431,10 +414,11 @@ Object* Engine::getObject(const char* obj_name){
     ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
         ObjectList* obj_cursor = zone_cursor->zone->getObjects();
-        while(obj_cursor != NULL){
-            if(strcmp(obj_cursor->obj->getName(), obj_name)){
+        while(obj_cursor != NULL && obj_cursor->obj != NULL){
+            if(strcmp(obj_cursor->obj->getName(), obj_name) == 0){
                 return obj_cursor->obj;
             }
+            obj_cursor = obj_cursor->next;
         }
         zone_cursor = zone_cursor->next;
     }

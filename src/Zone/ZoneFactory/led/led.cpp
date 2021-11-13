@@ -1,7 +1,7 @@
 #include "led.hpp"
 extern Engine* engine;
 
-int buildEditor(){
+void buildEditor(){
     SDL_Window* window = engine->getWindow();
 
     Zone* led = new Zone("led");
