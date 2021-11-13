@@ -12,8 +12,6 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
 /** Default destructor
  */
 UITextBox::~UITextBox(){
-    free(this->text);
-    free(subelements);
 }
 
 /** Sets the text in the textbox
