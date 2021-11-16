@@ -102,6 +102,13 @@ void Object::setYVel(float yV){
     this->yV = yV;
 }
 
+/** Sets the friction
+ * @param friction The object's friction
+ */
+void Object::setFriction(float friction){
+    this->friction = friction;
+}
+
 /** Sets the environmental bump to true
  */
 void Object::setEnvBump(){

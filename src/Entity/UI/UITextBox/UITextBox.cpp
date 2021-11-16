@@ -18,8 +18,6 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
 /** Default destructor
  */
 UITextBox::~UITextBox(){
-    free(this->text);
-    free(subelements);
 }
 
 void UITextBox::addBorders(char* border_pattern, uint8_t border_types){

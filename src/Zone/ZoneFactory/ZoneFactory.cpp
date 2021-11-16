@@ -7,4 +7,7 @@ void loadZone(const char* zone_name, Engine* engine, ObjectList* add_objects){
 	else if(strcmp(zone_name, "led") == 0){
 		buildEditor();
 	}
+	else if(strcmp(zone_name, "global") == 0){
+		buildGlobal();
+	}
 }
