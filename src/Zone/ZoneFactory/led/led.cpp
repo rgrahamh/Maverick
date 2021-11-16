@@ -10,7 +10,7 @@ void buildEditor(){
     zone_name->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(zone_name);
 
-    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, 1, window, "./assets/fonts/luximr.ttf", "Objects in zone:", 0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL, "./assets/sprites/ui/basic_border");
+    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, 1, window, "./assets/fonts/luximr.ttf", "Objects in zone:", 0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL);
     object_list->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(object_list);
 
@@ -30,7 +30,7 @@ void buildEditor(){
     tool_selection->addSprite(0, "./assets/sprites/ui/black.png");
     led->addUIElement(tool_selection);
 
-    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, 1, window, "./assets/fonts/luximr.ttf", "Selected object attributes", 0.0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL, "./assets/sprites/ui/basic_border");
+    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, 1, window, "./assets/fonts/luximr.ttf", "Selected object attributes", 0.0, 20, ALIGNMENT::NORMAL, ALIGNMENT::NORMAL);
     object_attr->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(object_attr);
 

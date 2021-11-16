@@ -15,6 +15,8 @@ Control::Control(){
         memset(&controllers[i], '\0', sizeof(ControllerState));
         memset(&old_controllers[i], '\0', sizeof(ControllerState));
     }
+
+    mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);
 }
 
 /** Default destructor for the Control object
@@ -100,6 +102,11 @@ void Control::updateKeyboard(){
     memcpy(keys, keyboard, num_elements);
 }
 
+void Control::updateMouse(){
+    old_mouse = mouse;
+    mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);
+}
+
 /** Update the controller input (happens once per game loop)
  */
 void Control::updateInput(){
@@ -108,6 +115,9 @@ void Control::updateInput(){
 
     //Update keyboard
     updateKeyboard();
+
+    //Update the mouse
+    updateMouse();
 }
 
 /** Gets the controller state last frame
@@ -138,4 +148,18 @@ const uint8_t* Control::getOldKeys() const{
  */
 const uint8_t* Control::getKeys() const{
     return keys;
+}
+
+/** Gets the mouse state last frmae
+ * @return The mouse state last frame
+ */
+const MouseState* Control::getOldMouse() const{
+    return &old_mouse;
+}
+
+/** Gets the mouse state last frmae
+ * @return The mouse state last frame
+ */
+const MouseState* Control::getMouse() const{
+    return &mouse;
 }
