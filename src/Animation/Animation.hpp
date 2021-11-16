@@ -28,9 +28,20 @@ struct Sprite{
 	double rotation;
 };
 
+typedef struct AnimationSequence{
+	Sprite* sprite;
+
+	HitboxList* hitboxes;
+	
+	unsigned int keytime;
+
+	struct AnimationSequence* next;
+} AnimationSeq;
+
 class Animation{
 	public:
 		Animation(float* x_base, float* y_base, char draw_layer = 1);
+		void freeFrame(AnimationSeq* );
 		~Animation();
 
 		void advance(uint32_t delta);
@@ -57,15 +68,6 @@ class Animation{
 
 
 	private:
-		typedef struct AnimationSequence{
-			Sprite* sprite;
-
-			HitboxList* hitboxes;
-			
-			unsigned int keytime;
-
-			struct AnimationSequence* next;
-		} AnimationSeq;
 
 		//The image sequence and start of image sequence
 		AnimationSeq* sequence;

@@ -24,25 +24,38 @@ Animation::Animation(float* x_base, float* y_base, char draw_layer){
 /** Animation destructor
  */
 Animation::~Animation(){
-	/*while(sequence_start != NULL){
-		HitboxList* hitboxes = sequence_start->hitboxes;
-		while(hitboxes != NULL){
-			if(hitboxes->hitbox != NULL){
-				delete hitboxes->hitbox;
+	if(sequence_start != nullptr){
+		AnimationSeq* cursor = sequence_start;
+		do {
+			HitboxList* hitboxes = cursor->hitboxes;
+			while(hitboxes != NULL){
+				if(hitboxes->hitbox != NULL){
+					//delete hitboxes->hitbox;
+				}
+
+				HitboxList* tmp = hitboxes;
+				hitboxes = hitboxes->next;
+				delete tmp;
 			}
 
-			HitboxList* tmp = hitboxes;
-			hitboxes = hitboxes->next;
-			delete hitboxes;
-		}
+			if(cursor->sprite != nullptr){
+				if(cursor->sprite->rect != nullptr){
+					free(cursor->sprite->rect);
+				}
 
-		delete sequence_start->sprite;
+				if(cursor->sprite->texture != nullptr){
+					SDL_DestroyTexture(cursor->sprite->texture);
+				}
 
-		AnimationSeq* tmp;
-		tmp = sequence_start;
-		sequence_start = sequence_start->next;
-		free(tmp);
-	}*/
+				delete cursor->sprite;
+			}
+
+			AnimationSeq* tmp;
+			tmp = cursor;
+			cursor = cursor->next;
+			free(tmp);
+		} while(cursor != sequence_start);
+	}
 }
 
 /** Gets the current sprite

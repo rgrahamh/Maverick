@@ -105,13 +105,16 @@ void Engine::start(){
     new_objs->next = NULL;
 
     //Loading the test zone as the first area
-    this->addThread(new std::thread(loadZone, "Test Zone", this, new_objs));
+    //this->addThread(new std::thread(loadZone, "Test Zone", this, new_objs));
+    loadZone("Test Zone", this, new_objs);
 
     //Loading the level editor
-    this->addThread(new std::thread(loadZone, "led", this, nullptr));
+    //this->addThread(new std::thread(loadZone, "led", this, nullptr));
+    loadZone("led", this, nullptr);
 
     //Loading the test zone as the first area
-    this->addThread(new std::thread(loadZone, "global", this, nullptr));
+    //this->addThread(new std::thread(loadZone, "global", this, nullptr));
+    loadZone("global", this, nullptr);
 
     //Setting the reference
     camera->setReference(player);
@@ -127,6 +130,7 @@ void Engine::gameLoop(){
 
 	while(!exit_game){
         EntityList* all_entities = buildFullEntityList();
+        delta = SDL_GetTicks();
 
         if(all_entities != nullptr){
             //Cleanup threads every second
@@ -200,12 +204,6 @@ void Engine::physicsStep(ObjectList* all_objects){
             all_objects = all_objects->next;
         }
     }
-
-    UIElementList* cursor = ui_elements;
-    while(cursor != NULL){
-        cursor->element->_process(this->delta);
-        cursor = cursor->next;
-    }
 }
 
 /** The collision step of the game engine
@@ -262,11 +260,13 @@ void Engine::collisionStep(ObjectList* all_objects){
                     break;
             }
             
-            //CHANGE THESE BACK TO VARIABLE WITH WINDOW SIZE
-            int win_width = 1920;
-            int win_height = 1080;
-            int x_iter = win_width / 16;
-            int y_iter = win_height / 9;
+            //The number of blocks in x & y directions
+            const int x_block = 16, y_block = 9;
+
+            int win_width, win_height;
+            SDL_GetWindowSize(this->window, &win_width, &win_height);
+            int x_iter = win_width / x_block;
+            int y_iter = win_height / y_block;
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most

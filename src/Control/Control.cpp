@@ -11,6 +11,9 @@ Control::Control(){
         if(SDL_IsGameController(i)){
             controller_objs[i] = SDL_GameControllerOpen(i);
         }
+        else{
+            controller_objs[i] = nullptr;
+        }
 
         memset(&controllers[i], '\0', sizeof(ControllerState));
         memset(&old_controllers[i], '\0', sizeof(ControllerState));

@@ -84,11 +84,11 @@ enum CHARACTER_ANIMATION{
 };
 
 enum CONTROL_TYPE{
+	NONE = 0,
 	KEYBOARD = 1,
 	GAMEPAD = 2,
 	AI = 4,
-	NETWORK = 8,
-	NONE = 16
+	NETWORK = 8
 };
 
 class Character : public Object, public Race, public Style{
