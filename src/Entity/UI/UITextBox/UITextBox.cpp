@@ -4,13 +4,26 @@ extern TextureHash* texture_hash;
 
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed,
-                     int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types)
+                     int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types, int border_buff)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT_BOX, window){
-    this->text = new UIText(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window, font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);
+    int window_width, window_height;
+    SDL_GetWindowSize(window, &window_width, &window_height);
+
+    double text_view_x_offset = ((view_x_offset * window_width) + border_buff) / window_width;
+    double text_view_y_offset = ((view_y_offset * window_height) + border_buff) / window_height;
+
+    double text_view_width = ((view_width * window_width) - (border_buff * 2)) / window_width;
+    double text_view_height = ((view_height * window_height) - (border_buff * 2)) / window_height;
+
+    this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height,
+                            animation_num, draw_layer, window, font_path, text, scroll_speed,
+                            point, text_x_alignment, text_y_alignment);
 
     this->subelements = new UIElementList;
     this->subelements->element = this->text;
     this->subelements->next = nullptr;
+
+    memset(this->borders, '\0', sizeof(UIElement*) * 4);
 
     addBorders(border_pattern, border_types);
 }
@@ -18,6 +31,11 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
 /** Default destructor
  */
 UITextBox::~UITextBox(){
+    for(int i = 0; i < 4; i++){
+        if(borders[i] != nullptr){
+            delete borders[i];
+        }
+    }
 }
 
 void UITextBox::addBorders(char* border_pattern, uint8_t border_types){
@@ -73,11 +91,11 @@ void UITextBox::addBorders(char* border_pattern, uint8_t border_types){
                         }
                     }
 
-                    UIElement* new_element = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                          border_width / (double)win_width, border_height / (double)win_height, 1, this->getDrawLayer() + 1,
-                                                          UI_OBJECT_TYPE::GENERIC, this->window);
-                    new_element->addSprite(0, sprite_path);
-                    this->addElement(new_element);
+                    //Draw layer doesn't matter here because we're drawing them manually w/ the text box
+                    this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
+                                                     border_width / (double)win_width, border_height / (double)win_height, 1, 1,
+                                                     UI_OBJECT_TYPE::GENERIC, this->window);
+                    this->borders[i]->addSprite(0, sprite_path);
                 }
             }
         }
@@ -134,4 +152,29 @@ void UITextBox::setXAlignment(ALIGNMENT x_alignment){
  */
 void UITextBox::setYAlignment(ALIGNMENT y_alignment){
     this->text->setYAlignment(y_alignment);
+}
+
+
+/** Draws this UITextBox
+ * @param renderer The SDL_Renderer we're drawing to
+ * @param delta The time passed since last draw (in ms)
+ * @param camera_x The X location of the camera
+ * @param camera_y The Y location of the camera
+ */
+void UITextBox::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+    //Draw the textbox background
+    this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
+
+    //Draw the text
+    if(this->text != nullptr){
+        this->text->draw(renderer, delta, camera_x, camera_y);
+    }
+
+    //Draw the borders
+    for(int i = 0; i < 4; i++){
+        if(this->borders[i] != nullptr){
+            this->borders[i]->draw(renderer, delta, camera_x, camera_y);
+        }
+    }
+
 }

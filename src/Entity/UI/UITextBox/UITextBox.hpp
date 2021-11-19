@@ -7,7 +7,8 @@ enum BORDER_TYPE{
     TOP_BORDER = 1,
     BOTTOM_BORDER = 2,
     LEFT_BORDER = 4,
-    RIGHT_BORDER = 8
+    RIGHT_BORDER = 8,
+    ALL_BORDERS = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER
 };
 
 class UITextBox : public UIElement{
@@ -16,7 +17,8 @@ class UITextBox : public UIElement{
                   unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text = "",
                   float scroll_speed = 0.0, int point = 24,
                   ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER,
-                  char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
+                  char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER,
+                  int border_buffer = 0);
         ~UITextBox();
 
         void addBorders(char* border_pattern, uint8_t border_types);
@@ -28,8 +30,11 @@ class UITextBox : public UIElement{
         void setXAlignment(ALIGNMENT x_alignment);
         void setYAlignment(ALIGNMENT y_alignment);
 
+        virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+
     private:
         UIText* text;
+        UIElement* borders[4];
 
 };
 

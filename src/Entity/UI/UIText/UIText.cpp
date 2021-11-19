@@ -93,7 +93,6 @@ void UIText::setText(const char* text){
  */
 void UIText::setFont(const char* font_path){
     if(font_path != nullptr){
-        this->setStyle(TTF_STYLE_NORMAL);
         if(this->font != nullptr){
             TTF_CloseFont(this->font);
         }
@@ -102,7 +101,10 @@ void UIText::setFont(const char* font_path){
         this->font = TTF_OpenFont(font_path, point);
         if(font == nullptr){
             fprintf(stderr, "Could not open texture: %s\n", TTF_GetError());
+            return;
         }
+
+        this->setStyle(TTF_STYLE_NORMAL);
     }
     else{
         fprintf(stderr, "Failed to set font; font_path is null!\n");

@@ -106,7 +106,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
     }
 }
 
-/** Draws this UIElement and all children UIElements
+/** Draws this UIElement
  * @param renderer The SDL_Renderer we're drawing to
  * @param delta The time passed since last draw (in ms)
  * @param camera_x The X location of the camera

@@ -22,9 +22,11 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
     this->visible = true;
     this->active_animation = 0;
     this->animation_num = animation_num;
-    this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
-    for(unsigned int i = 0; i < animation_num; i++){
-        animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
+    if(animation_num > 0){
+        this->animations = (Animation**)malloc(sizeof(Animation*) * animation_num);
+        for(unsigned int i = 0; i < animation_num; i++){
+            animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
+        }
     }
 
     //Initializing attributes
