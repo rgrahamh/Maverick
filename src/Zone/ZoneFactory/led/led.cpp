@@ -34,6 +34,9 @@ void buildEditor(){
     object_attr->addSprite(0, "./assets/sprites/ui/blue_box_small.png");
     led->addUIElement(object_attr);
 
+    UIScreenBlit* mini_display = new UIScreenBlit("mini_display", 0.8, 0.0, 0.2, 0.2, 0, 1, window);
+    led->addUIElement(mini_display);
+
     engine->addZone(led);
     engine->activateZone("led");
 }

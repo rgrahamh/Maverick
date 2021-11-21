@@ -1,6 +1,6 @@
 #include "UIElement.hpp"
+#include "../../Engine/Engine.hpp"
 
-class Engine;
 extern Engine* engine;
 
 /** UIElement constructor (for viewport calcs, 1.0 is one screen width/height)
@@ -25,7 +25,7 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->window = window;
 
     int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     this->x = view_x_offset * win_width;
     this->y = view_y_offset * win_height;

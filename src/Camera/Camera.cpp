@@ -34,7 +34,7 @@ void Camera::recenter(){
     } 
 
     int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     float obj_x = reference->getX() + (reference->getWidth() / 2) - (win_width / 2);
     float obj_y = reference->getY() + (reference->getHeight() / 2) - (win_height / 2);

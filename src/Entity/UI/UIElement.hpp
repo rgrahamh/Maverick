@@ -11,6 +11,7 @@ enum UI_OBJECT_TYPE{
     TEXT_BOX,
     SELECTOR,
     BOX,
+    SCREEN_BLIT,
     RADIAL
 };
 

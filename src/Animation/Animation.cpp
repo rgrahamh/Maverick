@@ -8,7 +8,7 @@ extern Engine* engine;
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(float* x_base, float* y_base, char draw_layer){
+Animation::Animation(float* x_base, float* y_base){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -17,7 +17,6 @@ Animation::Animation(float* x_base, float* y_base, char draw_layer){
 	this->x_scale = 1.0;
 	this->y_scale = 1.0;
 	this->time_counter = 0;
-	this->draw_layer = draw_layer;
 	this->paused = false;
 }
 
@@ -80,13 +79,6 @@ HitboxList* Animation::getHitboxes(){
 	else{
 		return nullptr;
 	}
-}
-
-/** Gets the current draw layer
- * @return The current draw layer
- */
-unsigned char Animation::getDrawLayer(){
-	return this->draw_layer;
 }
 
 /** Gets the draw axis

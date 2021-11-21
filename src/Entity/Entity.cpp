@@ -17,6 +17,8 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
     this->x = start_x;
     this->y = start_y;
 
+    this->draw_layer = draw_layer;
+
     //Initializing animation/visibility attributes
     this->active = true;
     this->visible = true;
@@ -25,7 +27,7 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
     if(animation_num > 0){
         this->animations = (Animation**)malloc(sizeof(Animation*) * animation_num);
         for(unsigned int i = 0; i < animation_num; i++){
-            animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
+            animations[i] = new Animation(&(this->x), &(this->y));
         }
     }
 
@@ -81,15 +83,15 @@ float Entity::getHeight(){
 /** Gets the draw layer of the object
  * @return The draw layer of the object
  */
-unsigned int Entity::getDrawLayer(){
-    return this->animations[active_animation]->getDrawLayer();
+int Entity::getDrawLayer(){
+    return this->draw_layer;
 }
 
 /** Gets the draw axis of the object
  * @return The draw axis of the object
  */
 float Entity::getDrawAxis(){
-    return this->animations[active_animation]->getDrawAxis();
+    return (this->animation_num == 0)? 0 : this->animations[active_animation]->getDrawAxis();
 }
 
 /** Gets the hitboxes of the current animation state

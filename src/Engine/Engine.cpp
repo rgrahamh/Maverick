@@ -34,8 +34,11 @@ Engine::Engine(){
     //Initialization of control system
     control = new Control();
 
+    int win_x = 1920;
+    int win_y = 1080;
+
     //Initialization of window and camera
-	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win_x, win_y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
         fflush(stdout);
@@ -45,7 +48,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -53,6 +56,10 @@ Engine::Engine(){
     }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
+
+    //Set up the screenshot blit surface
+    this->screen_blit_surface = SDL_CreateRGBSurface(0, win_x, win_y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    this->screen_blit_texture = nullptr;
 
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
@@ -347,10 +354,21 @@ void Engine::drawStep(EntityList* all_entities){
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
+
+    //Comment out for production builds (seems to have poor performance implications)
+    if(SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, this->screen_blit_surface->pixels, this->screen_blit_surface->pitch) == 0){
+        this->screen_blit_texture = SDL_CreateTextureFromSurface(renderer, this->screen_blit_surface);
+    }
+
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw((ObjectList*)all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
+
+    if(this->screen_blit_texture != nullptr){
+        SDL_DestroyTexture(this->screen_blit_texture);
+        this->screen_blit_texture = nullptr;
+    }
 
     freeFullEntityList(all_entities);
 }
@@ -460,6 +478,13 @@ uint64_t Engine::getState(){
  */
 SDL_Window* Engine::getWindow(){
     return this->window;
+}
+
+/** Gets the texture representing all object (to be blit elsewhere on the screen)
+ * @return The texture being blit (or nullptr if the blit failed)
+ */
+SDL_Texture* Engine::getScreenBlitTexture(){
+    return this->screen_blit_texture;
 }
 
 /** Checks the state of the engine against the passed-in state(s)

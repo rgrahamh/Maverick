@@ -56,12 +56,13 @@ class Engine{
 		//Thread creation
 		void addThread(std::thread* thread);
 
-		//Gets an object
+		//Getters
 		Object* getObject(const char* name);
 		Object* getObject(const char* name, const char* zone);
 		UIElement* getUIElement(const char* name);
 		uint64_t getState();
 		SDL_Window* getWindow();
+		SDL_Texture* getScreenBlitTexture();
 
 		bool checkState(uint64_t state_condition);
 		void setState(uint64_t new_state);
@@ -106,6 +107,10 @@ class Engine{
 
 		//UI Objects
 		UIElementList* ui_elements;
+
+		//A surface you can use to blit the player's whole PoV somewhere
+		SDL_Surface* screen_blit_surface;
+		SDL_Texture* screen_blit_texture;
 
 		//Zones
 		ZoneList* zones;

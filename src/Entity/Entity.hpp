@@ -22,7 +22,7 @@ class Entity{
 		float getWidth();
 		float getHeight();
 		HitboxList* getHitboxes();
-		unsigned int getDrawLayer();
+		int getDrawLayer();
 		float getDrawAxis();
 		bool isActive();
 		bool isVisible();
@@ -81,6 +81,9 @@ class Entity{
 		//Animation
 		Animation** animations;
 		AnimationList* ignored_animations;
+
+		//Draw layer tracking
+		int draw_layer;
 };
 
 #endif

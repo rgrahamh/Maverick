@@ -9,11 +9,6 @@
  */
 Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer)
       : Entity(name, start_x, start_y, animation_num, draw_layer){
-    int name_len = strlen(name);
-    this->name = (char*)malloc(name_len + 1);
-    memcpy(this->name, name, name_len);
-    this->name[name_len] = '\0';
-    
     //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
@@ -27,19 +22,6 @@ Object::Object(const char* name, float start_x, float start_y, float friction, f
     //Initializing various physics elements
     this->friction = friction;
     this->mass = mass;
-
-    //Initializing animation/visibility attributes
-    this->active = true;
-    this->visible = true;
-    this->active_animation = 0;
-    this->animation_num = animation_num;
-    this->animations = (Animation**)calloc(sizeof(Animation*), animation_num);
-    for(unsigned int i = 0; i < animation_num; i++){
-        animations[i] = new Animation(&(this->x), &(this->y), draw_layer);
-    }
-
-    //Initializing attributes
-    this->attr = new HashTable(64);
 }
 
 /** Destructor for objects

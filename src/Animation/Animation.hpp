@@ -40,7 +40,7 @@ typedef struct AnimationSequence{
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, char draw_layer = 1);
+		Animation(float* x_base, float* y_base);
 		void freeFrame(AnimationSeq* );
 		~Animation();
 
@@ -73,9 +73,6 @@ class Animation{
 		AnimationSeq* sequence;
 		AnimationSeq* sequence_end;
 		AnimationSeq* sequence_start;
-
-		//The draw layer
-		char draw_layer;
 
 		//Pointers to the X and Y base coords
 		float* x_base;
