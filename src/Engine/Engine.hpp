@@ -64,11 +64,14 @@ class Engine{
 		SDL_Window* getWindow();
 		SDL_Texture* getScreenBlitTexture();
 
+		//State handling
 		bool checkState(uint64_t state_condition);
 		void setState(uint64_t new_state);
 
+		//Zone handling
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
+		void unloadZone(const char* zone_name);
 
 	private:
 		void gameLoop();

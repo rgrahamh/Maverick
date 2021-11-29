@@ -721,13 +721,13 @@ void Engine::addZone(Zone* zone){
  */
 void Engine::activateZone(const char* zone_name){
     //If it's the first zone
-    if(strcmp(this->zones->zone->getName(), zone_name) == 0){
+    if(this->zones != nullptr && strcmp(this->zones->zone->getName(), zone_name) == 0){
         ZoneList* moved_zone = this->zones;
         zones = this->zones->next;
         moved_zone->next = this->active_zones;
         this->active_zones = moved_zone;
     }
-    else{
+    else if(this->zones != nullptr){
         ZoneList* zone_lst = this->zones;
         //If it's anything after the first zone
         while(zone_lst->next != NULL){
@@ -747,13 +747,13 @@ void Engine::activateZone(const char* zone_name){
 void Engine::deactivateZone(const char* zone_name){
     //If it's the first zone
     if(zone_name != NULL){
-        if(strcmp(this->active_zones->zone->getName(), zone_name) == 0){
+        if(this->zones != nullptr && strcmp(this->active_zones->zone->getName(), zone_name) == 0){
             ZoneList* moved_zone = this->active_zones;
             active_zones = this->active_zones->next;
             moved_zone->next = this->zones;
             this->zones = moved_zone;
         }
-        else{
+        else if(this->zones != nullptr){
             //If it's anything after the first zone
             ZoneList* zone_lst = this->active_zones;
             while(zone_lst->next != NULL){
@@ -763,6 +763,31 @@ void Engine::deactivateZone(const char* zone_name){
                     moved_zone->next = this->zones;
                     this->zones = moved_zone;
                 }
+            }
+        }
+    }
+}
+
+/** Unloads a zone from memory
+ * @param zone_name The name of the zone you wish to unload
+ */
+void Engine::unloadZone(const char* zone_name){
+    //If it's the first zone
+    if(this->zones != nullptr && strcmp(this->zones->zone->getName(), zone_name) == 0){
+        ZoneList* unloaded_zone = this->zones;
+        zones = this->zones->next;
+        delete unloaded_zone->zone;
+        delete unloaded_zone;
+    }
+    else if(this->zones != nullptr){
+        ZoneList* zone_lst = this->zones;
+        //If it's anything after the first zone
+        while(zone_lst->next != NULL){
+            if(strcmp(zone_lst->next->zone->getName(), zone_name) == 0){
+                ZoneList* unloaded_zone = zone_lst->next;
+                zone_lst->next = unloaded_zone->next;
+                delete unloaded_zone->zone;
+                delete unloaded_zone;
             }
         }
     }
