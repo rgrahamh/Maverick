@@ -68,6 +68,14 @@ class Engine{
 		bool checkState(uint64_t state_condition);
 		void setState(uint64_t new_state);
 
+		//Global scale getters
+		float getGlobalXScale();
+		float getGlobalYScale();
+
+		//Global scale setters
+		void setGlobalXScale(float x_scale);
+		void setGlobalYScale(float y_scale);
+
 		//Zone handling
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
@@ -95,8 +103,8 @@ class Engine{
 		void threadCleanup();
 
 		//Object list building/destruction
-		EntityList* buildFullEntityList();
-		void freeFullEntityList(EntityList* all_entities);
+		void buildFullEntityList();
+		void freeFullEntityList();
 
 		//Saving logic
 		void saveGame();
@@ -131,6 +139,13 @@ class Engine{
 
 		//State tracking
 		uint64_t state;
+
+		//Engine entities
+		EntityList entities;
+
+		//Scale
+		float global_x_scale;
+		float global_y_scale;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;

@@ -64,11 +64,18 @@ Engine::Engine(){
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
 
+    //Set global scales
+    this->global_x_scale = 1.0;
+    this->global_y_scale = 1.0;
+
     this->zones = NULL;
     this->active_zones = NULL;
 
     //Set to the title screen
     this->state = GAME_STATE::OVERWORLD;
+
+    this->entities.obj = (ObjectList*)calloc(1, sizeof(ObjectList));
+    this->entities.ui = (UIElementList*)calloc(1, sizeof(UIElementList));
 
     this->threads = NULL;
 
@@ -100,6 +107,8 @@ Engine::~Engine(){
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+
+    freeFullEntityList();
 }
 
 /** The function that is called to start the game engine's operation
@@ -136,27 +145,25 @@ void Engine::gameLoop(){
     SDL_AddEventWatch(event_listener, &exit_game);
 
 	while(!exit_game){
-        EntityList* all_entities = buildFullEntityList();
+        buildFullEntityList();
         delta = SDL_GetTicks();
 
-        if(all_entities != nullptr){
-            //Cleanup threads every second
-            if(this->delta % 1000 == 0){
-                this->threadCleanup();
-            }
-
-            delta = SDL_GetTicks() - last_time;
-            last_time = SDL_GetTicks();
-
-            this->actionStep(all_entities);
-            this->physicsStep(all_entities->obj);
-            if(this->state != GAME_STATE::PAUSE){
-                this->collisionStep(all_entities->obj);
-            }
-
-            //Different because we need to adjust the object list for draw order
-            this->drawStep(all_entities);
+        //Cleanup threads every second
+        if(this->delta % 1000 == 0){
+            this->threadCleanup();
         }
+
+        delta = SDL_GetTicks() - last_time;
+        last_time = SDL_GetTicks();
+
+        this->actionStep(&this->entities);
+        this->physicsStep(this->entities.obj);
+        if(this->state != GAME_STATE::PAUSE){
+            this->collisionStep(this->entities.obj);
+        }
+
+        //Different because we need to adjust the object list for draw order
+        this->drawStep(&this->entities);
 	}
 }
 
@@ -351,14 +358,18 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
+    SDL_RenderSetScale(renderer, global_x_scale, global_y_scale);
+
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
 
     //Comment out for production builds (seems to have poor performance implications)
-    if(SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, this->screen_blit_surface->pixels, this->screen_blit_surface->pitch) == 0){
+    /*if(SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, this->screen_blit_surface->pixels, this->screen_blit_surface->pitch) == 0){
         this->screen_blit_texture = SDL_CreateTextureFromSurface(renderer, this->screen_blit_surface);
-    }
+    }*/
+
+    SDL_RenderSetScale(renderer, 1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw((ObjectList*)all_entities->ui, this->delta);
@@ -369,8 +380,6 @@ void Engine::drawStep(EntityList* all_entities){
         SDL_DestroyTexture(this->screen_blit_texture);
         this->screen_blit_texture = nullptr;
     }
-
-    freeFullEntityList(all_entities);
 }
 
 /** Recursively sorts the objects in the order of draw
@@ -502,6 +511,34 @@ void Engine::setState(uint64_t state){
     this->state = state;
 }
 
+/** Sets the global X scale of the engine
+ * @param x_scale The global X scale of the engine
+ */
+void Engine::setGlobalXScale(float x_scale){
+    this->global_x_scale = x_scale;
+}
+
+/** Sets the global Y scale of the engine
+ * @param y_scale The global Y scale of the engine
+ */
+void Engine::setGlobalYScale(float y_scale){
+    this->global_y_scale = y_scale;
+}
+
+/** Returns the global X scale of the engine
+ * @return The global X scale of the engine
+ */
+float Engine::getGlobalXScale(){
+    return this->global_x_scale;
+}
+
+/** Returns the global Y scale of the engine
+ * @return The global Y scale of the engine
+ */
+float Engine::getGlobalYScale(){
+    return this->global_y_scale;
+}
+
 /** Goes through all active threads and cleans them up
  */
 void Engine::threadCleanup(){
@@ -607,78 +644,78 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 /** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
  * @return A full list of all active objects in the engine
  */
-EntityList* Engine::buildFullEntityList(){
-    ObjectList* all_objects = new ObjectList;
-    all_objects->obj = NULL;
-    all_objects->next = NULL;
-    ObjectList* obj_iter = all_objects;
+void Engine::buildFullEntityList(){
+    ObjectList* obj_iter = this->entities.obj;
+    ObjectList* obj_iter_delayed = obj_iter;
+    UIElementList* ui_iter = this->entities.ui;
+    UIElementList* ui_iter_delayed = ui_iter;
 
-    UIElementList* all_ui = new UIElementList;
-    all_ui->element = NULL;
-    all_ui->next = NULL;
-    UIElementList* ui_iter = all_ui;
-
-    bool obj_init = true;
-    bool ui_init = true;
     ZoneList* zone_iter = this->active_zones;
+    //For each zone
     while(zone_iter != NULL){
+        //For each object in the zone
         ObjectList* new_objects = zone_iter->zone->getObjects();
         while(new_objects != NULL && new_objects->obj != NULL){
-            //We have to do this for every entry except for the first
-            if(obj_init == false){
-                obj_iter->next = new ObjectList;
-                obj_iter = obj_iter->next;
-                obj_iter->next = NULL;
-            }
+            //Set the object
             obj_iter->obj = new_objects->obj;
-            new_objects = new_objects->next;
 
-            obj_init = false;
+            //If there's not a next object in the current list and no more new objects
+            if(obj_iter->next == nullptr){
+                obj_iter->next = new ObjectList;
+                obj_iter->next->obj = nullptr;
+            }
+
+            obj_iter_delayed = obj_iter;
+            obj_iter = obj_iter->next;
+            new_objects = new_objects->next;
         }
 
+        //For each UI element in the zone
         UIElementList* new_elements = zone_iter->zone->getUIElements();
         while(new_elements != NULL && new_elements->element != NULL){
-            //We have to do this for every entry except for the first
-            if(ui_init == false){
-                ui_iter->next = new UIElementList;
-                ui_iter = ui_iter->next;
-                ui_iter->next = NULL;
-            }
             ui_iter->element = new_elements->element;
-            new_elements = new_elements->next;
 
-            ui_init = false;
+            //We have to do this for every entry except for the first
+            if(ui_iter->next == nullptr){
+                ui_iter->next = new UIElementList;
+                ui_iter->next->element = nullptr;
+            }
+
+            ui_iter_delayed = ui_iter;
+            ui_iter = ui_iter->next;
+            new_elements = new_elements->next;
         }
 
         zone_iter = zone_iter->next;
     }
 
-    if(all_objects->obj == NULL){
-        delete all_objects;
-        all_objects = nullptr;
+    //Clean up all hanging nodes (this can happen if there are less objects this frame than the last)
+    if(obj_iter != this->entities.obj){
+        while(obj_iter != nullptr){
+            ObjectList* tmp = obj_iter;
+            obj_iter = obj_iter->next;
+            delete tmp;
+        }
     }
+    obj_iter_delayed->next = nullptr;
 
-    if(all_ui->element == NULL){
-        delete all_ui;
-        all_ui = nullptr;
+    if(ui_iter != this->entities.ui){
+        while(ui_iter != nullptr){
+            UIElementList* tmp = ui_iter;
+            ui_iter = ui_iter->next;
+            delete tmp;
+        }
     }
+    ui_iter_delayed->next = nullptr;
 
-    if(all_objects == NULL && all_ui == NULL){
-        return NULL;
-    }
-
-    EntityList* all_entities = new EntityList;
-    all_entities->obj = all_objects;
-    all_entities->ui = all_ui;
-    return all_entities;
 }
 
 /** Frees the full list of objects generated for each step
  * @param all_objects The full list of objects
  */
-void Engine::freeFullEntityList(EntityList* all_entities){
+void Engine::freeFullEntityList(){
     ObjectList* free_objects;
-    ObjectList* all_objects = all_entities->obj;
+    ObjectList* all_objects = this->entities.obj;
     while(all_objects != NULL){
         free_objects = all_objects->next;
         delete all_objects;
@@ -686,14 +723,12 @@ void Engine::freeFullEntityList(EntityList* all_entities){
     }
 
     UIElementList* free_ui;
-    UIElementList* all_ui = all_entities->ui;
+    UIElementList* all_ui = this->entities.ui;
     while(all_ui != NULL){
         free_ui = all_ui->next;
         delete all_ui;
         all_ui = free_ui;
     }
-
-    delete all_entities;
 }
 
 /** Adds a new thread to the engine (to get cleaned up once the thread's execution halts)
