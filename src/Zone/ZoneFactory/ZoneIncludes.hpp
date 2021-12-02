@@ -4,5 +4,6 @@
 #include "../../Entity/Object/Object.hpp"
 #include "../../Engine/Engine.hpp"
 #include "../Zone.hpp"
+#include "../../Factory/Factory.hpp"
 
 #endif

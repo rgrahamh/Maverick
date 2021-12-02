@@ -2,12 +2,11 @@
 #define CAMERA_HPP
 
 #include "../Entity/Object/Object.hpp"
+#include "../Entity/UI/UIElement.hpp"
 
 #include <SDL2/SDL.h>
 
-#define MIN_DRAW_LAYER -3
-#define MAX_DRAW_LAYER 3
-#define FOLLOW_RATE 0.08
+#define FOLLOW_RATE 0.04
 
 class Camera{
 	public:
@@ -16,12 +15,13 @@ class Camera{
 
 		void setReference(Object* reference);
 		void _draw(ObjectList* obj_lst, uint32_t delta);
+		void _draw(UIElementList* element_lst, uint32_t delta);
 		SDL_Renderer* getRenderer();
 
 	private:
 		Object* reference;
-		int current_x;
-		int current_y;
+	    float current_x;
+		float current_y;
 
 		SDL_Renderer* renderer;
 		SDL_Window* window;

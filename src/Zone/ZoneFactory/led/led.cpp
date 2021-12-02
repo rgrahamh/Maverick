@@ -37,6 +37,8 @@ void buildEditor(){
     UIScreenBlit* mini_display = new UIScreenBlit("mini_display", 0.8, 0.0, 0.2, 0.2, 0, 1, window);
     led->addUIElement(mini_display);
 
+    //Add a level area section
+
     engine->addZone(led);
     engine->activateZone("led");
 }

@@ -56,6 +56,20 @@ void Camera::_draw(ObjectList* obj_lst, uint32_t delta){
     }
 }
 
+/** Draws all UI elements in the given UI element list
+ * @param obj_lst The UI element list that you wish to draw
+ */
+void Camera::_draw(UIElementList* element_lst, uint32_t delta){
+    recenter();
+
+    while(element_lst != NULL){
+        if(element_lst->element->isVisible()){
+            element_lst->element->_draw(renderer, delta, 0, 0);
+        }
+        element_lst = element_lst->next;
+    }
+}
+
 SDL_Renderer* Camera::getRenderer(){
     return renderer;
 }

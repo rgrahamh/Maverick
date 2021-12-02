@@ -48,7 +48,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -114,15 +114,10 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
-    //Create the player
-    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
-    ObjectList* new_objs = new ObjectList;
-    new_objs->obj = player;
-    new_objs->next = NULL;
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "Test Zone", this, new_objs));
-    loadZone("Test Zone", this, new_objs);
+    loadZone("Test Zone", this, nullptr);
 
     //Loading the level editor
     //this->addThread(new std::thread(loadZone, "led", this, nullptr));
@@ -131,9 +126,6 @@ void Engine::start(){
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global", this, nullptr));
     loadZone("global", this, nullptr);
-
-    //Setting the reference
-    camera->setReference(player);
 
     gameLoop();
 }
@@ -372,7 +364,7 @@ void Engine::drawStep(EntityList* all_entities){
     SDL_RenderSetScale(renderer, 1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
-    this->camera->_draw((ObjectList*)all_entities->ui, this->delta);
+    this->camera->_draw(all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
 
@@ -480,6 +472,13 @@ Object* Engine::getObject(const char* obj_name, const char* zone_name){
  */
 uint64_t Engine::getState(){
     return this->state;
+}
+
+/** Gets the camera engine's camera
+ * @return The engine's camera
+ */
+Camera* Engine::getCamera(){
+    return this->camera;
 }
 
 /** Gets the window the engine is using
@@ -662,6 +661,7 @@ void Engine::buildFullEntityList(){
             //If there's not a next object in the current list and no more new objects
             if(obj_iter->next == nullptr){
                 obj_iter->next = new ObjectList;
+                obj_iter->next->next = nullptr;
                 obj_iter->next->obj = nullptr;
             }
 
@@ -678,6 +678,7 @@ void Engine::buildFullEntityList(){
             //We have to do this for every entry except for the first
             if(ui_iter->next == nullptr){
                 ui_iter->next = new UIElementList;
+                ui_iter->next->next = nullptr;
                 ui_iter->next->element = nullptr;
             }
 

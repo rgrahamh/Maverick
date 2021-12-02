@@ -311,7 +311,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void Animation::draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -336,14 +336,18 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 
+	SDL_Rect draw_rect = *curr_rect;
+	draw_rect.x -= camera_x;
+	draw_rect.y -= camera_y;
+
 	//Draw the sprite
 	if(sprite->rotation){
-		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, sprite->rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
+		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, &draw_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
 			printf(SDL_GetError());
 		}
 	}
 	else{
-		if(SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect)){
+		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
 			printf(SDL_GetError());
 		}
 	}

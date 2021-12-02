@@ -72,6 +72,8 @@ class Engine{
 		float getGlobalXScale();
 		float getGlobalYScale();
 
+		Camera* getCamera();
+
 		//Global scale setters
 		void setGlobalXScale(float x_scale);
 		void setGlobalYScale(float y_scale);
