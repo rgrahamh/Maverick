@@ -1,6 +1,6 @@
 #include "UIElement.hpp"
+#include "../../Engine/Engine.hpp"
 
-class Engine;
 extern Engine* engine;
 
 /** UIElement constructor (for viewport calcs, 1.0 is one screen width/height)
@@ -14,7 +14,8 @@ extern Engine* engine;
  * @param obj_type The object type (a UI_OBJECT_TYPE)
  * @param window The current window (used for viewport calculation)
  */
-UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
+                     unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
         :  Entity(name, 0, 0, animation_num, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
@@ -24,7 +25,7 @@ UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset,
     this->window = window;
 
     int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     this->x = view_x_offset * win_width;
     this->y = view_y_offset * win_height;
@@ -41,14 +42,14 @@ UIElement::UIElement(const char* name, float view_x_offset, float view_y_offset,
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    UIElementList* cursor = subelements;
+    /*UIElementList* cursor = subelements;
     while(cursor != nullptr){
         UIElementList* tmp = cursor;
         delete cursor->element;
 
         cursor = cursor->next;
         delete tmp;
-    }
+    }*/
 }
 
 void UIElement::process(uint32_t delta){
@@ -105,7 +106,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
     }
 }
 
-/** Draws this UIElement and all children UIElements
+/** Draws this UIElement
  * @param renderer The SDL_Renderer we're drawing to
  * @param delta The time passed since last draw (in ms)
  * @param camera_x The X location of the camera
@@ -144,7 +145,7 @@ void UIElement::setScale(float x_scale, float y_scale){
  * @param width The width
  * @param height The height
  */
-void UIElement::setViewSize(float view_width, float view_height){
+void UIElement::setViewSize(double view_width, double view_height){
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
@@ -198,8 +199,8 @@ void UIElement::setVisible(bool visible){
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
- * @param width The view width of the sprite (default if -1)
- * @param height The view height of the sprite (default if -1)
+ * @param width The view width of the sprite (scales to element if -1)
+ * @param height The view height of the sprite (scales to element if -1)
  */ 
 void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
     int win_width, win_height;
@@ -208,8 +209,14 @@ void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, u
     if(width != -1){
         width *= (float)win_width;
     }
+    else{
+        width = this->draw_area.w;
+    }
     if(height != -1){
         height *= (float)win_height;
+    }
+    else{
+        height = this->draw_area.h;
     }
     this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }

@@ -34,7 +34,7 @@ void Camera::recenter(){
     } 
 
     int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     float obj_x = reference->getX() + (reference->getWidth() / 2) - (win_width / 2);
     float obj_y = reference->getY() + (reference->getHeight() / 2) - (win_height / 2);
@@ -53,6 +53,20 @@ void Camera::_draw(ObjectList* obj_lst, uint32_t delta){
             obj_lst->obj->_draw(renderer, delta, current_x, current_y);
         }
         obj_lst = obj_lst->next;
+    }
+}
+
+/** Draws all UI elements in the given UI element list
+ * @param obj_lst The UI element list that you wish to draw
+ */
+void Camera::_draw(UIElementList* element_lst, uint32_t delta){
+    recenter();
+
+    while(element_lst != NULL){
+        if(element_lst->element->isVisible()){
+            element_lst->element->_draw(renderer, delta, 0, 0);
+        }
+        element_lst = element_lst->next;
     }
 }
 

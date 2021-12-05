@@ -28,9 +28,20 @@ struct Sprite{
 	double rotation;
 };
 
+typedef struct AnimationSequence{
+	Sprite* sprite;
+
+	HitboxList* hitboxes;
+	
+	unsigned int keytime;
+
+	struct AnimationSequence* next;
+} AnimationSeq;
+
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base, char draw_layer = 1);
+		Animation(float* x_base, float* y_base);
+		void freeFrame(AnimationSeq* );
 		~Animation();
 
 		void advance(uint32_t delta);
@@ -51,29 +62,17 @@ class Animation{
 		void addHitbox(Hitbox* hitbox);
 		void addHitbox(Hitbox* hitbox, int hitbox_num);
 
-		void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
 
 		void rotate(int direction, float rotation_amnt);
 
 
 	private:
-		typedef struct AnimationSequence{
-			Sprite* sprite;
-
-			HitboxList* hitboxes;
-			
-			unsigned int keytime;
-
-			struct AnimationSequence* next;
-		} AnimationSeq;
 
 		//The image sequence and start of image sequence
 		AnimationSeq* sequence;
 		AnimationSeq* sequence_end;
 		AnimationSeq* sequence_start;
-
-		//The draw layer
-		char draw_layer;
 
 		//Pointers to the X and Y base coords
 		float* x_base;

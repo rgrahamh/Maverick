@@ -8,7 +8,7 @@ extern Engine* engine;
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(float* x_base, float* y_base, char draw_layer){
+Animation::Animation(float* x_base, float* y_base){
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -17,32 +17,44 @@ Animation::Animation(float* x_base, float* y_base, char draw_layer){
 	this->x_scale = 1.0;
 	this->y_scale = 1.0;
 	this->time_counter = 0;
-	this->draw_layer = draw_layer;
 	this->paused = false;
 }
 
 /** Animation destructor
  */
 Animation::~Animation(){
-	/*while(sequence_start != NULL){
-		HitboxList* hitboxes = sequence_start->hitboxes;
-		while(hitboxes != NULL){
-			if(hitboxes->hitbox != NULL){
-				delete hitboxes->hitbox;
+	if(sequence_start != nullptr){
+		AnimationSeq* cursor = sequence_start;
+		do {
+			HitboxList* hitboxes = cursor->hitboxes;
+			while(hitboxes != NULL){
+				if(hitboxes->hitbox != NULL){
+					//delete hitboxes->hitbox;
+				}
+
+				HitboxList* tmp = hitboxes;
+				hitboxes = hitboxes->next;
+				delete tmp;
 			}
 
-			HitboxList* tmp = hitboxes;
-			hitboxes = hitboxes->next;
-			delete hitboxes;
-		}
+			if(cursor->sprite != nullptr){
+				if(cursor->sprite->rect != nullptr){
+					free(cursor->sprite->rect);
+				}
 
-		delete sequence_start->sprite;
+				if(cursor->sprite->texture != nullptr){
+					SDL_DestroyTexture(cursor->sprite->texture);
+				}
 
-		AnimationSeq* tmp;
-		tmp = sequence_start;
-		sequence_start = sequence_start->next;
-		free(tmp);
-	}*/
+				delete cursor->sprite;
+			}
+
+			AnimationSeq* tmp;
+			tmp = cursor;
+			cursor = cursor->next;
+			free(tmp);
+		} while(cursor != sequence_start);
+	}
 }
 
 /** Gets the current sprite
@@ -67,13 +79,6 @@ HitboxList* Animation::getHitboxes(){
 	else{
 		return nullptr;
 	}
-}
-
-/** Gets the current draw layer
- * @return The current draw layer
- */
-unsigned char Animation::getDrawLayer(){
-	return this->draw_layer;
 }
 
 /** Gets the draw axis
@@ -306,7 +311,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void Animation::draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -331,14 +336,18 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 
+	SDL_Rect draw_rect = *curr_rect;
+	draw_rect.x -= camera_x;
+	draw_rect.y -= camera_y;
+
 	//Draw the sprite
 	if(sprite->rotation){
-		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, sprite->rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
+		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, &draw_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
 			printf(SDL_GetError());
 		}
 	}
 	else{
-		if(SDL_RenderCopy(renderer, sprite->texture, NULL, sprite->rect)){
+		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
 			printf(SDL_GetError());
 		}
 	}

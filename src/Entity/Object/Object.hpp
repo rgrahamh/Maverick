@@ -27,6 +27,7 @@ class Object : public Entity{
 		void setXVel(float xV);
 		void setYVel(float yV);
 		void setEnvBump();
+		void setFriction(float friction);
 
 		void applyForce(float xA, float yA);
 

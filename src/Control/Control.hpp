@@ -45,7 +45,14 @@ struct ControllerState{
     //Left stick axies
     float left_stick_x_axis;
     float left_stick_y_axis;
+};
 
+struct MouseState{
+    //Mouse location
+    int x;
+    int y;
+
+    uint32_t button_state;
 };
 
 class Control{
@@ -64,10 +71,14 @@ class Control{
         const uint8_t* getOldKeys() const;
         const uint8_t* getKeys() const;
 
+        const MouseState* getMouse() const;
+        const MouseState* getOldMouse() const;
+
     private:
         //Helper update functions
         int updateControllers();
         void updateKeyboard();
+        void updateMouse();
 
         //The number of connected controllers
         uint8_t num_controllers;
@@ -82,6 +93,9 @@ class Control{
         //Keyboard states for the prior & current frame
         uint8_t old_keys[512];
         uint8_t keys[512];
+
+        MouseState mouse;
+        MouseState old_mouse;
 };
 
 #endif

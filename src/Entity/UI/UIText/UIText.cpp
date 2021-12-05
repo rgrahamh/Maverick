@@ -17,8 +17,10 @@
  * @param x_alignment The horizontal alignment of the text
  * @param y_alignment The vertical alignment of the text
  */
-UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float view_width, float view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text, float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
-    : UIElement(name, view_x_offest, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT, window){
+UIText::UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
+               unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text,
+               float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT, window){
     //Setting the text's alignment
     this->x_alignment = x_alignment;
     this->y_alignment = y_alignment;
@@ -40,7 +42,8 @@ UIText::UIText(const char* name, float view_x_offest, float view_y_offset, float
     this->setFont(font_path);
     this->setPoint(point);
 
-    this->font_color = SDL_Color{0x00, 0x00, 0x00, 0xFF};
+    //Default color is white
+    this->font_color = SDL_Color{0xFF, 0xFF, 0xFF, 0xFF};
 
     this->setText(text);
 }
@@ -90,7 +93,6 @@ void UIText::setText(const char* text){
  */
 void UIText::setFont(const char* font_path){
     if(font_path != nullptr){
-        this->setStyle(TTF_STYLE_NORMAL);
         if(this->font != nullptr){
             TTF_CloseFont(this->font);
         }
@@ -99,7 +101,10 @@ void UIText::setFont(const char* font_path){
         this->font = TTF_OpenFont(font_path, point);
         if(font == nullptr){
             fprintf(stderr, "Could not open texture: %s\n", TTF_GetError());
+            return;
         }
+
+        this->setStyle(TTF_STYLE_NORMAL);
     }
     else{
         fprintf(stderr, "Failed to set font; font_path is null!\n");

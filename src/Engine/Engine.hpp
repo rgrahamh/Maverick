@@ -14,6 +14,7 @@
 #include "../Control/Control.hpp"
 
 #include "../Entity/UI/UIElement.hpp"
+#include "../Entity/Object/Object.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -32,6 +33,11 @@ struct ThreadList{
 	struct ThreadList* next;
 };
 
+struct EntityList{
+	ObjectList* obj;
+	UIElementList* ui;
+};
+
 class Engine{
 	public:
 		Engine();
@@ -43,31 +49,50 @@ class Engine{
 		//Zone addition/state handling
 		void addZone(Zone* zone);
 
-		//Gets an object
+		//Adds an object/UIElement to the engine
 		void addObject(Object* object);
 		void addUIElement(UIElement* ui);
 
+		//Thread creation
+		void addThread(std::thread* thread);
+
+		//Getters
 		Object* getObject(const char* name);
 		Object* getObject(const char* name, const char* zone);
 		UIElement* getUIElement(const char* name);
 		uint64_t getState();
-		bool checkState(uint64_t state_condition);
+		SDL_Window* getWindow();
+		SDL_Texture* getScreenBlitTexture();
 
+		//State handling
+		bool checkState(uint64_t state_condition);
 		void setState(uint64_t new_state);
 
+		//Global scale getters
+		float getGlobalXScale();
+		float getGlobalYScale();
+
+		Camera* getCamera();
+
+		//Global scale setters
+		void setGlobalXScale(float x_scale);
+		void setGlobalYScale(float y_scale);
+
+		//Zone handling
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
+		void unloadZone(const char* zone_name);
 
 	private:
 		void gameLoop();
 
 		//Engine steps
 		//Action step
-		void actionStep(ObjectList* all_objects);
+		void actionStep(EntityList* all_entities);
 		void globalAction();
 
 		//Draw step
-		void drawStep(ObjectList* all_objects);
+		void drawStep(EntityList* all_objects);
 		ObjectList* drawSort(ObjectList* all_objects);
 
 		//Collision step
@@ -80,8 +105,8 @@ class Engine{
 		void threadCleanup();
 
 		//Object list building/destruction
-		ObjectList* buildFullObjList();
-		void freeFullObjList(ObjectList* all_objects);
+		void buildFullEntityList();
+		void freeFullEntityList();
 
 		//Saving logic
 		void saveGame();
@@ -95,6 +120,10 @@ class Engine{
 
 		//UI Objects
 		UIElementList* ui_elements;
+
+		//A surface you can use to blit the player's whole PoV somewhere
+		SDL_Surface* screen_blit_surface;
+		SDL_Texture* screen_blit_texture;
 
 		//Zones
 		ZoneList* zones;
@@ -112,6 +141,13 @@ class Engine{
 
 		//State tracking
 		uint64_t state;
+
+		//Engine entities
+		EntityList entities;
+
+		//Scale
+		float global_x_scale;
+		float global_y_scale;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;
