@@ -100,7 +100,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
 
     //Draw all children elements (AFTER the parent element)
     UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
+    while(cursor != nullptr && cursor->element != nullptr){
         cursor->element->_draw(renderer, delta, camera_x, camera_y);
         cursor = cursor->next;
     }

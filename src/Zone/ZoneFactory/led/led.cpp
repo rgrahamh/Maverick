@@ -19,7 +19,8 @@ void buildEditor(){
     led->addUIElement(layer_display);
 
     for(int i = 0; i < 10; i++){
-        //HOTBAR GENERATION; NEEDS SOME SORT OF FRAME FOR DISPLAYING OBJECTS
+        UIObjectFrame* status_bar = new UIObjectFrame("status_bar", 0.1 + (i * 0.07), 0.925, 0.07, 0.045, 1, 1, window, nullptr);
+        led->addUIElement(status_bar);
     }
 
     UITextBox* status_bar = new UITextBox("status_bar", 0.1, 0.97, 0.7, 0.03, 1, 1, window, "./assets/fonts/luximr.ttf", "Ready", 0.0, 12);

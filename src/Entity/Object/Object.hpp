@@ -23,6 +23,7 @@ class Object : public Entity{
 		float getYVel();
 		float getMass();
 		bool getEnvBump();
+		Sprite* getSprite();
 		
 		void setXVel(float xV);
 		void setYVel(float yV);

@@ -19,9 +19,7 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
                             animation_num, draw_layer, window, font_path, text, scroll_speed,
                             point, text_x_alignment, text_y_alignment);
 
-    this->subelements = new UIElementList;
-    this->subelements->element = this->text;
-    this->subelements->next = nullptr;
+    this->subelements = nullptr;
 
     memset(this->borders, '\0', sizeof(UIElement*) * 4);
 
@@ -32,10 +30,12 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
  */
 UITextBox::~UITextBox(){
     for(int i = 0; i < 4; i++){
-        if(borders[i] != nullptr){
-            delete borders[i];
+        if(this->borders[i] != nullptr){
+            delete this->borders[i];
         }
     }
+
+    delete this->text;
 }
 
 void UITextBox::addBorders(char* border_pattern, uint8_t border_types){

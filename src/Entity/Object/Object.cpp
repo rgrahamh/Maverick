@@ -70,6 +70,13 @@ bool Object::getEnvBump(){
     return this->env_bump;
 }
 
+/** Gets the current object's current sprite
+ * @return The object's current sprite
+ */
+Sprite* Object::getSprite(){
+    return this->animations[active_animation]->getSprite();
+}
+
 /** Sets the X velocity
  * @param xV The X velocity
  */
