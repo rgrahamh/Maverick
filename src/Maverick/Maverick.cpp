@@ -1,4 +1,4 @@
-#include "./Cyberena.hpp"
+#include "./Maverick.hpp"
 
 int main(int argc, char** argv){
 	engine = new Engine();

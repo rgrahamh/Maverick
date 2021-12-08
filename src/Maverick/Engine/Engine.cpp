@@ -1,11 +1,7 @@
 #include "./Engine.hpp"
 
-#include "../Entity/Object/Character/Character.hpp"
-#include "../Entity/UI/UIText/UIText.hpp"
-#include "../Entity/UI/UITextBox/UITextBox.hpp"
-#include "../Factory/Factory.hpp"
+// EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
-
 
 static int SDLCALL event_listener(void* userdata, SDL_Event* event){
     if(event->type == SDL_EventType::SDL_QUIT){

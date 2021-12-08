@@ -1,7 +1,7 @@
 #ifndef WEAPON_H
 #define WEAPON_H
 
-#include "../Object.hpp"
+#include "../../../../Maverick/Entity/Object/Object.hpp"
 
 enum WEAPON_TYPE{
 	axe,

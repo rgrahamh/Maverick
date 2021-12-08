@@ -1,4 +1,7 @@
 #include "global.hpp"
+#include "../../../Maverick/Engine/Engine.hpp"
+#include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
+#include "../../../Cyberena/Entity/Object/Character/Character.hpp"
 extern Engine* engine;
 
 void buildGlobal(){
