@@ -37,8 +37,8 @@ LED= $(LED_FACTORY) $(LED_ZONES)
 #Master component
 MAVERICK= ./src/Maverick/Maverick.cpp $(MOTOR)
 
-led:
-	$(CC) $(MAVERICK) $(CYBERENA) $(LED) -o led $(CFLAGS) -g $(INCLUDE_SDL)
+Editor:
+	$(CC) $(MAVERICK) $(CYBERENA) $(LED) -o editor $(CFLAGS) -g $(INCLUDE_SDL)
 
 cyberena_test:
 	$(CC) -O0 $(MAVERICK) $(CYBERENA) -o cyberena $(CFLAGS) -g $(INCLUDE_SDL)

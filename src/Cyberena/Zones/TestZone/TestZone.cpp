@@ -1,12 +1,9 @@
 #include "./TestZone.hpp"
+#include "../../../Maverick/Engine/Engine.hpp"
+extern Engine* engine;
 
-void buildTestZone(Engine* engine, ObjectList* add_object){
+void buildTestZone(){
     Zone* zone = new Zone("Test Zone");
-
-    while(add_object != NULL){
-        zone->addObject(add_object->obj);
-        add_object = add_object->next;
-    }
 
     //Create pillars
     zone->addObject(buildPillar("pillar1", 800.0, 600.0));

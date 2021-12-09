@@ -5,6 +5,6 @@
 #include "../../Entity/Object/Character/Character.hpp"
 #include "../../Factory/Factory.hpp"
 
-void buildTestZone(Engine* engine, ObjectList* add_objects);
+void buildTestZone();
 
 #endif

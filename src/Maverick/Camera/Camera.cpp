@@ -1,5 +1,7 @@
 #include "./Camera.hpp"
 
+const float follow_rate = 0.04;
+
 /** The parameterized constructor for the camera
  * @param window The window that the camera should be drawing to
  * @param reference The object that the camera is centered on
@@ -34,12 +36,14 @@ void Camera::recenter(){
     } 
 
     int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
+    SDL_GetRendererOutputSize(this->renderer, &win_width, &win_height);
 
-    float obj_x = reference->getX() + (reference->getWidth() / 2) - (win_width / 2);
-    float obj_y = reference->getY() + (reference->getHeight() / 2) - (win_height / 2);
-    current_x += (obj_x - current_x) * FOLLOW_RATE;
-    current_y += (obj_y - current_y) * FOLLOW_RATE;
+    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_width / 2) / x_scale);
+    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_height / 2) / y_scale);
+    this->current_x = obj_x;
+    this->current_y = obj_y;
+    //this->current_x += ((obj_x - current_x) * follow_rate);
+    //this->current_y += ((obj_y - current_y) * follow_rate);
 }
 
 /** Draws all objects in the given object list
@@ -72,4 +76,14 @@ void Camera::_draw(UIElementList* element_lst, uint32_t delta){
 
 SDL_Renderer* Camera::getRenderer(){
     return renderer;
+}
+
+/** Sets the X & Y scale of the camera
+ * @param x_scale The X scale of the camera
+ * @param x_scale The Y scale of the camera
+ */
+void Camera::setScale(float x_scale, float y_scale){
+    this->x_scale = x_scale;
+    this->y_scale = y_scale;
+    SDL_RenderSetScale(this->renderer, x_scale, y_scale);
 }

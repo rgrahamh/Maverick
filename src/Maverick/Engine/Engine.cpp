@@ -70,8 +70,8 @@ Engine::Engine(){
     //Set to the title screen
     this->state = GAME_STATE::OVERWORLD;
 
-    this->entities.obj = (ObjectList*)calloc(1, sizeof(ObjectList));
-    this->entities.ui = (UIElementList*)calloc(1, sizeof(UIElementList));
+    this->entities.obj = nullptr;
+    this->entities.ui = nullptr;
 
     this->threads = NULL;
 
@@ -112,16 +112,16 @@ Engine::~Engine(){
 void Engine::start(){
 
     //Loading the test zone as the first area
-    //this->addThread(new std::thread(loadZone, "Test Zone", this, new_objs));
-    loadZone("Test Zone", this, nullptr);
+    this->addThread(new std::thread(loadZone, "Test Zone"));
+    //loadZone("Test Zone");
 
     //Loading the level editor
-    //this->addThread(new std::thread(loadZone, "led", this, nullptr));
-    loadZone("led", this, nullptr);
+    this->addThread(new std::thread(loadZone, "led"));
+    //loadZone("led");
 
     //Loading the test zone as the first area
-    //this->addThread(new std::thread(loadZone, "global", this, nullptr));
-    loadZone("global", this, nullptr);
+    this->addThread(new std::thread(loadZone, "global"));
+    //loadZone("global");
 
     gameLoop();
 }
@@ -346,7 +346,7 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
-    SDL_RenderSetScale(renderer, global_x_scale, global_y_scale);
+    camera->setScale(global_x_scale, global_y_scale);
 
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
@@ -357,7 +357,7 @@ void Engine::drawStep(EntityList* all_entities){
         this->screen_blit_texture = SDL_CreateTextureFromSurface(renderer, this->screen_blit_surface);
     }*/
 
-    SDL_RenderSetScale(renderer, 1.0, 1.0);
+    camera->setScale(1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
@@ -640,8 +640,15 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
  * @return A full list of all active objects in the engine
  */
 void Engine::buildFullEntityList(){
+    if(unlikely(this->entities.obj == nullptr)){
+        this->entities.obj = new ObjectList;
+    }
     ObjectList* obj_iter = this->entities.obj;
     ObjectList* obj_iter_delayed = obj_iter;
+
+    if(unlikely(this->entities.ui == nullptr)){
+        this->entities.ui = new UIElementList;
+    }
     UIElementList* ui_iter = this->entities.ui;
     UIElementList* ui_iter_delayed = ui_iter;
 
@@ -687,24 +694,31 @@ void Engine::buildFullEntityList(){
     }
 
     //Clean up all hanging nodes (this can happen if there are less objects this frame than the last)
-    if(obj_iter != this->entities.obj){
+    if(likely(obj_iter != this->entities.obj)){
         while(obj_iter != nullptr){
             ObjectList* tmp = obj_iter;
             obj_iter = obj_iter->next;
             delete tmp;
         }
+        obj_iter_delayed->next = nullptr;
     }
-    obj_iter_delayed->next = nullptr;
+    else{
+        delete obj_iter;
+        this->entities.obj = nullptr;
+    }
 
-    if(ui_iter != this->entities.ui){
+    if(likely(ui_iter != this->entities.ui)){
         while(ui_iter != nullptr){
             UIElementList* tmp = ui_iter;
             ui_iter = ui_iter->next;
             delete tmp;
         }
+        ui_iter_delayed->next = nullptr;
     }
-    ui_iter_delayed->next = nullptr;
-
+    else{
+        delete ui_iter;
+        this->entities.ui = nullptr;
+    }
 }
 
 /** Frees the full list of objects generated for each step

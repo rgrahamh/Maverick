@@ -6,6 +6,6 @@
 #include "../../../Cyberena/Zones/TestZone/TestZone.hpp"
 #include "../../../Cyberena/Zones/global/global.hpp"
 
-void loadZone(const char* zone_name, Engine* engine, ObjectList* add_objects);
+void loadZone(const char* zone_name);
 
 #endif
