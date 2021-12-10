@@ -2,14 +2,7 @@
 #define UITEXTBOX_H
 #include "../UIElement.hpp"
 #include "../UIText/UIText.hpp"
-
-enum BORDER_TYPE{
-    TOP_BORDER = 1,
-    BOTTOM_BORDER = 2,
-    LEFT_BORDER = 4,
-    RIGHT_BORDER = 8,
-    ALL_BORDERS = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER
-};
+#include "../UIBorders/UIBorders.hpp"
 
 class UITextBox : public UIElement{
     public:
@@ -18,10 +11,9 @@ class UITextBox : public UIElement{
                   float scroll_speed = 0.0, int point = 24,
                   ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER,
                   char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER,
-                  int border_buffer = 0);
+                  int border_buff = 0);
         ~UITextBox();
 
-        void addBorders(char* border_pattern, uint8_t border_types);
         void setText(const char* text);
         void setFont(const char* font_path);
         void setStyle(uint8_t style);
@@ -34,7 +26,7 @@ class UITextBox : public UIElement{
 
     private:
         UIText* text;
-        UIElement* borders[4];
+        UIBorders* borders;
 
 };
 

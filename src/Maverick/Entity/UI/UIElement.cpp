@@ -114,7 +114,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
  */
 void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw this element
-    if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
+    if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP && active_animation < animation_num){
         this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
     }
 }

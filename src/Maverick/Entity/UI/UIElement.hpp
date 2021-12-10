@@ -9,6 +9,7 @@ enum UI_OBJECT_TYPE{
     WINDOW,
     TEXT,
     TEXT_BOX,
+    BORDERS,
     SELECTOR,
     BOX,
     SCREEN_BLIT,
