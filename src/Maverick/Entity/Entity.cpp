@@ -30,6 +30,9 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
             animations[i] = new Animation(&(this->x), &(this->y));
         }
     }
+    else{
+        this->animations = nullptr;
+    }
 
     //Initializing attributes
     this->attr = new HashTable(64);
@@ -41,7 +44,9 @@ Entity::~Entity(){
     for(unsigned int i = 0; i < animation_num; i++){
         delete animations[i];
     }
-    free(animations);
+    if(animations != nullptr){
+        free(animations);
+    }
     free(name);
 }
 
