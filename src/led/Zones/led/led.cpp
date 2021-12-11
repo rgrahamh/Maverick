@@ -19,7 +19,8 @@ void buildEditor(){
     led->addUIElement(layer_display);
 
     for(int i = 0; i < 10; i++){
-        UIObjectFrame* status_bar = new UIObjectFrame("status_bar", 0.1 + (i * 0.07), 0.925, 0.07, 0.045, 1, 1, window, nullptr);
+        UIObjectFrame* status_bar = new UIObjectFrame("status_bar", 0.1 + (i * 0.07), 0.925, 0.07, 0.045, 1, 1, window, nullptr, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 14);
+        status_bar->addSprite(0, "./assets/sprites/ui/black.png");
         led->addUIElement(status_bar);
     }
 

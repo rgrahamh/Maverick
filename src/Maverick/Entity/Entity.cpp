@@ -23,7 +23,7 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
     this->active = true;
     this->visible = true;
     this->active_animation = 0;
-    this->animation_num = animation_num;
+    this->total_animation_num = animation_num;
     if(animation_num > 0){
         this->animations = (Animation**)malloc(sizeof(Animation*) * animation_num);
         for(unsigned int i = 0; i < animation_num; i++){
@@ -41,7 +41,7 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
 /** Destructor for objects
  */
 Entity::~Entity(){
-    for(unsigned int i = 0; i < animation_num; i++){
+    for(unsigned int i = 0; i < total_animation_num; i++){
         delete animations[i];
     }
     if(animations != nullptr){
@@ -75,14 +75,24 @@ float Entity::getY(){
  * @return The width of the object
  */
 float Entity::getWidth(){
-    return this->animations[active_animation]->getSprite()->rect->w;
+    if(this->active_animation < this->total_animation_num){
+        return this->animations[active_animation]->getSprite()->rect->w;
+    }
+    else{
+        return 0;
+    }
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
 float Entity::getHeight(){
-    return this->animations[active_animation]->getSprite()->rect->h;
+    if(this->active_animation < this->total_animation_num){
+        return this->animations[active_animation]->getSprite()->rect->h;
+    }
+    else{
+        return 0;
+    }
 }
 
 /** Gets the draw layer of the object
@@ -96,14 +106,24 @@ int Entity::getDrawLayer(){
  * @return The draw axis of the object
  */
 float Entity::getDrawAxis(){
-    return (this->animation_num == 0)? 0 : this->animations[active_animation]->getDrawAxis();
+    if(this->active_animation < this->total_animation_num){
+        return this->animations[active_animation]->getDrawAxis();
+    }
+    else{
+        return 0;
+    }
 }
 
 /** Gets the hitboxes of the current animation state
  * @return The HitboxList containing the object's current hitboxes
  */
 HitboxList* Entity::getHitboxes(){
-    return this->animations[active_animation]->getHitboxes();
+    if(this->active_animation < this->total_animation_num){
+        return this->animations[active_animation]->getHitboxes();
+    }
+    else{
+        return nullptr;
+    }
 }
 
 /** Sets if the current object is active (can be interacted with)
@@ -138,7 +158,9 @@ void* Entity::getAttr(const char* key){
  * @param height The height of the sprite (default if -1)
  */ 
 void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
-    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+    if(animation_num < this->total_animation_num){
+        this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+    }
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
@@ -153,16 +175,18 @@ void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsi
  */
 void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element,
                        float y_element, unsigned int type, int sprite_num){
-    Hitbox* hitbox;
-    //We should never hit the CONE in this case.
-    if(shape == RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-    }
-    else{
-        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-    }
+    if(animation_num < this->total_animation_num){
+        Hitbox* hitbox;
+        //We should never hit the CONE in this case.
+        if(shape == RECT){
+            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+        }
+        else{
+            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+        }
 
-    this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+        this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+    }
 }
 
 /** Adds a hitbox to a given animation on all sprites
@@ -175,16 +199,18 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param type The type flags of the hitbox
  */
 void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
-    Hitbox* hitbox;
-    //We should never hit the CONE in this case.
-    if(shape == RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-    }
-    else{
-        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-    }
+    if(animation_num < this->total_animation_num){
+        Hitbox* hitbox;
+        //We should never hit the CONE in this case.
+        if(shape == RECT){
+            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+        }
+        else{
+            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+        }
 
-    this->animations[animation_num]->addHitbox(hitbox);
+        this->animations[animation_num]->addHitbox(hitbox);
+    }
 }
 
 /** Adds a hitbox to a range of animations on all sprites
@@ -208,7 +234,7 @@ void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end,
         hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
     }
 
-    for(unsigned int i = animation_start; i <= animation_end && i < animation_num; i++){
+    for(unsigned int i = animation_start; i <= animation_end && i < total_animation_num; i++){
         this->animations[i]->addHitbox(hitbox);
     }
 }
@@ -227,8 +253,10 @@ void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end,
  */
 void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
-    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-    this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+    if(animation_num < this->total_animation_num){
+        Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+        this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+    }
 }
 
 /** Adds a hitbox to a given animation (including angles and ratios) on all sprites. Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
@@ -244,8 +272,10 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  */
 void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop){
-    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-    this->animations[animation_num]->addHitbox(hitbox);
+    if(animation_num < this->total_animation_num){
+        Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+        this->animations[animation_num]->addHitbox(hitbox);
+    }
 }
 
 /** Adds a hitbox to a given animation (including angles and ratios) on all sprites. Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
@@ -263,8 +293,8 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
 void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop){
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-    for(unsigned int i = animation_start; i <= animation_end && i < animation_num; i++){
-        this->animations[animation_num]->addHitbox(hitbox);
+    for(unsigned int i = animation_start; i <= animation_end && i < total_animation_num; i++){
+        this->animations[i]->addHitbox(hitbox);
     }
 }
 
@@ -286,7 +316,7 @@ void Entity::setY(float y){
  * @param animation_num The animation number
  */
 void Entity::setAnimation(unsigned int animation_num){
-    if(this->active_animation != animation_num){
+    if(animation_num < this->total_animation_num && animation_num != this->active_animation){
         this->active_animation = animation_num;
         this->animations[active_animation]->start();
     }
@@ -298,7 +328,9 @@ void Entity::setAnimation(unsigned int animation_num){
  * @param y_scale The y scale factor
  */
 void Entity::setScale(unsigned int animation_num, float x_scale, float y_scale){
-    this->animations[animation_num]->setScale(x_scale, y_scale);
+    if(animation_num < this->total_animation_num){
+        this->animations[animation_num]->setScale(x_scale, y_scale);
+    }
 }
 
 /** Sets the scale for all animations
@@ -306,7 +338,7 @@ void Entity::setScale(unsigned int animation_num, float x_scale, float y_scale){
  * @param y_scale The y scale factor
  */
 void Entity::setScale(float x_scale, float y_scale){
-    for(unsigned int i = 0; i < this->animation_num; i++){
+    for(unsigned int i = 0; i < this->total_animation_num; i++){
         this->animations[i]->setScale(x_scale, y_scale);
     }
 }
@@ -317,7 +349,9 @@ void Entity::setScale(float x_scale, float y_scale){
  * @param y_scale The y scale factor
  */
 void Entity::setSize(unsigned int animation_num, float width, float height){
-    this->animations[animation_num]->setSize(width, height);
+    if(animation_num < this->total_animation_num){
+        this->animations[animation_num]->setSize(width, height);
+    }
 }
 
 /** Sets the scale for all animations
@@ -325,7 +359,7 @@ void Entity::setSize(unsigned int animation_num, float width, float height){
  * @param height The y scale factor
  */
 void Entity::setSize(float width, float height){
-    for(unsigned int i = 0; i < this->animation_num; i++){
+    for(unsigned int i = 0; i < this->total_animation_num; i++){
         this->animations[i]->setSize(width, height);
     }
 }

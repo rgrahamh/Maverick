@@ -4,7 +4,7 @@ extern TextureHash* texture_hash;
 
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                              unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern,
-                             uint8_t border_types, int border_buff)
+                             uint8_t border_types)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::BORDERS, window){
     this->subelements = nullptr;
 
@@ -98,7 +98,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
  */
 void UIBorders::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw the textbox background
-    if(active_animation < animation_num){
+    if(active_animation < this->total_animation_num){
         this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
     }
 

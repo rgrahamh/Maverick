@@ -76,7 +76,7 @@ class Entity{
 
 		//Animation tracking
 		unsigned int active_animation;
-		unsigned int animation_num;
+		unsigned int total_animation_num;
 
 		//Animation
 		Animation** animations;

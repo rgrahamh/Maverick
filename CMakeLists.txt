@@ -5,8 +5,6 @@ project(Cyberena)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -pthread -Wno-write-strings")
 
-set(CMAKE_INSTALL_PREFIX "${PROJECT_SOURCE_DIR}/bin")
-
 set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp
 )

@@ -15,7 +15,7 @@ class UIBorders: public UIElement{
     public:
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                   unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern = "",
-                  uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER, int border_buff = 0);
+                  uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
         ~UIBorders();
 
         void addBorders(char* border_pattern, uint8_t border_types);

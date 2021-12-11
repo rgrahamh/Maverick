@@ -74,7 +74,12 @@ bool Object::getEnvBump(){
  * @return The object's current sprite
  */
 Sprite* Object::getSprite(){
-    return this->animations[active_animation]->getSprite();
+    if(this->active_animation < this->total_animation_num){
+        return this->animations[active_animation]->getSprite();
+    }
+    else{
+        return nullptr;
+    }
 }
 
 /** Sets the X velocity
@@ -171,7 +176,9 @@ void Object::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int cam
  * @param window The window that content is being drawn to
  */
 void Object::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
-    this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
+    if(this->active_animation < this->total_animation_num){
+        this->animations[this->active_animation]->draw(renderer, delta, camera_x, camera_y);
+    }
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

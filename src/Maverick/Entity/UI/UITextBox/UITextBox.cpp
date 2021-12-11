@@ -21,8 +21,13 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
 
     this->subelements = nullptr;
 
-    this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height, 0, draw_layer,
-                                  window, border_pattern, border_types, border_buff);
+    if(border_pattern != nullptr){
+        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height, 0, draw_layer,
+                                    window, border_pattern, border_types);
+    }
+    else{
+        this->borders = nullptr;
+    }
 }
 
 /** Default destructor
@@ -87,7 +92,6 @@ void UITextBox::setYAlignment(ALIGNMENT y_alignment){
     this->text->setYAlignment(y_alignment);
 }
 
-
 /** Draws this UITextBox
  * @param renderer The SDL_Renderer we're drawing to
  * @param delta The time passed since last draw (in ms)
@@ -96,7 +100,7 @@ void UITextBox::setYAlignment(ALIGNMENT y_alignment){
  */
 void UITextBox::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw the textbox background
-    if(active_animation < animation_num){
+    if(active_animation < this->total_animation_num){
         this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
     }
 

@@ -114,7 +114,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
  */
 void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw this element
-    if(active_animation < animation_num){
+    if(active_animation < this->total_animation_num){
         this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
     }
 }
@@ -126,7 +126,7 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 void UIElement::setScale(float x_scale, float y_scale){
     //Set scale for this element
     if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
-        for(unsigned int i = 0; i < this->animation_num; i++){
+        for(unsigned int i = 0; i < this->total_animation_num; i++){
             this->animations[i]->setScale(x_scale, y_scale);
         }
     }
@@ -134,7 +134,7 @@ void UIElement::setScale(float x_scale, float y_scale){
     //Set scale for all children elements
     UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
-        for(unsigned int i = 0; i < this->animation_num; i++){
+        for(unsigned int i = 0; i < this->total_animation_num; i++){
             this->animations[i]->setScale(x_scale, y_scale);
         }
         cursor = cursor->next;
@@ -150,7 +150,7 @@ void UIElement::setViewSize(double view_width, double view_height){
     SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
     if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
-        for(unsigned int i = 0; i < this->animation_num; i++){
+        for(unsigned int i = 0; i < this->total_animation_num; i++){
             this->animations[i]->setSize(view_width * win_width, view_height * win_height);
         }
     }
@@ -158,7 +158,7 @@ void UIElement::setViewSize(double view_width, double view_height){
     //Set scale for all children elements
     UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
-        for(unsigned int i = 0; i < this->animation_num; i++){
+        for(unsigned int i = 0; i < this->total_animation_num; i++){
             this->animations[i]->setSize(view_width * win_width, view_height * win_height);
         }
         cursor = cursor->next;
@@ -203,22 +203,24 @@ void UIElement::setVisible(bool visible){
  * @param height The view height of the sprite (scales to element if -1)
  */ 
 void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
-    int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
+    if(animation_num < this->total_animation_num){
+        int win_width, win_height;
+        SDL_GetWindowSize(window, &win_width, &win_height);
 
-    if(width != -1){
-        width *= (float)win_width;
+        if(width != -1){
+            width *= (float)win_width;
+        }
+        else{
+            width = this->draw_area.w;
+        }
+        if(height != -1){
+            height *= (float)win_height;
+        }
+        else{
+            height = this->draw_area.h;
+        }
+        this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
     }
-    else{
-        width = this->draw_area.w;
-    }
-    if(height != -1){
-        height *= (float)win_height;
-    }
-    else{
-        height = this->draw_area.h;
-    }
-    this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
 }
 
 /** Adds an element to the child element list
