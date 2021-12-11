@@ -2,9 +2,20 @@
 
 extern TextureHash* texture_hash;
 
+/** UIBorders constructor (for viewport calcs, 1.0 is one screen width/height)
+ * @param name The name of the UIElement
+ * @param view_x_offset The viewport X offset of the UIElement
+ * @param view_y_offset The viewport X offset of the UIElement
+ * @param view_width The viewport width of the UIElement
+ * @param view_height The viewport height of the UIElement
+ * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
+ * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
+ * @param window The current window (used for viewport calculation)
+ * @param border_pattern The pattern for the border texture files you wish to use
+ * @param border_types The border locations
+ */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                             unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern,
-                             uint8_t border_types)
+                     unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern, uint8_t border_types)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::BORDERS, window){
     this->subelements = nullptr;
 
@@ -23,6 +34,10 @@ UIBorders::~UIBorders(){
     }
 }
 
+/** Creates & adds borders based upon the border_pattern & border_types
+ * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].png")
+ * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
+ */
 void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
     int win_width, win_height;
     SDL_GetWindowSize(this->window, &win_width, &win_height);
@@ -90,7 +105,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
     }
 }
 
-/** Draws this UITextBox
+/** Draws these UIBorders
  * @param renderer The SDL_Renderer we're drawing to
  * @param delta The time passed since last draw (in ms)
  * @param camera_x The X location of the camera
