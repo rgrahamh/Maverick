@@ -132,5 +132,4 @@ void UITextBox::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
     if(this->borders != nullptr){
         this->borders->_draw(renderer, delta, camera_x, camera_y);
     }
-
 }

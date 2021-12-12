@@ -40,10 +40,10 @@ void Camera::recenter(){
 
     float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_width / 2) / x_scale);
     float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_height / 2) / y_scale);
-    this->current_x = obj_x;
-    this->current_y = obj_y;
-    //this->current_x += ((obj_x - current_x) * follow_rate);
-    //this->current_y += ((obj_y - current_y) * follow_rate);
+    //this->current_x = obj_x;
+    //this->current_y = obj_y;
+    this->current_x += ((obj_x - current_x) * follow_rate);
+    this->current_y += ((obj_y - current_y) * follow_rate);
 }
 
 /** Draws all objects in the given object list
@@ -64,8 +64,6 @@ void Camera::_draw(ObjectList* obj_lst, uint32_t delta){
  * @param obj_lst The UI element list that you wish to draw
  */
 void Camera::_draw(UIElementList* element_lst, uint32_t delta){
-    recenter();
-
     while(element_lst != NULL){
         if(element_lst->element->isVisible()){
             element_lst->element->_draw(renderer, delta, 0, 0);
