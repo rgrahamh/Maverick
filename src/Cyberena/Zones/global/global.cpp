@@ -14,7 +14,7 @@ void buildGlobal(){
     global->addObject(player);
 
     //Create the pause menu
-    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, UI_OBJECT_TYPE::WINDOW, window);
+    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, window);
     pause_menu->setActive(false);
     pause_menu->addSprite(0, "./assets/sprites/ui/shade.png", 0, 0, 0);
 

@@ -3,20 +3,6 @@
 
 #include "../Entity.hpp"
 
-enum UI_OBJECT_TYPE{
-    GENERIC,
-    ELEMENT_GROUP,
-    WINDOW,
-    TEXT,
-    TEXT_BOX,
-    BORDERS,
-    SELECTOR,
-    BOX,
-    SCREEN_BLIT,
-    OBJECT_FRAME,
-    RADIAL
-};
-
 class UIElement;
 
 struct UIElementList{
@@ -26,7 +12,7 @@ struct UIElementList{
 
 class UIElement : public Entity{
     public:
-        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window);
+        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window);
         virtual ~UIElement();
 
 		virtual void _process(uint32_t delta);
@@ -48,8 +34,6 @@ class UIElement : public Entity{
         UIElementList* getSubelements();
 
     protected:
-        //The UI object type
-        enum UI_OBJECT_TYPE type;
         //All elements which are children of this one
         UIElementList* subelements;
 
@@ -64,6 +48,9 @@ class UIElement : public Entity{
 
         //The UI draw area
         SDL_Rect draw_area;
+
+        //Checks if the mouse is inside of the draw area
+        bool isMouseInside(Control* control);
 };
 
 

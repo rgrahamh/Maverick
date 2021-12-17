@@ -39,6 +39,9 @@ void buildEditor(){
     UIScreenBlit* mini_display = new UIScreenBlit("mini_display", 0.8, 0.0, 0.2, 0.2, 0, 1, window);
     led->addUIElement(mini_display);
 
+    UILevelPort* ui_level_port = new UILevelPort("level_port", 0.1, 0, 0.7, 0.925, window);
+    led->addUIElement(ui_level_port);
+
     //Add a level area section
 
     engine->addZone(led);

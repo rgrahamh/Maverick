@@ -16,7 +16,7 @@ extern TextureHash* texture_hash;
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern, uint8_t border_types)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::BORDERS, window){
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
     this->subelements = nullptr;
 
     memset(this->borders, '\0', sizeof(UIElement*) * 4);
@@ -96,8 +96,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                         delete borders[i];
                     }
                     this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                     border_width / (double)win_width, border_height / (double)win_height, 1, 1,
-                                                     UI_OBJECT_TYPE::GENERIC, this->window);
+                                                     border_width / (double)win_width, border_height / (double)win_height, 1, 1, this->window);
                     this->borders[i]->addSprite(0, sprite_path);
                 }
             }

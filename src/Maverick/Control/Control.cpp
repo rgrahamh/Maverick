@@ -20,6 +20,7 @@ Control::Control(){
     }
 
     mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);
+    mouse.scroll_wheel = 0;
 }
 
 /** Default destructor for the Control object
@@ -30,6 +31,22 @@ Control::~Control(){
             SDL_GameControllerClose(controller_objs[i]);
         }
     }
+}
+
+/** Update the controller input (happens once per game loop)
+ */
+void Control::updateInput(){
+    //Update controllers
+    num_controllers = updateControllers();
+
+    //Update keyboard
+    updateKeyboard();
+
+    //Update the mouse
+    updateMouse();
+
+    //Update any other events that may have occurred
+    pollEvents();
 }
 
 /** Update controller states
@@ -108,19 +125,9 @@ void Control::updateKeyboard(){
 void Control::updateMouse(){
     old_mouse = mouse;
     mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);
-}
 
-/** Update the controller input (happens once per game loop)
- */
-void Control::updateInput(){
-    //Update controllers
-    num_controllers = updateControllers();
-
-    //Update keyboard
-    updateKeyboard();
-
-    //Update the mouse
-    updateMouse();
+    //This value will be set in pollEvents() if it changes at all
+    mouse.scroll_wheel = 0;
 }
 
 /** Gets the controller state last frame
@@ -165,4 +172,15 @@ const MouseState* Control::getOldMouse() const{
  */
 const MouseState* Control::getMouse() const{
     return &mouse;
+}
+
+/** Polls events (for updating input that isn't captured in other SDL operations)
+ */
+void Control::pollEvents(){
+    SDL_Event event;
+    while(SDL_PollEvent(&event)){
+        if(event.type == SDL_EventType::SDL_MOUSEWHEEL){
+            this->mouse.scroll_wheel = event.wheel.y;
+        }
+    }
 }

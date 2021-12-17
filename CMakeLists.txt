@@ -114,8 +114,13 @@ set(LedZonesSrc
     ./src/led/Zones/led/led.cpp
 )
 
+set(LedUISrc
+    ./src/led/Entity/UI/UILevelPort/UILevelPort.cpp
+)
+
 set(LedSrc
     ${LedZonesSrc}
+    ${LedUISrc}
 )
 
 add_executable(editor

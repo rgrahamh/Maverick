@@ -49,10 +49,14 @@ struct ControllerState{
 
 struct MouseState{
     //Mouse location
-    int x;
-    int y;
+    int32_t x;
+    int32_t y;
 
+    //Mouse buttons
     uint32_t button_state;
+
+    //Scroll wheel
+    int32_t scroll_wheel;
 };
 
 class Control{
@@ -79,6 +83,7 @@ class Control{
         int updateControllers();
         void updateKeyboard();
         void updateMouse();
+        void pollEvents();
 
         //The number of connected controllers
         uint8_t num_controllers;

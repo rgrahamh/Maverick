@@ -11,11 +11,10 @@ extern Engine* engine;
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param obj_type The object type (a UI_OBJECT_TYPE)
  * @param window The current window (used for viewport calculation)
  */
 UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     unsigned int animation_num, int draw_layer, enum UI_OBJECT_TYPE obj_type, SDL_Window* window)
+                     unsigned int animation_num, int draw_layer, SDL_Window* window)
         :  Entity(name, 0, 0, animation_num, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
@@ -35,7 +34,6 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->draw_area.w = view_width * win_width;
     this->draw_area.h = view_height * win_height;
 
-    this->type = obj_type;
     this->subelements = nullptr;
 }
 
@@ -68,13 +66,16 @@ void UIElement::_process(uint32_t delta){
     }
 }
 
-/** Handles actions for this UIElement and all children UIElements
+/** Handles actions for this UIElement
  * @param event The event that has occurred
  */
 void UIElement::action(Control* control){
     return;
 }
 
+/** Handles actions for this UIElement and all children UIElements
+ * @param event The event that has occurred
+ */
 void UIElement::_action(Control* control){
     this->action(control);
 
@@ -125,10 +126,8 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
  */
 void UIElement::setScale(float x_scale, float y_scale){
     //Set scale for this element
-    if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
-        for(unsigned int i = 0; i < this->total_animation_num; i++){
-            this->animations[i]->setScale(x_scale, y_scale);
-        }
+    for(unsigned int i = 0; i < this->total_animation_num; i++){
+        this->animations[i]->setScale(x_scale, y_scale);
     }
 
     //Set scale for all children elements
@@ -149,10 +148,8 @@ void UIElement::setViewSize(double view_width, double view_height){
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
-    if(this->type != UI_OBJECT_TYPE::ELEMENT_GROUP){
-        for(unsigned int i = 0; i < this->total_animation_num; i++){
-            this->animations[i]->setSize(view_width * win_width, view_height * win_height);
-        }
+    for(unsigned int i = 0; i < this->total_animation_num; i++){
+        this->animations[i]->setSize(view_width * win_width, view_height * win_height);
     }
 
     //Set scale for all children elements
@@ -261,4 +258,17 @@ UIElement* UIElement::getElement(const char* name){
  */
 UIElementList* UIElement::getSubelements(){
     return this->subelements;
+}
+
+/** Returns true if the mouse is inside the draw area, and false otherwise
+ * @return If the mouse is within the draw area
+ */
+bool UIElement::isMouseInside(Control* control){
+    const MouseState* mouse = control->getMouse();
+    if(mouse->x > this->draw_area.x && mouse->x < (this->draw_area.x + this->draw_area.w) &&
+       mouse->y > this->draw_area.y && mouse->y < (this->draw_area.y + this->draw_area.h)){
+        return true;
+    }
+
+    return false;
 }

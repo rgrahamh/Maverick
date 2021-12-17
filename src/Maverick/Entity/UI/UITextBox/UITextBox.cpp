@@ -24,7 +24,7 @@ extern TextureHash* texture_hash;
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      unsigned int animation_num, int draw_layer, SDL_Window* window, char* font_path, char* text, float scroll_speed,
                      int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types, int border_buff)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, UI_OBJECT_TYPE::TEXT_BOX, window){
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
     int window_width, window_height;
     SDL_GetWindowSize(window, &window_width, &window_height);
 

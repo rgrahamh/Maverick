@@ -1,6 +1,6 @@
 #include "./Camera.hpp"
 
-const float follow_rate = 0.04;
+const float follow_rate = 0.08;
 
 /** The parameterized constructor for the camera
  * @param window The window that the camera should be drawing to
