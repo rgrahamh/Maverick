@@ -41,6 +41,7 @@ set(UISrc
 
 set(ObjectSrc
     ./src/Maverick/Entity/Object/Object.cpp
+    ./src/Maverick/Entity/Object/CameraReference/CameraReference.cpp
 )
 
 set(EntitySrc

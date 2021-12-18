@@ -114,16 +114,16 @@ Engine::~Engine(){
 void Engine::start(){
 
     //Loading the test zone as the first area
+    //this->addThread(new std::thread(loadZone, "global"));
+    loadZone("global");
+
+    //Loading the test zone as the first area
     this->addThread(new std::thread(loadZone, "Test Zone"));
     //loadZone("Test Zone");
 
     //Loading the level editor
     this->addThread(new std::thread(loadZone, "led"));
     //loadZone("led");
-
-    //Loading the test zone as the first area
-    this->addThread(new std::thread(loadZone, "global"));
-    //loadZone("global");
 
     gameLoop();
 }
@@ -352,9 +352,6 @@ void Engine::drawStep(EntityList* all_entities){
     SDL_RenderClear(renderer);
 
     camera->setScale(current_x_scale, current_y_scale);
-
-    int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
@@ -650,12 +647,16 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 void Engine::buildFullEntityList(){
     if(unlikely(this->entities.obj == nullptr)){
         this->entities.obj = new ObjectList;
+        this->entities.obj->next = nullptr;
+        this->entities.obj->obj = nullptr;
     }
     ObjectList* obj_iter = this->entities.obj;
     ObjectList* obj_iter_delayed = obj_iter;
 
     if(unlikely(this->entities.ui == nullptr)){
         this->entities.ui = new UIElementList;
+        this->entities.ui->next = nullptr;
+        this->entities.ui->element = nullptr;
     }
     UIElementList* ui_iter = this->entities.ui;
     UIElementList* ui_iter_delayed = ui_iter;

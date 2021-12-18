@@ -6,6 +6,7 @@
 #include "../../../Maverick/Entity/UI/UIScreenBlit/UIScreenBlit.hpp"
 #include "../../../Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.hpp"
 #include "../../../Maverick/Zone/ZoneFactory/ZoneIncludes.hpp"
+#include "../../../Maverick/Entity/Object/CameraReference/CameraReference.hpp"
 
 //led includes
 #include "../../Entity/UI/UILevelPort/UILevelPort.hpp"

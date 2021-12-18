@@ -42,8 +42,13 @@ void buildEditor(){
     UILevelPort* ui_level_port = new UILevelPort("level_port", 0.1, 0, 0.7, 0.925, window);
     led->addUIElement(ui_level_port);
 
+    CameraReference* cam_ref = new CameraReference("cam_ref", 0.0, 0.0);
+    led->addObject(cam_ref);
+
     //Add a level area section
 
     engine->addZone(led);
     engine->activateZone("led");
+
+    engine->getCamera()->setReference(cam_ref);
 }
