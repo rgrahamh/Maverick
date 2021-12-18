@@ -6,6 +6,7 @@
 #define likely(x) __builtin_expect((x),1)
 #define unlikely(x) __builtin_expect((x),0)
 #define MS_PER_FRAME 167
+#define ZOOM_RATE 0.08
 
 #include <thread>
 
@@ -146,8 +147,12 @@ class Engine{
 		EntityList entities;
 
 		//Scale
-		float global_x_scale;
-		float global_y_scale;
+		float current_x_scale;
+		float current_y_scale;
+
+		//Scale
+		float target_x_scale;
+		float target_y_scale;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;

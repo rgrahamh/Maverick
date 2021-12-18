@@ -60,9 +60,11 @@ Engine::Engine(){
     //Setting up the texture hash table
     texture_hash = new TextureHash(2048);
 
-    //Set global scales
-    this->global_x_scale = 1.0;
-    this->global_y_scale = 1.0;
+    //Set scales
+    this->current_x_scale = 1.0;
+    this->current_y_scale = 1.0;
+    this->target_x_scale = 1.0;
+    this->target_y_scale = 1.0;
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -206,6 +208,9 @@ void Engine::physicsStep(ObjectList* all_objects){
             all_objects = all_objects->next;
         }
     }
+
+    this->current_x_scale += (this->target_x_scale - this->current_x_scale) * ZOOM_RATE;
+    this->current_y_scale += (this->target_y_scale - this->current_y_scale) * ZOOM_RATE;
 }
 
 /** The collision step of the game engine
@@ -346,7 +351,7 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
-    camera->setScale(global_x_scale, global_y_scale);
+    camera->setScale(current_x_scale, current_y_scale);
 
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
@@ -510,28 +515,28 @@ void Engine::setState(uint64_t state){
  * @param x_scale The global X scale of the engine
  */
 void Engine::setGlobalXScale(float x_scale){
-    this->global_x_scale = x_scale;
+    this->target_x_scale = x_scale;
 }
 
 /** Sets the global Y scale of the engine
  * @param y_scale The global Y scale of the engine
  */
 void Engine::setGlobalYScale(float y_scale){
-    this->global_y_scale = y_scale;
+    this->target_y_scale = y_scale;
 }
 
 /** Returns the global X scale of the engine
  * @return The global X scale of the engine
  */
 float Engine::getGlobalXScale(){
-    return this->global_x_scale;
+    return this->target_x_scale;
 }
 
 /** Returns the global Y scale of the engine
  * @return The global Y scale of the engine
  */
 float Engine::getGlobalYScale(){
-    return this->global_y_scale;
+    return this->target_y_scale;
 }
 
 /** Goes through all active threads and cleans them up
