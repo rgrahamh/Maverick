@@ -353,6 +353,9 @@ void Engine::drawStep(EntityList* all_entities){
 
     camera->setScale(current_x_scale, current_y_scale);
 
+    int win_width, win_height;
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
+
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
