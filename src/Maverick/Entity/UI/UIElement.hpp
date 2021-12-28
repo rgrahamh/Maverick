@@ -5,6 +5,20 @@
 
 class UIElement;
 
+enum UI_ELEMENT_TYPE{
+    GENERIC_ELEMENT,
+    WINDOW,
+    TEXT,
+    TEXT_BOX,
+    BORDERS,
+    SELECTOR,
+    BOX,
+    SCREEN_BLIT,
+    OBJECT_FRAME,
+    RADIAL,
+    EXTENDED_UI_ELEMENT_TYPE_START
+};
+
 struct UIElementList{
     UIElement* element;
     struct UIElementList* next;
@@ -21,6 +35,9 @@ class UIElement : public Entity{
 		virtual void action(Control* control);
         virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+
+		virtual unsigned int serializeData(char** buff_ptr);
+		virtual unsigned int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 
 		virtual void setScale(float x_scale, float y_scale);
         virtual void setViewSize(double view_width, double view_height);

@@ -17,6 +17,8 @@ extern TextureHash* texture_hash;
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern, uint8_t border_types)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
+    this->type = UI_ELEMENT_TYPE::BORDERS;
+
     this->subelements = nullptr;
 
     memset(this->borders, '\0', sizeof(UIElement*) * 4);
@@ -35,7 +37,7 @@ UIBorders::~UIBorders(){
 }
 
 /** Creates & adds borders based upon the border_pattern & border_types
- * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].png")
+ * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
 void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
@@ -44,11 +46,11 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
 
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
-        char* file_patterns[4] = {"_top.png", "_bottom.png", "_left.png", "_right.png"};
+        char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
         char* border_names[4] = {"top_border", "bottom_border", "left_border", "right_border"};
         for(int i = 0; i < 4; i++){
             if(border_types & (1 << i)){
-                //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.png")
+                //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.bmp")
                 int combined_len = strlen(file_patterns[i]) + strlen(border_pattern) + 1;
                 char sprite_path[combined_len];
                 strcpy(sprite_path, border_pattern);

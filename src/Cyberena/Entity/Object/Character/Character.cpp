@@ -8,6 +8,8 @@ Character::Character(const char* name, float start_x, float start_y, float frict
 	: Object(name, start_x, start_y, friction, mass, animation_num, draw_layer),
 	Race(race),
 	Style(style){
+    this->type = EXTENDED_OBJECT_TYPE::CHARACTER;
+
 	//Setting the struct pointers; these are the non-optional params
 	this->stats = stats;
 	this->mastery = mastery;

@@ -20,6 +20,8 @@ UIText::UIText(const char* name, double view_x_offset, double view_y_offset, dou
                unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text,
                float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
+    this->type = UI_ELEMENT_TYPE::TEXT;
+
     //Setting the text's alignment
     this->x_alignment = x_alignment;
     this->y_alignment = y_alignment;

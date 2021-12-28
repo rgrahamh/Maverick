@@ -13,6 +13,10 @@ extern Engine* engine;
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
  * @param window The current window (used for viewport calculation)
  */
+
+//DETERMINE USAGE OF TYPE!!!!!!!!!!!!!!!!
+
+
 UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      unsigned int animation_num, int draw_layer, SDL_Window* window)
         :  Entity(name, 0, 0, animation_num, draw_layer){
@@ -22,6 +26,8 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->view_width = view_width;
     this->view_height = view_height;
     this->window = window;
+
+    this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
     int win_width, win_height;
     SDL_GetWindowSize(this->window, &win_width, &win_height);
@@ -271,4 +277,10 @@ bool UIElement::isMouseInside(Control* control){
     }
 
     return false;
+}
+
+unsigned int UIElement::serializeData(char** buff_ptr){
+}
+
+unsigned int UIElement::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
 }

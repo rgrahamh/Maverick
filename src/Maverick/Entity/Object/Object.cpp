@@ -9,6 +9,8 @@
  */
 Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer)
       : Entity(name, start_x, start_y, animation_num, draw_layer){
+    this->type = OBJECT_TYPE::GENERIC_OBJECT;
+
     //Initializing position, velocity, and acceleration
     this->x = start_x;
     this->y = start_y;
@@ -188,4 +190,10 @@ void Object::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
  */
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
 	printf("Collided!\n");
+}
+
+unsigned int Object::serializeData(char** buff_ptr){
+}
+
+unsigned int Object::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
 }

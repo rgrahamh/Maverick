@@ -20,6 +20,7 @@ class TextureHash : public HashTable{
 		~TextureHash();
 
 		void add(const char* key, SDL_Surface* surface);
+		bool has(const char* key);
 		SDL_Surface* get(const char* key);
 	
 	private:

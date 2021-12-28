@@ -163,8 +163,14 @@ void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_
 		rect->h = height;
 	}
 
+	unsigned int sprite_name_len = strlen(sprite_path);
+	char* sprite_name = (char*)malloc(sprite_name_len + 1);
+	memcpy(sprite_name, sprite_path, sprite_name_len);
+	sprite_name[sprite_name_len] = '\0';
+
 	//Create the sprite
 	Sprite* sprite = new Sprite();
+	sprite->name = sprite_name;
 	sprite->rotation = 0.0;
 
 	//If it's the first animation frame
@@ -371,4 +377,18 @@ void Animation::rotate(int direction, float rotate_amnt){
 			}
 		}
 	}
+}
+
+/** Gets the start of the animation sequence
+ * @return The start of the animation sequence
+ */
+AnimationSeq* Animation::getSequenceStart(){
+	return this->sequence_start;
+}
+
+/** Gets the end of the animation sequence
+ * @return The end of the animation sequence
+ */
+AnimationSeq* Animation::getSequenceEnd(){
+	return this->sequence_end;
 }

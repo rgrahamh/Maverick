@@ -385,3 +385,15 @@ void Entity::setVisible(bool visible){
 void Entity::setAttr(const char* key, void* val){
     this->attr->add(key, val);
 }
+
+uint32_t Entity::getType(){
+    return this->type;
+}
+
+Animation** Entity::getAnimations(){
+    return this->animations;
+}
+
+unsigned int Entity::getTotalAnimationNum(){
+    return this->total_animation_num;
+}

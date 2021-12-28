@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "../../../../Maverick/Entity/Object/Object.hpp"
+#include "../Object.hpp"
 #include "../Item/Item.hpp"
 #include "../Weapon/Weapon.hpp"
 #include "../Armor/Armor.hpp"

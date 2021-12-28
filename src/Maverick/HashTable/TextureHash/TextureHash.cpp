@@ -30,6 +30,24 @@ TextureHash::~TextureHash(){
 	}
 }
 
+bool TextureHash::has(const char* key){
+	if(key != nullptr){
+		for(unsigned int i = 0; i < this->size; i++){
+			if(this->table[i] != NULL){
+				THEntry* cursor = this->table[i];
+				while(cursor != NULL){
+					if(cursor->key != nullptr &&
+					strcmp(cursor->key, key) == 0){
+						return true;
+					}
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
 /** Adds a new entry to the hash table
  * @param key The string (filepath) that is being hashed
  * @param surface The texture that is being put into the table

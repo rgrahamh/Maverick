@@ -47,9 +47,6 @@ class Engine{
 		//Game engine run
 		void start();
 
-		//Zone addition/state handling
-		void addZone(Zone* zone);
-
 		//Adds an object/UIElement to the engine
 		void addObject(Object* object);
 		void addUIElement(UIElement* ui);
@@ -80,6 +77,7 @@ class Engine{
 		void setGlobalYScale(float y_scale);
 
 		//Zone handling
+		void addZone(Zone* zone);
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
 		void unloadZone(const char* zone_name);
@@ -108,10 +106,6 @@ class Engine{
 		//Object list building/destruction
 		void buildFullEntityList();
 		void freeFullEntityList();
-
-		//Saving logic
-		void saveGame();
-		void loadGame();
 
 		//Handles the default collision between objects
 		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);

@@ -3,7 +3,7 @@
 extern Engine* engine;
 
 void buildTestZone(){
-    Zone* zone = new Zone("Test Zone");
+    Zone* zone = new Zone("Test Zone", 0, 0);
 
     //Create pillars
     zone->addObject(buildPillar("pillar1", 800.0, 600.0));

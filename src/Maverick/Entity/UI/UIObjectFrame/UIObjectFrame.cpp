@@ -18,8 +18,9 @@ UIObjectFrame::UIObjectFrame(const char* name, double view_x_offset, double view
                              unsigned int animation_num, int draw_layer, SDL_Window* window, Object* reference,
                              char* border_pattern, uint8_t border_types, int border_buff)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
-    this->reference = reference;
+    this->type = UI_ELEMENT_TYPE::OBJECT_FRAME;
 
+    this->reference = reference;
     this->border_buff = border_buff;
 
     if(border_pattern != nullptr){

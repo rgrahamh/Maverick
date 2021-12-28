@@ -3,7 +3,7 @@
 /** The zone constructor
  * @param name The name of the zone
  */
-Zone::Zone(const char* name){
+Zone::Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord){
     this->name = name;
 
     this->objects = new ObjectList;

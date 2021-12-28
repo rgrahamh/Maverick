@@ -4,14 +4,18 @@
 #include "../HashTable/TextureHash/TextureHash.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
+#include "../Utility/Utility.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
 #include <unordered_map>
+#include <unordered_set>
 
 extern TextureHash* texture_hash;
 
 struct Sprite{
+	char* name;
+
 	SDL_Surface* surface;
 	SDL_Texture* texture;
 	SDL_Rect* rect;
@@ -53,6 +57,8 @@ class Animation{
 		float getDrawAxis();
 		uint32_t getTimeLeft();
 		bool getPaused();
+		AnimationSeq* getSequenceStart();
+		AnimationSeq* getSequenceEnd();
 
 		void setPaused(bool paused);
 		void setSize(int width, int height);
@@ -65,6 +71,8 @@ class Animation{
 		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
 
 		void rotate(int direction, float rotation_amnt);
+
+		void saveResources(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 
 
 	private:
