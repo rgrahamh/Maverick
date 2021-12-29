@@ -18,27 +18,36 @@ Engine::Engine(){
     //Init SDL
     if(SDL_Init(SDL_INIT_EVERYTHING)){
         printf("Failed to init everything!\n");
+        exit(-1);
     }
     if(IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG){
         printf("Failed to init IMG!\n");
         printf("IMG_Init: %s\n", IMG_GetError());
+        exit(-1);
     }
     if(TTF_Init() < 0){
         printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
+        exit(-1);
     }
 
     //Initialization of control system
     control = new Control();
 
-    int win_x = 1920;
-    int win_y = 1080;
-
     //Initialization of window and camera
+    SDL_DisplayMode display_mode;
+    if(SDL_GetDesktopDisplayMode(0, &display_mode)){
+        printf("Could not find display; exiting");
+        exit(-1);
+    }
+
+    int win_x = display_mode.w;
+    int win_y = display_mode.h;
+
 	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win_x, win_y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
         fflush(stdout);
-        return;
+        exit(-1);
     }
 
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -48,7 +57,7 @@ Engine::Engine(){
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
-        return;
+        exit(-1);
     }
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
@@ -118,8 +127,8 @@ void Engine::start(){
     loadZone("global");
 
     //Loading the test zone as the first area
-    this->addThread(new std::thread(loadZone, "Test Zone"));
-    //loadZone("Test Zone");
+    //this->addThread(new std::thread(loadZone, "Test Zone"));
+    loadZone("Test Zone");
 
     //Loading the level editor
     this->addThread(new std::thread(loadZone, "led"));
@@ -166,12 +175,24 @@ void Engine::actionStep(EntityList* all_entities){
 
     ObjectList* obj_cursor = all_entities->obj;
     while(obj_cursor != NULL){
+        Object* curr_object = obj_cursor->obj;
+        if(unlikely(curr_object->isActive() == false)){
+            obj_cursor = obj_cursor->next;
+            continue;
+        }
+
         obj_cursor->obj->action(control);
         obj_cursor = obj_cursor->next;
     }
 
     UIElementList* ui_cursor = all_entities->ui;
     while(ui_cursor != NULL){
+        UIElement* curr_element = ui_cursor->element;
+        if(unlikely(curr_element->isActive() == false)){
+            ui_cursor = ui_cursor->next;
+            continue;
+        }
+
         ui_cursor->element->action(control);
         ui_cursor = ui_cursor->next;
     }
@@ -204,6 +225,12 @@ void Engine::globalAction(){
 void Engine::physicsStep(ObjectList* all_objects){
     if(!this->checkState(GAME_STATE::PAUSE)){
         while(all_objects != NULL){
+            Object* curr_object = all_objects->obj;
+            if(unlikely(curr_object->isActive() == false)){
+                all_objects = all_objects->next;
+                continue;
+            }
+
             all_objects->obj->_process(this->delta);
             all_objects = all_objects->next;
         }
@@ -351,17 +378,14 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
+    //Set custom scale for objects
     camera->setScale(current_x_scale, current_y_scale);
 
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
 
-    //Comment out for production builds (seems to have poor performance implications)
-    /*if(SDL_RenderReadPixels(renderer, NULL, SDL_PIXELFORMAT_ARGB8888, this->screen_blit_surface->pixels, this->screen_blit_surface->pitch) == 0){
-        this->screen_blit_texture = SDL_CreateTextureFromSurface(renderer, this->screen_blit_surface);
-    }*/
-
+    //Set scale back to normal for UI elements
     camera->setScale(1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
@@ -846,4 +870,18 @@ void Engine::unloadZone(const char* zone_name){
             }
         }
     }
+}
+
+/** Gets all zones
+ * @return A ZoneList* of all zones
+ */
+ZoneList* Engine::getZones(){
+    return this->zones;
+}
+
+/** Gets all active zones
+ * @return A ZoneList* of all active zones
+ */
+ZoneList* Engine::getActiveZones(){
+    return this->active_zones;
 }

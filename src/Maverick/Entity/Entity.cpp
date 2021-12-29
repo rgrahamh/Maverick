@@ -437,7 +437,7 @@ void Entity::setSize(float width, float height){
     }
 }
 
-/** Sets the visibility of the current animation state
+/** Sets the activation of the current animation state
  * @return If the object is active
  */
 void Entity::setActive(bool active){

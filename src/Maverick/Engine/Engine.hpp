@@ -82,6 +82,9 @@ class Engine{
 		void deactivateZone(const char* zone_name);
 		void unloadZone(const char* zone_name);
 
+		ZoneList* getZones();
+		ZoneList* getActiveZones();
+
 	private:
 		void gameLoop();
 

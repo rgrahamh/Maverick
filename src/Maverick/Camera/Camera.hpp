@@ -6,6 +6,11 @@
 
 #include <SDL2/SDL.h>
 
+enum CAMERA_FOLLOW_MODE{
+	FIXED_FOLLOW = 0,
+	GRADUAL_FOLLOW = 1
+};
+
 class Camera{
 	public:
 		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference);
@@ -17,6 +22,7 @@ class Camera{
 		SDL_Renderer* getRenderer();
 
 		void setScale(float x_scale, float y_scale);
+		void setFollowMode(CAMERA_FOLLOW_MODE follow_mode);
 
 	private:
 		Object* reference;
@@ -24,6 +30,8 @@ class Camera{
 		double current_y;
 		float x_scale;
 		float y_scale;
+
+		CAMERA_FOLLOW_MODE follow_mode;
 
 		SDL_Renderer* renderer;
 		SDL_Window* window;

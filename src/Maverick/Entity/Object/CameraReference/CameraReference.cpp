@@ -25,5 +25,7 @@ void CameraReference::action(Control* control){
         if(keys[SDL_SCANCODE_D] | keys[SDL_SCANCODE_RIGHT]){
             this->xA += x_speed / engine->getGlobalXScale();
         }
+
+        engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::FIXED_FOLLOW);
     }
 }

@@ -30,6 +30,7 @@ void buildEditor(){
         sprintf(hotbar_name+6, "%i", i);
         hotbar_name[7] = 0;
         UIObjectFrame* hotbar = new UIObjectFrame(hotbar_name, 0.1 + (i * 0.07), 0.925, 0.07, 0.045, window, 1, nullptr, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 14);
+        hotbar->addAnimation("background");
         hotbar->addSprite("background", "./assets/sprites/ui/black.bmp");
         hotbar->setAnimation("background");
         led->addUIElement(hotbar);
@@ -61,8 +62,19 @@ void buildEditor(){
 
     //Add a level area section
 
+    engine->getCamera()->setReference(cam_ref);
+
+    //REMOVE THIS SECTION EVENTUALLY; led should eventually be the only thing loaded
+    ZoneList* zones = engine->getActiveZones();
+    while(zones != nullptr){
+        ObjectList* objects = zones->zone->getObjects();
+        while(objects != nullptr){
+            objects->obj->setActive(false);
+            objects = objects->next;
+        }
+        zones = zones->next;
+    }
+
     engine->addZone(led);
     engine->activateZone("led");
-
-    engine->getCamera()->setReference(cam_ref);
 }

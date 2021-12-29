@@ -119,6 +119,8 @@ void Character::action(Control* control){
 				if(keys[SDL_SCANCODE_D]){
 					this->xA += 0.1;
 				}
+
+				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
 			}
 		}
 		else if(this->control == CONTROL_TYPE::GAMEPAD){
@@ -205,6 +207,8 @@ void Character::action(Control* control){
 			if(!this->sliding){
 				this->yA += pad->left_stick_y_axis * 0.1;
 				this->xA += pad->left_stick_x_axis * 0.1;
+
+				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
 			}
 		}
 	}
