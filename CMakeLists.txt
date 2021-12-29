@@ -35,7 +35,6 @@ set(UISrc
     ./src/Maverick/Entity/UI/UIBorders/UIBorders.cpp
     ./src/Maverick/Entity/UI/UIText/UIText.cpp
     ./src/Maverick/Entity/UI/UITextBox/UITextBox.cpp
-    ./src/Maverick/Entity/UI/UIScreenBlit/UIScreenBlit.cpp
     ./src/Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.cpp
 )
 

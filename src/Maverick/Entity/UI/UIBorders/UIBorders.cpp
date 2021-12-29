@@ -15,8 +15,8 @@ extern TextureHash* texture_hash;
  * @param border_types The border locations
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern, uint8_t border_types)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
+                     SDL_Window* window, int draw_layer, char* border_pattern, uint8_t border_types)
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
 
     this->subelements = nullptr;
@@ -98,8 +98,10 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                         delete borders[i];
                     }
                     this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                     border_width / (double)win_width, border_height / (double)win_height, 1, 1, this->window);
-                    this->borders[i]->addSprite(0, sprite_path);
+                                                     border_width / (double)win_width, border_height / (double)win_height, this->window, 1);
+                    this->borders[i]->addAnimation("border");
+                    this->borders[i]->addSprite("border", sprite_path);
+                    this->borders[i]->setAnimation("border");
                 }
             }
         }
@@ -114,8 +116,8 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
  */
 void UIBorders::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw the textbox background
-    if(active_animation < this->total_animation_num){
-        this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
+    if(active_animation != nullptr){
+        this->active_animation->draw(renderer, delta, camera_x, camera_y);
     }
 
     //Draw the borders

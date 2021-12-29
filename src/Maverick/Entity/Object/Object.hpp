@@ -21,7 +21,7 @@ enum OBJECT_TYPE{
 
 class Object : public Entity{
 	public:
-		Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer = 1);
+		Object(const char* name, float start_x, float start_y, float friction, float mass, int draw_layer = 1);
 		virtual ~Object();
 		float getOldX();
 		float getOldY();

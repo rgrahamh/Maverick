@@ -7,8 +7,8 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(const char* name, float start_x, float start_y, float friction, float mass, unsigned int animation_num, int draw_layer)
-      : Entity(name, start_x, start_y, animation_num, draw_layer){
+Object::Object(const char* name, float start_x, float start_y, float friction, float mass, int draw_layer)
+      : Entity(name, start_x, start_y, draw_layer){
     this->type = OBJECT_TYPE::GENERIC_OBJECT;
 
     //Initializing position, velocity, and acceleration
@@ -76,8 +76,8 @@ bool Object::getEnvBump(){
  * @return The object's current sprite
  */
 Sprite* Object::getSprite(){
-    if(this->active_animation < this->total_animation_num){
-        return this->animations[active_animation]->getSprite();
+    if(this->active_animation != nullptr){
+        return this->active_animation->getSprite();
     }
     else{
         return nullptr;
@@ -178,8 +178,8 @@ void Object::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int cam
  * @param window The window that content is being drawn to
  */
 void Object::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
-    if(this->active_animation < this->total_animation_num){
-        this->animations[this->active_animation]->draw(renderer, delta, camera_x, camera_y);
+    if(this->active_animation != nullptr){
+        this->active_animation->draw(renderer, delta, camera_x, camera_y);
     }
 }
 

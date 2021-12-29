@@ -26,7 +26,7 @@ struct UIElementList{
 
 class UIElement : public Entity{
     public:
-        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window);
+        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer = 0);
         virtual ~UIElement();
 
 		virtual void _process(uint32_t delta);
@@ -45,7 +45,7 @@ class UIElement : public Entity{
 		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
-        void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime = 0, float x_offset = 0, float y_offset = 0, float width = -1.0, float height = -1.0);
+        void addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime = 0, float x_offset = 0, float y_offset = 0, float width = -1.0, float height = -1.0);
 
         UIElement* getElement(const char* name);
         UIElementList* getSubelements();

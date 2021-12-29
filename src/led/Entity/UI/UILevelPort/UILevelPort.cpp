@@ -13,7 +13,7 @@ extern Engine* engine;
  * @param window The current window (used for viewport calculation)
  */
 UILevelPort::UILevelPort(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window)
-           : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, 0, 0, window){
+           : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, 0){
 }
 
 /** Handles actions for this UILevelPort

@@ -72,6 +72,7 @@ class Control{
         const ControllerState* getController(uint8_t controller) const;
 
         //Sets controller states
+        const uint8_t* getDigitalPress() const;
         const uint8_t* getOldKeys() const;
         const uint8_t* getKeys() const;
 
@@ -96,6 +97,7 @@ class Control{
         ControllerState controllers[MAX_GAMEPADS];
 
         //Keyboard states for the prior & current frame
+        uint8_t digital_press[512];
         uint8_t old_keys[512];
         uint8_t keys[512];
 

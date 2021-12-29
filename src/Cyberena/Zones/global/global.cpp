@@ -14,12 +14,13 @@ void buildGlobal(){
     global->addObject(player);
 
     //Create the pause menu
-    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 1, 0, window);
+    UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, window, 0);
     pause_menu->setActive(false);
-    pause_menu->addSprite(0, "./assets/sprites/ui/shade.bmp", 0, 0, 0);
+    pause_menu->addSprite("default", "./assets/sprites/ui/shade.bmp", 0, 0, 0);
+    pause_menu->setAnimation("default");
 
     //Create the pause text
-    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, 1, window, "./assets/fonts/luximr.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
+    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, window, 1, "./assets/fonts/luximr.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
     pause_text->setColor(255, 255, 255);
     pause_menu->addElement(pause_text);
 

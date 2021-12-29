@@ -4,8 +4,8 @@
 class Engine;
 extern Engine* engine;
 
-Character::Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, unsigned animation_num, int draw_layer)
-	: Object(name, start_x, start_y, friction, mass, animation_num, draw_layer),
+Character::Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
+	: Object(name, start_x, start_y, friction, mass, draw_layer),
 	Race(race),
 	Style(style){
     this->type = EXTENDED_OBJECT_TYPE::CHARACTER;
@@ -16,7 +16,7 @@ Character::Character(const char* name, float start_x, float start_y, float frict
 	this->abilities = abilities;
 	this->control = control;
     this->sliding = false;
-	this->control = CONTROL_TYPE::GAMEPAD | CONTROL_TYPE::KEYBOARD;
+	this->control = CONTROL_TYPE::KEYBOARD;
 	this->control_num = 0;
 
 	//Initializing inventory
@@ -42,107 +42,71 @@ Character::~Character(){
 }
 
 bool Character::isStanding(){
-    return active_animation >= UP_NEUTRAL && active_animation <= RIGHT_NEUTRAL;
+    return strncmp("neutral", this->active_animation->getName(), 7) == 0;
 }
 
 bool Character::isWalking(){
-    return active_animation >= UP_WALK && active_animation <= RIGHT_WALK;
+    return strncmp("walk", this->active_animation->getName(), 4) == 0;
 }
 
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
 void Character::action(Control* control){
-    const uint8_t* keys = control->getKeys();
-	const ControllerState* pad = control->getController(this->control_num);
+	const char* active_animation_name = this->active_animation->getName();
 
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
 		//If the character is in an actionable state
-		if(this->control & CONTROL_TYPE::KEYBOARD){
+		if(this->control == CONTROL_TYPE::KEYBOARD){
+			const uint8_t* keys = control->getKeys();
+			const uint8_t* digital = control->getDigitalPress();
+
 			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
 			if(((!(keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_D]))
 			|| (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
 			|| (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
 			|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]))
 			&& this->isWalking()){
-				setAnimation(active_animation - 4);
+				if(strcmp("walk_up", active_animation_name) == 0){
+					setAnimation("neutral_up");
+				}
+				else if(strcmp("walk_right", active_animation_name) == 0){
+					setAnimation("neutral_right");
+				}
+				else if(strcmp("walk_left", active_animation_name) == 0){
+					setAnimation("neutral_left");
+				}
+				else if(strcmp("walk_down", active_animation_name) == 0){
+					setAnimation("neutral_down");
+				}
 			}
-			//Else if up and no other keys
-			else if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
-				setAnimation(UP_WALK);
+
+			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
+			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+				setAnimation("walk_up");
+				active_animation->setNextAnimation(findAnimation("walk_up"));
 			}
 			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
-				setAnimation(DOWN_WALK);
+				setAnimation("walk_down");
+				active_animation->setNextAnimation(findAnimation("walk_down"));
 			}
 			else if((!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
 				  || (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
 				  || (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
 				  || (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])){
-				setAnimation(LEFT_WALK);
+				setAnimation("walk_left");
+				active_animation->setNextAnimation(findAnimation("walk_left"));
 			}
 			else if((!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
 				  || (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
 				  || (!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])
 				  || (keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
-				setAnimation(RIGHT_WALK);
+				setAnimation("walk_right");
+				active_animation->setNextAnimation(findAnimation("walk_right"));
 			}
-		}
-		else if(this->control & CONTROL_TYPE::GAMEPAD){
-			float x_axis = pad->left_stick_x_axis;
-			float y_axis = pad->left_stick_y_axis;
-			if(x_axis == 0.0 && y_axis == 0.0 && this->isWalking()){
-				setAnimation(active_animation - 4);
-			}
-			else if(x_axis > 0.0 && y_axis > 0.0){
-				if(x_axis > y_axis && this->active_animation != RIGHT_WALK){
-					setAnimation(RIGHT_WALK);
-				}
-				else if(x_axis <= y_axis && this->active_animation != DOWN_WALK){
-					setAnimation(DOWN_WALK);
-				}
-			}
-			else if(x_axis > 0.0 && y_axis < 0.0){
-				if(x_axis > abs(y_axis) && this->active_animation != RIGHT_WALK){
-					setAnimation(RIGHT_WALK);
-				}
-				else if(x_axis <= abs(y_axis) && this->active_animation != UP_WALK){
-					setAnimation(UP_WALK);
-				}
-			}
-			else if(x_axis < 0.0 && y_axis > 0.0){
-				if(abs(x_axis) > y_axis && this->active_animation != LEFT_WALK){
-					setAnimation(LEFT_WALK);
-				}
-				else if(abs(x_axis) <= y_axis && this->active_animation != DOWN_WALK){
-					setAnimation(DOWN_WALK);
-				}
-			}
-			else if(x_axis < 0.0 && y_axis < 0.0){
-				//No abs needed, but more extreme direction will be the lesser
-				if(x_axis < y_axis && this->active_animation != LEFT_WALK){
-					setAnimation(LEFT_WALK);
-				}
-				else if(x_axis >= y_axis && this->active_animation != UP_WALK){
-					setAnimation(UP_WALK);
-				}
-			}
-			else if(x_axis > 0.0 && this->active_animation != RIGHT_WALK){
-				setAnimation(RIGHT_WALK);
-			}
-			else if(y_axis > 0.0 && this->active_animation != DOWN_WALK){
-				setAnimation(DOWN_WALK);
-			}
-			else if(x_axis < 0.0 && this->active_animation != LEFT_WALK){
-				setAnimation(LEFT_WALK);
-			}
-			else if(y_axis < 0.0 && this->active_animation != UP_WALK){
-				setAnimation(UP_WALK);
-			}
-		}
 
-		//If we're not sliding (in an actionable state)
-		if(!this->sliding){
-			if(this->control & CONTROL_TYPE::KEYBOARD){
+			//If we're not sliding (in an actionable state)
+			if(!this->sliding){
 				if(keys[SDL_SCANCODE_W]){
 					this->yA -= 0.1;
 				}
@@ -156,7 +120,89 @@ void Character::action(Control* control){
 					this->xA += 0.1;
 				}
 			}
-			else if(this->control & CONTROL_TYPE::GAMEPAD){
+		}
+		else if(this->control == CONTROL_TYPE::GAMEPAD){
+			const ControllerState* pad = control->getController(this->control_num);
+			float x_axis = pad->left_stick_x_axis;
+			float y_axis = pad->left_stick_y_axis;
+			//Q1
+			if(x_axis == 0.0 && y_axis == 0.0 && this->isWalking()){
+				if(strcmp("walk_up", active_animation_name) == 0){
+					setAnimation("neutral_right");
+				}
+				else if(strcmp("walk_right", active_animation_name) == 0){
+					setAnimation("neutral_right");
+				}
+				else if(strcmp("walk_left", active_animation_name) == 0){
+					setAnimation("neutral_left");
+				}
+				else if(strcmp("walk_down", active_animation_name) == 0){
+					setAnimation("neutral_down");
+				}
+			}
+			else if(x_axis > 0.0 && y_axis > 0.0){
+				if(x_axis > y_axis){
+					setAnimation("walk_right");
+					active_animation->setNextAnimation(findAnimation("walk_right"));
+				}
+				else if(x_axis <= y_axis){
+					setAnimation("walk_down");
+					active_animation->setNextAnimation(findAnimation("walk_down"));
+				}
+			}
+			//Q4
+			else if(x_axis > 0.0 && y_axis < 0.0){
+				if(x_axis > abs(y_axis)){
+					setAnimation("walk_right");
+					active_animation->setNextAnimation(findAnimation("walk_right"));
+				}
+				else if(x_axis <= abs(y_axis)){
+					setAnimation("walk_up");
+					active_animation->setNextAnimation(findAnimation("walk_up"));
+				}
+			}
+			//Q2
+			else if(x_axis < 0.0 && y_axis > 0.0){
+				if(abs(x_axis) > y_axis){
+					setAnimation("walk_left");
+					active_animation->setNextAnimation(findAnimation("walk_left"));
+				}
+				else if(abs(x_axis) <= y_axis){
+					setAnimation("walk_right");
+					active_animation->setNextAnimation(findAnimation("walk_right"));
+				}
+			}
+			//Q3
+			else if(x_axis < 0.0 && y_axis < 0.0){
+				//No abs needed, but more extreme direction will be the lesser
+				if(x_axis < y_axis){
+					setAnimation("walk_left");
+					active_animation->setNextAnimation(findAnimation("walk_left"));
+				}
+				else if(x_axis >= y_axis){
+					setAnimation("walk_down");
+					active_animation->setNextAnimation(findAnimation("walk_down"));
+				}
+			}
+			else if(x_axis > 0.0){
+				setAnimation("walk_right");
+					active_animation->setNextAnimation(findAnimation("walk_right"));
+			}
+			else if(y_axis > 0.0){
+				setAnimation("walk_down");
+					active_animation->setNextAnimation(findAnimation("walk_down"));
+			}
+			else if(x_axis < 0.0){
+				setAnimation("walk_left");
+				active_animation->setNextAnimation(findAnimation("walk_left"));
+			}
+			else if(y_axis < 0.0){
+				setAnimation("walk_up");
+				active_animation->setNextAnimation(findAnimation("walk_up"));
+			}
+
+			//If we're not sliding (in an actionable state)
+			if(!this->sliding){
 				this->yA += pad->left_stick_y_axis * 0.1;
 				this->xA += pad->left_stick_x_axis * 0.1;
 			}

@@ -72,15 +72,15 @@ typedef struct EquipmentList{
 	//Pants* pants;
 } Equipment;
 
-enum CHARACTER_ANIMATION{
-	UP_NEUTRAL    = 0,
-	DOWN_NEUTRAL  = 1,
-	LEFT_NEUTRAL  = 2,
-	RIGHT_NEUTRAL = 3,
-	UP_WALK       = 4,
-	DOWN_WALK     = 5,
-	LEFT_WALK     = 6,
-	RIGHT_WALK    = 7
+enum CHARACTER_STATE{
+	NEUTRAL_UP    = 0,
+	NEUTRAL_DOWN  = 1,
+	NEUTRAL_LEFT  = 2,
+	NEUTRAL_RIGHT = 3,
+	WALK_UP       = 4,
+	WALK_DOWN     = 5,
+	WALK_LEFT     = 6,
+	WALK_RIGHT    = 7
 };
 
 enum CONTROL_TYPE{
@@ -93,7 +93,7 @@ enum CONTROL_TYPE{
 
 class Character : public Object, public Race, public Style{
 	public:
-		Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, unsigned int animation_num = 12, int draw_layer = 1);
+		Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, int draw_layer = 1);
 		virtual ~Character();
 
 		//Useful for actions on other objects & input

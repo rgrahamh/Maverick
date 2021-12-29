@@ -8,7 +8,12 @@ extern Engine* engine;
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(float* x_base, float* y_base){
+Animation::Animation(const char* name, float* x_base, float* y_base){
+    int name_len = strlen(name);
+    this->name = (char*)malloc(name_len + 1);
+    memcpy(this->name, name, name_len);
+    this->name[name_len] = '\0';
+
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -18,6 +23,8 @@ Animation::Animation(float* x_base, float* y_base){
 	this->y_scale = 1.0;
 	this->time_counter = 0;
 	this->paused = false;
+
+	this->next_animation = nullptr;
 }
 
 /** Animation destructor
@@ -55,6 +62,8 @@ Animation::~Animation(){
 			free(tmp);
 		} while(cursor != sequence_start);
 	}
+
+	free(name);
 }
 
 /** Gets the current sprite
@@ -138,13 +147,13 @@ bool Animation::isAnimated(){
  * @param width The width of the new sprite 
  * @param height The height of the new sprite
  */
-void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width, int height){
+int Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width, int height){
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = texture_hash->get(sprite_path)) == NULL){
 		if(surface == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
-			return;
+			return -1;
 		}
 	}
 
@@ -204,7 +213,7 @@ void Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_
 /** Adds a new hitbox to an animation (to all sprites)
  * @param hitbox The hitbox to add
  */
-void Animation::addHitbox(Hitbox* hitbox){
+int Animation::addHitbox(Hitbox* hitbox){
 	AnimationSeq* cursor = this->sequence_start;
 	if(cursor != NULL){
 		do{
@@ -215,6 +224,11 @@ void Animation::addHitbox(Hitbox* hitbox){
 
 			cursor = cursor->next;
 		} while (cursor != this->sequence_start);
+
+		return 0;
+	}
+	else{
+		return -1;
 	}
 }
 
@@ -222,89 +236,127 @@ void Animation::addHitbox(Hitbox* hitbox){
  * @param hitbox The hitbox to add
  * @param sprite_num The sprite number (-1 adds to the last sprite)
  */
-void Animation::addHitbox(Hitbox* hitbox, int sprite_num){
-	if(sprite_num == -1){
-		HitboxList* new_hitbox = new HitboxList;
-		new_hitbox->hitbox = hitbox;
-		new_hitbox->next = NULL;
-		if(this->sequence_end != NULL){
-			if(this->sequence_end->hitboxes == NULL){
-				this->sequence_end->hitboxes = new_hitbox;
-			}
-			else{
-				this->sequence_end->hitboxes->next = new_hitbox;
-			}
-		}
-	}
-	else{
-		AnimationSeq* cursor = this->sequence_start;
-		for(int i = 0; i < sprite_num && cursor != NULL; i++){
-			cursor = cursor->next;
-		}
-		if(cursor != NULL){
+int Animation::addHitbox(Hitbox* hitbox, int sprite_num){
+	if(this->sequence_start != nullptr){
+		if(sprite_num == -1){
 			HitboxList* new_hitbox = new HitboxList;
 			new_hitbox->hitbox = hitbox;
-			new_hitbox->next = cursor->hitboxes;
-			cursor->hitboxes = new_hitbox;
-		}
-	}
-}
-
-/** Sets the scale of the animation
- * @param x_scale The X scale factor
- * @param y_scale the Y scale factor
- */
-void Animation::setScale(float x_scale, float y_scale){
-	AnimationSeq* cursor = sequence_start;
-	if(cursor != NULL){
-		do{
-			cursor->sprite->curr_x_offset *= x_scale / this->x_scale;
-			cursor->sprite->curr_y_offset *= y_scale / this->y_scale;
-
-			if(cursor->sprite->rect != NULL){
-				cursor->sprite->rect->w *= x_scale / this->x_scale;
-				cursor->sprite->rect->h *= y_scale / this->y_scale;
-			}
-			if(cursor->hitboxes != NULL){
-				for(HitboxList* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
-					hitboxlst->hitbox->setScale(x_scale, y_scale);
+			new_hitbox->next = NULL;
+			if(this->sequence_end != NULL){
+				if(this->sequence_end->hitboxes == NULL){
+					this->sequence_end->hitboxes = new_hitbox;
+				}
+				else{
+					this->sequence_end->hitboxes->next = new_hitbox;
 				}
 			}
-
-			cursor = cursor->next;
-		} while(cursor != sequence_start);
+		}
+		else{
+			AnimationSeq* cursor = this->sequence_start;
+			for(int i = 0; i < sprite_num && cursor != NULL; i++){
+				cursor = cursor->next;
+			}
+			if(cursor != NULL){
+				HitboxList* new_hitbox = new HitboxList;
+				new_hitbox->hitbox = hitbox;
+				new_hitbox->next = cursor->hitboxes;
+				cursor->hitboxes = new_hitbox;
+			}
+		}
+		return 0;
 	}
+	else{
+		return -1;
+	}
+}
 
-	this->x_scale = x_scale;
-	this->y_scale = y_scale;
+/** Sets the next animation
+ * @param next_animation The next animation
+ */
+void Animation::setNextAnimation(Animation* next_animation){
+	this->next_animation = next_animation;
 }
 
 /** Sets the scale of the animation
  * @param x_scale The X scale factor
  * @param y_scale the Y scale factor
  */
-void Animation::setSize(int width, int height){
-	AnimationSeq* cursor = sequence_start;
-	if(cursor != NULL){
-		do{
-			if(cursor->sprite->rect != NULL){
-				cursor->sprite->rect->w = width;
-				cursor->sprite->rect->h = height;
-			}
+int Animation::setScale(float x_scale, float y_scale){
+	if(this->sequence_start != nullptr){
+		AnimationSeq* cursor = sequence_start;
+		if(cursor != NULL){
+			do{
+				cursor->sprite->curr_x_offset *= x_scale / this->x_scale;
+				cursor->sprite->curr_y_offset *= y_scale / this->y_scale;
 
-			cursor = cursor->next;
-		} while(cursor != sequence_start);
+				if(cursor->sprite->rect != NULL){
+					cursor->sprite->rect->w *= x_scale / this->x_scale;
+					cursor->sprite->rect->h *= y_scale / this->y_scale;
+				}
+				if(cursor->hitboxes != NULL){
+					for(HitboxList* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
+						hitboxlst->hitbox->setScale(x_scale, y_scale);
+					}
+				}
+
+				cursor = cursor->next;
+			} while(cursor != sequence_start);
+		}
+
+		this->x_scale = x_scale;
+		this->y_scale = y_scale;
+
+		return 0;
+	}
+	else{
+		return -1;
+	}
+}
+
+/** Sets the size of the animation
+ * @param x_scale The X size
+ * @param y_scale the Y size
+ */
+int Animation::setSize(int width, int height){
+	if(this->sequence_start != nullptr){
+		AnimationSeq* cursor = sequence_start;
+		if(cursor != NULL){
+			do{
+				if(cursor->sprite->rect != NULL){
+					cursor->sprite->rect->w = width;
+					cursor->sprite->rect->h = height;
+				}
+
+				cursor = cursor->next;
+			} while(cursor != sequence_start);
+		}
+
+		return 0;
+	}
+	else{
+		return -1;
 	}
 }
 
 /** Advances the animation by a frame
  */
 void Animation::advance(uint32_t delta){
-	if(this->isAnimated() && !this->paused && sequence->keytime <= time_counter){
-		sequence = sequence->next;
-		time_counter -= sequence->keytime;
+	if(this->isAnimated() && !this->paused){
+		time_counter += delta;
+		//If we've exceeded the keytime for this frame
+		if(sequence->keytime <= time_counter){
+			//If we've hit the end of the sequence & next_animation is not nullptr (for a loop, next_sequence should be start_sequence)
+			if(sequence == sequence_end && next_animation != nullptr){
+				sequence = next_animation->getSequenceStart();
+			}
+			//If we haven't hit the end of the sequence
+			else if(sequence != sequence_end){
+				sequence = sequence->next;
+			}
+			//If we're on the last frame of the sequence & next_animation is null, maintain the current frame
+			time_counter -= sequence->keytime;
+		}
 	}
-	time_counter += delta;
 }
 
 /** Starts the animation over again
@@ -391,4 +443,11 @@ AnimationSeq* Animation::getSequenceStart(){
  */
 AnimationSeq* Animation::getSequenceEnd(){
 	return this->sequence_end;
+}
+
+/** Gets the name of the animation
+ * @return The name of the animation
+ */
+const char* Animation::getName(){
+	return this->name;
 }
