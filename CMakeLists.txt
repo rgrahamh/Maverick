@@ -9,6 +9,10 @@ set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp
 )
 
+set(AudioSrc
+    ./src/Maverick/Audio/SoundBoard.cpp
+)
+
 set(HashSrc
     ./src/Maverick/HashTable/HashTable.cpp
     ./src/Maverick/HashTable/TextureHash/TextureHash.cpp
@@ -67,6 +71,7 @@ set(EngineSrc
 
 set(MotorSrc
     ${AnimationSrc}
+    ${AudioSrc}
     ${HashSrc}
     ${HitboxSrc}
     ${CameraSrc}
@@ -133,5 +138,6 @@ target_link_libraries(editor
     SDL2
     SDL2_image
     SDL2_ttf
+    SDL2_mixer
     GL
 )

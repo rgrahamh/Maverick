@@ -62,8 +62,8 @@ class Entity{
 		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 
-		virtual unsigned int serializeData(char** buff_ptr) = 0;
-		virtual unsigned int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set) = 0;
+		virtual int serializeData(char** buff_ptr);
+		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 		
 	protected:
 		//Name

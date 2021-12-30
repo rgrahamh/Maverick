@@ -3,6 +3,8 @@
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
 
+std::atomic<bool> exit_game = false;
+
 static int SDLCALL event_listener(void* userdata, SDL_Event* event){
     if(event->type == SDL_EventType::SDL_QUIT){
         *(bool*)userdata = true;
@@ -29,6 +31,20 @@ Engine::Engine(){
         printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
         exit(-1);
     }
+    //Don't need to init w/ anything else; we're just using WAVs
+    if(Mix_Init(0) < 0){
+        printf("Failed to init Mixer! ERR: %s\n", Mix_GetError());
+        exit(-1);
+    }
+
+    //Play around w/ the audio frequency
+    if(Mix_OpenAudio(44100, AUDIO_S32LSB, 2, 512) < 0){
+        printf("Failed to init Mixer Audio! ERR: %s\n", Mix_GetError());
+        exit(-1);
+    }
+
+    //Initialization of the sound board
+    this->sound_board = new SoundBoard();
 
     //Initialization of control system
     control = new Control();
@@ -114,6 +130,8 @@ Engine::~Engine(){
     TTF_Quit();
     IMG_Quit();
     SDL_Quit();
+    Mix_CloseAudio();
+    Mix_Quit();
 
     freeFullEntityList();
 }
@@ -140,7 +158,6 @@ void Engine::start(){
 /** The primary game loop
  */
 void Engine::gameLoop(){
-    bool exit_game = false;
     SDL_AddEventWatch(event_listener, &exit_game);
 
 	while(!exit_game){
@@ -884,4 +901,11 @@ ZoneList* Engine::getZones(){
  */
 ZoneList* Engine::getActiveZones(){
     return this->active_zones;
+}
+
+/** Gets the engine's sound board
+ * @return The engine's sound board
+ */
+SoundBoard* Engine::getSoundBoard(){
+    return this->sound_board;
 }

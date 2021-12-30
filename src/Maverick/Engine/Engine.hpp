@@ -17,8 +17,12 @@
 #include "../Entity/UI/UIElement.hpp"
 #include "../Entity/Object/Object.hpp"
 
+#include "../Audio/SoundBoard.hpp"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 enum GAME_STATE : uint64_t{
 	TITLE = 1,
@@ -85,6 +89,8 @@ class Engine{
 		ZoneList* getZones();
 		ZoneList* getActiveZones();
 
+		SoundBoard* getSoundBoard();
+
 	private:
 		void gameLoop();
 
@@ -136,6 +142,9 @@ class Engine{
 
 		//Control
 		Control* control;
+
+		//Sound
+		SoundBoard* sound_board;
 
 		//State tracking
 		uint64_t state;

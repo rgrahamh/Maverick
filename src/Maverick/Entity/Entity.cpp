@@ -480,3 +480,32 @@ Animation* Entity::findAnimation(const char* animation_name){
     }
     return animation_cursor->animation;
 }
+
+int Entity::serializeData(char** buff_ptr){
+}
+
+int Entity::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
+    if(active_animation != nullptr){
+        AnimationSeq* sequence_start = active_animation->getSequenceStart();
+        AnimationSeq* cursor = sequence_start;
+        if(cursor != NULL){
+            do{
+                //If this asset's not been saved in this file yet
+                if(sprite_set.find(std::string(cursor->sprite->name)) == sprite_set.end()){
+                    //Insert the asset
+                }
+
+                //Also have a place for saving audio (once that's implemented in the system)
+                if(audio_set.find(std::string(cursor->sprite->name)) == audio_set.end()){
+                    //Insert the audio
+                }
+
+                cursor = cursor->next;
+                sprite_set.insert(cursor->sprite->name);
+            } while(cursor != sequence_start);
+        }
+    }
+    else{
+        return -1;
+    }
+}

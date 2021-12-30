@@ -1,27 +1,5 @@
 #include "Saver.hpp"
 
-int saveAnimationAssets(Animation** animations, unsigned int animation_num, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
-	for(int i = 0; i < animation_num; i++){
-		if(animations[i] != nullptr){
-			AnimationSeq* sequence_start = animations[i]->getSequenceStart();
-			AnimationSeq* cursor = sequence_start;
-			if(cursor != NULL){
-				do{
-					//If this asset's not been saved in this file yet
-					if(sprite_set.find(cursor->sprite->name) == sprite_set.end()){
-						//Insert the asset
-					}
-
-					//Also have a place for saving audio (once that's implemented in the system)
-
-					cursor = cursor->next;
-					sprite_set.insert(cursor->sprite->name);
-				} while(cursor != sequence_start);
-			}
-		}
-	}
-}
-
 int saveZone(Zone* zone){
 	bool endian = getEndian();
 
@@ -54,7 +32,6 @@ int saveZone(Zone* zone){
 	//Save resources used in this zone (both by UI elements & objects)
 	while(element_cursor != nullptr && element_cursor->element != nullptr){
 		UIElement* element = element_cursor->element;
-		saveAnimationAssets(element->getAnimations(), element->getTotalAnimationNum(), sprite_set, audio_set);
 		char* assets_buff = nullptr;
 		unsigned int buff_len = element->serializeAssets(&assets_buff, sprite_set, audio_set);
 		if(buff_len > 0 && assets_buff != nullptr){
@@ -83,7 +60,6 @@ int saveZone(Zone* zone){
 	//Write UI elements to file
 	while(element_cursor != nullptr && element_cursor->element != nullptr){
 		UIElement* element = element_cursor->element;
-		saveAnimationAssets(element->getAnimations(), element->getTotalAnimationNum(), sprite_set, audio_set);
 		char* data_buff = nullptr;
 		unsigned int buff_len = element->serializeData(&data_buff);
 		if(buff_len > 0 && data_buff != nullptr){

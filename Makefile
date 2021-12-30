@@ -1,4 +1,4 @@
-INCLUDE_SDL= -lSDL2 -lSDL2_image -lSDL2_ttf -lGL
+INCLUDE_SDL= -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lGL
 CC=g++
 CFLAGS= -Wall -std=c++17 -pthread -Wno-write-strings
 

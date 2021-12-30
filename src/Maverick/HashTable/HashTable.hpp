@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
 typedef struct HashTableEntry{
 	char* key;

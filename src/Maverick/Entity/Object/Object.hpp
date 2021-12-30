@@ -16,7 +16,7 @@
 enum OBJECT_TYPE{
     GENERIC_OBJECT,
     CAMERA_REFERENCE,
-	EXTENDED_OBJECT_TYPE_START
+	EXTENDED_OBJECT_TYPE_START = 4096
 };
 
 class Object : public Entity{
@@ -31,8 +31,8 @@ class Object : public Entity{
 		bool getEnvBump();
 		Sprite* getSprite();
 
-		virtual unsigned int serializeData(char** buff_ptr);
-		virtual unsigned int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
+		virtual int serializeData(char** buff_ptr);
+		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 		
 		void setXVel(float xV);
 		void setYVel(float yV);
