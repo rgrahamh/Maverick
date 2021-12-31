@@ -1,4 +1,6 @@
 #include "SoundBoard.hpp"
+#include "../Engine/Engine.hpp"
+extern Engine* engine;
 
 SoundBoard::SoundBoard(){
     Mix_AllocateChannels(NUM_CHANNELS);
@@ -93,6 +95,8 @@ int SoundBoard::playMusic(Music* music, unsigned int fade){
 
         //Start channel 2
         setInstruments(music, 2, fade);
+
+        return 1;
     }
     //If channel 1 isn't playing anything (will hit both when nothing is playing & when just channel 2 is playing)
     else{
@@ -109,6 +113,41 @@ int SoundBoard::playMusic(Music* music, unsigned int fade){
 
         //Start channel 1
         setInstruments(music, 1, fade);
+
+        return 2;
+    }
+}
+
+void SoundBoard::setMusicVolume(int channel_id, float volume, unsigned int fade){
+    if(fade == 0){
+        if(channel_id == -1 || channel_id == 1){
+            for(int i = BASS_CHANNEL_1; i <= MISC_CHANNEL_1; i++){
+                Mix_Volume(i, volume * MIX_MAX_VOLUME);
+            }
+        }
+
+        if(channel_id == -1 || channel_id == 2){
+            for(int i = BASS_CHANNEL_2; i <= MISC_CHANNEL_2; i++){
+                Mix_Volume(i, volume * MIX_MAX_VOLUME);
+            }
+        }
+    }
+    else{
+        if(channel_id == -1 || channel_id == 1){
+            for(int i = BASS_CHANNEL_1; i <= MISC_CHANNEL_1; i++){
+                if(Mix_Playing(i)){
+                    engine->addThread(new std::thread (&SoundBoard::fadeVolume, this, i, volume, fade));
+                }
+            }
+        }
+
+        if(channel_id == -1 || channel_id == 2){
+            for(int i = BASS_CHANNEL_2; i <= MISC_CHANNEL_2; i++){
+                if(Mix_Playing(i)){
+                    engine->addThread(new std::thread(&SoundBoard::fadeVolume, this, i, volume, fade));
+                }
+            }
+        }
     }
 }
 
@@ -116,10 +155,10 @@ int SoundBoard::playMusic(Music* music, unsigned int fade){
  * @param channel_id The channel to set the volume for (if -1, sets the volume for all channels)
  * @param volume The volume level (as a positive float; 1.0 is max volume)
  */
-void SoundBoard::setChannelVolume(int channel_id, float volume, unsigned int fade){
+void SoundBoard::setSoundVolume(int channel_id, float volume, unsigned int fade){
     //No fade
     if(fade == 0){
-        Mix_Volume(channel_id, MIX_MAX_VOLUME * volume);
+        Mix_Volume(channel_id, volume * MIX_MAX_VOLUME );
     }
     else{
         //Fade to volume for selected channel
@@ -216,6 +255,8 @@ int SoundBoard::playSound(Mix_Chunk* sound_chunk, int loops, float left_pan, flo
         Mix_Volume(channel_id, sound_level * MIX_MAX_VOLUME);
         Mix_SetPanning(channel_id, left_pan, right_pan);
     }
+
+    return channel_id;
 }
 
 /** Stops a sound
@@ -235,8 +276,8 @@ void SoundBoard::fadeVolume(unsigned int channel_id, float volume, unsigned int 
     uint8_t current_volume = starting_volume;
     uint8_t target_volume = volume * MIX_MAX_VOLUME;
 
-    int8_t volume_diff = abs(starting_volume - target_volume);
-    uint8_t volume_dir = (target_volume > starting_volume)? 1 : -1;
+    uint8_t volume_diff = abs(starting_volume - target_volume);
+    int8_t volume_dir = (target_volume > starting_volume)? 1 : -1;
     for(int i = 0; i < volume_diff; i++){
         //In microseconds for more granularity
         std::this_thread::sleep_for(std::chrono::microseconds((fade * 1000) / volume_diff));

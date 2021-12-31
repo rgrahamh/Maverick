@@ -57,7 +57,8 @@ class SoundBoard{
         int playSound(Mix_Chunk* sound_chunk, int loops = 0, float left_pan = 1.0, float right_pan = 1.0);
         int stopSound(int channel_num);
 
-        void setChannelVolume(int channel_id, float volume, unsigned int fade = 0);
+        void setMusicVolume(int channel_id, float volume, unsigned int fade = 0);
+        void setSoundVolume(int channel_id, float volume, unsigned int fade = 0);
 
     private:
         float music_level;

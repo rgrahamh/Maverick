@@ -79,9 +79,6 @@ Engine::Engine(){
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
 
-    Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
-    sound_board->playMusic(song1);
-
     //Set scales
     this->current_x_scale = 1.0;
     this->current_y_scale = 1.0;
@@ -148,6 +145,10 @@ void Engine::start(){
     //Loading the level editor
     this->addThread(new std::thread(loadZone, "led"));
     //loadZone("led");
+
+    Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
+    sound_board->playMusic(song1);
+    sound_board->setMusicVolume(1, 0.0, 10000);
 
     gameLoop();
 }
