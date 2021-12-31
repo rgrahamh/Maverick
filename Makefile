@@ -4,7 +4,7 @@ CFLAGS= -Wall -std=c++17 -pthread -Wno-write-strings
 
 #Engine components
 ANIMATION= ./src/Maverick/Animation/Animation.cpp
-HASH= ./src/Maverick/HashTable/HashTable.cpp ./src/Maverick/HashTable/TextureHash/TextureHash.cpp
+HASH= ./src/Maverick/HashTable/HashTable.cpp ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
 HITBOXES= ./src/Maverick/Animation/Hitbox/Hitbox.cpp ./src/Maverick/Animation/Hitbox/HitEllipse/HitEllipse.cpp ./src/Maverick/Animation/Hitbox/HitEllipse/HitCone/HitCone.cpp ./src/Maverick/Animation/Hitbox/HitRect/HitRect.cpp ./src/Maverick/Animation/Hitbox/HitboxCollision.cpp
 CAMERA= ./src/Maverick/Camera/Camera.cpp
 CONTROL= ./src/Maverick/Control/Control.cpp

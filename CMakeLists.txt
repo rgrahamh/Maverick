@@ -15,7 +15,9 @@ set(AudioSrc
 
 set(HashSrc
     ./src/Maverick/HashTable/HashTable.cpp
-    ./src/Maverick/HashTable/TextureHash/TextureHash.cpp
+    ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
+    ./src/Maverick/HashTable/MusicHash/MusicHash.cpp
+    ./src/Maverick/HashTable/SoundHash/SoundHash.cpp
 )
 
 set(HitboxSrc

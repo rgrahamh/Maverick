@@ -27,12 +27,18 @@ enum RESERVED_CHANNELS{
 };
 
 struct Music{
+    const char* name = nullptr;
     Mix_Chunk* bass = nullptr;
     Mix_Chunk* lead_guitar = nullptr;
     Mix_Chunk* rhythm_guitar = nullptr;
     Mix_Chunk* drums = nullptr;
     Mix_Chunk* synth = nullptr;
     Mix_Chunk* misc = nullptr;
+};
+
+struct Sound{
+    const char* name = nullptr;
+    Mix_Chunk* sample = nullptr;
 };
 
 class SoundBoard{
@@ -48,11 +54,15 @@ class SoundBoard{
         void playEnvironment(Mix_Chunk* sound_chunk, int loops = 0);
         void stopEnvironment();
     
-        int playSound(Mix_Chunk* sound_chunk, int loops = 0);
+        int playSound(Mix_Chunk* sound_chunk, int loops = 0, float left_pan = 1.0, float right_pan = 1.0);
+        int stopSound(int channel_num);
 
         void setChannelVolume(int channel_id, float volume, unsigned int fade = 0);
 
     private:
+        float music_level;
+        float sound_level;
+
         void fadeVolume(unsigned int channel_id, float tagret_volume, unsigned int fade);
         void setInstruments(Music* music, int channel_id, unsigned int fade = 0.0);
 

@@ -5,14 +5,6 @@
 
 std::atomic<bool> exit_game = false;
 
-static int SDLCALL event_listener(void* userdata, SDL_Event* event){
-    if(event->type == SDL_EventType::SDL_QUIT){
-        *(bool*)userdata = true;
-    }
-
-    return 1;
-}
-
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -45,10 +37,6 @@ Engine::Engine(){
 
     //Initialization of the sound board
     this->sound_board = new SoundBoard();
-
-    Music song1;
-    song1.bass = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
-    sound_board->playMusic(&song1);
 
     //Initialization of control system
     control = new Control();
@@ -87,7 +75,12 @@ Engine::Engine(){
     this->screen_blit_texture = nullptr;
 
     //Setting up the texture hash table
-    texture_hash = new TextureHash(2048);
+    this->sprite_hash = new SpriteHash(2048);
+    this->sound_hash = new SoundHash(2048);
+    this->music_hash = new MusicHash(2048);
+
+    Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
+    sound_board->playMusic(song1);
 
     //Set scales
     this->current_x_scale = 1.0;
@@ -162,8 +155,6 @@ void Engine::start(){
 /** The primary game loop
  */
 void Engine::gameLoop(){
-    SDL_AddEventWatch(event_listener, &exit_game);
-
 	while(!exit_game){
         buildFullEntityList();
         delta = SDL_GetTicks();
@@ -912,4 +903,28 @@ ZoneList* Engine::getActiveZones(){
  */
 SoundBoard* Engine::getSoundBoard(){
     return this->sound_board;
+}
+
+/** Gets a texture from the engine
+ * @param key The texture's identifier in the hash table
+ * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
+ */
+SDL_Surface* Engine::getSurface(const char* key){
+    return this->sprite_hash->get(key);
+}
+
+/** Gets a sound from the engine
+ * @param key The sound's identifier in the hash table
+ * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
+ */
+Sound* Engine::getSound(const char* key){
+    return this->sound_hash->get(key);
+}
+
+/** Gets a music from the engine
+ * @param key The music's identifier in the hash table
+ * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
+ */
+Music* Engine::getMusic(const char* key){
+    return this->music_hash->get(key);
 }

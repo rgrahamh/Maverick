@@ -1,5 +1,5 @@
-#ifndef TEXTUREHASH_HPP
-#define TEXTUREHASH_HPP
+#ifndef SPRITEHASH_HPP
+#define SPRITEHASH_HPP
 
 #include <string.h>
 #include <SDL2/SDL.h>
@@ -8,16 +8,16 @@
 
 #include "../HashTable.hpp"
 
-typedef struct TextureHashEntry{
+typedef struct SpriteHashEntry{
 	char* key;
 	SDL_Surface* surface;
-	struct TextureHashEntry* next;
+	struct SpriteHashEntry* next;
 } THEntry;
 
-class TextureHash : public HashTable{
+class SpriteHash : public HashTable{
 	public:
-		TextureHash(unsigned int size);
-		~TextureHash();
+		SpriteHash(unsigned int size);
+		~SpriteHash();
 
 		void add(const char* key, SDL_Surface* surface);
 		bool has(const char* key);

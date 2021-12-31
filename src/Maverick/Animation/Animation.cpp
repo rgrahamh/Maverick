@@ -150,7 +150,7 @@ bool Animation::isAnimated(){
 int Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width, int height){
 	//Getting the texture
 	SDL_Surface* surface;
-	if((surface = texture_hash->get(sprite_path)) == NULL){
+	if((surface = engine->getSurface(sprite_path)) == NULL){
 		if(surface == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return -1;
@@ -208,6 +208,8 @@ int Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_o
 
 	//Set up the circular link
 	this->sequence_end->next = this->sequence_start;
+
+	return 0;
 }
 
 /** Adds a new hitbox to an animation (to all sprites)
@@ -234,11 +236,11 @@ int Animation::addHitbox(Hitbox* hitbox){
 
 /** Adds a new hitbox to an animation (with sprite number)
  * @param hitbox The hitbox to add
- * @param sprite_num The sprite number (-1 adds to the last sprite)
+ * @param sequence_num The sprite number (-1 adds to the last sprite)
  */
-int Animation::addHitbox(Hitbox* hitbox, int sprite_num){
+int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 	if(this->sequence_start != nullptr){
-		if(sprite_num == -1){
+		if(sequence_num == -1){
 			HitboxList* new_hitbox = new HitboxList;
 			new_hitbox->hitbox = hitbox;
 			new_hitbox->next = NULL;
@@ -253,7 +255,7 @@ int Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 		}
 		else{
 			AnimationSeq* cursor = this->sequence_start;
-			for(int i = 0; i < sprite_num && cursor != NULL; i++){
+			for(int i = 0; i < sequence_num && cursor != NULL; i++){
 				cursor = cursor->next;
 			}
 			if(cursor != NULL){
@@ -261,6 +263,36 @@ int Animation::addHitbox(Hitbox* hitbox, int sprite_num){
 				new_hitbox->hitbox = hitbox;
 				new_hitbox->next = cursor->hitboxes;
 				cursor->hitboxes = new_hitbox;
+			}
+		}
+		return 0;
+	}
+	else{
+		return -1;
+	}
+}
+
+/** Adds a new sound to an animation (given the sprite number)
+ * @param sound The sound to add
+ * @param sequence_num The sequence number (-1 adds to the last element of the sequence)
+ */
+int Animation::addSound(Sound* sound, int sequence_num){
+	if(this->sequence_start != nullptr){
+		if(sequence_num == -1){
+			if(this->sequence_end != NULL){
+				this->sequence_end->sound = sound;
+			}
+			else{
+				return -1;
+			}
+		}
+		else{
+			AnimationSeq* cursor = this->sequence_start;
+			for(int i = 0; i < sequence_num && cursor != NULL; i++){
+				cursor = cursor->next;
+			}
+			if(cursor != NULL){
+				cursor->sound = sound;
 			}
 		}
 		return 0;

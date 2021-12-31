@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "../HashTable/HashTable.hpp"
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
@@ -39,6 +40,8 @@ class Entity{
 		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
 		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
 		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+
+		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
 		void setX(float x);
 		void setY(float y);

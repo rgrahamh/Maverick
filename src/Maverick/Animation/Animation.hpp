@@ -1,7 +1,7 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "../HashTable/TextureHash/TextureHash.hpp"
+#include "../Audio/SoundBoard.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Utility/Utility.hpp"
@@ -10,8 +10,6 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 #include <unordered_set>
-
-extern TextureHash* texture_hash;
 
 struct Sprite{
 	char* name;
@@ -33,13 +31,15 @@ struct Sprite{
 };
 
 typedef struct AnimationSequence{
-	Sprite* sprite;
+	Sprite* sprite = nullptr;
 
-	HitboxList* hitboxes;
+	Sound* sound = nullptr;
+
+	HitboxList* hitboxes = nullptr;
 	
-	unsigned int keytime;
+	unsigned int keytime = 0;
 
-	struct AnimationSequence* next;
+	struct AnimationSequence* next = nullptr;
 } AnimationSeq;
 
 class Animation{
@@ -68,7 +68,8 @@ class Animation{
 
 		int addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
 		int addHitbox(Hitbox* hitbox);
-		int addHitbox(Hitbox* hitbox, int hitbox_num);
+		int addHitbox(Hitbox* hitbox, int sequence_num);
+		int addSound(Sound* sound, int sequence_num);
 
 		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
 

@@ -24,6 +24,7 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
     player->addSprite("walk_down", "./assets/sprites/old_game_resources/Down_Left_Foot.bmp", 256, 0, 0);
     player->addSprite("walk_down", "./assets/sprites/old_game_resources/Down_Neutral.bmp", 256, 0, 0);
     player->addSprite("walk_down", "./assets/sprites/old_game_resources/Down_Right_Foot.bmp", 256, 0, 0);
+    
 
     player->addAnimation("walk_left");
     player->addSprite("walk_left", "./assets/sprites/old_game_resources/Left_Left_Foot.bmp", 256, 0, 0);

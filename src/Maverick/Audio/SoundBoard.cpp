@@ -20,6 +20,9 @@ SoundBoard::SoundBoard(){
     Mix_GroupChannel(MISC_CHANNEL_2, 2);
 
     Mix_ReserveChannels(UNRESERVED_CHANNEL);
+
+    music_level = 1.0;
+    sound_level = 1.0;
 }
 
 SoundBoard::~SoundBoard(){
@@ -180,15 +183,46 @@ void SoundBoard::resumeMusic(int channel_id){
     }
 }
 
+/** Resumes music for the specified channel
+ * @param channel_id The channel you wish to stop music for (-1 if you wish to resume all channels)
+ */
+void SoundBoard::stopMusic(int channel_id){
+    if(channel_id == -1 || channel_id == 1){
+        Mix_HaltChannel(BASS_CHANNEL_1);
+        Mix_HaltChannel(LEAD_GUITAR_CHANNEL_1);
+        Mix_HaltChannel(RHYTHM_GUITAR_CHANNEL_1);
+        Mix_HaltChannel(DRUMS_CHANNEL_1);
+        Mix_HaltChannel(SYNTH_CHANNEL_1);
+        Mix_HaltChannel(MISC_CHANNEL_1);
+    }
+
+    if(channel_id == -1 || channel_id == 2){
+        Mix_HaltChannel(BASS_CHANNEL_2);
+        Mix_HaltChannel(LEAD_GUITAR_CHANNEL_2);
+        Mix_HaltChannel(RHYTHM_GUITAR_CHANNEL_2);
+        Mix_HaltChannel(DRUMS_CHANNEL_2);
+        Mix_HaltChannel(SYNTH_CHANNEL_2);
+        Mix_HaltChannel(MISC_CHANNEL_2);
+    }
+}
+
 /** Plays a sound <loops + 1> number of times
  * @param sound_chunk The sound chunk that we're playing
  * @param loops The number of loops we're playing
  */
-int SoundBoard::playSound(Mix_Chunk* sound_chunk, int loops){
-    if(sound_chunk == nullptr || Mix_PlayChannel(-1, sound_chunk, loops) == -1){
-        return -1;
+int SoundBoard::playSound(Mix_Chunk* sound_chunk, int loops, float left_pan, float right_pan){
+    int channel_id = Mix_PlayChannel(-1, sound_chunk, loops);
+    if(channel_id != -1){
+        Mix_Volume(channel_id, sound_level * MIX_MAX_VOLUME);
+        Mix_SetPanning(channel_id, left_pan, right_pan);
     }
-    return 0;
+}
+
+/** Stops a sound
+ * @param channel_num The channel number we're stopping
+ */
+int SoundBoard::stopSound(int channel_num){
+    return Mix_HaltChannel(channel_num);
 }
 
 /** Fades the volume to a certain level (THIS IS BLOCKING, ONLY RUN THIS FROM SIDE THREADS)

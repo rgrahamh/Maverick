@@ -1,20 +1,17 @@
-#include "./TextureHash.hpp"
+#include "./SpriteHash.hpp"
 
 extern SDL_Renderer* renderer;
 
-//The instance of the texture hash table
-TextureHash* texture_hash;
-
-/** The paramterized constructor for the TextureHash
+/** The paramterized constructor for the SpriteHash
  * @param size The size of the hash table
  */
-TextureHash::TextureHash(unsigned int size) : HashTable(size){
+SpriteHash::SpriteHash(unsigned int size) : HashTable(size){
 	this->table = (THEntry**)calloc(sizeof(THEntry*), size);
 }
 
-/** The destructor for the TextureHash
+/** The destructor for the SpriteHash
  */
-TextureHash::~TextureHash(){
+SpriteHash::~SpriteHash(){
 	for(unsigned int i = 0; i < this->size; i++){
 		if(this->table[i] != NULL){
 			THEntry* cursor = this->table[i];
@@ -30,29 +27,11 @@ TextureHash::~TextureHash(){
 	}
 }
 
-bool TextureHash::has(const char* key){
-	if(key != nullptr){
-		for(unsigned int i = 0; i < this->size; i++){
-			if(this->table[i] != NULL){
-				THEntry* cursor = this->table[i];
-				while(cursor != NULL){
-					if(cursor->key != nullptr &&
-					strcmp(cursor->key, key) == 0){
-						return true;
-					}
-				}
-			}
-		}
-	}
-	
-	return false;
-}
-
 /** Adds a new entry to the hash table
  * @param key The string (filepath) that is being hashed
  * @param surface The texture that is being put into the table
  */
-void TextureHash::add(const char* key, SDL_Surface* surface){
+void SpriteHash::add(const char* key, SDL_Surface* surface){
 	unsigned int hash_val = this->hash(key);
 
 	//Copying the key for permanent storage
@@ -82,7 +61,7 @@ void TextureHash::add(const char* key, SDL_Surface* surface){
  * @param key The string (filepath) that is being hashed
  * @return The texture with the given key
  */
-SDL_Surface* TextureHash::get(const char* key){
+SDL_Surface* SpriteHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
 	printf("Getting texture %s\n", key);

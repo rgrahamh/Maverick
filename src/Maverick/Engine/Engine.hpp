@@ -10,6 +10,10 @@
 
 #include <thread>
 
+#include "../HashTable/SpriteHash/SpriteHash.hpp"
+#include "../HashTable/MusicHash/MusicHash.hpp"
+#include "../HashTable/SoundHash/SoundHash.hpp"
+
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
 #include "../Control/Control.hpp"
@@ -91,6 +95,11 @@ class Engine{
 
 		SoundBoard* getSoundBoard();
 
+		//Resource hashes
+		SDL_Surface* getSurface(const char* key);
+		Sound* getSound(const char* key);
+		Music* getMusic(const char* key);
+
 	private:
 		void gameLoop();
 
@@ -159,6 +168,11 @@ class Engine{
 		//Scale
 		float target_x_scale;
 		float target_y_scale;
+
+		//Resource Hashes
+		SpriteHash* sprite_hash;
+		SoundHash* sound_hash;
+		MusicHash* music_hash;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;

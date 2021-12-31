@@ -1,6 +1,7 @@
 #include "./UIBorders.hpp"
+#include "../../../Engine/Engine.hpp"
 
-extern TextureHash* texture_hash;
+extern Engine* engine;
 
 /** UIBorders constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
@@ -58,7 +59,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                 sprite_path[combined_len - 1] = '\0';
 
                 //Get the surface of the border (necessary to check if the texture can be loaded & get texture height/width)
-                SDL_Surface* border_surface = texture_hash->get(sprite_path);
+                SDL_Surface* border_surface = engine->getSurface(sprite_path);
 
                 if(border_surface != nullptr){
                     double border_width, border_height, border_x, border_y;

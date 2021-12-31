@@ -1,7 +1,5 @@
 #include "./UITextBox.hpp"
 
-extern TextureHash* texture_hash;
-
 /** UITextBox constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement

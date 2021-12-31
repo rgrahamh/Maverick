@@ -2,6 +2,7 @@
 #define CONTROL_H
 
 #include <SDL2/SDL.h>
+#include <atomic>
 
 #define MAX_GAMEPADS 4
 #define MAX_AXIS_RANGE 32767.0

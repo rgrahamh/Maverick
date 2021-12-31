@@ -1,4 +1,5 @@
 #include "./Control.hpp"
+extern std::atomic<bool> exit_game;
 
 /** Default constructor for the Control object
  */
@@ -197,6 +198,9 @@ void Control::pollEvents(){
     while(SDL_PollEvent(&event)){
         if(event.type == SDL_EventType::SDL_MOUSEWHEEL){
             this->mouse.scroll_wheel = event.wheel.y;
+        }
+        if(event.type == SDL_EventType::SDL_QUIT){
+            exit_game = true;
         }
     }
 }

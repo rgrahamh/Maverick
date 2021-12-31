@@ -1,7 +1,8 @@
 #include "Loader.hpp"
 #include "../../../Maverick/Utility/Utility.hpp"
+#include "../../../Maverick/Engine/Engine.hpp"
 
-extern TextureHash* texture_hash;
+extern Engine* engine;
 
 Zone* loadZone(const char* zone_name){
 	bool endian = getEndian();
@@ -62,7 +63,7 @@ Zone* loadZone(const char* zone_name){
 
 		//The data sector
 
-		if(resource_type == RESOURCE_TYPE::BMP && texture_hash->has(identifier) == false){
+		if(resource_type == RESOURCE_TYPE::BMP && sprite_hash->has(identifier) == false){
 			SDL_Surface* surface = new SDL_Surface();
 
 			//Image width
@@ -84,7 +85,7 @@ Zone* loadZone(const char* zone_name){
 			memcpy(surface->pixels, cursor, data_len);
 			cursor += data_len;
 
-			texture_hash->add(identifier, surface);
+			sprite_hash->add(identifier, surface);
 		}
 		else if(resource_type == RESOURCE_TYPE::WAV){
 			SDL_AudioSpec* spec = new SDL_AudioSpec();
