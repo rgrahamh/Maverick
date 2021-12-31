@@ -32,7 +32,7 @@ Engine::Engine(){
         exit(-1);
     }
     //Don't need to init w/ anything else; we're just using WAVs
-    if(Mix_Init(0) < 0){
+    if(Mix_Init(MIX_INIT_MP3) < 0){
         printf("Failed to init Mixer! ERR: %s\n", Mix_GetError());
         exit(-1);
     }
@@ -45,6 +45,10 @@ Engine::Engine(){
 
     //Initialization of the sound board
     this->sound_board = new SoundBoard();
+
+    Music song1;
+    song1.bass = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
+    sound_board->playMusic(&song1);
 
     //Initialization of control system
     control = new Control();
