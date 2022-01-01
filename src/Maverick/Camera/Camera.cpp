@@ -16,6 +16,7 @@ Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = N
     }
     this->window = window;
     this->renderer = renderer;
+    this->follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW;
 }
 
 Camera::~Camera(){
@@ -40,10 +41,14 @@ void Camera::recenter(){
 
     float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_width / 2) / x_scale);
     float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_height / 2) / y_scale);
-    this->current_x = obj_x;
-    this->current_y = obj_y;
-    //this->current_x += ((obj_x - current_x) * follow_rate);
-    //this->current_y += ((obj_y - current_y) * follow_rate);
+    if(follow_mode == CAMERA_FOLLOW_MODE::FIXED_FOLLOW){
+        this->current_x = obj_x;
+        this->current_y = obj_y;
+    }
+    else{
+        this->current_x += ((obj_x - current_x) * follow_rate);
+        this->current_y += ((obj_y - current_y) * follow_rate);
+    }
 }
 
 /** Draws all objects in the given object list
@@ -72,16 +77,27 @@ void Camera::_draw(UIElementList* element_lst, uint32_t delta){
     }
 }
 
+/** Gets the renderer the camera's using
+ * @return The renderer the camera's using
+ */
 SDL_Renderer* Camera::getRenderer(){
     return renderer;
 }
 
 /** Sets the X & Y scale of the camera
  * @param x_scale The X scale of the camera
- * @param x_scale The Y scale of the camera
+ * @param y_scale The Y scale of the camera
  */
 void Camera::setScale(float x_scale, float y_scale){
     this->x_scale = x_scale;
     this->y_scale = y_scale;
     SDL_RenderSetScale(this->renderer, x_scale, y_scale);
+}
+
+/** Sets the camera follow mode
+ * @param x_scale The X scale of the camera
+ * @param x_scale The Y scale of the camera
+ */
+void Camera::setFollowMode(CAMERA_FOLLOW_MODE follow_mode){
+    this->follow_mode = follow_mode;
 }

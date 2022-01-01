@@ -6,7 +6,7 @@
 
 class Zone{
     public:
-        Zone(const char* name);
+        Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord);
         ~Zone();
 
         ObjectList* getObjects();

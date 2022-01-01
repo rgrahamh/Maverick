@@ -5,6 +5,20 @@
 
 class UIElement;
 
+enum UI_ELEMENT_TYPE{
+    GENERIC_ELEMENT,
+    WINDOW,
+    TEXT,
+    TEXT_BOX,
+    BORDERS,
+    SELECTOR,
+    BOX,
+    SCREEN_BLIT,
+    OBJECT_FRAME,
+    RADIAL,
+    EXTENDED_UI_ELEMENT_TYPE_START = 4096
+};
+
 struct UIElementList{
     UIElement* element;
     struct UIElementList* next;
@@ -12,7 +26,7 @@ struct UIElementList{
 
 class UIElement : public Entity{
     public:
-        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window);
+        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer = 0);
         virtual ~UIElement();
 
 		virtual void _process(uint32_t delta);
@@ -22,13 +36,16 @@ class UIElement : public Entity{
         virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
+		virtual int serializeData(char** buff_ptr);
+		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
+
 		virtual void setScale(float x_scale, float y_scale);
         virtual void setViewSize(double view_width, double view_height);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
-        void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime = 0, float x_offset = 0, float y_offset = 0, float width = -1.0, float height = -1.0);
+        void addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime = 0, float x_offset = 0, float y_offset = 0, float width = -1.0, float height = -1.0);
 
         UIElement* getElement(const char* name);
         UIElementList* getSubelements();

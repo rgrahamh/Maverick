@@ -3,15 +3,21 @@ cmake_minimum_required(VERSION 2.2)
 project(Cyberena)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -pthread -Wno-write-strings")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
 
 set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp
 )
 
+set(AudioSrc
+    ./src/Maverick/Audio/SoundBoard.cpp
+)
+
 set(HashSrc
     ./src/Maverick/HashTable/HashTable.cpp
-    ./src/Maverick/HashTable/TextureHash/TextureHash.cpp
+    ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
+    ./src/Maverick/HashTable/MusicHash/MusicHash.cpp
+    ./src/Maverick/HashTable/SoundHash/SoundHash.cpp
 )
 
 set(HitboxSrc
@@ -35,7 +41,6 @@ set(UISrc
     ./src/Maverick/Entity/UI/UIBorders/UIBorders.cpp
     ./src/Maverick/Entity/UI/UIText/UIText.cpp
     ./src/Maverick/Entity/UI/UITextBox/UITextBox.cpp
-    ./src/Maverick/Entity/UI/UIScreenBlit/UIScreenBlit.cpp
     ./src/Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.cpp
 )
 
@@ -68,6 +73,7 @@ set(EngineSrc
 
 set(MotorSrc
     ${AnimationSrc}
+    ${AudioSrc}
     ${HashSrc}
     ${HitboxSrc}
     ${CameraSrc}
@@ -134,5 +140,6 @@ target_link_libraries(editor
     SDL2
     SDL2_image
     SDL2_ttf
+    SDL2_mixer
     GL
 )

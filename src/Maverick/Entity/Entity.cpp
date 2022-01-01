@@ -1,13 +1,15 @@
 #include "./Entity.hpp"
+#include "../Engine/Engine.hpp"
+extern Engine* engine;
 
 /** Object parameterized constructor
  * @param start_x The starting X location of the object
  * @param start_y The starting Y location of the objcet
  * @param friction The object's coefficient of friction
  * @param draw_layer The draw layer of the object
- * @param animation_num The number of animations
+ * @param animation_name The number of animations
  */
-Entity::Entity(const char* name, float start_x, float start_y, unsigned int animation_num, int draw_layer){
+Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
     int name_len = strlen(name);
     this->name = (char*)malloc(name_len + 1);
     memcpy(this->name, name, name_len);
@@ -22,17 +24,8 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
     //Initializing animation/visibility attributes
     this->active = true;
     this->visible = true;
-    this->active_animation = 0;
-    this->total_animation_num = animation_num;
-    if(animation_num > 0){
-        this->animations = (Animation**)malloc(sizeof(Animation*) * animation_num);
-        for(unsigned int i = 0; i < animation_num; i++){
-            animations[i] = new Animation(&(this->x), &(this->y));
-        }
-    }
-    else{
-        this->animations = nullptr;
-    }
+    this->active_animation = nullptr;
+    this->animations = nullptr;
 
     //Initializing attributes
     this->attr = new HashTable(64);
@@ -41,11 +34,11 @@ Entity::Entity(const char* name, float start_x, float start_y, unsigned int anim
 /** Destructor for objects
  */
 Entity::~Entity(){
-    for(unsigned int i = 0; i < total_animation_num; i++){
-        delete animations[i];
-    }
-    if(animations != nullptr){
-        free(animations);
+    while(animations != nullptr){
+        delete animations->animation;
+        AnimationList* tmp = animations;
+        animations = animations->next;
+        delete tmp;
     }
     free(name);
 }
@@ -75,8 +68,8 @@ float Entity::getY(){
  * @return The width of the object
  */
 float Entity::getWidth(){
-    if(this->active_animation < this->total_animation_num){
-        return this->animations[active_animation]->getSprite()->rect->w;
+    if(this->active_animation != nullptr){
+        return this->active_animation->getSprite()->rect->w;
     }
     else{
         return 0;
@@ -87,8 +80,8 @@ float Entity::getWidth(){
  * @return The width of the object
  */
 float Entity::getHeight(){
-    if(this->active_animation < this->total_animation_num){
-        return this->animations[active_animation]->getSprite()->rect->h;
+    if(this->active_animation != nullptr){
+        return this->active_animation->getSprite()->rect->h;
     }
     else{
         return 0;
@@ -106,8 +99,8 @@ int Entity::getDrawLayer(){
  * @return The draw axis of the object
  */
 float Entity::getDrawAxis(){
-    if(this->active_animation < this->total_animation_num){
-        return this->animations[active_animation]->getDrawAxis();
+    if(this->active_animation != nullptr){
+        return this->active_animation->getDrawAxis();
     }
     else{
         return 0;
@@ -118,8 +111,8 @@ float Entity::getDrawAxis(){
  * @return The HitboxList containing the object's current hitboxes
  */
 HitboxList* Entity::getHitboxes(){
-    if(this->active_animation < this->total_animation_num){
-        return this->animations[active_animation]->getHitboxes();
+    if(this->active_animation != nullptr){
+        return this->active_animation->getHitboxes();
     }
     else{
         return nullptr;
@@ -148,23 +141,52 @@ void* Entity::getAttr(const char* key){
     return this->attr->get(key);
 }
 
+/** Creates a new animation (you MUST do this before adding hitboxes/sprites)
+ * @param animation_name The name of the new animation
+ */
+int Entity::addAnimation(const char* animation_name){
+    //If the animation already exists, just return
+    if(findAnimation(animation_name) != nullptr){
+        return -1;
+    }
+
+    Animation* new_animation = new Animation(animation_name, &x, &y);
+    AnimationList* new_animation_list = new AnimationList;
+    new_animation_list->animation = new_animation;
+    new_animation_list->next = nullptr;
+
+    if(animations == nullptr){
+        animations = new_animation_list;
+    }
+    else{
+        new_animation_list->next = animations;
+        animations = new_animation_list;
+    }
+    return 0;
+}
+
 /** Adds a sprite to a given animation
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param sprite_path The filepath to the sprite you're adding
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
  * @param y_offset The Y offset of the sprite
  * @param width The width of the sprite (default if -1)
  * @param height The height of the sprite (default if -1)
+ * @return 0 on success, -1 if the animation doesn't exist
  */ 
-void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
-    if(animation_num < this->total_animation_num){
-        this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+int Entity::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
+        return animation->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+    }
+    else{
+        return -1;
     }
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param shape The hitbox shape
  * @param x_offset The X offset of the hitbox
  * @param y_offset The Y offset of the hitbox
@@ -172,59 +194,15 @@ void Entity::addSprite(unsigned int animation_num, const char* sprite_path, unsi
  * @param y_element The Y width/radius of the hitbox
  * @param type The type flags of the hitbox
  * @param sprite_num The sprite number that is being used
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element,
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element,
                        float y_element, unsigned int type, int sprite_num){
-    if(animation_num < this->total_animation_num){
-        Hitbox* hitbox;
-        //We should never hit the CONE in this case.
-        if(shape == RECT){
-            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-        }
-        else{
-            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-        }
-
-        this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
+        return -1;
     }
-}
 
-/** Adds a hitbox to a given animation on all sprites
- * @param animation_num The animation number
- * @param shape The hitbox shape
- * @param x_offset The X offset of the hitbox
- * @param y_offset The Y offset of the hitbox
- * @param x_element The X width/radius of the hitbox
- * @param y_element The Y width/radius of the hitbox
- * @param type The type flags of the hitbox
- */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
-    if(animation_num < this->total_animation_num){
-        Hitbox* hitbox;
-        //We should never hit the CONE in this case.
-        if(shape == RECT){
-            hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-        }
-        else{
-            hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
-        }
-
-        this->animations[animation_num]->addHitbox(hitbox);
-    }
-}
-
-/** Adds a hitbox to a range of animations on all sprites
- * @param animation_start The starting animation number (inclusive; this index will be added to)
- * @param animation_end The ending animation number (inclusive; this index will be added to)
- * @param shape The hitbox shape
- * @param x_offset The X offset of the hitbox
- * @param y_offset The Y offset of the hitbox
- * @param x_element The X width/radius of the hitbox
- * @param y_element The Y width/radius of the hitbox
- * @param type The type flags of the hitbox
- */
-void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape,
-                       float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
@@ -234,13 +212,73 @@ void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end,
         hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
     }
 
-    for(unsigned int i = animation_start; i <= animation_end && i < total_animation_num; i++){
-        this->animations[i]->addHitbox(hitbox);
-    }
+    animation->addHitbox(hitbox, sprite_num);
+    return 0;
 }
 
-/** Adds a hitbox to a given animation (including angles and ratios) on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1). Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
- * @param animation_num The animation number
+/** Adds a hitbox to a given animation on all sprites
+ * @param animation_name The animation name
+ * @param shape The hitbox shape
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
+ * @return 0 on success, -1 if the animation doesn't exist
+ */
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    Hitbox* hitbox;
+    //We should never hit the CONE in this case.
+    if(shape == RECT){
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+    else{
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+
+    animation->addHitbox(hitbox);
+    return 0;
+}
+
+/** Adds a hitbox to all loaded animations
+ * @param shape The hitbox shape
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
+ * @return 0 on success, -1 if no animations exist
+ */
+int Entity::addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type){
+    if(animations == nullptr){
+        return -1;
+    }
+
+    Hitbox* hitbox;
+    //We should never hit the CONE in this case.
+    if(shape == RECT){
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+    else{
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type);
+    }
+
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->addHitbox(hitbox);
+        animation_cursor = animation_cursor->next;
+    }
+
+    return 0;
+}
+
+/** Adds a hitbox to a given animation (including angles and ratios) on either the specified sprite of an animation or the last-added sprite of the animation (if -1). Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
+ * @param animation_name The animation name
  * @param type The hitbox type
  * @param x_offset The X offset of the hitbox
  * @param y_offset The Y offset of the hitbox
@@ -250,17 +288,22 @@ void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end,
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
  * @param sprite_num The sprite number that is being used
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num){
-    if(animation_num < this->total_animation_num){
-        Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-        this->animations[animation_num]->addHitbox(hitbox, sprite_num);
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
     }
+
+    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+    animation->addHitbox(hitbox, sprite_num);
+    return 0;
 }
 
 /** Adds a hitbox to a given animation (including angles and ratios) on all sprites. Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param type The hitbox type
  * @param x_offset The X offset of the hitbox
  * @param y_offset The Y offset of the hitbox
@@ -269,13 +312,18 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param type The type flags of the hitbox
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset,
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop){
-    if(animation_num < this->total_animation_num){
-        Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-        this->animations[animation_num]->addHitbox(hitbox);
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
     }
+
+    Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
+    animation->addHitbox(hitbox);
+    return 0;
 }
 
 /** Adds a hitbox to a given animation (including angles and ratios) on all sprites. Due to the fact cones are the only ones using angles and ratios, this is currently just cones.
@@ -289,12 +337,40 @@ void Entity::addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_o
  * @param type The type flags of the hitbox
  * @param angle The slice angle
  * @param slice_prop The slice proportion for the hitbox
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset,
+int Entity::addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset,
                        float x_element, float y_element, unsigned int type, float angle, float slice_prop){
+    if(animations == nullptr){
+        return -1;
+    }
+    
     Hitbox* hitbox = (Hitbox*)new HitCone(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, angle, slice_prop, type);
-    for(unsigned int i = animation_start; i <= animation_end && i < total_animation_num; i++){
-        this->animations[i]->addHitbox(hitbox);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->addHitbox(hitbox);
+        animation_cursor = animation_cursor->next;
+    }
+    return 0;
+}
+
+/** Adds a sound to a given animation
+ * @param animation_name The animation name
+ * @param sprite_path The filepath to the sprite you're adding
+ * @param keytime The number of frames until the animation progresses
+ * @param x_offset The X offset of the sprite
+ * @param y_offset The Y offset of the sprite
+ * @param width The width of the sprite (default if -1)
+ * @param height The height of the sprite (default if -1)
+ * @return 0 on success, -1 if the animation doesn't exist
+ */ 
+int Entity::addSound(const char* animation_name, const char* sound_path, int sequence_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
+        return animation->addSound(engine->getSound(sound_path), sequence_num);
+    }
+    else{
+        return -1;
     }
 }
 
@@ -313,23 +389,35 @@ void Entity::setY(float y){
 }
 
 /** Sets the animation number
- * @param animation_num The animation number
+ * @param animation_name The animation name
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::setAnimation(unsigned int animation_num){
-    if(animation_num < this->total_animation_num && animation_num != this->active_animation){
-        this->active_animation = animation_num;
-        this->animations[active_animation]->start();
+int Entity::setAnimation(const char* animation_name){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr && animation != this->active_animation){
+        this->active_animation = animation;
+        this->active_animation->start();
+        return 0;
+    }
+    else{
+        return -1;
     }
 }
 
 /** Sets the scale for a single animation
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param x_scale The x scale factor
  * @param y_scale The y scale factor
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::setScale(unsigned int animation_num, float x_scale, float y_scale){
-    if(animation_num < this->total_animation_num){
-        this->animations[animation_num]->setScale(x_scale, y_scale);
+int Entity::setScale(const char* animation_name, float x_scale, float y_scale){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
+        animation->setScale(x_scale, y_scale);
+        return 0;
+    }
+    else{
+        return -1;
     }
 }
 
@@ -338,19 +426,27 @@ void Entity::setScale(unsigned int animation_num, float x_scale, float y_scale){
  * @param y_scale The y scale factor
  */
 void Entity::setScale(float x_scale, float y_scale){
-    for(unsigned int i = 0; i < this->total_animation_num; i++){
-        this->animations[i]->setScale(x_scale, y_scale);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->setScale(x_scale, y_scale);
+        animation_cursor = animation_cursor->next;
     }
 }
 
 /** Sets the scale for a single animation
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param x_scale The x scale factor
  * @param y_scale The y scale factor
+ * @return 0 on success, -1 if the animation doesn't exist
  */
-void Entity::setSize(unsigned int animation_num, float width, float height){
-    if(animation_num < this->total_animation_num){
-        this->animations[animation_num]->setSize(width, height);
+int Entity::setSize(const char* animation_name, float width, float height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
+        animation->setSize(width, height);
+        return 0;
+    }
+    else{
+        return -1;
     }
 }
 
@@ -359,12 +455,14 @@ void Entity::setSize(unsigned int animation_num, float width, float height){
  * @param height The y scale factor
  */
 void Entity::setSize(float width, float height){
-    for(unsigned int i = 0; i < this->total_animation_num; i++){
-        this->animations[i]->setSize(width, height);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->setSize(width, height);
+        animation_cursor = animation_cursor->next;
     }
 }
 
-/** Sets the visibility of the current animation state
+/** Sets the activation of the current animation state
  * @return If the object is active
  */
 void Entity::setActive(bool active){
@@ -384,4 +482,57 @@ void Entity::setVisible(bool visible){
  */
 void Entity::setAttr(const char* key, void* val){
     this->attr->add(key, val);
+}
+
+/** Gets the object type
+ * @return A uint32_t representation of the object type set in the constructor
+ */
+uint32_t Entity::getType(){
+    return this->type;
+}
+
+Animation* Entity::findAnimation(const char* animation_name){
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        if(strcmp(animation_cursor->animation->getName(), animation_name) == 0){
+            break;
+        }
+        animation_cursor = animation_cursor->next;
+    }
+
+    if(animation_cursor == nullptr){
+        return nullptr;
+    }
+    return animation_cursor->animation;
+}
+
+int Entity::serializeData(char** buff_ptr){
+    return 0;
+}
+
+int Entity::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
+    if(active_animation != nullptr){
+        return -1;
+    }
+
+    AnimationSeq* sequence_start = active_animation->getSequenceStart();
+    AnimationSeq* cursor = sequence_start;
+    if(cursor != NULL){
+        do{
+            //If this asset's not been saved in this file yet
+            if(sprite_set.find(std::string(cursor->sprite->name)) == sprite_set.end()){
+                //Insert the asset
+            }
+
+            //Also have a place for saving audio (once that's implemented in the system)
+            if(audio_set.find(std::string(cursor->sprite->name)) == audio_set.end()){
+                //Insert the audio
+            }
+
+            cursor = cursor->next;
+            sprite_set.insert(cursor->sprite->name);
+        } while(cursor != sequence_start);
+    }
+
+    return 0;
 }

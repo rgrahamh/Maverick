@@ -13,15 +13,20 @@ extern Engine* engine;
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
  * @param window The current window (used for viewport calculation)
  */
-UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     unsigned int animation_num, int draw_layer, SDL_Window* window)
-        :  Entity(name, 0, 0, animation_num, draw_layer){
+
+//DETERMINE USAGE OF TYPE!!!!!!!!!!!!!!!!
+
+
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer)
+         : Entity(name, 0, 0, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
     this->view_y_offset = view_y_offset;
     this->view_width = view_width;
     this->view_height = view_height;
     this->window = window;
+
+    this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
     int win_width, win_height;
     SDL_GetWindowSize(this->window, &win_width, &win_height);
@@ -115,8 +120,8 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
  */
 void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw this element
-    if(active_animation < this->total_animation_num){
-        this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
+    if(active_animation != nullptr){
+        this->active_animation->draw(renderer, delta, camera_x, camera_y);
     }
 }
 
@@ -126,16 +131,15 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
  */
 void UIElement::setScale(float x_scale, float y_scale){
     //Set scale for this element
-    for(unsigned int i = 0; i < this->total_animation_num; i++){
-        this->animations[i]->setScale(x_scale, y_scale);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->setScale(x_scale, y_scale);
     }
 
     //Set scale for all children elements
     UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
-        for(unsigned int i = 0; i < this->total_animation_num; i++){
-            this->animations[i]->setScale(x_scale, y_scale);
-        }
+        cursor->element->setScale(x_scale, y_scale);
         cursor = cursor->next;
     }
 }
@@ -148,16 +152,15 @@ void UIElement::setViewSize(double view_width, double view_height){
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
-    for(unsigned int i = 0; i < this->total_animation_num; i++){
-        this->animations[i]->setSize(view_width * win_width, view_height * win_height);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
     }
 
     //Set scale for all children elements
     UIElementList* cursor = this->subelements;
     while(cursor != nullptr){
-        for(unsigned int i = 0; i < this->total_animation_num; i++){
-            this->animations[i]->setSize(view_width * win_width, view_height * win_height);
-        }
+        cursor->element->setViewSize(view_width, view_height);
         cursor = cursor->next;
     }
 }
@@ -191,7 +194,7 @@ void UIElement::setVisible(bool visible){
 }
 
 /** Adds a sprite to a given animation
- * @param animation_num The animation number
+ * @param animation_name The animation name
  * @param sprite_path The filepath to the sprite you're adding
  * @param keytime The number of frames until the animation progresses
  * @param x_offset The X offset of the sprite
@@ -199,8 +202,9 @@ void UIElement::setVisible(bool visible){
  * @param width The view width of the sprite (scales to element if -1)
  * @param height The view height of the sprite (scales to element if -1)
  */ 
-void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
-    if(animation_num < this->total_animation_num){
+void UIElement::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr){
         int win_width, win_height;
         SDL_GetWindowSize(window, &win_width, &win_height);
 
@@ -216,7 +220,7 @@ void UIElement::addSprite(unsigned int animation_num, const char* sprite_path, u
         else{
             height = this->draw_area.h;
         }
-        this->animations[animation_num]->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+        animation->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
     }
 }
 
@@ -271,4 +275,32 @@ bool UIElement::isMouseInside(Control* control){
     }
 
     return false;
+}
+
+int UIElement::serializeData(char** buff_ptr){
+    return 0;
+}
+
+int UIElement::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
+    if(active_animation == nullptr){
+        return -1;
+    }
+
+    AnimationSeq* sequence_start = active_animation->getSequenceStart();
+    AnimationSeq* cursor = sequence_start;
+    if(cursor != NULL){
+        do{
+            //If this asset's not been saved in this file yet
+            if(sprite_set.find(cursor->sprite->name) == sprite_set.end()){
+                //Insert the asset
+            }
+
+            //Also have a place for saving audio (once that's implemented in the system)
+
+            cursor = cursor->next;
+            sprite_set.insert(cursor->sprite->name);
+        } while(cursor != sequence_start);
+    }
+
+    return 0;
 }

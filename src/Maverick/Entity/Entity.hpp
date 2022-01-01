@@ -1,6 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "../HashTable/HashTable.hpp"
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
@@ -14,7 +15,7 @@
 
 class Entity{
 	public:
-		Entity(const char* name, float start_x, float start_y, unsigned int animation_num, int draw_layer = 1);
+		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
 		virtual ~Entity();
 		char* getName();
 		float getX();
@@ -27,22 +28,27 @@ class Entity{
 		bool isActive();
 		bool isVisible();
 		void* getAttr(const char* key);
+		uint32_t getType();
 
-		void addSprite(unsigned int animation_num, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
+		int addAnimation(const char* animation_name);
 
-		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
-		void addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
-		void addHitbox(unsigned int animation_start, unsigned int animation_end, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
-		void addHitbox(unsigned int animation_num, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+		int addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
+
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
+		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
+		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+
+		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
 		void setX(float x);
 		void setY(float y);
-		void setAnimation(unsigned int animation_num);
-		void setScale(unsigned int animation_num, float x_scale, float y_scale);
+		int setAnimation(const char* animation_name);
+		int setScale(const char* animation_name, float x_scale, float y_scale);
 		void setScale(float x_scale, float y_scale);
-		void setSize(unsigned int animation_num, float width, float height);
+		int setSize(const char* animation_name, float width, float height);
 		void setSize(float width, float height);
 		void setActive(bool active);
 		void setVisible(bool visible);
@@ -58,10 +64,16 @@ class Entity{
 
 		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
+
+		virtual int serializeData(char** buff_ptr);
+		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 		
 	protected:
 		//Name
 		char* name;
+
+		//The entity type (exact values are specified by child classes)
+		uint32_t type;
 
         //Position
         float x;
@@ -74,16 +86,15 @@ class Entity{
 		bool active;
 		bool visible;
 
-		//Animation tracking
-		unsigned int active_animation;
-		unsigned int total_animation_num;
-
 		//Animation
-		Animation** animations;
+		Animation* active_animation;
+		AnimationList* animations;
 		AnimationList* ignored_animations;
 
 		//Draw layer tracking
 		int draw_layer;
+
+		Animation* findAnimation(const char* animation_name);
 };
 
 #endif

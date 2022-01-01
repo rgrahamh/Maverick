@@ -1,4 +1,5 @@
 #include "./Control.hpp"
+extern std::atomic<bool> exit_game;
 
 /** Default constructor for the Control object
  */
@@ -115,11 +116,20 @@ void Control::updateKeyboard(){
     int num_elements;
     const uint8_t* keyboard = SDL_GetKeyboardState(&num_elements);
 
+    //Prevent out-of-bounds
+    if(num_elements > 512){
+        num_elements = 512;
+    }
+
     //Update the old keyboard state w/ the last keyboard state
-    memcpy(old_keys, keys, 512);
+    memcpy(old_keys, keys, num_elements);
 
     //Update the new keyboard state w/ the newly-polled information
     memcpy(keys, keyboard, num_elements);
+
+    for(int i = 0; i < num_elements; i++){
+        digital_press[i] = keys[i] > old_keys[i];
+    }
 }
 
 void Control::updateMouse(){
@@ -144,6 +154,13 @@ const ControllerState* Control::getOldController(uint8_t controller) const{
  */
 const ControllerState* Control::getController(uint8_t controller) const{
     return &controllers[controller];
+}
+
+/** Gets the digital presses (keys pressed this frame that weren't last frame)
+ * @return The digital presses since last frame
+ */
+const uint8_t* Control::getDigitalPress() const{
+    return digital_press;
 }
 
 /** Gets the keyboard state last frame
@@ -181,6 +198,9 @@ void Control::pollEvents(){
     while(SDL_PollEvent(&event)){
         if(event.type == SDL_EventType::SDL_MOUSEWHEEL){
             this->mouse.scroll_wheel = event.wheel.y;
+        }
+        if(event.type == SDL_EventType::SDL_QUIT){
+            exit_game = true;
         }
     }
 }

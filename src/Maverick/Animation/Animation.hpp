@@ -1,17 +1,19 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include "../HashTable/TextureHash/TextureHash.hpp"
+#include "../Audio/SoundBoard.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
+#include "../Utility/Utility.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
 #include <unordered_map>
-
-extern TextureHash* texture_hash;
+#include <unordered_set>
 
 struct Sprite{
+	char* name;
+
 	SDL_Surface* surface;
 	SDL_Texture* texture;
 	SDL_Rect* rect;
@@ -29,18 +31,20 @@ struct Sprite{
 };
 
 typedef struct AnimationSequence{
-	Sprite* sprite;
+	Sprite* sprite = nullptr;
 
-	HitboxList* hitboxes;
+	Sound* sound = nullptr;
+
+	HitboxList* hitboxes = nullptr;
 	
-	unsigned int keytime;
+	unsigned int keytime = 0;
 
-	struct AnimationSequence* next;
+	struct AnimationSequence* next = nullptr;
 } AnimationSeq;
 
 class Animation{
 	public:
-		Animation(float* x_base, float* y_base);
+		Animation(const char* name, float* x_base, float* y_base);
 		void freeFrame(AnimationSeq* );
 		~Animation();
 
@@ -53,26 +57,38 @@ class Animation{
 		float getDrawAxis();
 		uint32_t getTimeLeft();
 		bool getPaused();
+		const char* getName();
+		AnimationSeq* getSequenceStart();
+		AnimationSeq* getSequenceEnd();
 
 		void setPaused(bool paused);
-		void setSize(int width, int height);
-		void setScale(float x_scale, float y_scale);
+		int setSize(int width, int height);
+		int setScale(float x_scale, float y_scale);
+		void setNextAnimation(Animation* next_animation);
 
-		void addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
-		void addHitbox(Hitbox* hitbox);
-		void addHitbox(Hitbox* hitbox, int hitbox_num);
+		int addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
+		int addHitbox(Hitbox* hitbox);
+		int addHitbox(Hitbox* hitbox, int sequence_num);
+		int addSound(Sound* sound, int sequence_num);
 
 		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
 
 		void rotate(int direction, float rotation_amnt);
 
+		void saveResources(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
 
 	private:
+		//Name
+		char* name;
 
 		//The image sequence and start of image sequence
 		AnimationSeq* sequence;
 		AnimationSeq* sequence_end;
 		AnimationSeq* sequence_start;
+
+		//The next animation to be played (if null the animation will stop at the end, if it's a reference to itself it'll loop).
+		//Uses the animation rather than AnimationSeq so that we can enact lazy loading while bringing files in
+		Animation* next_animation;
 
 		//Pointers to the X and Y base coords
 		float* x_base;

@@ -12,7 +12,7 @@ enum ALIGNMENT{
 
 class UIText : public UIElement{
     public:
-        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, unsigned int animation_num, int draw_layer, SDL_Window* window, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::NORMAL, ALIGNMENT y_alignment = ALIGNMENT::NORMAL);
+        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::NORMAL, ALIGNMENT y_alignment = ALIGNMENT::NORMAL);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);

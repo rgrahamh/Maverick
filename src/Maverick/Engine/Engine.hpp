@@ -10,6 +10,10 @@
 
 #include <thread>
 
+#include "../HashTable/SpriteHash/SpriteHash.hpp"
+#include "../HashTable/MusicHash/MusicHash.hpp"
+#include "../HashTable/SoundHash/SoundHash.hpp"
+
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
 #include "../Control/Control.hpp"
@@ -17,8 +21,12 @@
 #include "../Entity/UI/UIElement.hpp"
 #include "../Entity/Object/Object.hpp"
 
+#include "../Audio/SoundBoard.hpp"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 enum GAME_STATE : uint64_t{
 	TITLE = 1,
@@ -46,9 +54,6 @@ class Engine{
 
 		//Game engine run
 		void start();
-
-		//Zone addition/state handling
-		void addZone(Zone* zone);
 
 		//Adds an object/UIElement to the engine
 		void addObject(Object* object);
@@ -80,9 +85,20 @@ class Engine{
 		void setGlobalYScale(float y_scale);
 
 		//Zone handling
+		void addZone(Zone* zone);
 		void activateZone(const char* zone_name);
 		void deactivateZone(const char* zone_name);
 		void unloadZone(const char* zone_name);
+
+		ZoneList* getZones();
+		ZoneList* getActiveZones();
+
+		SoundBoard* getSoundBoard();
+
+		//Resource hashes
+		SDL_Surface* getSurface(const char* key);
+		Sound* getSound(const char* key);
+		Music* getMusic(const char* key);
 
 	private:
 		void gameLoop();
@@ -108,10 +124,6 @@ class Engine{
 		//Object list building/destruction
 		void buildFullEntityList();
 		void freeFullEntityList();
-
-		//Saving logic
-		void saveGame();
-		void loadGame();
 
 		//Handles the default collision between objects
 		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);
@@ -140,6 +152,9 @@ class Engine{
 		//Control
 		Control* control;
 
+		//Sound
+		SoundBoard* sound_board;
+
 		//State tracking
 		uint64_t state;
 
@@ -153,6 +168,11 @@ class Engine{
 		//Scale
 		float target_x_scale;
 		float target_y_scale;
+
+		//Resource Hashes
+		SpriteHash* sprite_hash;
+		SoundHash* sound_hash;
+		MusicHash* music_hash;
 
 		//A frame counter so we can have timed events trigger every X frames
 		uint32_t last_time;

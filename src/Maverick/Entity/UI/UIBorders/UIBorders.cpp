@@ -1,6 +1,7 @@
 #include "./UIBorders.hpp"
+#include "../../../Engine/Engine.hpp"
 
-extern TextureHash* texture_hash;
+extern Engine* engine;
 
 /** UIBorders constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
@@ -15,8 +16,10 @@ extern TextureHash* texture_hash;
  * @param border_types The border locations
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     unsigned int animation_num, int draw_layer, SDL_Window* window, char* border_pattern, uint8_t border_types)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, animation_num, draw_layer, window){
+                     SDL_Window* window, int draw_layer, char* border_pattern, uint8_t border_types)
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, draw_layer){
+    this->type = UI_ELEMENT_TYPE::BORDERS;
+
     this->subelements = nullptr;
 
     memset(this->borders, '\0', sizeof(UIElement*) * 4);
@@ -35,7 +38,7 @@ UIBorders::~UIBorders(){
 }
 
 /** Creates & adds borders based upon the border_pattern & border_types
- * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].png")
+ * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
 void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
@@ -44,11 +47,11 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
 
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
-        char* file_patterns[4] = {"_top.png", "_bottom.png", "_left.png", "_right.png"};
+        char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
         char* border_names[4] = {"top_border", "bottom_border", "left_border", "right_border"};
         for(int i = 0; i < 4; i++){
             if(border_types & (1 << i)){
-                //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.png")
+                //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.bmp")
                 int combined_len = strlen(file_patterns[i]) + strlen(border_pattern) + 1;
                 char sprite_path[combined_len];
                 strcpy(sprite_path, border_pattern);
@@ -56,7 +59,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                 sprite_path[combined_len - 1] = '\0';
 
                 //Get the surface of the border (necessary to check if the texture can be loaded & get texture height/width)
-                SDL_Surface* border_surface = texture_hash->get(sprite_path);
+                SDL_Surface* border_surface = engine->getSurface(sprite_path);
 
                 if(border_surface != nullptr){
                     double border_width, border_height, border_x, border_y;
@@ -96,8 +99,10 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                         delete borders[i];
                     }
                     this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                     border_width / (double)win_width, border_height / (double)win_height, 1, 1, this->window);
-                    this->borders[i]->addSprite(0, sprite_path);
+                                                     border_width / (double)win_width, border_height / (double)win_height, this->window, 1);
+                    this->borders[i]->addAnimation("border");
+                    this->borders[i]->addSprite("border", sprite_path);
+                    this->borders[i]->setAnimation("border");
                 }
             }
         }
@@ -112,8 +117,8 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
  */
 void UIBorders::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
     //Draw the textbox background
-    if(active_animation < this->total_animation_num){
-        this->animations[active_animation]->draw(renderer, delta, camera_x, camera_y);
+    if(active_animation != nullptr){
+        this->active_animation->draw(renderer, delta, camera_x, camera_y);
     }
 
     //Draw the borders
