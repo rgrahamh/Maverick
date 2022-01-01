@@ -378,13 +378,22 @@ void Animation::advance(uint32_t delta){
 		//If we've exceeded the keytime for this frame
 		if(sequence->keytime <= time_counter){
 			//If we've hit the end of the sequence & next_animation is not nullptr (for a loop, next_sequence should be start_sequence)
+			bool progressed = false;
 			if(sequence == sequence_end && next_animation != nullptr){
 				sequence = next_animation->getSequenceStart();
+				progressed = true;
 			}
 			//If we haven't hit the end of the sequence
 			else if(sequence != sequence_end){
 				sequence = sequence->next;
+				progressed = true;
 			}
+
+			//Play the new sound, if it exists
+			if(sequence->sound != nullptr && progressed){
+				engine->getSoundBoard()->playSound(sequence->sound->sample, 0);
+			}
+
 			//If we're on the last frame of the sequence & next_animation is null, maintain the current frame
 			time_counter -= sequence->keytime;
 		}

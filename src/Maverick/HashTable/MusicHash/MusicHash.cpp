@@ -64,8 +64,6 @@ void MusicHash::add(const char* key, Music* music){
 Music* MusicHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	printf("Getting texture %s\n", key);
-
 	MHEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case

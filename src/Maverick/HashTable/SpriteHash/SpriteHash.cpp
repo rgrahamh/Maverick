@@ -64,8 +64,6 @@ void SpriteHash::add(const char* key, SDL_Surface* surface){
 SDL_Surface* SpriteHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	printf("Getting texture %s\n", key);
-
 	THEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case

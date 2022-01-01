@@ -64,8 +64,6 @@ void SoundHash::add(const char* key, Sound* sound){
 Sound* SoundHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	printf("Getting texture %s\n", key);
-
 	SHEntry* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case
