@@ -3,10 +3,9 @@
 #include "../../../Maverick/Engine/Engine.hpp"
 
 extern Engine* engine;
+extern bool endian;
 
 Zone* loadZone(const char* zone_name){
-	bool endian = getEndian();
-
     if(zone_name == nullptr){
 		printf("Can't load zone; zone_name is null!\n");
 		return nullptr;
@@ -30,25 +29,25 @@ Zone* loadZone(const char* zone_name){
 	char* cursor = file_buff;
 
 	//Load global coordinates
-	int64_t global_x_coord = EndianSwap((int32_t*)cursor, endian);
+	int64_t global_x_coord = EndianSwap((int32_t*)cursor);
 	cursor += 8;
-	int64_t global_y_coord = EndianSwap((int32_t*)cursor, endian);
+	int64_t global_y_coord = EndianSwap((int32_t*)cursor);
 	cursor += 8;
 
 	Zone* zone = new Zone(zone_name, global_x_coord, global_y_coord);
 
 	//The resource number
-	uint32_t resource_num = EndianSwap((uint32_t*)cursor, endian);
+	uint32_t resource_num = EndianSwap((uint32_t*)cursor);
 	cursor += 4;
 
 	//The resource block
 	for(int i = 0; i < resource_num; i++){
 		//The resource type
-		uint16_t resource_type = EndianSwap((uint16_t*)cursor, endian);
+		uint16_t resource_type = EndianSwap((uint16_t*)cursor);
 		cursor += 2;
 
 		//The identifier len
-		uint16_t identifier_len = EndianSwap((uint16_t*)cursor, endian);
+		uint16_t identifier_len = EndianSwap((uint16_t*)cursor);
 		cursor += 2;
 
 		//The resource identifier
@@ -58,24 +57,24 @@ Zone* loadZone(const char* zone_name){
 		cursor += identifier_len;
 
 		//The data len
-		uint16_t data_len = EndianSwap((uint16_t*)cursor, endian);
+		uint16_t data_len = EndianSwap((uint16_t*)cursor);
 		cursor += 2;
 
 		//The data sector
 
-		if(resource_type == RESOURCE_TYPE::BMP && sprite_hash->has(identifier) == false){
+		if(resource_type == RESOURCE_TYPE::BMP && engine->getSurface(identifier) == nullptr){
 			SDL_Surface* surface = new SDL_Surface();
 
 			//Image width
-			uint32_t width = EndianSwap((uint32_t*)cursor, endian);
+			uint32_t width = EndianSwap((uint32_t*)cursor);
 			cursor += 4;
 
 			//Image height
-			uint32_t height = EndianSwap((uint32_t*)cursor, endian);
+			uint32_t height = EndianSwap((uint32_t*)cursor);
 			cursor += 4;
 
 			//Color depth
-			uint16_t color_depth = EndianSwap((uint16_t*)cursor, endian);
+			uint16_t color_depth = EndianSwap((uint16_t*)cursor);
 			cursor += 2;
 			data_len -= 10;
 
@@ -93,7 +92,7 @@ Zone* loadZone(const char* zone_name){
 
 
 			//Frequency
-			spec->freq = EndianSwap((uint16_t*)cursor, endian);
+			spec->freq = EndianSwap((uint16_t*)cursor);
 			cursor += 2;
 
 			//Channels
@@ -101,8 +100,6 @@ Zone* loadZone(const char* zone_name){
 			cursor++;
 		}
 	}
-
-
 
 	fclose(zone_file);
 }

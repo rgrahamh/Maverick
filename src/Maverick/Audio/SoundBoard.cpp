@@ -136,7 +136,7 @@ void SoundBoard::setMusicVolume(int channel_id, float volume, unsigned int fade)
         if(channel_id == -1 || channel_id == 1){
             for(int i = BASS_CHANNEL_1; i <= MISC_CHANNEL_1; i++){
                 if(Mix_Playing(i)){
-                    engine->addThread(new std::thread (&SoundBoard::fadeVolume, this, i, volume, fade));
+                    engine->addThread(new std::thread(&SoundBoard::fadeVolume, this, i, volume, fade));
                 }
             }
         }
@@ -163,13 +163,13 @@ void SoundBoard::setSoundVolume(int channel_id, float volume, unsigned int fade)
     else{
         //Fade to volume for selected channel
         if(channel_id != -1){
-            std::thread fade_thread(&SoundBoard::fadeVolume, this, channel_id, volume, fade);
+            engine->addThread(new std::thread(&SoundBoard::fadeVolume, this, channel_id, volume, fade));
         }
         //Fade to volume for all playing channels
         else{
             for(int i = 0; i < NUM_CHANNELS; i++){
                 if(Mix_Playing(i)){
-                    std::thread fade_thread(&SoundBoard::fadeVolume, this, channel_id, volume, fade);
+                    engine->addThread(new std::thread(&SoundBoard::fadeVolume, this, i, volume, fade));
                 }
             }
         }
@@ -284,4 +284,6 @@ void SoundBoard::fadeVolume(unsigned int channel_id, float volume, unsigned int 
         current_volume += volume_dir;
         Mix_Volume(channel_id, current_volume);
     }
+
+	engine->cleanupThread(std::this_thread::get_id());
 }

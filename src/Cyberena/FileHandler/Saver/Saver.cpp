@@ -1,8 +1,8 @@
 #include "Saver.hpp"
 
-int saveZone(Zone* zone){
-	bool endian = getEndian();
+extern bool endian;
 
+int saveZone(Zone* zone){
     if(zone == nullptr){
 		printf("Zone ptr is null\n");
 		return -1;

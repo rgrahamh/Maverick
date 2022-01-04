@@ -2,6 +2,7 @@
 #define SOUNDBOARD_H
 #include <SDL2/SDL_mixer.h>
 #include <thread>
+#include <atomic>
 
 #define NUM_CHANNELS 48
 

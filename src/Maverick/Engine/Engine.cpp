@@ -5,6 +5,12 @@
 
 std::atomic<bool> exit_game = false;
 
+bool endian;
+
+std::thread::id base_thread_id = std::this_thread::get_id();
+
+extern Engine* engine;
+
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
  */
@@ -94,9 +100,11 @@ Engine::Engine(){
     this->entities.obj = nullptr;
     this->entities.ui = nullptr;
 
-    this->threads = NULL;
-
     this->delta = 0;
+
+    endian = getEndian();
+
+    this->thread_cleanup_queue = new std::queue<std::thread::id>();
 }
 
 /** Engine's destructor
@@ -143,8 +151,7 @@ void Engine::start(){
     loadZone("Test Zone");
 
     //Loading the level editor
-    this->addThread(new std::thread(loadZone, "led"));
-    //loadZone("led");
+    //engine->addThread(new std::thread(loadZone, "led"));
 
     Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
@@ -160,22 +167,26 @@ void Engine::gameLoop(){
         buildFullEntityList();
         delta = SDL_GetTicks();
 
-        //Cleanup threads every second
-        if(this->delta % 1000 == 0){
-            this->threadCleanup();
-        }
-
+        //Calculate the time that has passed since last frame
         delta = SDL_GetTicks() - last_time;
         last_time = SDL_GetTicks();
 
+        //Action step (where actions occur)
         this->actionStep(&this->entities);
-        this->physicsStep(this->entities.obj);
-        if(this->state != GAME_STATE::PAUSE){
+
+        if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT)){
+            //Physics step (where physics are calculated, obj positions updated, etc.)
+            this->physicsStep(this->entities.obj);
+
+            //Collision step (where collision is determined)
             this->collisionStep(this->entities.obj);
         }
 
         //Different because we need to adjust the object list for draw order
         this->drawStep(&this->entities);
+
+        //Thread cleanup
+        this->threadGC();
 	}
 }
 
@@ -361,7 +372,8 @@ void Engine::collisionStep(ObjectList* all_objects){
                     //Possible place for multi-threading!
 
                     //If both aren't environment and they collide, and the object isn't the same
-                    if((!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox) && object_lst->obj != object_cursor->obj){
+                    if(object_lst->obj != object_cursor->obj && (!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) &&
+                       object_lst->obj->getCollisionLayer() == object_cursor->obj->getCollisionLayer() && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
                         //We want the default collision handling to go last since it's the harshest (and might inhibit special collision cases)
                         object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
                         object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
@@ -578,29 +590,17 @@ float Engine::getGlobalYScale(){
 
 /** Goes through all active threads and cleans them up
  */
-void Engine::threadCleanup(){
-    ThreadList* cursor = this->threads;
-    ThreadList* prev_cursor = this->threads;
-    while(cursor != NULL){
-        if(cursor->thread->joinable()){
-            cursor->thread->join();
-            delete cursor->thread;
-            
-            if(cursor == threads){
-                cursor = cursor->next;
-                delete threads;
-                threads = cursor;
+inline void Engine::threadGC(){
+    while(thread_cleanup_queue.load()->empty() == false){
+        std::thread::id thread_id = thread_cleanup_queue.load()->front();
+        thread_cleanup_queue.load()->pop();
+        if(thread_map.find(thread_id) != thread_map.end()){
+            std::thread* thread_ptr = thread_map[thread_id];
+            if(thread_ptr != nullptr && thread_ptr->joinable()){
+                thread_ptr->join();
+                printf("Joined thread %i\n", thread_id);
+                thread_map.erase(thread_id);
             }
-            else{
-                ThreadList* curr_entry = cursor;
-                cursor = cursor->next;
-                prev_cursor->next = cursor;
-                delete curr_entry;
-            }
-        }
-        else{
-            prev_cursor = cursor;
-            cursor = cursor->next;
         }
     }
 }
@@ -792,10 +792,17 @@ void Engine::freeFullEntityList(){
  * @param thread The thread to add
  */
 void Engine::addThread(std::thread* thread){
-    ThreadList* thread_entry = new ThreadList;
-    thread_entry->thread = thread;
-    thread_entry->next = threads;
-    threads = thread_entry;
+    thread_map[thread->get_id()] = thread;
+}
+
+void Engine::cleanupThread(std::thread::id thread_id){
+    if(thread_id != base_thread_id){
+        thread_cleanup_queue.load()->push(thread_id);
+        printf("Put thread %i being put in cleanup list\n", thread_id);
+    }
+    else{
+        printf("Protected against thread %i being put in cleanup list\n", thread_id);
+    }
 }
 
 /** Adds a new zone to the game

@@ -9,6 +9,8 @@
 #define ZOOM_RATE 0.08
 
 #include <thread>
+#include <atomic>
+#include <queue>
 
 #include "../HashTable/SpriteHash/SpriteHash.hpp"
 #include "../HashTable/MusicHash/MusicHash.hpp"
@@ -23,6 +25,8 @@
 
 #include "../Audio/SoundBoard.hpp"
 
+#include "../Utility/Utility.hpp"
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
@@ -34,12 +38,8 @@ enum GAME_STATE : uint64_t{
 	BATTLE = 4,
 	DISCUSSION = 8,
 	PAUSE = 16,
-	EXIT = 32
-};
-
-struct ThreadList{
-	std::thread* thread;
-	struct ThreadList* next;
+	HALT = 32,
+	EXIT = 64
 };
 
 struct EntityList{
@@ -61,6 +61,7 @@ class Engine{
 
 		//Thread creation
 		void addThread(std::thread* thread);
+		void cleanupThread(std::thread::id thread_id);
 
 		//Getters
 		Object* getObject(const char* name);
@@ -118,8 +119,8 @@ class Engine{
 		//Physics step
 		void physicsStep(ObjectList* all_objects);
 
-		//Cleaning up threads
-		void threadCleanup();
+		//The thread garbage collector
+		void threadGC();
 
 		//Object list building/destruction
 		void buildFullEntityList();
@@ -142,8 +143,9 @@ class Engine{
 		ZoneList* zones;
 		ZoneList* active_zones;
 
-		//List of all threads
-		ThreadList* threads;
+		//The thread map
+		std::unordered_map<std::thread::id, std::thread*> thread_map;
+		std::atomic<std::queue<std::thread::id>*> thread_cleanup_queue;
 
 		//Render
 		Camera* camera;

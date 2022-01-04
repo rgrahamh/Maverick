@@ -3,7 +3,8 @@
 
 enum RESOURCE_TYPE{
 	BMP,
-	WAV
+	WAV,
+	CUT
 };
 
 Zone* loadZone(const char* zone_name);

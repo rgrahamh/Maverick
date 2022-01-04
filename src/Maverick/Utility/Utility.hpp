@@ -1,8 +1,15 @@
+#ifndef UTILITY_H
+#define UTILITY_H
 #include <inttypes.h>
 
+extern bool endian;
+
+/** Determines endian of the machine running the engine
+ * @return 1 if big endian, 0 if little endian
+ */
 inline bool getEndian(){
 	uint16_t endian_check = 1;
-	if(((char*)endian_check)[0] == 1){
+	if(((char*)&endian_check)[0] == 1){
 		return 1;
 	}
 	else{
@@ -10,8 +17,8 @@ inline bool getEndian(){
 	}
 }
 
-inline uint64_t EndianSwap(uint64_t* input, bool endianness){
-	if(endianness == 0){
+inline uint64_t EndianSwap(uint64_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -23,8 +30,8 @@ inline uint64_t EndianSwap(uint64_t* input, bool endianness){
 	}
 }
 
-inline int64_t EndianSwap(int64_t* input, bool endianness){
-	if(endianness == 0){
+inline int64_t EndianSwap(int64_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -36,8 +43,8 @@ inline int64_t EndianSwap(int64_t* input, bool endianness){
 	}
 }
 
-inline uint32_t EndianSwap(uint32_t* input, bool endianness){
-	if(endianness == 0){
+inline uint32_t EndianSwap(uint32_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -49,8 +56,8 @@ inline uint32_t EndianSwap(uint32_t* input, bool endianness){
 	}
 }
 
-inline int32_t EndianSwap(int32_t* input, bool endianness){
-	if(endianness == 0){
+inline int32_t EndianSwap(int32_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -62,8 +69,8 @@ inline int32_t EndianSwap(int32_t* input, bool endianness){
 	}
 }
 
-inline uint16_t EndianSwap(uint16_t* input, bool endianness){
-	if(endianness == 0){
+inline uint16_t EndianSwap(uint16_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -74,8 +81,8 @@ inline uint16_t EndianSwap(uint16_t* input, bool endianness){
 	}
 }
 
-inline int16_t EndianSwap(int16_t* input, bool endianness){
-	if(endianness == 0){
+inline int16_t EndianSwap(int16_t* input){
+	if(endian == 0){
 		return *input;
 	}
 	else{
@@ -85,3 +92,4 @@ inline int16_t EndianSwap(int16_t* input, bool endianness){
 		return output;
 	}
 }
+#endif

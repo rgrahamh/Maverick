@@ -7,8 +7,8 @@
  * @param draw_layer The draw layer of the object
  * @param animation_num The number of animations
  */
-Object::Object(const char* name, float start_x, float start_y, float friction, float mass, int draw_layer)
-      : Entity(name, start_x, start_y, draw_layer){
+Object::Object(const char* name, float start_x, float start_y, float friction, float mass, int layers)
+      : Entity(name, start_x, start_y, layers){
     this->type = OBJECT_TYPE::GENERIC_OBJECT;
 
     //Initializing position, velocity, and acceleration
@@ -24,6 +24,8 @@ Object::Object(const char* name, float start_x, float start_y, float friction, f
     //Initializing various physics elements
     this->friction = friction;
     this->mass = mass;
+
+    this->collision_layer = layers;
 }
 
 /** Destructor for objects
@@ -84,6 +86,13 @@ Sprite* Object::getSprite(){
     }
 }
 
+/** Gets the collision layer
+ * @return collision_layer The object's collision layer
+ */
+int Object::getCollisionLayer(){
+    return this->collision_layer;
+}
+
 /** Sets the X velocity
  * @param xV The X velocity
  */
@@ -109,6 +118,13 @@ void Object::setFriction(float friction){
  */
 void Object::setEnvBump(){
     this->env_bump = true;
+}
+
+/** Sets the collision layer
+ * @param collision_layer The object's new collision layer
+ */
+void Object::setCollisionLayer(int collision_layer){
+    this->collision_layer = collision_layer;
 }
 
 /** Applies force to an object

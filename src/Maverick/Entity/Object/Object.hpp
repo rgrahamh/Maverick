@@ -21,7 +21,7 @@ enum OBJECT_TYPE{
 
 class Object : public Entity{
 	public:
-		Object(const char* name, float start_x, float start_y, float friction, float mass, int draw_layer = 1);
+		Object(const char* name, float start_x, float start_y, float friction, float mass, int layers = 1);
 		virtual ~Object();
 		float getOldX();
 		float getOldY();
@@ -30,6 +30,7 @@ class Object : public Entity{
 		float getMass();
 		bool getEnvBump();
 		Sprite* getSprite();
+		int getCollisionLayer();
 
 		virtual int serializeData(char** buff_ptr);
 		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
@@ -38,6 +39,7 @@ class Object : public Entity{
 		void setYVel(float yV);
 		void setEnvBump();
 		void setFriction(float friction);
+		void setCollisionLayer(int collision_layer);
 
 		void applyForce(float xA, float yA);
 
@@ -75,6 +77,9 @@ class Object : public Entity{
 
 		//Environmental bump
 		bool env_bump;
+
+		//The collision layer
+		int collision_layer;
 };
 
 struct ObjectList{
