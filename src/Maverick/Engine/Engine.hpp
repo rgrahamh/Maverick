@@ -97,8 +97,11 @@ class Engine{
 		SoundBoard* getSoundBoard();
 
 		//Resource hashes
+		void addSurface(const char* key, SDL_Surface* surface);
 		SDL_Surface* getSurface(const char* key);
+		void addSound(const char* key, Sound* sound);
 		Sound* getSound(const char* key);
+		void addMusic(const char* key, Music* music);
 		Music* getMusic(const char* key);
 
 	private:

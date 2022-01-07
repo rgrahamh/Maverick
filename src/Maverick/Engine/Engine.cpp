@@ -815,6 +815,30 @@ void Engine::addZone(Zone* zone){
     zones = new_zone;
 }
 
+/**Adds a surface to the sprite hash
+ * @param key The key representing the surface
+ * @param surface The surface being added to the hash
+ */
+void Engine::addSurface(const char* key, SDL_Surface* surface){
+    this->sprite_hash->add(key, surface);
+}
+
+/**Adds a sound to the sprite hash
+ * @param key The key representing the sound
+ * @param sound The sound being added to the hash
+ */
+void Engine::addSound(const char* key, Sound* sound){
+    this->sound_hash->add(key, sound);
+}
+
+/**Adds a music to the sprite hash
+ * @param key The key representing the music
+ * @param music The music being added to the hash
+ */
+void Engine::addMusic(const char* key, Music* music){
+    this->music_hash->add(key, music);
+}
+
 /** Moves a Zone to the active_zones ZoneList
  * @param zone_name The name of the zone you wish to move
  */

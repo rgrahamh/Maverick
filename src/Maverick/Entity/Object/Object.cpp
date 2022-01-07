@@ -208,8 +208,5 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 	printf("Collided!\n");
 }
 
-int Object::serializeData(char** buff_ptr){
-}
-
-int Object::serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set){
+int Object::serializeData(FILE* file){
 }

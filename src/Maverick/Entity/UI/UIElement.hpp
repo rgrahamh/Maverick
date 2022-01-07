@@ -36,8 +36,7 @@ class UIElement : public Entity{
         virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
-		virtual int serializeData(char** buff_ptr);
-		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
+		virtual int serializeData(FILE* file);
 
 		virtual void setScale(float x_scale, float y_scale);
         virtual void setViewSize(double view_width, double view_height);

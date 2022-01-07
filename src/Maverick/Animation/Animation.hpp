@@ -19,12 +19,12 @@ struct Sprite{
 	SDL_Rect* rect;
 
 	//X & Y offsets from the object, discluding scale
-	float base_x_offset;
-	float base_y_offset;
+	uint32_t base_x_offset;
+	uint32_t base_y_offset;
 
 	//X & Y offsets from the object, including scale
-	float curr_x_offset;
-	float curr_y_offset;
+	uint32_t curr_x_offset;
+	uint32_t curr_y_offset;
 
 	//Rotation (clockwise, in degrees)
 	double rotation;
@@ -75,7 +75,7 @@ class Animation{
 
 		void rotate(int direction, float rotation_amnt);
 
-		void saveResources(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
+		unsigned int saveResources(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
 
 	private:
 		//Name

@@ -84,7 +84,7 @@ Zone* loadZone(const char* zone_name){
 			memcpy(surface->pixels, cursor, data_len);
 			cursor += data_len;
 
-			sprite_hash->add(identifier, surface);
+			engine->addSurface(identifier, surface);
 		}
 		else if(resource_type == RESOURCE_TYPE::WAV){
 			SDL_AudioSpec* spec = new SDL_AudioSpec();

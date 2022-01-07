@@ -32,8 +32,7 @@ class Object : public Entity{
 		Sprite* getSprite();
 		int getCollisionLayer();
 
-		virtual int serializeData(char** buff_ptr);
-		virtual int serializeAssets(char** buff_ptr, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set);
+		virtual int serializeData(FILE* file);
 		
 		void setXVel(float xV);
 		void setYVel(float yV);

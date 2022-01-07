@@ -28,6 +28,7 @@ int saveZone(Zone* zone){
 
 	std::unordered_set<std::string> sprite_set;
 	std::unordered_set<std::string> audio_set;
+	std::unordered_set<std::string> music_set;
 
 	//Save resources used in this zone (both by UI elements & objects)
 	while(element_cursor != nullptr && element_cursor->element != nullptr){
@@ -44,7 +45,7 @@ int saveZone(Zone* zone){
 	while(obj_cursor != nullptr && obj_cursor->obj != nullptr){
 		Object* obj = obj_cursor->obj;
 		char* assets_buff = nullptr;
-		unsigned int buff_len = obj->serializeAssets(&assets_buff, sprite_set, audio_set);
+		unsigned int buff_len = obj->serializeAssets(&assets_buff, sprite_set, audio_set, music_set);
 		if(buff_len > 0 && assets_buff != nullptr){
 			fwrite(assets_buff, buff_len, 1, zone_file);
 			delete assets_buff;
