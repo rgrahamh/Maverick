@@ -6,11 +6,13 @@
 
 class Zone{
     public:
-        Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord);
+        Zone(const char* name, uint64_t global_x_coord, uint64_t global_y_coord);
         ~Zone();
 
         ObjectList* getObjects();
         UIElementList* getUIElements();
+        uint64_t getGlobalX();
+        uint64_t getGlobalY();
 
         void addObject(Object* object);
         void addUIElement(UIElement* element);
@@ -19,6 +21,9 @@ class Zone{
         ObjectList* objects;
         UIElementList* ui;
         const char* name;
+
+        uint64_t global_x_coord;
+        uint64_t global_y_coord;
 };
 
 struct ZoneList{

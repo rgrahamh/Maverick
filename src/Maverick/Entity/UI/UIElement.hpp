@@ -36,15 +36,15 @@ class UIElement : public Entity{
         virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
         virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
-		virtual int serializeData(FILE* file);
+		virtual int serializeData(FILE* file, Zone* base_zone);
 
-		virtual void setScale(float x_scale, float y_scale);
+		virtual void setScale(double x_scale, double y_scale);
         virtual void setViewSize(double view_width, double view_height);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
-        void addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime = 0, float x_offset = 0, float y_offset = 0, float width = -1.0, float height = -1.0);
+        void addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime = 0, double x_offset = 0, double y_offset = 0, float width = -1.0, float height = -1.0);
 
         UIElement* getElement(const char* name);
         UIElementList* getSubelements();

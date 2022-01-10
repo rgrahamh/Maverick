@@ -96,14 +96,14 @@ int Object::getCollisionLayer(){
 /** Sets the X velocity
  * @param xV The X velocity
  */
-void Object::setXVel(float xV){
+void Object::setXVel(double xV){
     this->xV = xV;
 }
 
 /** Sets the Y velocity
  * @param yV The Y velocity
  */
-void Object::setYVel(float yV){
+void Object::setYVel(double yV){
     this->yV = yV;
 }
 
@@ -131,7 +131,7 @@ void Object::setCollisionLayer(int collision_layer){
  * @param xA The X newtons of the force
  * @param yA The Y newtons of the force
  */
-void Object::applyForce(float xA, float yA){
+void Object::applyForce(double xA, double yA){
     this->xA += xA / this->mass;
     this->yA += yA;
 }
@@ -208,5 +208,5 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 	printf("Collided!\n");
 }
 
-int Object::serializeData(FILE* file){
+int Object::serializeData(FILE* file, Zone* base_zone){
 }

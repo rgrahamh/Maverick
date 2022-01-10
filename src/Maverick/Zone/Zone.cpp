@@ -3,7 +3,7 @@
 /** The zone constructor
  * @param name The name of the zone
  */
-Zone::Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord){
+Zone::Zone(const char* name, uint64_t global_x_coord, uint64_t global_y_coord){
     this->name = name;
 
     this->objects = new ObjectList;
@@ -13,6 +13,9 @@ Zone::Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord){
     this->ui = new UIElementList;
     this->ui->element = NULL;
     this->ui->next = NULL;
+
+    this->global_x_coord = global_x_coord;
+    this->global_y_coord = global_y_coord;
 }
 
 /** The zone default destructor
@@ -54,6 +57,20 @@ UIElementList* Zone::getUIElements(){
  */
 const char* Zone::getName(){
     return this->name;
+}
+
+/** Gets the global X coordinate
+ * @return The global X coodrdinate
+ */
+uint64_t Zone::getGlobalX(){
+    return this->global_x_coord;
+}
+
+/** Gets the global Y coordinate
+ * @return The global Y coodrdinate
+ */
+uint64_t Zone::getGlobalY(){
+    return this->global_y_coord;
 }
 
 /** Adds an object to the zone

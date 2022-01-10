@@ -88,7 +88,7 @@ SDL_Renderer* Camera::getRenderer(){
  * @param x_scale The X scale of the camera
  * @param y_scale The Y scale of the camera
  */
-void Camera::setScale(float x_scale, float y_scale){
+void Camera::setScale(double x_scale, double y_scale){
     this->x_scale = x_scale;
     this->y_scale = y_scale;
     SDL_RenderSetScale(this->renderer, x_scale, y_scale);

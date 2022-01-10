@@ -54,7 +54,7 @@ void MusicHash::add(const char* key, Music* music){
 	}
 	table[hash_val] = new_entry;
 
-	printf("Loaded music %s\n", key);
+	size++;
 }
 
 /** Gets the texture from the hash table

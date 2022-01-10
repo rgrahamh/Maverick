@@ -129,7 +129,7 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
  * @param x_scale The X scale
  * @param y_scale The Y scale
  */
-void UIElement::setScale(float x_scale, float y_scale){
+void UIElement::setScale(double x_scale, double y_scale){
     //Set scale for this element
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
@@ -202,7 +202,7 @@ void UIElement::setVisible(bool visible){
  * @param width The view width of the sprite (scales to element if -1)
  * @param height The view height of the sprite (scales to element if -1)
  */ 
-void UIElement::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
+void UIElement::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, double x_offset, double y_offset, float width, float height){
     Animation* animation = findAnimation(animation_name);
     if(animation != nullptr){
         int win_width, win_height;
@@ -277,6 +277,6 @@ bool UIElement::isMouseInside(Control* control){
     return false;
 }
 
-int UIElement::serializeData(FILE* file){
+int UIElement::serializeData(FILE* file, Zone* base_zone){
     return 0;
 }

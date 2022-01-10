@@ -563,14 +563,14 @@ void Engine::setState(uint64_t state){
 /** Sets the global X scale of the engine
  * @param x_scale The global X scale of the engine
  */
-void Engine::setGlobalXScale(float x_scale){
+void Engine::setGlobalXScale(double x_scale){
     this->target_x_scale = x_scale;
 }
 
 /** Sets the global Y scale of the engine
  * @param y_scale The global Y scale of the engine
  */
-void Engine::setGlobalYScale(float y_scale){
+void Engine::setGlobalYScale(double y_scale){
     this->target_y_scale = y_scale;
 }
 
@@ -637,16 +637,16 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             float old_x = mov_obj->getOldX();
             float old_y = mov_obj->getOldY();
 
-            float x = mov_obj->getX();
-            float y = mov_obj->getY();
+            double x = mov_obj->getX();
+            double y = mov_obj->getY();
 
-            float x_movement = old_x - x;
-            float y_movement = old_y - y;
+            double x_movement = old_x - x;
+            double y_movement = old_y - y;
 
             mov_obj->setEnvBump();
 
-            float x_iter = x_movement / ROLLBACK_STEP;
-            float y_iter = y_movement / ROLLBACK_STEP;
+            double x_iter = x_movement / ROLLBACK_STEP;
+            double y_iter = y_movement / ROLLBACK_STEP;
 
             //Rollback to the point where we're no longer colliding
             for(int i = 0; mov_box->checkCollision(env_box); i++){
@@ -666,8 +666,8 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             float mass_sum = obj1->getMass() + obj2->getMass();
 
-            float x_force = (obj1_x_force + obj2_x_force) / mass_sum;
-            float y_force = (obj1_y_force + obj2_y_force) / mass_sum;
+            double x_force = (obj1_x_force + obj2_x_force) / mass_sum;
+            double y_force = (obj1_y_force + obj2_y_force) / mass_sum;
 
             obj1->setXVel(x_force);
             obj1->setYVel(y_force);

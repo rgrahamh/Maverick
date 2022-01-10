@@ -19,7 +19,7 @@ enum HITBOX_TYPE{
 
 class Hitbox{
     public:
-        Hitbox(float* x_base, float* y_base, float x_offset, float y_offset, unsigned int type);
+        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, unsigned int type);
         virtual ~Hitbox();
 
         float getX();
@@ -34,21 +34,21 @@ class Hitbox{
         HITBOX_SHAPE getShape();
         unsigned int getType();
 
-        virtual void setScale(float x_scale, float y_scale);
+        virtual void setScale(double x_scale, double y_scale);
 
-        virtual bool isPointInside(float x_coord, float y_coord);
+        virtual bool isPointInside(double x_coord, double y_coord);
         virtual bool checkCollision(Hitbox* other);
         
     protected:
 		//Pointers to the X and Y base coords
-		float* x_base;
-		float* y_base;
+		double* x_base;
+		double* y_base;
 
-        float x_base_offset;
-        float y_base_offset;
+        double x_base_offset;
+        double y_base_offset;
 
-        float x_curr_offset;
-        float y_curr_offset;
+        double x_curr_offset;
+        double y_curr_offset;
 
         HITBOX_SHAPE shape;
         unsigned int type;

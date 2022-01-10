@@ -21,15 +21,15 @@ class Camera{
 		void _draw(UIElementList* element_lst, uint32_t delta);
 		SDL_Renderer* getRenderer();
 
-		void setScale(float x_scale, float y_scale);
+		void setScale(double x_scale, double y_scale);
 		void setFollowMode(CAMERA_FOLLOW_MODE follow_mode);
 
 	private:
 		Object* reference;
 	    double current_x;
 		double current_y;
-		float x_scale;
-		float y_scale;
+		double x_scale;
+		double y_scale;
 
 		CAMERA_FOLLOW_MODE follow_mode;
 

@@ -54,7 +54,7 @@ void SpriteHash::add(const char* key, SDL_Surface* surface){
 	}
 	table[hash_val] = new_entry;
 
-	printf("Loaded surface %s\n", key);
+	size++;
 }
 
 /** Gets the texture from the hash table

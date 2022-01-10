@@ -2,7 +2,7 @@
 #include "../../../Engine/Engine.hpp"
 extern Engine* engine;
 
-CameraReference::CameraReference(const char* name, float start_x, float start_y, float x_speed, float y_speed)
+CameraReference::CameraReference(const char* name, float start_x, float start_y, double x_speed, double y_speed)
                : Object(name, start_x, start_y, 1, 0, 0){
     this->type = OBJECT_TYPE::CAMERA_REFERENCE;
 

@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "../HashTable/HashTable.hpp"
+#include "../HashTable/AttributeHash/AttributeHash.hpp"
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
@@ -13,41 +13,48 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
+enum RESOURCE_TYPE{
+	BMP,
+	SOUND,
+	MUSIC,
+	CUT
+};
+
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
 		virtual ~Entity();
 		char* getName();
-		float getX();
-		float getY();
+		double getX();
+		double getY();
 		float getWidth();
 		float getHeight();
 		HitboxList* getHitboxes();
 		int getDrawLayer();
-		float getDrawAxis();
+		double getDrawAxis();
 		bool isActive();
 		bool isVisible();
 		void* getAttr(const char* key);
-		uint32_t getType();
+		uint16_t getType();
 
 		int addAnimation(const char* animation_name);
 
 		int addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
 
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num);
+		int addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
+		int addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop);
 
 		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
-		void setX(float x);
-		void setY(float y);
+		void setX(double x);
+		void setY(double y);
 		int setAnimation(const char* animation_name);
-		int setScale(const char* animation_name, float x_scale, float y_scale);
-		void setScale(float x_scale, float y_scale);
+		int setScale(const char* animation_name, double x_scale, double y_scale);
+		void setScale(double x_scale, double y_scale);
 		int setSize(const char* animation_name, float width, float height);
 		void setSize(float width, float height);
 		void setActive(bool active);
@@ -65,22 +72,26 @@ class Entity{
 		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
 
-		virtual int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
-		virtual int serializeData(FILE* file);
+		//Call
+		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+
+		int serializeData(FILE* file, Zone* base_zone);
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
 		
 	protected:
 		//Name
 		char* name;
 
 		//The entity type (exact values are specified by child classes)
-		uint32_t type;
+		uint16_t type;
 
         //Position
-        float x;
-        float y;
+        double x;
+        double y;
 
 		//Attributes
-		HashTable* attr;
+		AttributeHash* attr;
 
 		//If the object is active/visible
 		bool active;

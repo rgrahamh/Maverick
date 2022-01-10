@@ -8,7 +8,7 @@ extern Engine* engine;
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(const char* name, float* x_base, float* y_base){
+Animation::Animation(const char* name, double* x_base, double* y_base){
     int name_len = strlen(name);
     this->name = (char*)malloc(name_len + 1);
     memcpy(this->name, name, name_len);
@@ -147,7 +147,7 @@ bool Animation::isAnimated(){
  * @param width The width of the new sprite 
  * @param height The height of the new sprite
  */
-int Animation::addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width, int height){
+int Animation::addFrame(const char* sprite_path, unsigned int keytime, double x_offset, double y_offset, int width, int height){
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = engine->getSurface(sprite_path)) == NULL){
@@ -313,7 +313,7 @@ void Animation::setNextAnimation(Animation* next_animation){
  * @param x_scale The X scale factor
  * @param y_scale the Y scale factor
  */
-int Animation::setScale(float x_scale, float y_scale){
+int Animation::setScale(double x_scale, double y_scale){
 	if(this->sequence_start != nullptr){
 		AnimationSeq* cursor = sequence_start;
 		if(cursor != NULL){

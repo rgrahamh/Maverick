@@ -24,7 +24,6 @@ class SoundHash : public HashTable{
 		Sound* get(const char* key);
 	
 	private:
-		unsigned int size;
 		std::atomic<SHEntry**> table;
 };
 #endif

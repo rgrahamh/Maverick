@@ -9,7 +9,7 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitRect::HitRect(float* x_base, float* y_base, float x_offset, float y_offset, float width, float height, unsigned int type)
+HitRect::HitRect(double* x_base, double* y_base, double x_offset, double y_offset, float width, float height, unsigned int type)
 	:Hitbox(x_base, y_base, x_offset, y_offset, type){
 		this->base_height = height;
 		this->curr_height = height;
@@ -41,7 +41,7 @@ float HitRect::getWidth(){
  * @param y_coord The Y coordinate to check against
  * @return true if the point is inside the hitbox, false otherwise
  */
-bool HitRect::isPointInside(float x_coord, float y_coord){
+bool HitRect::isPointInside(double x_coord, double y_coord){
 	if(x_coord > *this->x_base + this->x_curr_offset
 	&& x_coord < *this->x_base + this->x_curr_offset + this->curr_width
 	&& y_coord > *this->y_base + this->y_curr_offset
@@ -55,7 +55,7 @@ bool HitRect::isPointInside(float x_coord, float y_coord){
  * @param x_scale The X scale of the hitbox
  * @param y_scale The Y scale of the hitbox
  */
-void HitRect::setScale(float x_scale, float y_scale){
+void HitRect::setScale(double x_scale, double y_scale){
 	Hitbox::setScale(x_scale, y_scale);
 	this->curr_height = y_scale * this->base_height;
 	this->curr_width = x_scale * this->base_width;

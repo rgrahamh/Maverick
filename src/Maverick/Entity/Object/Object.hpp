@@ -32,15 +32,15 @@ class Object : public Entity{
 		Sprite* getSprite();
 		int getCollisionLayer();
 
-		virtual int serializeData(FILE* file);
+		virtual int serializeData(FILE* file, Zone* base_zone);
 		
-		void setXVel(float xV);
-		void setYVel(float yV);
+		void setXVel(double xV);
+		void setYVel(double yV);
 		void setEnvBump();
 		void setFriction(float friction);
 		void setCollisionLayer(int collision_layer);
 
-		void applyForce(float xA, float yA);
+		void applyForce(double xA, double yA);
 
 		//Processing functions
 		virtual void _process(uint32_t delta);
@@ -61,12 +61,12 @@ class Object : public Entity{
 		float old_y;
 
 		//Velocity
-		float xV;
-		float yV;
+		double xV;
+		double yV;
 
 		//Acceleration
-		float xA;
-		float yA;
+		double xA;
+		double yA;
 
 		//Coefficient of friction
 		float friction;

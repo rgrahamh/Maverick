@@ -125,8 +125,8 @@ void Character::action(Control* control){
 		}
 		else if(this->control == CONTROL_TYPE::GAMEPAD){
 			const ControllerState* pad = control->getController(this->control_num);
-			float x_axis = pad->left_stick_x_axis;
-			float y_axis = pad->left_stick_y_axis;
+			double x_axis = pad->left_stick_x_axis;
+			double y_axis = pad->left_stick_y_axis;
 			//Q1
 			if(x_axis == 0.0 && y_axis == 0.0 && this->isWalking()){
 				if(strcmp("walk_up", active_animation_name) == 0){
@@ -236,8 +236,8 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 
 	if(this_type & COLLISION){
 		if(other_type & COLLISION && other_type & MOVABLE){
-			float x_diff = this->x - this->old_x;
-			float y_diff = this->y - this->old_y;
+			double x_diff = this->x - this->old_x;
+			double y_diff = this->y - this->old_y;
 
 			other->setX(other->getX() + x_diff);
 			other->setY(other->getY() + y_diff);

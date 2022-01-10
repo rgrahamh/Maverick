@@ -6,7 +6,7 @@
  * @param x_offset The hitbox offset from the base X position
  * @param y_offset The hitbox offset from the base Y position
  */
-Hitbox::Hitbox(float* x_base, float* y_base, float x_offset, float y_offset, unsigned int type){
+Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, unsigned int type){
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->x_base_offset = x_offset;
@@ -52,7 +52,7 @@ unsigned int Hitbox::getType(){
  * @param x_scale The new X scale of the hitbox
  * @param y_scale The new Y scale of the hitbox
  */
-void Hitbox::setScale(float x_scale, float y_scale){
+void Hitbox::setScale(double x_scale, double y_scale){
 	this->x_curr_offset = x_scale * x_base_offset;
 	this->y_curr_offset = y_scale * y_base_offset;
 }
@@ -60,7 +60,7 @@ void Hitbox::setScale(float x_scale, float y_scale){
 /** Returns true if the point is inside the hitbox, false otherwise. In the base class, it always returns false (it should always be overridden)
  * @return If the point is inside the hitbox
  */
-bool Hitbox::isPointInside(float x_coord, float y_coord){
+bool Hitbox::isPointInside(double x_coord, double y_coord){
 	return false;
 }
 

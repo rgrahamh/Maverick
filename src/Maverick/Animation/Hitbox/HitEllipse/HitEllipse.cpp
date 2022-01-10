@@ -9,7 +9,7 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitEllipse::HitEllipse(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, unsigned int type)
+HitEllipse::HitEllipse(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, unsigned int type)
 	:Hitbox(x_base, y_base, x_offset, y_offset, type){
 	this->x_base_radius = x_radius;
 	this->y_base_radius = y_radius;
@@ -40,7 +40,7 @@ float HitEllipse::getYRadius(){
  * @param x_scale The X scale of the hitbox
  * @param y_scale The Y scale of the hitbox
  */
-void HitEllipse::setScale(float x_scale, float y_scale){
+void HitEllipse::setScale(double x_scale, double y_scale){
 	Hitbox::setScale(x_scale, y_scale);
 	this->x_curr_radius = x_scale * this->x_base_radius;
 	this->y_curr_radius = y_scale * this->y_base_radius;
@@ -107,12 +107,12 @@ float HitEllipse::getDrawAxis(){
  * @param y_coord The Y coordinate being tested against
  * @return If the point is inside of the hitbox
  */
-bool HitEllipse::isPointInside(float x_coord, float y_coord){
-	float x_center = this->getX();
-	float y_center = this->getY();
+bool HitEllipse::isPointInside(double x_coord, double y_coord){
+	double x_center = this->getX();
+	double y_center = this->getY();
 
-	float x_diff = abs(x_center - x_coord);
-	float y_diff = abs(y_center - y_coord);
+	double x_diff = abs(x_center - x_coord);
+	double y_diff = abs(y_center - y_coord);
 
 	//Avoiding divide by zero
 	if(x_diff == 0){

@@ -82,8 +82,8 @@ class Engine{
 		Camera* getCamera();
 
 		//Global scale setters
-		void setGlobalXScale(float x_scale);
-		void setGlobalYScale(float y_scale);
+		void setGlobalXScale(double x_scale);
+		void setGlobalYScale(double y_scale);
 
 		//Zone handling
 		void addZone(Zone* zone);

@@ -11,7 +11,7 @@
  * @param slice_prop The proportion of the circle
  * @param type Some HITBOX_TYPE vals or'd together
  */
-HitCone::HitCone(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, float angle, float slice_prop, unsigned int type)
+HitCone::HitCone(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, float angle, float slice_prop, unsigned int type)
 	:HitEllipse(x_base, y_base, x_offset, y_offset, x_radius, y_radius, type){
 	this->angle = angle;
 	this->slice_prop = slice_prop;
@@ -26,7 +26,7 @@ HitCone::~HitCone(){}
  * @param x_scale The new X scale component
  * @param y_scale The new Y scale component
  */
-void HitCone::setScale(float x_scale, float y_scale){
+void HitCone::setScale(double x_scale, double y_scale){
 	this->x_curr_offset = x_scale * this->x_base_offset;
 	this->y_curr_offset = y_scale * this->y_base_offset;
 }

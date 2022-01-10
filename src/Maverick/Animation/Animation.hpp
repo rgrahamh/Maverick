@@ -44,7 +44,7 @@ typedef struct AnimationSequence{
 
 class Animation{
 	public:
-		Animation(const char* name, float* x_base, float* y_base);
+		Animation(const char* name, double* x_base, double* y_base);
 		void freeFrame(AnimationSeq* );
 		~Animation();
 
@@ -63,10 +63,10 @@ class Animation{
 
 		void setPaused(bool paused);
 		int setSize(int width, int height);
-		int setScale(float x_scale, float y_scale);
+		int setScale(double x_scale, double y_scale);
 		void setNextAnimation(Animation* next_animation);
 
-		int addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
+		int addFrame(const char* sprite_path, unsigned int keytime, double x_offset, double y_offset, int width = -1, int height = -1);
 		int addHitbox(Hitbox* hitbox);
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(Sound* sound, int sequence_num);
@@ -91,12 +91,12 @@ class Animation{
 		Animation* next_animation;
 
 		//Pointers to the X and Y base coords
-		float* x_base;
-		float* y_base;
+		double* x_base;
+		double* y_base;
 
 		//Scale of the height and width
-		float x_scale;
-		float y_scale;
+		double x_scale;
+		double y_scale;
 
 		//The time counter
 		unsigned int time_counter;

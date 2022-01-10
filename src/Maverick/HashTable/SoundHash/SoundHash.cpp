@@ -54,7 +54,7 @@ void SoundHash::add(const char* key, Sound* sound){
 	}
 	table[hash_val] = new_entry;
 
-	printf("Loaded sound %s\n", key);
+	size++;
 }
 
 /** Gets the texture from the hash table
