@@ -20,6 +20,8 @@ enum RESOURCE_TYPE{
 	CUT
 };
 
+class Zone;
+
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
@@ -37,9 +39,11 @@ class Entity{
 		void* getAttr(const char* key);
 		uint16_t getType();
 
-		int addAnimation(const char* animation_name);
+		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
 
-		int addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
+		int addAnimationSequence(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
+		int addSpriteSet(const char* animation_name, const char* sprite_set);
+		int addSprite(const char* animation_name, const char* sprite_path, const char* sprite_set, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
 		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num);
 		int addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type);
@@ -60,6 +64,8 @@ class Entity{
 		void setActive(bool active);
 		void setVisible(bool visible);
 		void setAttr(const char* key, void* val);
+		int setSpriteSet(const char* animation_name, const char* sprite_set);
+		int setSpriteSet(const char* sprite_set);
 
 		//Processing functions
 		virtual void _process(uint32_t delta) = 0;
@@ -101,6 +107,7 @@ class Entity{
 		Animation* active_animation;
 		AnimationList* animations;
 		AnimationList* ignored_animations;
+		uint16_t num_animations;
 
 		//Draw layer tracking
 		int draw_layer;

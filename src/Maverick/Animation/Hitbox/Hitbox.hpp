@@ -1,6 +1,8 @@
 #ifndef HITBOX_H
 #define HITBOX_H
 
+#include <inttypes.h>
+
 //The 
 enum HITBOX_SHAPE{
     RECT,
@@ -19,7 +21,7 @@ enum HITBOX_TYPE{
 
 class Hitbox{
     public:
-        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, unsigned int type);
+        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group = -1, int32_t hitbox_disable_timer = 0);
         virtual ~Hitbox();
 
         float getX();
@@ -33,6 +35,9 @@ class Hitbox{
 
         HITBOX_SHAPE getShape();
         unsigned int getType();
+
+        int32_t getHitboxGroup();
+        int32_t getHitboxDisableTimer();
 
         virtual void setScale(double x_scale, double y_scale);
 
@@ -51,7 +56,10 @@ class Hitbox{
         double y_curr_offset;
 
         HITBOX_SHAPE shape;
-        unsigned int type;
+        uint64_t type;
+
+        int32_t hitbox_group;
+        int32_t hitbox_disable_timer;
 };
 
 struct HitboxList{

@@ -15,8 +15,8 @@ class HashTable{
 		HashTable(unsigned int size);
 		~HashTable();
 
-		virtual void add(const char* key, void* val);
-		virtual void* get(const char* key);
+		void add(const char* key, void* val);
+		void* get(const char* key);
 
 	protected:
 		unsigned int size;

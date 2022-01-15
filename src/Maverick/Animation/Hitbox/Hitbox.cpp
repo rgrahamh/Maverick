@@ -6,7 +6,7 @@
  * @param x_offset The hitbox offset from the base X position
  * @param y_offset The hitbox offset from the base Y position
  */
-Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, unsigned int type){
+Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group, int32_t hitbox_disable_timer){
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->x_base_offset = x_offset;
@@ -14,6 +14,8 @@ Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset,
 	this->x_curr_offset = x_offset;
 	this->y_curr_offset = y_offset;
 	this->type = type;
+	this->hitbox_group = hitbox_group;
+	this->hitbox_disable_timer = hitbox_disable_timer;
 }
 
 /** The hitbox deconstructor
@@ -105,4 +107,20 @@ float Hitbox::getRightBound(){
  */
 float Hitbox::getDrawAxis(){
 	return *this->y_base + this->y_curr_offset;
+}
+
+/** Gets the hitbox group that the hitbox belongs to
+ * @return The hitbox group that the hitbox belongs to
+ */
+int32_t Hitbox::getHitboxGroup(){
+	return this->hitbox_group;
+}
+
+/** Gets the time (in ms) that the other object should not
+ *  check for collision with the hitbox group that
+ *  this hitbox belongs to (in the parent object)
+ * @return The hitbox group that the hitbox belongs to
+ */
+int32_t Hitbox::getHitboxDisableTimer(){
+	return this->hitbox_disable_timer;
 }

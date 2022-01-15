@@ -4,11 +4,14 @@
 
 extern Engine* engine;
 
+
+//FINISH MULTIPLE SPRITES
+
 /** The parameterized constructor of the Animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
  */
-Animation::Animation(const char* name, double* x_base, double* y_base){
+Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets){
     int name_len = strlen(name);
     this->name = (char*)malloc(name_len + 1);
     memcpy(this->name, name, name_len);
@@ -23,6 +26,9 @@ Animation::Animation(const char* name, double* x_base, double* y_base){
 	this->y_scale = 1.0;
 	this->time_counter = 0;
 	this->paused = false;
+	this->num_sprite_sets = num_sprite_sets;
+	this->sprite_set_counter = 0;
+	this->curr_sprite_set = 0;
 
 	this->next_animation = nullptr;
 }
@@ -44,17 +50,21 @@ Animation::~Animation(){
 				delete tmp;
 			}
 
-			if(cursor->sprite != nullptr){
-				if(cursor->sprite->rect != nullptr){
-					free(cursor->sprite->rect);
+			for(auto& sprite_set:this->sprite_sets){
+				if(cursor->sprite != nullptr){
+					if(cursor->sprite[sprite_set.second]->rect != nullptr){
+						free(cursor->sprite[sprite_set.second]->rect);
+					}
+
+					if(cursor->sprite[sprite_set.second]->texture != nullptr){
+						SDL_DestroyTexture(cursor->sprite[sprite_set.second]->texture);
+					}
 				}
 
-				if(cursor->sprite->texture != nullptr){
-					SDL_DestroyTexture(cursor->sprite->texture);
-				}
-
-				delete cursor->sprite;
+				delete cursor->sprite[sprite_set.second];
 			}
+
+			delete cursor->sprite;
 
 			AnimationSeq* tmp;
 			tmp = cursor;
@@ -70,8 +80,8 @@ Animation::~Animation(){
  * @return The current sprite
  */
 Sprite* Animation::getSprite(){
-	if(this->sequence){
-		return this->sequence->sprite;
+	if(this->sequence != nullptr){
+		return this->sequence->sprite[curr_sprite_set];
 	}
 	else{
 		return nullptr;
@@ -98,7 +108,7 @@ float Animation::getDrawAxis(){
 		return this->sequence->hitboxes->hitbox->getBotBound();
 	}
 	else if(this->sequence != NULL){
-		return this->sequence->sprite->rect->y + this->sequence->sprite->curr_y_offset;
+		return this->sequence->sprite[curr_sprite_set]->rect->y + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	else{
 		return 0.0;
@@ -147,7 +157,62 @@ bool Animation::isAnimated(){
  * @param width The width of the new sprite 
  * @param height The height of the new sprite
  */
-int Animation::addFrame(const char* sprite_path, unsigned int keytime, double x_offset, double y_offset, int width, int height){
+int Animation::addAnimationSequence(unsigned int keytime){
+	//If it's the first animation frame
+	if(this->sequence_end == NULL){
+		this->sequence_end = new AnimationSeq;
+		this->sequence_start = this->sequence_end;
+		this->sequence = this->sequence_end;
+	}
+	//Any additional frames
+	else{
+		this->sequence_end->next = new AnimationSeq;
+		this->sequence_end = this->sequence_end->next;
+		this->sequence_end->next = this->sequence_start;
+	}
+	//Regardless
+	this->sequence_end->sprite = (Sprite**)calloc(num_sprite_sets, sizeof(Sprite*));
+	this->sequence_end->keytime = keytime;
+	this->sequence_end->hitboxes = NULL;
+
+	//Set up the circular link
+	this->sequence_end->next = this->sequence_start;
+
+	this->sequence_len++; 
+
+	return 0;
+}
+
+int Animation::addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width, int height){
+	if(this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
+		return -1;
+	}
+	uint16_t sprite_set_idx = this->sprite_sets[sprite_set];
+
+	AnimationSeq* sequence_cursor = this->sequence_start;
+	if(sequence_cursor != nullptr){
+		do{
+			if(sequence_cursor->sprite[sprite_set_idx] == nullptr){
+				break;
+			}
+			sequence_cursor = sequence_cursor->next;
+		} while(sequence_cursor != sequence_start);
+	}
+
+	if(sequence_cursor == nullptr){
+		return -1;
+	}
+
+	unsigned int sprite_name_len = strlen(sprite_path);
+	char* sprite_name = (char*)malloc(sprite_name_len + 1);
+	memcpy(sprite_name, sprite_path, sprite_name_len);
+	sprite_name[sprite_name_len] = '\0';
+
+	//Create the sprite
+	Sprite* sprite = new Sprite();
+	sprite->name = sprite_name;
+	sprite->rotation = 0.0;
+
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = engine->getSurface(sprite_path)) == NULL){
@@ -172,44 +237,25 @@ int Animation::addFrame(const char* sprite_path, unsigned int keytime, double x_
 		rect->h = height;
 	}
 
-	unsigned int sprite_name_len = strlen(sprite_path);
-	char* sprite_name = (char*)malloc(sprite_name_len + 1);
-	memcpy(sprite_name, sprite_path, sprite_name_len);
-	sprite_name[sprite_name_len] = '\0';
+	sprite->rect = rect;
+	sprite->base_x_offset = x_offset;
+	sprite->base_y_offset = y_offset;
+	sprite->curr_x_offset = x_offset;
+	sprite->curr_y_offset = y_offset;
+	sprite->surface = surface;
+	sprite->texture = nullptr;
 
-	//Create the sprite
-	Sprite* sprite = new Sprite();
-	sprite->name = sprite_name;
-	sprite->rotation = 0.0;
-
-	//If it's the first animation frame
-	if(this->sequence_end == NULL){
-		this->sequence_end = new AnimationSeq;
-		this->sequence_start = this->sequence_end;
-		this->sequence = this->sequence_end;
-	}
-	//Any additional frames
-	else{
-		this->sequence_end->next = new AnimationSeq;
-		this->sequence_end = this->sequence_end->next;
-		this->sequence_end->next = this->sequence_start;
-	}
-	//Regardless
-	this->sequence_end->sprite = sprite;
-	this->sequence_end->sprite->rect = rect;
-	this->sequence_end->sprite->surface = surface;
-	this->sequence_end->sprite->texture = NULL;
-	this->sequence_end->sprite->base_x_offset = x_offset;
-	this->sequence_end->sprite->base_y_offset = y_offset;
-	this->sequence_end->sprite->curr_x_offset = x_offset;
-	this->sequence_end->sprite->curr_y_offset = y_offset;
-	this->sequence_end->keytime = keytime;
-	this->sequence_end->hitboxes = NULL;
-
-	//Set up the circular link
-	this->sequence_end->next = this->sequence_start;
+	sequence_cursor->sprite[sprite_set_idx] = sprite;
 
 	return 0;
+}
+
+int Animation::addSpriteSet(const char* sprite_set){
+	if(sprite_set_counter < num_sprite_sets && this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
+		this->sprite_sets[sprite_set] = sprite_set_counter++;
+		return 0;
+	}
+	return -1;
 }
 
 /** Adds a new hitbox to an animation (to all sprites)
@@ -318,12 +364,14 @@ int Animation::setScale(double x_scale, double y_scale){
 		AnimationSeq* cursor = sequence_start;
 		if(cursor != NULL){
 			do{
-				cursor->sprite->curr_x_offset *= x_scale / this->x_scale;
-				cursor->sprite->curr_y_offset *= y_scale / this->y_scale;
+				for(auto& sprite_set:this->sprite_sets){
+					cursor->sprite[sprite_set.second]->curr_x_offset *= x_scale / this->x_scale;
+					cursor->sprite[sprite_set.second]->curr_y_offset *= y_scale / this->y_scale;
 
-				if(cursor->sprite->rect != NULL){
-					cursor->sprite->rect->w *= x_scale / this->x_scale;
-					cursor->sprite->rect->h *= y_scale / this->y_scale;
+					if(cursor->sprite[sprite_set.second]->rect != NULL){
+						cursor->sprite[sprite_set.second]->rect->w *= x_scale / this->x_scale;
+						cursor->sprite[sprite_set.second]->rect->h *= y_scale / this->y_scale;
+					}
 				}
 				if(cursor->hitboxes != NULL){
 					for(HitboxList* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
@@ -350,24 +398,33 @@ int Animation::setScale(double x_scale, double y_scale){
  * @param y_scale the Y size
  */
 int Animation::setSize(int width, int height){
-	if(this->sequence_start != nullptr){
-		AnimationSeq* cursor = sequence_start;
-		if(cursor != NULL){
-			do{
-				if(cursor->sprite->rect != NULL){
-					cursor->sprite->rect->w = width;
-					cursor->sprite->rect->h = height;
-				}
-
-				cursor = cursor->next;
-			} while(cursor != sequence_start);
-		}
-
-		return 0;
-	}
-	else{
+	if(this->sequence_start == nullptr){
 		return -1;
 	}
+
+	AnimationSeq* cursor = this->sequence_start;
+	if(cursor != NULL){
+		do{
+			for(auto& sprite_set:this->sprite_sets){
+				if(cursor->sprite[sprite_set.second]->rect != NULL){
+					cursor->sprite[sprite_set.second]->rect->w = width;
+					cursor->sprite[sprite_set.second]->rect->h = height;
+				}
+			}
+
+			cursor = cursor->next;
+		} while(cursor != this->sequence_start);
+	}
+
+	return 0;
+}
+
+int Animation::setSpriteSet(const char* sprite_set){
+	if(this->sprite_sets.find(sprite_set) != this->sprite_sets.end()){
+		this->curr_sprite_set = sprite_sets[sprite_set];
+		return 0;
+	}
+	return -1;
 }
 
 /** Advances the animation by a frame
@@ -421,7 +478,7 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, flo
 		this->advance(delta);
 	}
 
-	Sprite* sprite = this->sequence->sprite;
+	Sprite* sprite = this->sequence->sprite[curr_sprite_set];
 	if(sprite == nullptr){
 		return;
 	}
@@ -459,7 +516,9 @@ void Animation::draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, flo
 void Animation::rotate(int direction, float rotate_amnt){
 	AnimationSeq* animations = sequence_start;
 	while(animations != NULL){
-		animations->sprite->rotation += rotate_amnt * ((direction)? -1 : 1);
+		for(auto& sprite_set:this->sprite_sets){
+			animations->sprite[sprite_set.second]->rotation += rotate_amnt * ((direction)? -1 : 1);
+		}
 
 		HitboxList* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){
@@ -491,4 +550,114 @@ AnimationSeq* Animation::getSequenceEnd(){
  */
 const char* Animation::getName(){
 	return this->name;
+}
+
+/** Gets the length of a sequence
+ * @return The sequence len
+ */
+uint16_t Animation::getSequenceLen(){
+	return this->sequence_len;
+}
+
+/** Checks if the animation has a specified sprite set
+ * @return true if the animation has the sprite_set, false otherwise
+ */
+bool Animation::hasSpriteSet(const char* sprite_set){
+	return (this->sprite_sets.find(sprite_set) != this->sprite_sets.end());
+}
+
+/** Saves the resources of the entity to a char*'s (which should be freed upon return)
+ * @param file The pointer to the open file to write to
+ * @param written_sprites The set of sprites that have already been written to file
+ * @param written_audio The set of audio assets that have already been written to file
+ * @param written_music The set of music assets that have already been written to file (used just by objects that handle music)
+ * @return The number of bytes that *buff_ptr is
+ */
+int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio){
+    AnimationSeq* cursor = sequence_start;
+    if(cursor != NULL){
+        do{
+			for(auto& sprite_set:this->sprite_sets){
+				Sprite* sprite = cursor->sprite[sprite_set.second];
+
+				//If this asset's not been saved in this file yet
+				if(written_sprites.find(std::string(sprite->name)) == written_sprites.end()){
+					//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
+					SDL_Surface* surface = engine->getSurface(sprite->name);
+
+					//Gather necessary info
+					//Width/Height are naturally ints (so size varies), meaning we need to truncate first
+					uint32_t width = surface->w;
+					width = EndianSwap(&width);
+					uint32_t height = surface->h;
+					height = EndianSwap(&height);
+
+					//Bit depth of the image
+					uint8_t depth = surface->format->BitsPerPixel;
+
+					//The RGBA masks
+					uint32_t rmask = EndianSwap(&surface->format->Rmask);
+					uint32_t gmask = EndianSwap(&surface->format->Gmask);
+					uint32_t bmask = EndianSwap(&surface->format->Bmask);
+					uint32_t amask = EndianSwap(&surface->format->Amask);
+
+					//Identifier len
+					uint16_t identifier_len = strlen(sprite->name);
+					uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
+
+					uint8_t asset_type = RESOURCE_TYPE::BMP;
+					fwrite(&asset_type, 1, 1, file);
+
+					//Identifier
+					fwrite(&identifier_len_swapped, 2, 1, file);
+					fwrite(sprite->name, 1, identifier_len, file);
+
+					//Write the image header info
+					fwrite(&width, 4, 1, file);
+					fwrite(&height, 4, 1, file);
+					fwrite(&depth, 1, 1, file);
+					fwrite(&rmask, 4, 1, file);
+					fwrite(&gmask, 4, 1, file);
+					fwrite(&bmask, 4, 1, file);
+					fwrite(&amask, 4, 1, file);
+
+					//Write the actual image data ((w * h * bpp) bytes)
+					fwrite(&surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
+
+					//Log this sprite as written
+					written_sprites.insert(sprite->name);
+				}
+
+				//Also have a place for saving audio (once that's implemented in the system)
+				if(written_audio.find(std::string(cursor->sound->name)) == written_audio.end()){
+
+					//Identifier len
+					uint16_t identifier_len = strlen(cursor->sound->name);
+					uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
+
+					uint8_t asset_type = RESOURCE_TYPE::SOUND;
+					fwrite(&asset_type, 1, 1, file);
+
+					//Identifier
+					fwrite(&identifier_len_swapped, 2, 1, file);
+					fwrite(cursor->sound->name, 1, identifier_len, file);
+
+					//Writing the audio buffer (from the mixer chunk) to file
+					uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
+					fwrite(&audio_len, 1, 1, file);
+					fwrite(&cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
+
+					//Insert the audio
+					written_audio.insert(cursor->sound->name);
+				}
+
+				cursor = cursor->next;
+				written_sprites.insert(sprite->name);
+			}
+        } while(cursor != sequence_start);
+    }
+}
+
+int Animation::serializeData(FILE* file){
+	return 0;
 }

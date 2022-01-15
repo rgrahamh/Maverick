@@ -44,7 +44,7 @@ class UIElement : public Entity{
 		virtual void setVisible(bool visible);
 
         void addElement(UIElement* element);
-        void addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime = 0, double x_offset = 0, double y_offset = 0, float width = -1.0, float height = -1.0);
+        int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, double x_offset = 0.0, double y_offset = 0.0, float width = -1.0, float height = -1.0);
 
         UIElement* getElement(const char* name);
         UIElementList* getSubelements();

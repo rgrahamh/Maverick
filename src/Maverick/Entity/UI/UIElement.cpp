@@ -202,26 +202,27 @@ void UIElement::setVisible(bool visible){
  * @param width The view width of the sprite (scales to element if -1)
  * @param height The view height of the sprite (scales to element if -1)
  */ 
-void UIElement::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, double x_offset, double y_offset, float width, float height){
+int UIElement::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, float width, float height){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        int win_width, win_height;
-        SDL_GetWindowSize(window, &win_width, &win_height);
-
-        if(width != -1){
-            width *= (float)win_width;
-        }
-        else{
-            width = this->draw_area.w;
-        }
-        if(height != -1){
-            height *= (float)win_height;
-        }
-        else{
-            height = this->draw_area.h;
-        }
-        animation->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+    if(animation == nullptr){
+        return -1;
     }
+    int win_width, win_height;
+    SDL_GetWindowSize(window, &win_width, &win_height);
+
+    if(width != -1){
+        width *= (float)win_width;
+    }
+    else{
+        width = this->draw_area.w;
+    }
+    if(height != -1){
+        height *= (float)win_height;
+    }
+    else{
+        height = this->draw_area.h;
+    }
+    return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
 }
 
 /** Adds an element to the child element list

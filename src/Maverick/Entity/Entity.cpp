@@ -1,4 +1,5 @@
 #include "./Entity.hpp"
+#include "../Zone/Zone.hpp"
 #include "../Engine/Engine.hpp"
 extern Engine* engine;
 
@@ -68,24 +69,28 @@ double Entity::getY(){
  * @return The width of the object
  */
 float Entity::getWidth(){
-    if(this->active_animation != nullptr){
-        return this->active_animation->getSprite()->rect->w;
-    }
-    else{
+    if(this->active_animation == nullptr){
         return 0;
     }
+    Sprite* sprite = this->active_animation->getSprite();
+    if(sprite == nullptr){
+        return 0;
+    }
+    return sprite->rect->w;
 }
 
 /** Gets the width of the object
  * @return The width of the object
  */
 float Entity::getHeight(){
-    if(this->active_animation != nullptr){
-        return this->active_animation->getSprite()->rect->h;
-    }
-    else{
+    if(this->active_animation == nullptr){
         return 0;
     }
+    Sprite* sprite = this->active_animation->getSprite();
+    if(sprite == nullptr){
+        return 0;
+    }
+    return sprite->rect->h;
 }
 
 /** Gets the draw layer of the object
@@ -99,24 +104,20 @@ int Entity::getDrawLayer(){
  * @return The draw axis of the object
  */
 double Entity::getDrawAxis(){
-    if(this->active_animation != nullptr){
-        return this->active_animation->getDrawAxis();
-    }
-    else{
+    if(this->active_animation == nullptr){
         return 0;
     }
+    return this->active_animation->getDrawAxis();
 }
 
 /** Gets the hitboxes of the current animation state
  * @return The HitboxList containing the object's current hitboxes
  */
 HitboxList* Entity::getHitboxes(){
-    if(this->active_animation != nullptr){
-        return this->active_animation->getHitboxes();
-    }
-    else{
+    if(this->active_animation == nullptr){
         return nullptr;
     }
+    return this->active_animation->getHitboxes();
 }
 
 /** Sets if the current object is active (can be interacted with)
@@ -144,13 +145,13 @@ void* Entity::getAttr(const char* key){
 /** Creates a new animation (you MUST do this before adding hitboxes/sprites)
  * @param animation_name The name of the new animation
  */
-int Entity::addAnimation(const char* animation_name){
+int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
     //If the animation already exists, just return
     if(findAnimation(animation_name) != nullptr){
         return -1;
     }
 
-    Animation* new_animation = new Animation(animation_name, &x, &y);
+    Animation* new_animation = new Animation(animation_name, &x, &y, num_sprite_sets);
     AnimationList* new_animation_list = new AnimationList;
     new_animation_list->animation = new_animation;
     new_animation_list->next = nullptr;
@@ -175,14 +176,73 @@ int Entity::addAnimation(const char* animation_name){
  * @param height The height of the sprite (default if -1)
  * @return 0 on success, -1 if the animation doesn't exist
  */ 
-int Entity::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width, int height){
+int Entity::addAnimationSequence(const char* animation_name, unsigned int keytime, unsigned int iter){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        return animation->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
-    }
-    else{
+    if(animation == nullptr){
         return -1;
     }
+    unsigned int ret = 0;
+    for(int i = 0; i < iter; i++){
+        ret |= animation->addAnimationSequence(keytime);
+    }
+    return ret; 
+}
+
+int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset, int y_offset, int width, int height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    //If the animation doesn't have the sprite set, add it
+    if(!animation->hasSpriteSet(sprite_set)){
+        animation->addSpriteSet(sprite_set);
+    }
+
+    return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
+}
+
+/** Sets the sprite set for a given animation in the object
+ * @param animation_name The animation set you'd like to add the sprite set to
+ * @param sprite_set The sprite set you'd like to add
+ * @return -1 if the sprite set add failed, 0 otherwise
+ */
+int Entity::addSpriteSet(const char* animation_name, const char* sprite_set){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    return animation->addSpriteSet(sprite_set);
+}
+
+/** Sets the sprite set for a given animation in the object
+ * @param animation_name The animation set you'd like to swap the sprite set for
+ * @param sprite_set The sprite set you'd like to swap to
+ * @return -1 if the swap failed, 0 otherwise
+ */
+int Entity::setSpriteSet(const char* animation_name, const char* sprite_set){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    return animation->setSpriteSet(sprite_set);
+}
+
+/** Sets the sprite set for all animations in the object
+ * @param sprite_set The sprite set you'd like to swap all object animations to
+ * @return -1 if any setSpriteSet() calls failed, 0 otherwise
+ */
+int Entity::setSpriteSet(const char* sprite_set){
+    int ret = 0;
+    AnimationList* cursor = animations;
+    while(cursor != nullptr){
+        ret |= cursor->animation->setSpriteSet(sprite_set);
+        cursor = cursor->next;
+    }
+
+    return ret;
 }
 
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
@@ -199,7 +259,7 @@ int Entity::addSprite(const char* animation_name, const char* sprite_path, unsig
 int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element,
                        double y_element, unsigned int type, int sprite_num){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
+    if(animation == nullptr){
         return -1;
     }
 
@@ -366,12 +426,10 @@ int Entity::addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset,
  */ 
 int Entity::addSound(const char* animation_name, const char* sound_path, int sequence_num){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        return animation->addSound(engine->getSound(sound_path), sequence_num);
-    }
-    else{
+    if(animation == nullptr){
         return -1;
     }
+    return animation->addSound(engine->getSound(sound_path), sequence_num);
 }
 
 /** Sets the X posision
@@ -412,13 +470,11 @@ int Entity::setAnimation(const char* animation_name){
  */
 int Entity::setScale(const char* animation_name, double x_scale, double y_scale){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        animation->setScale(x_scale, y_scale);
-        return 0;
-    }
-    else{
+    if(animation == nullptr){
         return -1;
     }
+    animation->setScale(x_scale, y_scale);
+    return 0;
 }
 
 /** Sets the scale for all animations
@@ -441,13 +497,11 @@ void Entity::setScale(double x_scale, double y_scale){
  */
 int Entity::setSize(const char* animation_name, float width, float height){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        animation->setSize(width, height);
-        return 0;
-    }
-    else{
+    if(animation == nullptr){
         return -1;
     }
+    animation->setSize(width, height);
+    return 0;
 }
 
 /** Sets the scale for all animations
@@ -544,33 +598,40 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
         switch(attr_list->type){
             //Writing chars & bools (1 byte)
             case ATTR_DATA_TYPE::BOOL:
-            case ATTR_DATA_TYPE::CHAR:
-                char attr_val = (char)attr_list->val;
+            case ATTR_DATA_TYPE::CHAR:{
+                bool attr_val = attr_list->val == 0;
                 fwrite(&attr_val, sizeof(attr_val), 1, file);
                 break;
+            }
 
             //Writing ints/uints (8 bytes)
             case ATTR_DATA_TYPE::INT:
-            case ATTR_DATA_TYPE::UINT:
+            case ATTR_DATA_TYPE::UINT:{
                 uint64_t attr_val = (uint64_t)attr_list->val;
+                fwrite(&attr_val, sizeof(attr_val), 1, file);
                 break;
+            }
 
             //Writing stings (? bytes)
-            case ATTR_DATA_TYPE::STRING:
+            case ATTR_DATA_TYPE::STRING:{
                 char* attr_str = (char*)attr_list->val;
                 uint16_t attr_val_len = strlen(attr_str);
                 uint16_t attr_val_len_swapped = EndianSwap(&attr_val_len);
                 fwrite(&attr_val_len_swapped, sizeof(attr_val_len_swapped), 1, file);
                 fwrite(attr_str, 1, attr_val_len, file);
                 break;
+            }
         }
     }
 
     //ANIMATION SECTION
+    uint16_t num_animations = EndianSwap(&this->num_animations);
+    fwrite(&num_animations, sizeof(num_animations), 1, file);
 
-    AnimationList* animations = this->animations;
-    while(this->animations != nullptr){
-
+    AnimationList* animation_cursor = this->animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->serializeData(file);
+        animation_cursor = animation_cursor->next;
     }
 
     if(this->active_animation != nullptr){
@@ -594,97 +655,23 @@ int Entity::serializeExtendedData(FILE* file, Zone* base_zone){
 
 /** Saves the resources of the entity to a char*'s (which should be freed upon return)
  * @param file The pointer to the open file to write to
- * @param sprite_set The set of sprites that have already been written to file
- * @param audio_set The set of audio assets that have already been written to file
- * @param music_set The set of music assets that have already been written to file (used just by objects that handle music)
+ * @param written_sprites The set of sprites that have already been written to file
+ * @param written_audio The set of audio assets that have already been written to file
+ * @param written_music The set of music assets that have already been written to file (used just by objects that handle music)
  * @return The number of bytes that *buff_ptr is
  */
-int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
-    if(active_animation != nullptr || file == nullptr){
+int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio, std::unordered_set<std::string>& written_music){
+    if(file == nullptr){
         return -1;
     }
 
-    AnimationSeq* sequence_start = active_animation->getSequenceStart();
-    AnimationSeq* cursor = sequence_start;
-    if(cursor != NULL){
-        do{
-            //If this asset's not been saved in this file yet
-            if(sprite_set.find(std::string(cursor->sprite->name)) == sprite_set.end()){
-                //Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
-                SDL_Surface* surface = engine->getSurface(cursor->sprite->name);
-
-                //Gather necessary info
-                //Width/Height are naturally ints (so size varies), meaning we need to truncate first
-                uint32_t width = surface->w;
-                width = EndianSwap(&width);
-                uint32_t height = surface->h;
-                height = EndianSwap(&height);
-
-                //Bit depth of the image
-                uint8_t depth = surface->format->BitsPerPixel;
-
-                //The RGBA masks
-                uint32_t rmask = EndianSwap(&surface->format->Rmask);
-                uint32_t gmask = EndianSwap(&surface->format->Gmask);
-                uint32_t bmask = EndianSwap(&surface->format->Bmask);
-                uint32_t amask = EndianSwap(&surface->format->Amask);
-
-                //Identifier len
-                uint16_t identifier_len = strlen(cursor->sprite->name);
-                uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-                uint8_t asset_type = RESOURCE_TYPE::BMP;
-                fwrite(&asset_type, 1, 1, file);
-
-                //Identifier
-                fwrite(&identifier_len_swapped, 2, 1, file);
-                fwrite(cursor->sprite->name, 1, identifier_len, file);
-
-                //Write the image header info
-                fwrite(&width, 4, 1, file);
-                fwrite(&height, 4, 1, file);
-                fwrite(&depth, 1, 1, file);
-                fwrite(&rmask, 4, 1, file);
-                fwrite(&gmask, 4, 1, file);
-                fwrite(&bmask, 4, 1, file);
-                fwrite(&amask, 4, 1, file);
-
-                //Write the actual image data ((w * h * bpp) bytes)
-                fwrite(&surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
-
-                //Log this sprite as written
-                sprite_set.insert(cursor->sprite->name);
-            }
-
-            //Also have a place for saving audio (once that's implemented in the system)
-            if(audio_set.find(std::string(cursor->sound->name)) == audio_set.end()){
-
-                //Identifier len
-                uint16_t identifier_len = strlen(cursor->sound->name);
-                uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-                uint8_t asset_type = RESOURCE_TYPE::SOUND;
-                fwrite(&asset_type, 1, 1, file);
-
-                //Identifier
-                fwrite(&identifier_len_swapped, 2, 1, file);
-                fwrite(cursor->sound->name, 1, identifier_len, file);
-
-                //Writing the audio buffer (from the mixer chunk) to file
-                uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
-                fwrite(&audio_len, 1, 1, file);
-                fwrite(&cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
-
-                //Insert the audio
-                audio_set.insert(cursor->sound->name);
-            }
-
-            cursor = cursor->next;
-            sprite_set.insert(cursor->sprite->name);
-        } while(cursor != sequence_start);
+    AnimationList* animation_cursor = animations;
+    while(animation_cursor != nullptr){
+        animation_cursor->animation->serializeAssets(file, written_sprites, written_audio);
+        animation_cursor = animation_cursor->next;
     }
 
-    return serializeExtendedAssets(file, sprite_set, audio_set, music_set);
+    return serializeExtendedAssets(file, written_sprites, written_audio, written_music);
 }
 
 /** This function should be overridden by children that wish to write additional
