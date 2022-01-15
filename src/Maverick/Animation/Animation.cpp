@@ -157,7 +157,7 @@ bool Animation::isAnimated(){
  * @param width The width of the new sprite 
  * @param height The height of the new sprite
  */
-int Animation::addAnimationSequence(unsigned int keytime){
+int Animation::addAnimationFrame(unsigned int keytime){
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
 		this->sequence_end = new AnimationSeq;

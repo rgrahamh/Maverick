@@ -17,7 +17,7 @@ void buildGlobal(){
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, window, 0);
     pause_menu->setActive(false);
     pause_menu->addAnimation("default", 1);
-    pause_menu->addAnimationSequence("default", 0);
+    pause_menu->addAnimationFrame("default", 0);
     pause_menu->addSprite("default", "default", "./assets/sprites/ui/shade.bmp");
     pause_menu->setAnimation("default");
 

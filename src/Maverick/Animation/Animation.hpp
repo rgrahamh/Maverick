@@ -69,7 +69,7 @@ class Animation{
 		void setNextAnimation(Animation* next_animation);
 		int setSpriteSet(const char* sprite_set);
 
-		int addAnimationSequence(unsigned int keytime);
+		int addAnimationFrame(unsigned int keytime);
 		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
 		int addSpriteSet(const char* sprite_set);
 		int addHitbox(Hitbox* hitbox);

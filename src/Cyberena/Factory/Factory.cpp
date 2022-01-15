@@ -6,39 +6,39 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
 
     //Neutral position
     player->addAnimation("neutral_up", 1);
-    player->addAnimationSequence("neutral_up", 0);
+    player->addAnimationFrame("neutral_up", 0);
     player->addSprite("neutral_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp");
     player->addAnimation("neutral_down", 1);
-    player->addAnimationSequence("neutral_down", 0);
+    player->addAnimationFrame("neutral_down", 0);
     player->addSprite("neutral_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp");
     player->addAnimation("neutral_left", 1);
-    player->addAnimationSequence("neutral_left", 0);
+    player->addAnimationFrame("neutral_left", 0);
     player->addSprite("neutral_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp");
     player->addAnimation("neutral_right", 1);
-    player->addAnimationSequence("neutral_right", 0);
+    player->addAnimationFrame("neutral_right", 0);
     player->addSprite("neutral_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp");
 
     //Walking position
     player->addAnimation("walk_up", 1);
-    player->addAnimationSequence("walk_up", 256, 3);
+    player->addAnimationFrame("walk_up", 256, 3);
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Left_Foot.bmp");
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp");
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Right_Foot.bmp");
 
     player->addAnimation("walk_down", 1);
-    player->addAnimationSequence("walk_down", 256, 3);
+    player->addAnimationFrame("walk_down", 256, 3);
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Left_Foot.bmp");
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp");
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Right_Foot.bmp");
     
     player->addAnimation("walk_left", 1);
-    player->addAnimationSequence("walk_left", 256, 3);
+    player->addAnimationFrame("walk_left", 256, 3);
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Left_Foot.bmp");
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp");
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Right_Foot.bmp");
 
     player->addAnimation("walk_right", 1);
-    player->addAnimationSequence("walk_right", 256, 3);
+    player->addAnimationFrame("walk_right", 256, 3);
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Left_Foot.bmp");
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp");
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Right_Foot.bmp");
@@ -60,7 +60,7 @@ Object* buildPillar(const char* name, float start_x, float start_y){
     Object* pillar = new Object(name, start_x, start_y, 1, 1000, 1);
 
     pillar->addAnimation("default", 1);
-    pillar->addAnimationSequence("default", 0);
+    pillar->addAnimationFrame("default", 0);
     pillar->addSprite("default", "day", "./assets/sprites/environment/pillar.bmp");
     pillar->setAnimation("default");
     pillar->addHitbox("default", ELLIPSE, 16, 120, 16, 8, COLLISION | ENVIRONMENT);
@@ -75,7 +75,7 @@ Object* buildBackground(const char* name, float start_x, float start_y){
     Object* background = new Object(name, start_x, start_y, 1, 1, 0);
 
     background->addAnimation("default", 1);
-    background->addAnimationSequence("default", 0);
+    background->addAnimationFrame("default", 0);
     background->addSprite("default", "day", "./assets/sprites/old_game_resources/Floor_Tile.bmp");
     background->setAnimation("default");
 

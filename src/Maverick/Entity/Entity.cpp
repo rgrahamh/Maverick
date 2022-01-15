@@ -176,14 +176,14 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
  * @param height The height of the sprite (default if -1)
  * @return 0 on success, -1 if the animation doesn't exist
  */ 
-int Entity::addAnimationSequence(const char* animation_name, unsigned int keytime, unsigned int iter){
+int Entity::addAnimationFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
     unsigned int ret = 0;
     for(int i = 0; i < iter; i++){
-        ret |= animation->addAnimationSequence(keytime);
+        ret |= animation->addAnimationFrame(keytime);
     }
     return ret; 
 }
