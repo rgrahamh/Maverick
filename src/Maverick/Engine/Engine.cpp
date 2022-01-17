@@ -153,9 +153,9 @@ void Engine::start(){
     //Loading the level editor
     //engine->addThread(new std::thread(loadZone, "led"));
 
-    Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
+    /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
-    sound_board->setMusicVolume(1, 0.0, 10000);
+    sound_board->setMusicVolume(1, 0.0, 10000);*/
 
     gameLoop();
 }
@@ -375,9 +375,19 @@ void Engine::collisionStep(ObjectList* all_objects){
                     if(object_lst->obj != object_cursor->obj && (!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) &&
                        object_lst->obj->getCollisionLayer() == object_cursor->obj->getCollisionLayer() && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
                         //We want the default collision handling to go last since it's the harshest (and might inhibit special collision cases)
-                        object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
-                        object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
-                        handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
+                        if(!object_lst->obj->checkHitboxImmunity(object_cursor->obj, hitbox_cursor->hitbox) &&
+                           !object_cursor->obj->checkHitboxImmunity(object_lst->obj, hitbox_lst->hitbox)){
+                            //Handle the base object collision & hitbox immunity
+                            object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
+                            object_cursor->obj->addHitboxImmunity(object_lst->obj, hitbox_lst->hitbox);
+
+                            //Handle the other object collision & hitbox immunity
+                            object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
+                            object_lst->obj->addHitboxImmunity(object_cursor->obj, hitbox_cursor->hitbox);
+
+                            //Handle default collision
+                            handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
+                        }
                     }
                     object_cursor = object_cursor->next;
                     hitbox_cursor = hitbox_cursor->next;
@@ -634,8 +644,8 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
-            float old_x = mov_obj->getOldX();
-            float old_y = mov_obj->getOldY();
+            double old_x = mov_obj->getOldX();
+            double old_y = mov_obj->getOldY();
 
             double x = mov_obj->getX();
             double y = mov_obj->getY();

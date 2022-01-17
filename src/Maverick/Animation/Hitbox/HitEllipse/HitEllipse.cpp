@@ -9,8 +9,8 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitEllipse::HitEllipse(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, unsigned int type)
-	:Hitbox(x_base, y_base, x_offset, y_offset, type){
+HitEllipse::HitEllipse(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
+	:Hitbox(x_base, y_base, x_offset, y_offset, type, hitbox_group, immunity_timer){
 	this->x_base_radius = x_radius;
 	this->y_base_radius = y_radius;
 	this->x_curr_radius = x_radius;

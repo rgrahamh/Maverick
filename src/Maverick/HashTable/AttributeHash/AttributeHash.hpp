@@ -5,10 +5,10 @@
 #include <SDL2/SDL.h>
 
 enum ATTR_DATA_TYPE{
-    INT = 0,
-    UINT,
-    BOOL,
-    CHAR,
+    INT_PTR = 0,
+    UINT_PTR,
+    BOOL_PTR,
+    CHAR_PTR,
     STRING
 };
 

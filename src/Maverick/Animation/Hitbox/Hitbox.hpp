@@ -21,7 +21,7 @@ enum HITBOX_TYPE{
 
 class Hitbox{
     public:
-        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group = -1, int32_t hitbox_disable_timer = 0);
+        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group = -1, int32_t immunity_timer = 0);
         virtual ~Hitbox();
 
         float getX();
@@ -37,7 +37,7 @@ class Hitbox{
         unsigned int getType();
 
         int32_t getHitboxGroup();
-        int32_t getHitboxDisableTimer();
+        int32_t getImmunityTimer();
 
         virtual void setScale(double x_scale, double y_scale);
 
@@ -59,11 +59,20 @@ class Hitbox{
         uint64_t type;
 
         int32_t hitbox_group;
-        int32_t hitbox_disable_timer;
+        int32_t immunity_timer;
 };
 
 struct HitboxList{
     Hitbox* hitbox;
     struct HitboxList* next;
+};
+
+class Entity;
+struct HitboxImmunityList{
+    Entity* entity;
+    Hitbox* hitbox;
+    uint32_t hitbox_group;
+    uint32_t ignore_timer;
+    struct HitboxImmunityList* next;
 };
 #endif

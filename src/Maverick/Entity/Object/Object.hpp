@@ -23,10 +23,10 @@ class Object : public Entity{
 	public:
 		Object(const char* name, float start_x, float start_y, float friction, float mass, int layers = 1);
 		virtual ~Object();
-		float getOldX();
-		float getOldY();
-		float getXVel();
-		float getYVel();
+		double getOldX();
+		double getOldY();
+		double getXVel();
+		double getYVel();
 		float getMass();
 		bool getEnvBump();
 		Sprite* getSprite();
@@ -57,8 +57,8 @@ class Object : public Entity{
 		
 	protected:
 		//Previous position (used for rollback)
-		float old_x;
-		float old_y;
+		double old_x;
+		double old_y;
 
 		//Velocity
 		double xV;

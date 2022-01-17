@@ -36,28 +36,28 @@ Object::~Object(){
 /** Gets the old X value of the object
  * @return The old X value of the object
  */
-float Object::getOldX(){
+double Object::getOldX(){
     return this->old_x;
 }
 
 /** Gets the old Y value of the object
  * @return The old Y value of the object
  */
-float Object::getOldY(){
+double Object::getOldY(){
     return this->old_y;
 }
 
 /** Gets the X velocity of the object
  * @return The X velocity of the object
  */
-float Object::getXVel(){
+double Object::getXVel(){
     return this->xV;
 }
 
 /** Gets the Y velocity of the object
  * @return The Y velocity of the object
  */
-float Object::getYVel(){
+double Object::getYVel(){
     return this->yV;
 }
 
@@ -156,8 +156,10 @@ void Object::_process(uint32_t delta){
     this->process(delta);
 
     //Updating old X & Y values
-    this->old_x = this->x;
-    this->old_y = this->y;
+    if(fabs(this->x - this->old_x) > 1.0 || fabs(this->y - this->old_y) > 1.0){
+        this->old_x = this->x;
+        this->old_y = this->y;
+    }
 
     //Updating environmental bump
     this->env_bump = false;
@@ -177,6 +179,8 @@ void Object::_process(uint32_t delta){
     }
     this->y += this->yV;
     this->yA = 0;
+
+    cleanupHitboxImmunity(delta);
 }
 
 /** Called during the process step by _process; space for users to override with custom processing logics

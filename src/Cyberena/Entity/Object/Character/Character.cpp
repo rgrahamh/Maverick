@@ -82,11 +82,13 @@ void Character::action(Control* control){
 			}
 
 			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
-			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]
+			|| keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]){
 				setAnimation("walk_up");
 				active_animation->setNextAnimation(findAnimation("walk_up"));
 			}
-			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]
+				 || !keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]){
 				setAnimation("walk_down");
 				active_animation->setNextAnimation(findAnimation("walk_down"));
 			}
@@ -231,7 +233,8 @@ void Character::process(uint32_t delta){
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	unsigned int other_type = other_hitbox->getType();
+	//TODO: Make character-specific env collision feel better
+	/*unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
 	if(this_type & COLLISION){
@@ -261,5 +264,5 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 				}
 			}
 		}
-	}
+	}*/
 }

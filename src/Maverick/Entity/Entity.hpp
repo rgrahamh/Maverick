@@ -34,10 +34,11 @@ class Entity{
 		HitboxList* getHitboxes();
 		int getDrawLayer();
 		double getDrawAxis();
-		bool isActive();
-		bool isVisible();
 		void* getAttr(const char* key);
 		uint16_t getType();
+		bool isActive();
+		bool isVisible();
+		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
 
@@ -45,12 +46,8 @@ class Entity{
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
 		int addSprite(const char* animation_name, const char* sprite_path, const char* sprite_set, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, float angle, float slice_prop);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
+		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
@@ -106,13 +103,16 @@ class Entity{
 		//Animation
 		Animation* active_animation;
 		AnimationList* animations;
-		AnimationList* ignored_animations;
 		uint16_t num_animations;
+
+		//Hitbox group ignoring (key=other object; first tuple=hitbox group; second tuple=timer)
+		HitboxImmunityList* hitbox_immunity;
 
 		//Draw layer tracking
 		int draw_layer;
 
 		Animation* findAnimation(const char* animation_name);
+		void cleanupHitboxImmunity(uint32_t delta);
 };
 
 #endif

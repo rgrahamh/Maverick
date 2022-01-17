@@ -5,8 +5,11 @@
  * @param y_base A pointer to the base object's Y value
  * @param x_offset The hitbox offset from the base X position
  * @param y_offset The hitbox offset from the base Y position
+ * @param type The hitbox type (flags to specify what kind of hitbox it is)
+ * @param group The hitbox group (other hitboxes that should be tied in with immunity will have the same value)
+ * @param immunity_timer The amount of time the hitbox won't interact with a given "other" object if hit
  */
-Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group, int32_t hitbox_disable_timer){
+Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group, int32_t immunity_timer){
 	this->x_base = x_base;
 	this->y_base = y_base;
 	this->x_base_offset = x_offset;
@@ -15,7 +18,7 @@ Hitbox::Hitbox(double* x_base, double* y_base, double x_offset, double y_offset,
 	this->y_curr_offset = y_offset;
 	this->type = type;
 	this->hitbox_group = hitbox_group;
-	this->hitbox_disable_timer = hitbox_disable_timer;
+	this->immunity_timer = immunity_timer;
 }
 
 /** The hitbox deconstructor
@@ -121,6 +124,6 @@ int32_t Hitbox::getHitboxGroup(){
  *  this hitbox belongs to (in the parent object)
  * @return The hitbox group that the hitbox belongs to
  */
-int32_t Hitbox::getHitboxDisableTimer(){
-	return this->hitbox_disable_timer;
+int32_t Hitbox::getImmunityTimer(){
+	return this->immunity_timer;
 }

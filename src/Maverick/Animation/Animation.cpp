@@ -150,12 +150,7 @@ bool Animation::isAnimated(){
 }
 
 /** Adds a frame to an animation
- * @param sprite_path The filepath of the sprite
  * @param keytime The number of frames before the key continues
- * @param x_offset The X offset of the new sprite
- * @param y_offset The Y offset of the new sprite
- * @param width The width of the new sprite 
- * @param height The height of the new sprite
  */
 int Animation::addAnimationFrame(unsigned int keytime){
 	//If it's the first animation frame
@@ -183,6 +178,14 @@ int Animation::addAnimationFrame(unsigned int keytime){
 	return 0;
 }
 
+/** Adds a sprite to the animation
+ * @param sprite_set The sprite set you'd like to add the sprite to
+ * @param sprite_path The filepath of the sprite
+ * @param x_offset The X offset of the new sprite
+ * @param y_offset The Y offset of the new sprite
+ * @param width The width of the new sprite 
+ * @param height The height of the new sprite
+ */
 int Animation::addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width, int height){
 	if(this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
 		return -1;

@@ -69,6 +69,8 @@ void UIElement::_process(uint32_t delta){
         }
         cursor = cursor->next;
     }
+
+    cleanupHitboxImmunity(delta);
 }
 
 /** Handles actions for this UIElement
