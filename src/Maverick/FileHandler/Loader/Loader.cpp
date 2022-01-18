@@ -3,9 +3,8 @@
 #include "../../../Maverick/Engine/Engine.hpp"
 
 extern Engine* engine;
-extern bool endian;
 
-Zone* loadZone(const char* zone_name){
+Zone* loadZoneFromFile(const char* zone_name){
     if(zone_name == nullptr){
 		printf("Can't load zone; zone_name is null!\n");
 		return nullptr;
@@ -63,8 +62,6 @@ Zone* loadZone(const char* zone_name){
 		//The data sector
 
 		if(resource_type == RESOURCE_TYPE::BMP && engine->getSurface(identifier) == nullptr){
-			SDL_Surface* surface = new SDL_Surface();
-
 			//Image width
 			uint32_t width = EndianSwap((uint32_t*)cursor);
 			cursor += 4;
@@ -86,7 +83,7 @@ Zone* loadZone(const char* zone_name){
 
 			engine->addSurface(identifier, surface);
 		}
-		else if(resource_type == RESOURCE_TYPE::WAV){
+		else if(resource_type == RESOURCE_TYPE::MUSIC){
 			SDL_AudioSpec* spec = new SDL_AudioSpec();
 			spec->silence = 0;
 

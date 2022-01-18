@@ -91,6 +91,7 @@ class Engine{
 		void deactivateZone(const char* zone_name);
 		void unloadZone(const char* zone_name);
 
+		Zone* getZone(const char* zone_name);
 		ZoneList* getZones();
 		ZoneList* getActiveZones();
 

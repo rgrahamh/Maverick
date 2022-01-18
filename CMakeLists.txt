@@ -68,6 +68,11 @@ set(FactorySrc
     ./src/Cyberena/Factory/Factory.cpp
 )
 
+set(FileHandlerSrc
+    ./src/Maverick/FileHandler/Saver/Saver.cpp
+    ./src/Maverick/FileHandler/Loader/Loader.cpp
+)
+
 set(EngineSrc
     ./src/Maverick/Engine/Engine.cpp
 )
@@ -83,6 +88,7 @@ set(MotorSrc
     ${ZoneSrc}
     ${ZoneFactorySrc}
     ${FactorySrc}
+    ${FileHandlerSrc}
     ${EngineSrc}
 )
 

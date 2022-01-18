@@ -2,6 +2,7 @@
 
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
+#include "../FileHandler/Saver/Saver.hpp"
 
 std::atomic<bool> exit_game = false;
 
@@ -152,6 +153,9 @@ void Engine::start(){
 
     //Loading the level editor
     //engine->addThread(new std::thread(loadZone, "led"));
+
+    saveZone(this->getZone("global"));
+    saveZone(this->getZone("Test Zone"));
 
     /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
@@ -931,6 +935,30 @@ void Engine::unloadZone(const char* zone_name){
  */
 ZoneList* Engine::getZones(){
     return this->zones;
+}
+
+/** Gets a zone by name
+ * @param zone_name The name of the zone you want
+ * @return The requested zone
+ */
+Zone* Engine::getZone(const char* zone_name){
+    ZoneList* zone_cursor = this->zones;
+    while(zone_cursor != nullptr){
+        if(strcmp(zone_name, zone_cursor->zone->getName()) == 0){
+            return zone_cursor->zone;
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    zone_cursor = this->active_zones;
+    while(zone_cursor != nullptr){
+        if(strcmp(zone_name, zone_cursor->zone->getName()) == 0){
+            return zone_cursor->zone;
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return nullptr;
 }
 
 /** Gets all active zones
