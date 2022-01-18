@@ -23,6 +23,8 @@ class HitEllipse : public Hitbox{
 
 		virtual bool isPointInside(double x_coord, double y_coord) override;
 
+		void serializeData(FILE* file);
+
 	protected:
 		double x_base_radius;
 		double x_curr_radius;

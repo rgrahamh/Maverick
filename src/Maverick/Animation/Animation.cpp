@@ -152,7 +152,7 @@ bool Animation::isAnimated(){
 /** Adds a frame to an animation
  * @param keytime The number of frames before the key continues
  */
-int Animation::addAnimationFrame(unsigned int keytime){
+int Animation::addFrame(unsigned int keytime){
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
 		this->sequence_end = new AnimationSeq;
@@ -253,6 +253,9 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	return 0;
 }
 
+/** Adds a new sprite set to an animation
+ * @param sprite_set The sprite set you'd like to add
+ */
 int Animation::addSpriteSet(const char* sprite_set){
 	if(sprite_set_counter < num_sprite_sets && this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
 		this->sprite_sets[sprite_set] = sprite_set_counter++;
@@ -662,5 +665,75 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 }
 
 int Animation::serializeData(FILE* file){
-	return 0;
+	//Store animation identifier
+	uint16_t name_len = strlen(this->name);
+	uint16_t name_len_swap = EndianSwap(&name_len);
+	fwrite(&name_len_swap, sizeof(name_len_swap), 1, file);
+	fwrite(this->name, 1, name_len, file);
+
+	//Number of frames
+	uint16_t sequence_len_swap = EndianSwap(&this->sequence_len);
+	fwrite(&sequence_len_swap, sizeof(sequence_len_swap), 1, file);
+
+	//Per frame
+	AnimationSeq* sequence_cursor = this->sequence_start;
+	while(sequence_cursor != nullptr){
+		//Getting the number of sprites in this frame
+		uint16_t sprite_num = 0;
+		for(auto& sprite_set:sprite_sets){
+			if(sequence_cursor->sprite[sprite_set.second] != nullptr){
+				sprite_num++;
+			}
+		}
+
+		uint16_t sprite_num_swap = EndianSwap(&sprite_num);
+		fwrite(&sprite_num_swap, sizeof(sprite_num_swap), 1, file);
+
+		//Recording the sprite & attributes in this frame
+		for(auto& sprite_set:sprite_sets){
+			if(sequence_cursor->sprite[sprite_set.second] != nullptr){
+				const char* sprite_set_name = sprite_set.first.c_str();
+				uint16_t sprite_set_name_len = strlen(sprite_set_name);
+				uint16_t sprite_set_name_len_swap = EndianSwap(&sprite_set_name_len);
+				fwrite(&sprite_set_name_len_swap, sizeof(sprite_set_name_len_swap), 1, file);
+				fwrite(&sprite_set_name, 1, sprite_set_name_len, file);
+
+				uint16_t x_offset_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->base_x_offset);
+				fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
+
+				uint16_t y_offset_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->base_y_offset);
+				fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
+
+				uint16_t width_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->rect->w);
+				fwrite(&width_swap, sizeof(width_swap), 1, file);
+
+				uint16_t height_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->rect->h);
+				fwrite(&height_swap, sizeof(height_swap), 1, file);
+
+				uint64_t rotation_swap = EndianSwap((uint64_t*)&sequence_cursor->sprite[sprite_set.second]->rotation);
+				fwrite(&rotation_swap, sizeof(rotation_swap), 1, file);
+			}
+		}
+
+		//Record the keytime
+		uint32_t keytime_swap = EndianSwap(&sequence_cursor->keytime);
+		fwrite(&keytime_swap, sizeof(keytime_swap), 1, file);
+
+		//Record the sound
+		const char* sound_name = sequence_cursor->sound->name;
+		uint16_t sound_name_len = strlen(sound_name);
+		uint16_t sound_name_swapped = EndianSwap(&sound_name_len);
+		fwrite(&sound_name_swapped, sizeof(sound_name_swapped), 1, file);
+		fwrite(&sound_name, 1, sound_name_len, file);
+
+		//Record hitbox info
+		HitboxList* hitbox_cursor = sequence_cursor->hitboxes;
+		while(hitbox_cursor != nullptr){
+			hitbox_cursor->hitbox->serializeData(file);
+
+			hitbox_cursor = hitbox_cursor->next;
+		}
+
+		sequence_cursor = sequence_cursor->next;
+	}
 }

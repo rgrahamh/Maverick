@@ -212,5 +212,5 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 	printf("Collided!\n");
 }
 
-int Object::serializeData(FILE* file, Zone* base_zone){
+int Object::serializeExtendedData(FILE* file, Zone* base_zone){
 }

@@ -22,6 +22,8 @@ Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
 
     this->draw_layer = draw_layer;
 
+    this->num_animations = 0;
+
     //Initializing animation/visibility attributes
     this->active = true;
     this->visible = true;
@@ -164,6 +166,7 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
         new_animation_list->next = animations;
         animations = new_animation_list;
     }
+    this->num_animations++;
     return 0;
 }
 
@@ -177,14 +180,14 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
  * @param height The height of the sprite (default if -1)
  * @return 0 on success, -1 if the animation doesn't exist
  */ 
-int Entity::addAnimationFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
+int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
     unsigned int ret = 0;
     for(int i = 0; i < iter; i++){
-        ret |= animation->addAnimationFrame(keytime);
+        ret |= animation->addFrame(keytime);
     }
     return ret; 
 }

@@ -42,7 +42,7 @@ class Entity{
 
 		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
 
-		int addAnimationFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
+		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
 		int addSprite(const char* animation_name, const char* sprite_path, const char* sprite_set, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 

@@ -32,8 +32,8 @@ class Object : public Entity{
 		Sprite* getSprite();
 		int getCollisionLayer();
 
-		virtual int serializeData(FILE* file, Zone* base_zone);
-		
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
+
 		void setXVel(double xV);
 		void setYVel(double yV);
 		void setEnvBump();
@@ -54,7 +54,7 @@ class Object : public Entity{
 		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
-		
+
 	protected:
 		//Previous position (used for rollback)
 		double old_x;

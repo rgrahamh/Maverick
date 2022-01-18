@@ -234,7 +234,7 @@ void Character::process(uint32_t delta){
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
 	//TODO: Make character-specific env collision feel better
-	/*unsigned int other_type = other_hitbox->getType();
+	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
 	if(this_type & COLLISION){
@@ -260,9 +260,14 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 					this->x = new_x;
 					if(this_hitbox->checkCollision(other_hitbox)){
 						this->y = this->old_y;
+						//If all else fails, hand it back to the generic collision handling function
+						if(this_hitbox->checkCollision(other_hitbox)){
+							this->x = new_x;
+							this->y = new_y;
+						}
 					}
 				}
 			}
 		}
-	}*/
+	}
 }

@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 
 struct Sprite{
@@ -69,7 +70,7 @@ class Animation{
 		void setNextAnimation(Animation* next_animation);
 		int setSpriteSet(const char* sprite_set);
 
-		int addAnimationFrame(unsigned int keytime);
+		int addFrame(unsigned int keytime);
 		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
 		int addSpriteSet(const char* sprite_set);
 		int addHitbox(Hitbox* hitbox);
@@ -98,7 +99,7 @@ class Animation{
 
 		//Keeps track of the current sprite set, and the number of sprite sets for this animation
 		uint16_t curr_sprite_set;
-		std::unordered_map<std::string, uint16_t> sprite_sets;
+		std::map<std::string, uint16_t> sprite_sets;
 		uint16_t num_sprite_sets;
 		uint16_t sprite_set_counter;
 

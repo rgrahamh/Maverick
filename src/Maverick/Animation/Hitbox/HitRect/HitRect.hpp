@@ -8,8 +8,8 @@ class HitRect : public Hitbox{
 		HitRect(double* x_base, double* y_base, double x_offset, double y_offset, float width, float height, unsigned int type, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		~HitRect();
 
-		float getWidth();
-		float getHeight();
+		double getWidth();
+		double getHeight();
 
         float getRightBound() override;
         float getLeftBound() override;
@@ -22,12 +22,14 @@ class HitRect : public Hitbox{
 
 		bool checkCollision(Hitbox* other) override;
 
-	private:
-		float curr_width;
-		float curr_height;
+		void serializeData(FILE* file);
 
-		float base_width;
-		float base_height;
+	private:
+		double curr_width;
+		double curr_height;
+
+		double base_width;
+		double base_height;
 };
 
 #include "../HitboxCollision.hpp"

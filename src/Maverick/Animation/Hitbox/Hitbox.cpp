@@ -49,7 +49,7 @@ HITBOX_SHAPE Hitbox::getShape(){
 /** Returns the type of the hitbox
  * @return The HITBOX_TYPE that represents the hitbox type
  */
-unsigned int Hitbox::getType(){
+uint64_t Hitbox::getType(){
 	return this->type;
 }
 

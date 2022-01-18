@@ -101,7 +101,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                     this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
                                                      border_width / (double)win_width, border_height / (double)win_height, this->window, 1);
                     this->borders[i]->addAnimation("border", 1);
-                    this->borders[i]->addAnimationFrame("border", 0);
+                    this->borders[i]->addFrame("border", 0);
                     this->borders[i]->addSprite("border", "default", sprite_path);
                     this->borders[i]->setAnimation("border");
                 }

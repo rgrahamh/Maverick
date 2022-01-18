@@ -2,14 +2,18 @@
 #define HITBOX_H
 
 #include <inttypes.h>
+#include <stdio.h>
 
-//The 
+#include "../../Utility/Utility.hpp"
+
+//The shape of the hitbox
 enum HITBOX_SHAPE{
-    RECT,
+    RECT = 0,
     ELLIPSE,
     CONE
 };
 
+//The type of the hitbox (default flags that may be applied to a hitbox)
 enum HITBOX_TYPE{
     ENVIRONMENT = 1,  //Environmental element (can skip check against other environmental collisions)
     COLLISION = 2,    //A more general collision hitbox
@@ -34,7 +38,7 @@ class Hitbox{
         virtual float getDrawAxis();
 
         HITBOX_SHAPE getShape();
-        unsigned int getType();
+        uint64_t getType();
 
         int32_t getHitboxGroup();
         int32_t getImmunityTimer();
@@ -43,6 +47,8 @@ class Hitbox{
 
         virtual bool isPointInside(double x_coord, double y_coord);
         virtual bool checkCollision(Hitbox* other);
+
+        virtual void serializeData(FILE* file) = 0;
         
     protected:
 		//Pointers to the X and Y base coords

@@ -129,3 +129,40 @@ bool HitEllipse::isPointInside(double x_coord, double y_coord){
 	}
 	return false;
 }
+
+/** Serialize the HitRect
+ * @param file The file that serialized data is outputted to
+ */
+void HitEllipse::serializeData(FILE* file){
+	//Write hitbox shape
+	uint8_t shape = this->shape;
+	fwrite(&shape, 1, 1, file);
+
+	//Write X offset
+	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_base_offset);
+	fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
+
+	//Write Y offset
+	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_base_offset);
+	fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
+
+	//Write X component (X radius/width)
+	uint64_t width_swap = EndianSwap((uint64_t*)&this->x_base_radius);
+	fwrite(&width_swap, sizeof(width_swap), 1, file);
+
+	//Write Y component (Y radius/height)
+	uint64_t height_swap = EndianSwap((uint64_t*)&this->y_base_radius);
+	fwrite(&height_swap, sizeof(height_swap), 1, file);
+
+	//Hitbox flags
+	uint64_t type_swap = EndianSwap(&this->type);
+	fwrite(&type_swap, sizeof(type_swap), 1, file);
+
+	//Hitbox group
+	uint32_t hitbox_group_swap = EndianSwap(&this->hitbox_group);
+	fwrite(&hitbox_group_swap, sizeof(hitbox_group_swap), 1, file);
+
+	//Immunity timer
+	uint32_t immunity_timer_swap = EndianSwap(&this->immunity_timer);
+	fwrite(&immunity_timer_swap, sizeof(immunity_timer_swap), 1, file);
+}
