@@ -620,13 +620,13 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 							fwrite(sprite->name, 1, identifier_len, file);
 
 							//Write the image header info
-							fwrite(&width_swap, 4, 1, file);
-							fwrite(&height_swap, 4, 1, file);
+							fwrite(&width_swap, sizeof(width_swap), 1, file);
+							fwrite(&height_swap, sizeof(height_swap), 1, file);
 							fwrite(&depth, 1, 1, file);
-							fwrite(&rmask, 4, 1, file);
-							fwrite(&gmask, 4, 1, file);
-							fwrite(&bmask, 4, 1, file);
-							fwrite(&amask, 4, 1, file);
+							fwrite(&rmask, sizeof(rmask), 1, file);
+							fwrite(&gmask, sizeof(gmask), 1, file);
+							fwrite(&bmask, sizeof(bmask), 1, file);
+							fwrite(&amask, sizeof(amask), 1, file);
 
 							//Write the actual image data ((w * h * bpp) bytes)
 							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
