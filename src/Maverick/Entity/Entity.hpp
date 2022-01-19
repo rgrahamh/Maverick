@@ -77,10 +77,10 @@ class Entity{
 
 		//Call
 		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
-		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set) = 0;
 
 		int serializeData(FILE* file, Zone* base_zone);
-		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;
 		
 	protected:
 		//Name

@@ -32,6 +32,7 @@ class Object : public Entity{
 		Sprite* getSprite();
 		int getCollisionLayer();
 
+		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
 
 		void setXVel(double xV);

@@ -213,4 +213,9 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 }
 
 int Object::serializeExtendedData(FILE* file, Zone* base_zone){
+    return 0;
+}
+
+int Object::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+    return 0;
 }

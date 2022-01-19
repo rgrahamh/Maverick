@@ -70,7 +70,7 @@ Animation::~Animation(){
 			tmp = cursor;
 			cursor = cursor->next;
 			free(tmp);
-		} while(cursor != sequence_start);
+		} while(cursor != sequence_start && cursor != nullptr);
 	}
 
 	free(name);
@@ -199,7 +199,7 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 				break;
 			}
 			sequence_cursor = sequence_cursor->next;
-		} while(sequence_cursor != sequence_start);
+		} while(sequence_cursor != sequence_start && sequence_cursor != nullptr);
 	}
 
 	if(sequence_cursor == nullptr){
@@ -386,7 +386,7 @@ int Animation::setScale(double x_scale, double y_scale){
 				}
 
 				cursor = cursor->next;
-			} while(cursor != sequence_start);
+			} while(cursor != sequence_start && cursor != nullptr);
 		}
 
 		this->x_scale = x_scale;
@@ -419,7 +419,7 @@ int Animation::setSize(int width, int height){
 			}
 
 			cursor = cursor->next;
-		} while(cursor != this->sequence_start);
+		} while(cursor != this->sequence_start && cursor != nullptr);
 	}
 
 	return 0;
@@ -584,83 +584,87 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
     if(cursor != NULL){
         do{
 			for(auto& sprite_set:this->sprite_sets){
-				Sprite* sprite = cursor->sprite[sprite_set.second];
-				//If this asset's not been saved in this file yet
-				if(sprite != nullptr && written_sprites.find(std::string(sprite->name)) == written_sprites.end()){
-					//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
-					SDL_Surface* surface = engine->getSurface(sprite->name);
+				if(cursor->sprite != nullptr){
+					Sprite* sprite = cursor->sprite[sprite_set.second];
+					//If this asset's not been saved in this file yet
+					if(sprite != nullptr && written_sprites.find(sprite->name) == written_sprites.end()){
+						//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
+						SDL_Surface* surface = engine->getSurface(sprite->name);
 
-					//Gather necessary info
-					//Width/Height are naturally ints (so size varies), meaning we need to truncate first
-					uint32_t width = surface->w;
-					width = EndianSwap(&width);
-					uint32_t height = surface->h;
-					height = EndianSwap(&height);
+						if(surface != nullptr){
+							//Gather necessary info
+							//Width/Height are naturally ints (so size varies), meaning we need to truncate first
+							uint32_t width = surface->w;
+							width = EndianSwap(&width);
+							uint32_t height = surface->h;
+							height = EndianSwap(&height);
 
-					//Bit depth of the image
-					uint8_t depth = surface->format->BitsPerPixel;
+							//Bit depth of the image
+							uint8_t depth = surface->format->BitsPerPixel;
 
-					//The RGBA masks
-					uint32_t rmask = EndianSwap(&surface->format->Rmask);
-					uint32_t gmask = EndianSwap(&surface->format->Gmask);
-					uint32_t bmask = EndianSwap(&surface->format->Bmask);
-					uint32_t amask = EndianSwap(&surface->format->Amask);
+							//The RGBA masks
+							uint32_t rmask = EndianSwap(&surface->format->Rmask);
+							uint32_t gmask = EndianSwap(&surface->format->Gmask);
+							uint32_t bmask = EndianSwap(&surface->format->Bmask);
+							uint32_t amask = EndianSwap(&surface->format->Amask);
 
-					//Identifier len
-					uint16_t identifier_len = strlen(sprite->name);
-					uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
+							//Identifier len
+							uint16_t identifier_len = strlen(sprite->name);
+							uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
 
-					uint8_t asset_type = RESOURCE_TYPE::BMP;
-					fwrite(&asset_type, 1, 1, file);
+							uint8_t asset_type = RESOURCE_TYPE::BMP;
+							fwrite(&asset_type, 1, 1, file);
 
-					//Identifier
-					fwrite(&identifier_len_swapped, 2, 1, file);
-					fwrite(sprite->name, 1, identifier_len, file);
+							//Identifier
+							fwrite(&identifier_len_swapped, 2, 1, file);
+							fwrite(sprite->name, 1, identifier_len, file);
 
-					//Write the image header info
-					fwrite(&width, 4, 1, file);
-					fwrite(&height, 4, 1, file);
-					fwrite(&depth, 1, 1, file);
-					fwrite(&rmask, 4, 1, file);
-					fwrite(&gmask, 4, 1, file);
-					fwrite(&bmask, 4, 1, file);
-					fwrite(&amask, 4, 1, file);
+							//Write the image header info
+							fwrite(&width, 4, 1, file);
+							fwrite(&height, 4, 1, file);
+							fwrite(&depth, 1, 1, file);
+							fwrite(&rmask, 4, 1, file);
+							fwrite(&gmask, 4, 1, file);
+							fwrite(&bmask, 4, 1, file);
+							fwrite(&amask, 4, 1, file);
 
-					//Write the actual image data ((w * h * bpp) bytes)
-					fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
+							//Write the actual image data ((w * h * bpp) bytes)
+							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
 
-					//Log this sprite as written
-					written_sprites.insert(sprite->name);
+							//Log this sprite as written
+							written_sprites.insert(sprite->name);
+						}
+					}
 				}
+			}
 
-				Sound* sound = cursor->sound;
-				//Also have a place for saving audio (once that's implemented in the system)
-				if(sound != nullptr && written_audio.find(std::string(cursor->sound->name)) == written_audio.end()){
-					//Identifier len
-					uint16_t identifier_len = strlen(cursor->sound->name);
-					uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
+			Sound* sound = cursor->sound;
+			//Also have a place for saving audio (once that's implemented in the system)
+			if(sound != nullptr && written_audio.find(cursor->sound->name) == written_audio.end()){
+				//Identifier len
+				uint16_t identifier_len = strlen(cursor->sound->name);
+				uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
 
-					uint8_t asset_type = RESOURCE_TYPE::SOUND;
-					fwrite(&asset_type, 1, 1, file);
+				uint8_t asset_type = RESOURCE_TYPE::SOUND;
+				fwrite(&asset_type, 1, 1, file);
 
-					//Identifier
-					fwrite(&identifier_len_swapped, 2, 1, file);
-					fwrite(cursor->sound->name, 1, identifier_len, file);
+				//Identifier
+				fwrite(&identifier_len_swapped, 2, 1, file);
+				fwrite(cursor->sound->name, 1, identifier_len, file);
 
-					//Writing the audio buffer (from the mixer chunk) to file
-					uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
-					fwrite(&audio_len, 1, 1, file);
-					fwrite(cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
+				//Writing the audio buffer (from the mixer chunk) to file
+				uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
+				fwrite(&audio_len, 1, 1, file);
+				fwrite(cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
 
-					//Insert the audio
-					written_audio.insert(cursor->sound->name);
-				}
-
-				written_sprites.insert(sprite->name);
+				//Insert the audio
+				written_audio.insert(cursor->sound->name);
 			}
 			cursor = cursor->next;
-        } while(cursor != sequence_start);
+        } while(cursor != sequence_start && cursor != nullptr);
     }
+
+	return 0;
 }
 
 int Animation::serializeData(FILE* file){
@@ -743,4 +747,6 @@ int Animation::serializeData(FILE* file){
 			sequence_cursor = sequence_cursor->next;
 		}while(sequence_cursor != nullptr && sequence_cursor != sequence_start);
 	}
+
+	return 0;
 }

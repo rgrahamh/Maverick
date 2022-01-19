@@ -4,7 +4,7 @@
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
 #include "../FileHandler/Saver/Saver.hpp"
 
-std::atomic<bool> exit_game = false;
+std::atomic<bool> exit_game;
 
 bool endian;
 
@@ -16,6 +16,8 @@ extern Engine* engine;
  * @param zones The zones that the game engine is initialized with
  */
 Engine::Engine(){
+    exit_game = false;
+
     //Init SDL
     if(SDL_Init(SDL_INIT_EVERYTHING)){
         printf("Failed to init everything!\n");
@@ -68,7 +70,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);

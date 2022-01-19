@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.2)
 project(Cyberena)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -O3 -std=c++11 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
 
 set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp

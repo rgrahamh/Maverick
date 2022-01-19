@@ -588,14 +588,6 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     return serializeExtendedData(file, base_zone);
 }
 
-/** This function should be overridden by children that wish to write additional
- *  data beyond the default saved info; everything needed by the base class is
- *  already saved by the point this is called, so it will just return 0 (success).
- */
-int Entity::serializeExtendedData(FILE* file, Zone* base_zone){
-    return 0;
-}
-
 /** Saves the resources of the entity to a char*'s (which should be freed upon return)
  * @param file The pointer to the open file to write to
  * @param written_sprites The set of sprites that have already been written to file
@@ -615,12 +607,4 @@ int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& written
     }
 
     return serializeExtendedAssets(file, written_sprites, written_audio, written_music);
-}
-
-/** This function should be overridden by children that wish to write additional
- *  assets beyond the default saved info; everything needed by the base class is
- *  already saved by the point this is called, so it will just return 0 (success).
- */
-int Entity::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
-    return 0;
 }

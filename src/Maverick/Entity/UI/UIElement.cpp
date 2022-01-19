@@ -280,6 +280,10 @@ bool UIElement::isMouseInside(Control* control){
     return false;
 }
 
-int UIElement::serializeData(FILE* file, Zone* base_zone){
+int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
+    return 0;
+}
+
+int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
     return 0;
 }
