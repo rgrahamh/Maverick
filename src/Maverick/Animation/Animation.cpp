@@ -595,9 +595,9 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 							//Gather necessary info
 							//Width/Height are naturally ints (so size varies), meaning we need to truncate first
 							uint32_t width = surface->w;
-							width = EndianSwap(&width);
+							uint32_t width_swap = EndianSwap(&width);
 							uint32_t height = surface->h;
-							height = EndianSwap(&height);
+							uint32_t height_swap = EndianSwap(&height);
 
 							//Bit depth of the image
 							uint8_t depth = surface->format->BitsPerPixel;
@@ -620,8 +620,8 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 							fwrite(sprite->name, 1, identifier_len, file);
 
 							//Write the image header info
-							fwrite(&width, 4, 1, file);
-							fwrite(&height, 4, 1, file);
+							fwrite(&width_swap, 4, 1, file);
+							fwrite(&height_swap, 4, 1, file);
 							fwrite(&depth, 1, 1, file);
 							fwrite(&rmask, 4, 1, file);
 							fwrite(&gmask, 4, 1, file);
