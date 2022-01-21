@@ -5,8 +5,9 @@
 
 class UIElement;
 
+//UI elements are in the positives
 enum UI_ELEMENT_TYPE{
-    GENERIC_ELEMENT,
+    GENERIC_ELEMENT = 0x0,
     WINDOW,
     TEXT,
     TEXT_BOX,
@@ -16,7 +17,7 @@ enum UI_ELEMENT_TYPE{
     SCREEN_BLIT,
     OBJECT_FRAME,
     RADIAL,
-    EXTENDED_UI_ELEMENT_TYPE_START = 4096
+    EXTENDED_UI_ELEMENT_TYPE_START = 0x8000
 };
 
 struct UIElementList{
@@ -53,6 +54,7 @@ class UIElement : public Entity{
     protected:
         //All elements which are children of this one
         UIElementList* subelements;
+        uint16_t num_subelements;
 
         //The window (to calculate sizes)
         SDL_Window* window;

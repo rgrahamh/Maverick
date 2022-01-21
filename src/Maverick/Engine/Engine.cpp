@@ -3,6 +3,7 @@
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
 #include "../FileHandler/Saver/Saver.hpp"
+#include "../FileHandler/Loader/Loader.hpp"
 
 std::atomic<bool> exit_game;
 
@@ -70,7 +71,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -144,6 +145,8 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
+    loadZoneFromFile("global");
+    loadZoneFromFile("Test Zone");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global"));

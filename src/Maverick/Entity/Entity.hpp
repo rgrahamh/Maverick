@@ -32,10 +32,10 @@ class Entity{
 		float getWidth();
 		float getHeight();
 		HitboxList* getHitboxes();
-		int getDrawLayer();
+		int16_t getDrawLayer();
 		double getDrawAxis();
 		void* getAttr(const char* key);
-		uint16_t getType();
+		uint32_t getType();
 		bool isActive();
 		bool isVisible();
 		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
@@ -87,7 +87,7 @@ class Entity{
 		char* name;
 
 		//The entity type (exact values are specified by child classes)
-		uint16_t type;
+		uint32_t type;
 
         //Position
         double x;
@@ -109,7 +109,7 @@ class Entity{
 		HitboxImmunityList* hitbox_immunity;
 
 		//Draw layer tracking
-		int draw_layer;
+		int16_t draw_layer;
 
 		Animation* findAnimation(const char* animation_name);
 		void cleanupHitboxImmunity(uint32_t delta);

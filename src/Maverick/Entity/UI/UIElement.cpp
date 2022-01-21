@@ -235,6 +235,7 @@ void UIElement::addElement(UIElement* element){
     new_element->element = element;
     new_element->next = subelements;
     subelements = new_element;
+    num_subelements++;
 }
 
 /** Tries to get an element of the given name
@@ -281,9 +282,34 @@ bool UIElement::isMouseInside(Control* control){
 }
 
 int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
+    //Get X/Y offsets
+    uint64_t view_x_offset_swap = EndianSwap((uint64_t*)&view_x_offset);
+    uint64_t view_y_offset_swap = EndianSwap((uint64_t*)&view_y_offset);
+
+    //Get width/height
+    uint64_t view_width_swap = EndianSwap((uint64_t*)&view_width);
+    uint64_t view_height_swap = EndianSwap((uint64_t*)&view_height);
+
+    fwrite(&view_x_offset_swap, sizeof(view_x_offset_swap), 1, file);
+    fwrite(&view_y_offset_swap, sizeof(view_x_offset_swap), 1, file);
+
+    fwrite(&view_width_swap, sizeof(view_width_swap), 1, file);
+    fwrite(&view_height_swap, sizeof(view_height_swap), 1, file);
+
+    UIElementList* subelement_cursor = subelements;
+    while(subelement_cursor != nullptr){
+        subelement_cursor->element->serializeData(file, base_zone);
+        subelement_cursor = subelement_cursor->next;
+    }
+
     return 0;
 }
 
 int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+    UIElementList* subelement_cursor = subelements;
+    while(subelement_cursor != nullptr){
+        subelement_cursor->element->serializeAssets(file, sprite_set, audio_set, music_set);
+        subelement_cursor = subelement_cursor->next;
+    }
     return 0;
 }
