@@ -629,6 +629,7 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 							fwrite(&amask, sizeof(amask), 1, file);
 
 							//Write the actual image data ((w * h * bpp) bytes)
+							fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
 							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
 
 							//Log this sprite as written

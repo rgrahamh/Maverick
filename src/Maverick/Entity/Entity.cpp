@@ -99,7 +99,7 @@ float Entity::getHeight(){
 /** Gets the draw layer of the object
  * @return The draw layer of the object
  */
-int Entity::getDrawLayer(){
+int16_t Entity::getDrawLayer(){
     return this->draw_layer;
 }
 
@@ -484,7 +484,7 @@ void Entity::setAttr(const char* key, void* val){
 /** Gets the object type
  * @return A uint32_t representation of the object type set in the constructor
  */
-uint16_t Entity::getType(){
+uint32_t Entity::getType(){
     return this->type;
 }
 
@@ -510,8 +510,8 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
 
     //GENERAL SECTION
     //Write the object type
-    uint16_t object_type = EndianSwap(&this->type);
-    fwrite(&object_type, 2, 1, file);
+    uint32_t entity_type = EndianSwap(&this->type);
+    fwrite(&entity_type, sizeof(entity_type), 1, file);
 
     //Identifier
     uint16_t identifier_len = strlen(this->name);
@@ -519,11 +519,9 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     fwrite(&identifier_len_swapped, sizeof(identifier_len_swapped), 1, file);
     fwrite(this->name, 1, identifier_len, file);
 
-    double write_x = this->x - base_zone->getGlobalX();
-    double write_y = this->y - base_zone->getGlobalY();
-
-    fwrite(&write_x, sizeof(write_x), 1, file);
-    fwrite(&write_y, sizeof(write_y), 1, file);
+    //Draw layer
+    int16_t draw_layer_swap = EndianSwap(&this->draw_layer);
+    fwrite(&draw_layer_swap, sizeof(draw_layer_swap), 1, file);
 
     //ATTRIBUTE SECTION
     AttributeHashEntry* attr_list;
@@ -585,7 +583,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
         fwrite(starting_animation, 1, starting_animation_len, file);
     }
 
-    return serializeExtendedData(file, base_zone);
+    return this->serializeExtendedData(file, base_zone);
 }
 
 /** Saves the resources of the entity to a char*'s (which should be freed upon return)
@@ -606,5 +604,5 @@ int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& written
         animation_cursor = animation_cursor->next;
     }
 
-    return serializeExtendedAssets(file, written_sprites, written_audio, written_music);
+    return this->serializeExtendedAssets(file, written_sprites, written_audio, written_music);
 }

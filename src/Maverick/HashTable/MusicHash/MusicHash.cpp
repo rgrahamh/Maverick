@@ -53,8 +53,6 @@ void MusicHash::add(const char* key, Music* music){
 		new_entry->next = table[hash_val];
 	}
 	table[hash_val] = new_entry;
-
-	size++;
 }
 
 /** Gets the texture from the hash table

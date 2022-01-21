@@ -1,4 +1,5 @@
 #include "./Object.hpp"
+#include "../../Zone/Zone.hpp"
 
 /** Object parameterized constructor
  * @param start_x The starting X location of the object
@@ -213,6 +214,15 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 }
 
 int Object::serializeExtendedData(FILE* file, Zone* base_zone){
+    //Write X/Y offsets from the zone origin
+    double write_x = this->x - base_zone->getGlobalX();
+    double write_y = this->y - base_zone->getGlobalY();
+
+    uint64_t write_x_swap = EndianSwap((uint64_t*)&write_x);
+    uint64_t write_y_swap = EndianSwap((uint64_t*)&write_y);
+    fwrite(&write_x_swap, sizeof(write_x_swap), 1, file);
+    fwrite(&write_y_swap, sizeof(write_y_swap), 1, file);
+
     return 0;
 }
 
