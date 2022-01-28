@@ -73,6 +73,11 @@ set(FileHandlerSrc
     ./src/Maverick/FileHandler/Loader/Loader.cpp
 )
 
+set(FilterSrc
+    ./src/Maverick/Filter/Filter.cpp
+    ./src/Maverick/Filter/ColorFilter/ColorFilter.cpp
+)
+
 set(EngineSrc
     ./src/Maverick/Engine/Engine.cpp
 )
@@ -89,6 +94,7 @@ set(MotorSrc
     ${ZoneFactorySrc}
     ${FactorySrc}
     ${FileHandlerSrc}
+    ${FilterSrc}
     ${EngineSrc}
 )
 
@@ -115,6 +121,7 @@ set(CyberenaEntitySrc
 set(CyberenaZonesSrc
     ./src/Cyberena/Zones/TestZone/TestZone.cpp
     ./src/Cyberena/Zones/global/global.cpp
+    ./src/Cyberena/Zones/FilterTest/FilterTest.cpp
 )
 
 set(CyberenaSrc

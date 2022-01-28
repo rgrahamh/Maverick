@@ -145,22 +145,24 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
-    loadZoneFromFile("global");
-    loadZoneFromFile("Test Zone");
+    //loadZoneFromFile("global");
+    //loadZoneFromFile("Test Zone");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global"));
-    loadZone("global");
+    //loadZone("global");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "Test Zone"));
-    loadZone("Test Zone");
+    //loadZone("Test Zone");
 
     //Loading the level editor
     //engine->addThread(new std::thread(loadZone, "led"));
 
-    saveZone(this->getZone("global"));
-    saveZone(this->getZone("Test Zone"));
+    //saveZone(this->getZone("global"));
+    //saveZone(this->getZone("Test Zone"));
+
+    loadZone("FilterTest");
 
     /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
@@ -435,12 +437,9 @@ void Engine::drawStep(EntityList* all_entities){
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
 
-    SDL_RenderPresent(renderer);
+    //Apply filters
 
-    if(this->screen_blit_texture != nullptr){
-        SDL_DestroyTexture(this->screen_blit_texture);
-        this->screen_blit_texture = nullptr;
-    }
+    SDL_RenderPresent(renderer);
 }
 
 /** Recursively sorts the objects in the order of draw
@@ -756,6 +755,8 @@ void Engine::buildFullEntityList(){
         }
 
         zone_iter = zone_iter->next;
+
+        //For each filter in the zone
     }
 
     //Clean up all hanging nodes (this can happen if there are less objects this frame than the last)

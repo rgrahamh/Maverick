@@ -44,7 +44,7 @@ class Entity{
 
 		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
-		int addSprite(const char* animation_name, const char* sprite_path, const char* sprite_set, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
+		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
 		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		void addHitboxImmunity(Entity* other, Hitbox* hitbox);

@@ -84,6 +84,20 @@ SDL_Renderer* Camera::getRenderer(){
     return renderer;
 }
 
+/** Gets the X coord of the top-left corner of the camera
+ * @return The X coord of the top-left corner of the camera
+ */
+double Camera::getX(){
+    return this->current_x;
+}
+
+/** Gets the Y coord of the top-left corner of the camera
+ * @return The Y coord of the top-left corner of the camera
+ */
+double Camera::getY(){
+    return this->current_y;
+}
+
 /** Sets the X & Y scale of the camera
  * @param x_scale The X scale of the camera
  * @param y_scale The Y scale of the camera

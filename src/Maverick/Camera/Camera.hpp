@@ -19,7 +19,10 @@ class Camera{
 		void setReference(Object* reference);
 		void _draw(ObjectList* obj_lst, uint32_t delta, double camera_x_offset = 0, double camera_y_offset = 0);
 		void _draw(UIElementList* element_lst, uint32_t delta);
+
 		SDL_Renderer* getRenderer();
+		double getX();
+		double getY();
 
 		void setScale(double x_scale, double y_scale);
 		void setFollowMode(CAMERA_FOLLOW_MODE follow_mode);

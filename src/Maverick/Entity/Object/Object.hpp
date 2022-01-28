@@ -13,11 +13,12 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
-//Objects are in the negatives
+//This leaves room for plenty of objects to grow
 enum OBJECT_TYPE{
-    GENERIC_OBJECT = 0x80000000,
+    GENERIC_OBJECT = 0x10000000,
     CAMERA_REFERENCE,
-	EXTENDED_OBJECT_TYPE_START = 0x80008000
+	EXTENDED_OBJECT_TYPE_START = 0x10000800,
+	OBJECT_END   = 0x2FFFFFFF
 };
 
 class Object : public Entity{

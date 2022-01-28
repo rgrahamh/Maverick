@@ -14,6 +14,10 @@ Zone::Zone(const char* name, uint64_t global_x_coord, uint64_t global_y_coord){
     this->ui->element = NULL;
     this->ui->next = NULL;
 
+    this->filters = new FilterList;
+    this->filters->filter = nullptr;
+    this->filters->next = nullptr;
+
     this->global_x_coord = global_x_coord;
     this->global_y_coord = global_y_coord;
 }
@@ -100,5 +104,17 @@ void Zone::addUIElement(UIElement* element){
         new_lst->next = this->ui;
         new_lst->element = element;
         this->ui = new_lst;
+    }
+}
+
+void Zone::addFilter(Filter* filter){
+    if(this->filters->filter == nullptr){
+        this->filters->filter = filter;
+    }
+    else{
+        FilterList* new_lst = new FilterList;
+        new_lst->next = this->filters;
+        new_lst->filter = filter;
+        this->filters = new_lst; 
     }
 }

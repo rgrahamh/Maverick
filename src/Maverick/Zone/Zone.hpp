@@ -3,6 +3,7 @@
 
 #include "../Entity/Object/Object.hpp"
 #include "../Entity/UI/UIElement.hpp"
+#include "../Filter/Filter.hpp"
 
 class Zone{
     public:
@@ -16,10 +17,12 @@ class Zone{
 
         void addObject(Object* object);
         void addUIElement(UIElement* element);
+        void addFilter(Filter* filter);
         const char* getName();
     private:
         ObjectList* objects;
         UIElementList* ui;
+        FilterList* filters;
         const char* name;
 
         uint64_t global_x_coord;
