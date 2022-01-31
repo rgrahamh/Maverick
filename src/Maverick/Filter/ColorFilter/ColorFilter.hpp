@@ -6,30 +6,25 @@
 #include <SDL2/SDL_image.h>
 
 enum COLOR_FILTER_TYPE{
-    RED_ADDITION,
-    BLUE_ADDITION,
-    GREEN_ADDITION,
-    RED_SUBTRACTION,
-    BLUE_SUBTRACTION,
-    GREEN_SUBTRACTION
+    ADD_COLOR_FILTER,
+    SUB_COLOR_FILTER
 };
 
 class ColorFilter : public Filter{
     public:
-        ColorFilter(double x, double y, const char* red_add_str, const char* blue_add_str, const char* green_add_str, const char* red_sub_str, const char* blue_sub_str, const char* green_sub_str);
+        ColorFilter(double x, double y, const char* add_filter_str, const char* sub_filter_str);
         ~ColorFilter();
 
         int setFilter(COLOR_FILTER_TYPE filter_type, const char* filter_path);
-        void apply(SDL_Surface* input);
+        void apply(SDL_Renderer* renderer);
 
     private:
-        SDL_Surface* red_addition_filter;
-        SDL_Surface* blue_addition_filter;
-        SDL_Surface* green_addition_filter;
-        SDL_Surface* red_subtraction_filter;
-        SDL_Surface* blue_subtraction_filter;
-        SDL_Surface* green_subtraction_filter;
+        SDL_Surface* add_surface;
+        SDL_Surface* sub_surface;
+        SDL_Texture* add_filter;
+        SDL_Texture* sub_filter;
 
         uint8_t calcShift(uint32_t mask);
+        void setWidthHeight();
 };
 #endif

@@ -1,43 +1,66 @@
 #include "ColorFilter.hpp"
 #include "../../Engine/Engine.hpp"
 
+static const SDL_BlendMode add_blend = SDL_ComposeCustomBlendMode(SDL_BlendFactor::SDL_BLENDFACTOR_ONE,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ONE,
+                                                                  SDL_BlendOperation::SDL_BLENDOPERATION_ADD,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ONE,
+                                                                  SDL_BlendOperation::SDL_BLENDOPERATION_ADD);
+
+static const SDL_BlendMode sub_blend = SDL_ComposeCustomBlendMode(SDL_BlendFactor::SDL_BLENDFACTOR_ONE,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ONE,
+                                                                  SDL_BlendOperation::SDL_BLENDOPERATION_SUBTRACT,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+                                                                  SDL_BlendFactor::SDL_BLENDFACTOR_ZERO,
+                                                                  SDL_BlendOperation::SDL_BLENDOPERATION_MAXIMUM);
+
 extern Engine* engine;
-ColorFilter::ColorFilter(double x, double y, const char* red_add_str, const char* blue_add_str, const char* green_add_str, const char* red_sub_str, const char* blue_sub_str, const char* green_sub_str)
+ColorFilter::ColorFilter(double x, double y, const char* sub_filter_str, const char* add_filter_str)
            : Filter(x, y){
     this->x = x;
     this->y = y;
 
     SDL_Renderer* renderer = engine->getCamera()->getRenderer();
 
-    red_addition_filter = engine->getSurface(red_add_str);
-    blue_addition_filter = engine->getSurface(blue_add_str);
-    green_addition_filter = engine->getSurface(green_add_str);
-    red_subtraction_filter = engine->getSurface(red_sub_str);
-    blue_subtraction_filter = engine->getSurface(blue_sub_str);
-    green_subtraction_filter = engine->getSurface(green_sub_str);
+    this->add_surface = engine->getSurface(add_filter_str);
+    if(this->add_surface != nullptr){
+        this->add_filter = SDL_CreateTextureFromSurface(renderer, this->add_surface);
+        if(add_filter != nullptr){
+            SDL_SetTextureBlendMode(this->add_filter, SDL_BLENDMODE_ADD);
+        }
+    }
 
-    this->width = red_addition_filter->w;
-    this->height = red_addition_filter->h;
+    this->sub_surface = engine->getSurface(sub_filter_str);
+    if(this->sub_surface != nullptr){
+        this->sub_filter = SDL_CreateTextureFromSurface(renderer, this->sub_surface);
+        if(sub_filter != nullptr){
+            SDL_SetTextureBlendMode(this->sub_filter, SDL_BLENDMODE_MOD);
+        }
+    }
+
+    this->setWidthHeight();
 }
 
 ColorFilter::~ColorFilter(){
-    if(red_addition_filter != nullptr){
-        SDL_FreeSurface(red_addition_filter);
+    if(this->add_surface != nullptr){
+        SDL_FreeSurface(this->add_surface);
     }
-    if(blue_addition_filter != nullptr){
-        SDL_FreeSurface(blue_addition_filter);
+    if(this->add_filter != nullptr){
+        SDL_DestroyTexture(this->add_filter);
     }
-    if(green_addition_filter != nullptr){
-        SDL_FreeSurface(green_addition_filter);
+    if(this->sub_surface != nullptr){
+        SDL_FreeSurface(this->sub_surface);
     }
-    if(red_subtraction_filter != nullptr){
-        SDL_FreeSurface(red_subtraction_filter);
+    if(this->sub_filter != nullptr){
+        SDL_DestroyTexture(this->sub_filter);
     }
-    if(blue_subtraction_filter != nullptr){
-        SDL_FreeSurface(blue_subtraction_filter);
-    }
-    if(green_subtraction_filter != nullptr){
-        SDL_FreeSurface(green_subtraction_filter);
+}
+
+inline void ColorFilter::setWidthHeight(){
+    if(this->add_surface != nullptr && this->sub_surface != nullptr){
+        this->width = (this->add_surface->w > this->sub_surface->w)? this->add_surface->w : this->sub_surface->w;
+        this->height = (this->add_surface->h > this->sub_surface->h)? this->add_surface->h : this->sub_surface->h;
     }
 }
 
@@ -58,35 +81,37 @@ int ColorFilter::setFilter(COLOR_FILTER_TYPE filter_type, const char* filter_pat
         this->height = new_surface->h;
     }
 
-    SDL_Surface* cleanup;
-    if(filter_type == COLOR_FILTER_TYPE::RED_ADDITION){
-        cleanup = red_addition_filter;
-        red_addition_filter = new_surface;
+    SDL_Renderer* renderer = engine->getCamera()->getRenderer();
+    if(filter_type == COLOR_FILTER_TYPE::ADD_COLOR_FILTER){
+        SDL_Texture* new_texture = SDL_CreateTextureFromSurface(renderer, new_surface);
+        if(new_texture != nullptr){
+            if(add_surface != nullptr){
+                SDL_FreeSurface(add_surface);
+            }
+            if(add_filter != nullptr){
+                SDL_DestroyTexture(add_filter);
+            }
+            this->add_surface = new_surface;
+            this->add_filter = new_texture;
+            SDL_SetTextureBlendMode(this->add_filter, add_blend);
+        }
     }
-    else if(filter_type == COLOR_FILTER_TYPE::BLUE_ADDITION){
-        cleanup = blue_addition_filter;
-        blue_addition_filter = new_surface;
-    }
-    else if(filter_type == COLOR_FILTER_TYPE::GREEN_ADDITION){
-        cleanup = green_addition_filter;
-        green_addition_filter = new_surface;
-    }
-    else if(filter_type == COLOR_FILTER_TYPE::RED_SUBTRACTION){
-        cleanup = red_subtraction_filter;
-        red_subtraction_filter = new_surface;
-    }
-    else if(filter_type == COLOR_FILTER_TYPE::BLUE_SUBTRACTION){
-        cleanup = blue_subtraction_filter;
-        blue_subtraction_filter = new_surface;
-    }
-    else if(filter_type == COLOR_FILTER_TYPE::GREEN_SUBTRACTION){
-        cleanup = green_subtraction_filter;
-        green_subtraction_filter = new_surface;
+    else if(filter_type == COLOR_FILTER_TYPE::SUB_COLOR_FILTER){
+        SDL_Texture* new_texture = SDL_CreateTextureFromSurface(renderer, new_surface);
+        if(new_texture != nullptr){
+            if(sub_surface != nullptr){
+                SDL_FreeSurface(sub_surface);
+            }
+            if(sub_filter != nullptr){
+                SDL_DestroyTexture(sub_filter);
+            }
+            this->sub_surface = new_surface;
+            this->sub_filter = new_texture;
+            SDL_SetTextureBlendMode(this->sub_filter, sub_blend);
+        }
     }
 
-    if(cleanup != nullptr){
-        SDL_FreeSurface(cleanup);
-    }
+    this->setWidthHeight();
 }
 
 inline uint8_t ColorFilter::calcShift(uint32_t mask)
@@ -103,94 +128,29 @@ inline uint8_t ColorFilter::calcShift(uint32_t mask)
     return 24;
 }
 
-inline void ColorFilter::apply(SDL_Surface* input){
-    Camera* camera = engine->getCamera();
-
-    uint64_t camera_x = camera->getX();
-    int input_width = input->w;
-    int32_t filter_width = this->width;
-    int32_t start_x;
-    if(x < camera_x){
-        filter_width -= camera_x - x;
-        start_x = 0;
-    }
-    else if(x + width > camera_x + input_width){
-        filter_width -= (x + width) - (camera_x + input_width);
-        start_x = x;
-    }
-    else{
-        start_x = x - camera_x;
-    }
-
-    uint64_t camera_y = camera->getY();
-    int input_height = input->h;
-    int32_t filter_height = height;
-    int32_t start_y;
-    if(camera_y > y){
-        filter_height -= camera_y - y;
-        start_y = 0;
-    }
-    else if(y + height > camera_y + input_height){
-        filter_height -= (y + height) - (camera_y + input_height);
-        start_y = y;
-    }
-    else{
-        start_y = y - camera_y;
-    }
-
-    //In this case, filter wouldn't be seen anyways so may as well return. Also prevents out-of-bounds.
-    if(filter_width < 0 || filter_height < 0 || start_x < 0 || start_y < 0){
+inline void ColorFilter::apply(SDL_Renderer* renderer){
+    if(this->add_filter == nullptr || this->sub_filter == nullptr){
         return;
     }
 
-    //We're assuming 32-bit imgs here; logic will have to be modified if that changes
-    uint64_t y_input_offset = start_y * input->w;
-    uint64_t y_filter_offset = width;
+    Camera* camera = engine->getCamera();
 
-    uint32_t* pixels = (uint32_t*)input->pixels;
-    uint32_t* red_add_pixels = (uint32_t*)red_addition_filter->pixels;
-    uint32_t* blue_add_pixels = (uint32_t*)blue_addition_filter->pixels;
-    uint32_t* green_add_pixels = (uint32_t*)green_addition_filter->pixels;
-    uint32_t* red_sub_pixels = (uint32_t*)red_subtraction_filter->pixels;
-    uint32_t* blue_sub_pixels = (uint32_t*)blue_subtraction_filter->pixels;
-    uint32_t* green_sub_pixels = (uint32_t*)green_subtraction_filter->pixels;
+    uint64_t camera_x = camera->getX();
+    uint64_t camera_y = camera->getY();
+    int renderer_width, renderer_height;
+    SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
 
-    register uint32_t red_mask = input->format->Rmask;
-    register uint32_t blue_mask = input->format->Bmask;
-    register uint32_t green_mask = input->format->Gmask;
-    register uint32_t alpha_mask = input->format->Amask;
+    SDL_Rect draw_rect;
+    draw_rect.x = this->x - camera_x;
+    draw_rect.y = this->y - camera_y;
+    draw_rect.w = this->width;
+    draw_rect.h = this->height;
 
-    register uint8_t red_shamt = calcShift(input->format->Rmask);
-    register uint8_t blue_shamt = calcShift(input->format->Bmask);
-    register uint8_t green_shamt = calcShift(input->format->Gmask);
-
-    for(uint64_t y_coord = start_y; y_coord < height; y_coord++){
-        y_input_offset += input->w;
-        y_filter_offset += width;
-        for(uint64_t x_coord; x_coord < width; x_coord++){
-            uint32_t old_pixel = pixels[x_coord + y_input_offset];
-            uint16_t red_val = ((old_pixel & red_mask) >> red_shamt)
-                               * ((256 + ((red_add_pixels[x_coord + y_filter_offset] & red_mask) >> red_shamt)) / 256.0)
-                               * (((red_sub_pixels[x_coord + y_filter_offset] & red_mask) >> red_shamt) / 256.0);
-            if(red_val > 255){
-                red_val = 255;
-            }
-
-            uint16_t blue_val = ((old_pixel & blue_mask) >> blue_shamt)
-                               * ((256 + ((blue_add_pixels[x_coord + y_filter_offset] & blue_mask) >> blue_shamt)) / 256.0)
-                               * (((blue_sub_pixels[x_coord + y_filter_offset] & blue_mask) >> blue_shamt) / 256.0);
-            if(blue_val > 255){
-                blue_val = 255;
-            }
-
-            uint16_t green_val = ((old_pixel & green_mask) >> green_shamt)
-                               * ((256 + ((green_add_pixels[x_coord + y_filter_offset] & green_mask) >> green_shamt)) / 256.0)
-                               * (((green_sub_pixels[x_coord + y_filter_offset] & green_mask) >> green_shamt) / 256.0);
-            if(green_val > 255){
-                green_val = 255;
-            }
-
-            pixels[x_coord + y_input_offset] = (red_val << red_shamt) | (blue_val << blue_shamt) | (green_val << green_shamt) | (old_pixel & alpha_mask);
-        }
+    if(draw_rect.x > renderer_width || draw_rect.y > renderer_height ||
+       draw_rect.x + draw_rect.w < 0 || draw_rect.y + draw_rect.h < 0){
+        return;
     }
+
+    SDL_RenderCopy(renderer, sub_filter, nullptr, &draw_rect);
+    SDL_RenderCopy(renderer, add_filter, nullptr, &draw_rect);
 }

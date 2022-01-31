@@ -12,6 +12,7 @@ class Zone{
 
         ObjectList* getObjects();
         UIElementList* getUIElements();
+        FilterList* getFilters();
         uint64_t getGlobalX();
         uint64_t getGlobalY();
 

@@ -437,7 +437,15 @@ void Engine::drawStep(EntityList* all_entities){
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
 
-    //Apply filters
+    ZoneList* zone_cursor = this->active_zones;
+    while(zone_cursor != nullptr){
+        FilterList* filters = zone_cursor->zone->getFilters();
+        while(filters != nullptr && filters->filter != nullptr){
+            filters->filter->apply(renderer);
+            filters = filters->next;
+        }
+        zone_cursor = zone_cursor->next;
+    }
 
     SDL_RenderPresent(renderer);
 }

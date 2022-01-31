@@ -26,7 +26,7 @@ class Filter{
         bool getVisible();
         void setVisible(bool visible);
 
-        virtual void apply(SDL_Surface* input) = 0;
+        virtual void apply(SDL_Renderer* input) = 0;
 
     protected:
         bool visible;

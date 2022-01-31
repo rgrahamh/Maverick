@@ -28,7 +28,9 @@ Zone::~Zone(){
     ObjectList* obj_cursor = objects;
     while(objects != NULL){
         obj_cursor = objects->next;
-        delete objects->obj;
+        if(objects->obj != nullptr){
+            delete objects->obj;
+        }
         delete objects;
         objects = obj_cursor;
     }
@@ -36,24 +38,43 @@ Zone::~Zone(){
     UIElementList* ui_cursor = ui;
     while(ui != NULL){
         ui_cursor = ui->next;
-        delete ui->element;
+        if(ui->element != nullptr){
+            delete ui->element;
+        }
         delete ui;
         ui = ui_cursor;
     }
+
+    FilterList* filter_cursor = filters;
+    while(filters != nullptr){
+        filter_cursor = filter_cursor->next;
+        if(filters->filter != nullptr){
+            delete filters->filter;
+        }
+        delete filters;
+        filters = filter_cursor;
+    }
 }
 
-/** Gets the all objects in the zone
+/** Gets all objects in the zone
  * @return An ObjectList* of all objects in the zone
  */
 ObjectList* Zone::getObjects(){
     return this->objects;
 }
 
-/** Gets the all objects in the zone
- * @return An ObjectList* of all objects in the zone
+/** Gets all UI Elements in the zone
+ * @return A UIElementList* of all UI Elements in the zone
  */
 UIElementList* Zone::getUIElements(){
     return this->ui;
+}
+
+/** Gets all Filters in the zone
+ * @return A FilterList* of all filters in the zone
+ */
+FilterList* Zone::getFilters(){
+    return this->filters;
 }
 
 /** Gets the name of the zone

@@ -16,11 +16,7 @@ void buildFilterTest(){
 
     ColorFilter* filter = new ColorFilter(0, 0,
                                           "./assets/channel-mixing-test/add-masks/pokemon-emerald-red-add.bmp",
-                                          "./assets/channel-mixing-test/add-masks/pokemon-emerald-blue-add.bmp",
-                                          "./assets/channel-mixing-test/add-masks/pokemon-emerald-green-add.bmp",
-                                          "./assets/channel-mixing-test/remove-masks/pokemon-emerald-red-remove.bmp",
-                                          "./assets/channel-mixing-test/remove-masks/pokemon-emerald-blue-remove.bmp",
-                                          "./assets/channel-mixing-test/remove-masks/pokemon-emerald-green-remove.bmp");
+                                          "./assets/channel-mixing-test/remove-masks/pokemon-emerald-blue-remove.bmp");
     
     zone->addFilter(filter);
 
