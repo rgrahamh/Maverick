@@ -3,7 +3,7 @@
 extern Engine* engine;
 
 CameraReference::CameraReference(const char* name, float start_x, float start_y, double x_speed, double y_speed)
-               : Object(name, start_x, start_y, 1, 0, 0){
+               : Object(name, start_x, start_y, 1, 0, 0, 4){
     this->type = OBJECT_TYPE::CAMERA_REFERENCE;
 
     this->x_speed = x_speed;

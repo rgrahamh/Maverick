@@ -6,7 +6,7 @@
 
 class HitEllipse : public Hitbox{
 	public:
-		HitEllipse(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, unsigned int type, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
+		HitEllipse(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, double x_radius, double y_radius, unsigned int type, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		virtual ~HitEllipse();
 
 		float getXRadius();
@@ -16,9 +16,7 @@ class HitEllipse : public Hitbox{
         float getLeftBound() override;
         float getTopBound() override;
         float getBotBound() override;
-		float getDrawAxis() override;
 
-		void setScale(double x_scale, double y_scale) override;
 		virtual bool checkCollision(Hitbox* other) override;
 
 		virtual bool isPointInside(double x_coord, double y_coord) override;

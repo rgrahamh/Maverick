@@ -29,6 +29,7 @@ Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t 
 	this->num_sprite_sets = num_sprite_sets;
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
+	this->draw_axis = -1.0;
 
 	this->next_animation = nullptr;
 }
@@ -104,12 +105,17 @@ HitboxList* Animation::getHitboxes(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
-	if(this->sequence != NULL && this->sequence->hitboxes != NULL){
-		return this->sequence->hitboxes->hitbox->getBotBound();
+	//If draw_axis is set
+	if(this->draw_axis != -1){
+		return this->draw_axis;
 	}
+	//Otherwise, interpolate from the sequence
 	else if(this->sequence != NULL){
-		return this->sequence->sprite[curr_sprite_set]->rect->y + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		return this->sequence->sprite[curr_sprite_set]->rect->y +
+		       this->sequence->sprite[curr_sprite_set]->rect->h +
+			   this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
+	//If we can't find the draw axis any other way
 	else{
 		return 0.0;
 	}
@@ -361,44 +367,6 @@ void Animation::setNextAnimation(Animation* next_animation){
 	this->next_animation = next_animation;
 }
 
-/** Sets the scale of the animation
- * @param x_scale The X scale factor
- * @param y_scale the Y scale factor
- */
-int Animation::setScale(double x_scale, double y_scale){
-	if(this->sequence_start != nullptr){
-		AnimationSeq* cursor = sequence_start;
-		if(cursor != NULL){
-			do{
-				for(auto& sprite_set:this->sprite_sets){
-					cursor->sprite[sprite_set.second]->curr_x_offset *= x_scale / this->x_scale;
-					cursor->sprite[sprite_set.second]->curr_y_offset *= y_scale / this->y_scale;
-
-					if(cursor->sprite[sprite_set.second]->rect != NULL){
-						cursor->sprite[sprite_set.second]->rect->w *= x_scale / this->x_scale;
-						cursor->sprite[sprite_set.second]->rect->h *= y_scale / this->y_scale;
-					}
-				}
-				if(cursor->hitboxes != NULL){
-					for(HitboxList* hitboxlst = cursor->hitboxes; hitboxlst != NULL; hitboxlst = hitboxlst->next){
-						hitboxlst->hitbox->setScale(x_scale, y_scale);
-					}
-				}
-
-				cursor = cursor->next;
-			} while(cursor != sequence_start && cursor != nullptr);
-		}
-
-		this->x_scale = x_scale;
-		this->y_scale = y_scale;
-
-		return 0;
-	}
-	else{
-		return -1;
-	}
-}
-
 /** Sets the size of the animation
  * @param x_scale The X size
  * @param y_scale the Y size
@@ -433,9 +401,16 @@ int Animation::setSpriteSet(const char* sprite_set){
 	return -1;
 }
 
+/** The draw axis offset, in pixels (from the top left of the animation).
+ * @param offset The draw axis offset, from the top left of the animation. -1 assumes position based off of the img size
+ */
+void Animation::setDrawAxis(double draw_axis){
+	this->draw_axis = draw_axis;
+}
+
 /** Advances the animation by a frame
  */
-void Animation::advance(uint32_t delta){
+void Animation::advance(uint64_t delta){
 	if(this->isAnimated() && !this->paused){
 		time_counter += delta;
 		//If we've exceeded the keytime for this frame
@@ -473,7 +448,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y){
+void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;

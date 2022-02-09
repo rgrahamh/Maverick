@@ -46,7 +46,7 @@ class Entity{
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
 		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element, double y_element, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double depth, double x_element, double y_element, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
@@ -54,8 +54,6 @@ class Entity{
 		void setX(double x);
 		void setY(double y);
 		int setAnimation(const char* animation_name);
-		int setScale(const char* animation_name, double x_scale, double y_scale);
-		void setScale(double x_scale, double y_scale);
 		int setSize(const char* animation_name, float width, float height);
 		void setSize(float width, float height);
 		void setActive(bool active);
@@ -65,15 +63,15 @@ class Entity{
 		int setSpriteSet(const char* sprite_set);
 
 		//Processing functions
-		virtual void _process(uint32_t delta) = 0;
+		virtual void _process(uint64_t delta) = 0;
 		//Need this for custom processing
-		virtual void process(uint32_t delta) = 0;
+		virtual void process(uint64_t delta) = 0;
 
 		virtual void _action(Control* control) = 0;
 		virtual void action(Control* control) = 0;
 
-		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
+		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
+		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
 		//Call
 		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
@@ -92,6 +90,7 @@ class Entity{
         //Position
         double x;
         double y;
+		double z;
 
 		//Attributes
 		AttributeHash* attr;
@@ -112,7 +111,7 @@ class Entity{
 		int16_t draw_layer;
 
 		Animation* findAnimation(const char* animation_name);
-		void cleanupHitboxImmunity(uint32_t delta);
+		void cleanupHitboxImmunity(uint64_t delta);
 };
 
 #endif

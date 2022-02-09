@@ -23,22 +23,29 @@ enum OBJECT_TYPE{
 
 class Object : public Entity{
 	public:
-		Object(const char* name, float start_x, float start_y, float friction, float mass, int layers = 1);
+		Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity = false, int layer = 1);
 		virtual ~Object();
 		double getOldX();
 		double getOldY();
+		double getOldZ();
 		double getXVel();
 		double getYVel();
+		double getZVel();
+		double getZ();
 		float getMass();
 		bool getEnvBump();
 		Sprite* getSprite();
 		int getCollisionLayer();
+		float getTerminalVelocity();
 
 		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
 
 		void setXVel(double xV);
 		void setYVel(double yV);
+		void setZVel(double zV);
+		void setZ(double z);
+		void setGravity(bool gravity);
 		void setEnvBump();
 		void setFriction(float friction);
 		void setCollisionLayer(int collision_layer);
@@ -46,15 +53,15 @@ class Object : public Entity{
 		void applyForce(double xA, double yA);
 
 		//Processing functions
-		virtual void _process(uint32_t delta);
+		virtual void _process(uint64_t delta);
 		//Need this for custom processing
-		virtual void process(uint32_t delta);
+		virtual void process(uint64_t delta);
 
 		virtual void _action(Control* control);
 		virtual void action(Control* control);
 
-		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
@@ -62,14 +69,20 @@ class Object : public Entity{
 		//Previous position (used for rollback)
 		double old_x;
 		double old_y;
+		double old_z;
+
+		//The Z position of the ground
+		double ground_z;
 
 		//Velocity
 		double xV;
 		double yV;
+		double zV;
 
 		//Acceleration
 		double xA;
 		double yA;
+		double zA;
 
 		//Coefficient of friction
 		float friction;
@@ -79,6 +92,12 @@ class Object : public Entity{
 
 		//Environmental bump
 		bool env_bump;
+
+		//If gravity should be applied to this object
+		bool gravity;
+
+		//Velocity cap
+		float terminal_velocity;
 
 		//The collision layer
 		int collision_layer;

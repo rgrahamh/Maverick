@@ -6,7 +6,7 @@ extern Engine* engine;
 void buildFilterTest(){
     Zone* zone = new Zone("FilterTest", 0, 0);
 
-    Object* base_img = new Object("pokemon_town", 0, 0, 0, 0, 1);
+    Object* base_img = new Object("pokemon_town", 0, 0, 0, 0, 1, 0);
     base_img->addAnimation("default", 1);
     base_img->addFrame("default");
     base_img->addSpriteSet("default", "default");

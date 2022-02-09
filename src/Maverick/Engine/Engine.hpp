@@ -32,6 +32,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 360
+
 enum GAME_STATE : uint64_t{
 	TITLE = 1,
 	OVERWORLD = 2,
@@ -46,6 +49,7 @@ struct EntityList{
 	ObjectList* obj;
 	UIElementList* ui;
 };
+
 
 class Engine{
 	public:
@@ -84,6 +88,10 @@ class Engine{
 		//Global scale setters
 		void setGlobalXScale(double x_scale);
 		void setGlobalYScale(double y_scale);
+
+		//Sets/gets the gravity
+		void setGravity(float gravity);
+		float getGravity();
 
 		//Zone handling
 		void addZone(Zone* zone);
@@ -171,9 +179,16 @@ class Engine{
 		float current_x_scale;
 		float current_y_scale;
 
-		//Scale
+		//Target scale
 		float target_x_scale;
 		float target_y_scale;
+
+		//Native scale
+		float native_x_scale;
+		float native_y_scale;
+
+		//Gravity val
+		float gravity;
 
 		//Resource Hashes
 		SpriteHash* sprite_hash;
@@ -181,8 +196,8 @@ class Engine{
 		MusicHash* music_hash;
 
 		//A frame counter so we can have timed events trigger every X frames
-		uint32_t last_time;
-		uint32_t delta;
+		uint64_t last_time;
+		uint64_t delta;
 };
 
 #endif

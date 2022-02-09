@@ -25,25 +25,32 @@ enum HITBOX_TYPE{
 
 class Hitbox{
     public:
-        Hitbox(double* x_base, double* y_base, double x_offset, double y_offset, uint64_t type, int32_t hitbox_group = -1, int32_t immunity_timer = 0);
+        Hitbox(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, uint64_t type, int32_t hitbox_group = -1, int32_t immunity_timer = 0);
         virtual ~Hitbox();
 
-        float getX();
-        float getY();
+        double getX();
+        double getY();
+        double getZ();
+
+        double getZMax();
+        double getZMin();
+
+        double getXOffset();
+        double getYOffset();
+        double getZOffset();
+
+        double getDepth();
 
         virtual float getRightBound();
         virtual float getLeftBound();
         virtual float getTopBound();
         virtual float getBotBound();
-        virtual float getDrawAxis();
 
         HITBOX_SHAPE getShape();
         uint64_t getType();
 
         int32_t getHitboxGroup();
         int32_t getImmunityTimer();
-
-        virtual void setScale(double x_scale, double y_scale);
 
         virtual bool isPointInside(double x_coord, double y_coord);
         virtual bool checkCollision(Hitbox* other);
@@ -54,12 +61,13 @@ class Hitbox{
 		//Pointers to the X and Y base coords
 		double* x_base;
 		double* y_base;
+        double* z_base;
 
-        double x_base_offset;
-        double y_base_offset;
+        double x_offset;
+        double y_offset;
+        double z_offset;
 
-        double x_curr_offset;
-        double y_curr_offset;
+        double depth;
 
         HITBOX_SHAPE shape;
         uint64_t type;

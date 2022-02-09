@@ -20,7 +20,7 @@ class UIBorders: public UIElement{
 
         void addBorders(char* border_pattern, uint8_t border_types);
 
-        virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
     private:
         UIElement* borders[4];

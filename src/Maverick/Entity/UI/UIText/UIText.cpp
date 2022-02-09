@@ -1,5 +1,8 @@
 #include "UIText.hpp"
 
+#include "../../../Engine/Engine.hpp"
+extern Engine* engine;
+
 /** UIText constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement
@@ -126,11 +129,6 @@ void UIText::setPoint(unsigned int point){
         //Set line size and num of 
         if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
             if(this->window != nullptr){
-
-                int win_height;
-                int win_width;
-                SDL_GetWindowSize(this->window, &win_width, &win_height);
-
                 //Free the old buffers
                 if(this->print_buff != nullptr){
                     for(unsigned int i = 0; i < this->num_lines; i++){
@@ -142,8 +140,8 @@ void UIText::setPoint(unsigned int point){
                 }
 
                 //Calculate the print_buffer attributes
-                this->num_lines = this->view_height * win_height / char_height;
-                this->chars_per_line = this->view_width * win_width / char_width;
+                this->num_lines = this->view_height * SCREEN_WIDTH / char_height;
+                this->chars_per_line = this->view_width * SCREEN_HEIGHT / char_width;
 
                 //Allocate space for the new buffers
                 this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
@@ -324,7 +322,7 @@ bool UIText::hitCharLimit(){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     int width;
     int height;
     SDL_Rect draw_rect = this->draw_area;
@@ -384,7 +382,7 @@ void UIText::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int came
 /** Handles UIText processing (like scrolling text print)
  * @param delta The amount of time that has passed since last processing (in ms)
  */
-void UIText::process(uint32_t delta){
+void UIText::process(uint64_t delta){
     //Scrolling the text from the internal text representation to the print_buffer
     if(this->print_buff != nullptr && this->ref_buff != nullptr && this->text != nullptr && this->scroll_speed != 0.0){
         //Find the first differing character (we're finished if we never hit a differing character)

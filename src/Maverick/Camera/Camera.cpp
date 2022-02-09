@@ -1,4 +1,5 @@
 #include "./Camera.hpp"
+#include "./../Engine/Engine.hpp"
 
 const float follow_rate = 0.08;
 
@@ -36,11 +37,8 @@ void Camera::recenter(){
         return;
     } 
 
-    int win_width, win_height;
-    SDL_GetRendererOutputSize(this->renderer, &win_width, &win_height);
-
-    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_width / 2) / x_scale);
-    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_height / 2) / y_scale);
+    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((SCREEN_WIDTH / 2) / x_scale);
+    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((SCREEN_HEIGHT / 2) / y_scale);
     if(follow_mode == CAMERA_FOLLOW_MODE::FIXED_FOLLOW){
         this->current_x = obj_x;
         this->current_y = obj_y;
@@ -54,7 +52,7 @@ void Camera::recenter(){
 /** Draws all objects in the given object list
  * @param obj_lst The object list that you wish to draw
  */
-void Camera::_draw(ObjectList* obj_lst, uint32_t delta, double camera_x_offset, double camera_y_offset){
+void Camera::_draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset, double camera_y_offset){
     recenter();
 
     while(obj_lst != NULL){
@@ -68,7 +66,7 @@ void Camera::_draw(ObjectList* obj_lst, uint32_t delta, double camera_x_offset, 
 /** Draws all UI elements in the given UI element list
  * @param obj_lst The UI element list that you wish to draw
  */
-void Camera::_draw(UIElementList* element_lst, uint32_t delta){
+void Camera::_draw(UIElementList* element_lst, uint64_t delta){
     while(element_lst != NULL){
         if(element_lst->element->isVisible()){
             element_lst->element->_draw(renderer, delta, 0, 0);

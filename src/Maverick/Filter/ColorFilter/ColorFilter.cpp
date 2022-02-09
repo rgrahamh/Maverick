@@ -137,8 +137,6 @@ inline void ColorFilter::apply(SDL_Renderer* renderer){
 
     uint64_t camera_x = camera->getX();
     uint64_t camera_y = camera->getY();
-    int renderer_width, renderer_height;
-    SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
 
     SDL_Rect draw_rect;
     draw_rect.x = this->x - camera_x;
@@ -146,9 +144,27 @@ inline void ColorFilter::apply(SDL_Renderer* renderer){
     draw_rect.w = this->width;
     draw_rect.h = this->height;
 
-    if(draw_rect.x > renderer_width || draw_rect.y > renderer_height ||
-       draw_rect.x + draw_rect.w < 0 || draw_rect.y + draw_rect.h < 0){
+    if(draw_rect.x > SCREEN_WIDTH || draw_rect.y > SCREEN_HEIGHT ||
+       draw_rect.x + draw_rect.w <= 0 || draw_rect.y + draw_rect.h <= 0){
         return;
+    }
+
+    //Cropping off unnecessary right/bottom section
+    if(draw_rect.x + draw_rect.w > SCREEN_WIDTH){
+        draw_rect.w = SCREEN_WIDTH - draw_rect.x;
+    }
+    if(draw_rect.y + draw_rect.h > SCREEN_HEIGHT){
+        draw_rect.h = SCREEN_HEIGHT - draw_rect.y;
+    }
+
+    //Cropping off unnecessary left/top section
+    if(draw_rect.x < 0){
+        draw_rect.w -= abs(draw_rect.x);
+        draw_rect.x = 0;
+    }
+    if(draw_rect.y < 0){
+        draw_rect.h -= abs(draw_rect.h);
+        draw_rect.y = 0;
     }
 
     SDL_RenderCopy(renderer, sub_filter, nullptr, &draw_rect);

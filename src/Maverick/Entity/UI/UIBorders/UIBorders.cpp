@@ -42,9 +42,6 @@ UIBorders::~UIBorders(){
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
 void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
-    int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
-
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
         char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
@@ -98,8 +95,8 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                     if(borders[i] != nullptr){
                         delete borders[i];
                     }
-                    this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                     border_width / (double)win_width, border_height / (double)win_height, this->window, 1);
+                    this->borders[i] = new UIElement(border_names[i], border_x / (double)SCREEN_WIDTH, border_y / (double)SCREEN_HEIGHT,
+                                                     border_width / (double)SCREEN_WIDTH, border_height / (double)SCREEN_HEIGHT, this->window, 1);
                     this->borders[i]->addAnimation("border", 1);
                     this->borders[i]->addFrame("border", 0);
                     this->borders[i]->addSprite("border", "default", sprite_path);
@@ -116,7 +113,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIBorders::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIBorders::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw the textbox background
     if(active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y);

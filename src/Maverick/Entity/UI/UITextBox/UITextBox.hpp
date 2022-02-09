@@ -21,7 +21,7 @@ class UITextBox : public UIElement{
         void setXAlignment(ALIGNMENT x_alignment);
         void setYAlignment(ALIGNMENT y_alignment);
 
-        virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
     private:
         UIText* text;

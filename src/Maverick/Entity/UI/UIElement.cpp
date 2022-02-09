@@ -28,16 +28,13 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 
     this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
-    int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
-
-    this->x = view_x_offset * win_width;
-    this->y = view_y_offset * win_height;
+    this->x = view_x_offset * SCREEN_WIDTH;
+    this->y = view_y_offset * SCREEN_HEIGHT;
 
     this->draw_area.x = this->x;
     this->draw_area.y = this->y;
-    this->draw_area.w = view_width * win_width;
-    this->draw_area.h = view_height * win_height;
+    this->draw_area.w = view_width * SCREEN_WIDTH;
+    this->draw_area.h = view_height * SCREEN_HEIGHT;
 
     this->subelements = nullptr;
 }
@@ -55,11 +52,11 @@ UIElement::~UIElement(){
     }*/
 }
 
-void UIElement::process(uint32_t delta){
+void UIElement::process(uint64_t delta){
     return;
 }
 
-void UIElement::_process(uint32_t delta){
+void UIElement::_process(uint64_t delta){
     this->process(delta);
 
     UIElementList* cursor = subelements;
@@ -102,7 +99,7 @@ void UIElement::_action(Control* control){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw this element
     this->draw(renderer, delta, camera_x, camera_y);
 
@@ -120,29 +117,10 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw this element
     if(active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y);
-    }
-}
-
-/** Sets the scale of the UIElement
- * @param x_scale The X scale
- * @param y_scale The Y scale
- */
-void UIElement::setScale(double x_scale, double y_scale){
-    //Set scale for this element
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->setScale(x_scale, y_scale);
-    }
-
-    //Set scale for all children elements
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
-        cursor->element->setScale(x_scale, y_scale);
-        cursor = cursor->next;
     }
 }
 
@@ -151,12 +129,10 @@ void UIElement::setScale(double x_scale, double y_scale){
  * @param height The height
  */
 void UIElement::setViewSize(double view_width, double view_height){
-    int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
-        animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
+        animation_cursor->animation->setSize(view_width * SCREEN_WIDTH, view_height * SCREEN_HEIGHT);
     }
 
     //Set scale for all children elements
@@ -209,17 +185,15 @@ int UIElement::addSprite(const char* animation_name, const char* sprite_set, con
     if(animation == nullptr){
         return -1;
     }
-    int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
 
     if(width != -1){
-        width *= (float)win_width;
+        width *= (float)SCREEN_WIDTH;
     }
     else{
         width = this->draw_area.w;
     }
     if(height != -1){
-        height *= (float)win_height;
+        height *= (float)SCREEN_HEIGHT;
     }
     else{
         height = this->draw_area.h;

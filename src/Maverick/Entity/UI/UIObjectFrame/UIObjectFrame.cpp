@@ -46,7 +46,7 @@ UIObjectFrame::~UIObjectFrame(){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIObjectFrame::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIObjectFrame::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw background
     if(active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y);

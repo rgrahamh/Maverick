@@ -9,13 +9,13 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitRect::HitRect(double* x_base, double* y_base, double x_offset, double y_offset, float width, float height, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
-	:Hitbox(x_base, y_base, x_offset, y_offset, type, hitbox_group, immunity_timer){
-		this->base_height = height;
-		this->curr_height = height;
-		this->base_width = width;
-		this->curr_width = width;
-		this->shape = RECT;
+HitRect::HitRect(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, float width, float height, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
+	:Hitbox(x_base, y_base, z_base, x_offset, y_offset, z_offset, depth, type, hitbox_group, immunity_timer){
+	this->base_height = height;
+	this->curr_height = height;
+	this->base_width = width;
+	this->curr_width = width;
+	this->shape = RECT;
 }
 
 /** The destructor for HitRect
@@ -42,23 +42,13 @@ double HitRect::getWidth(){
  * @return true if the point is inside the hitbox, false otherwise
  */
 bool HitRect::isPointInside(double x_coord, double y_coord){
-	if(x_coord > *this->x_base + this->x_curr_offset
-	&& x_coord < *this->x_base + this->x_curr_offset + this->curr_width
-	&& y_coord > *this->y_base + this->y_curr_offset
-	&& y_coord < *this->y_base + this->y_curr_offset + this->curr_height){
+	if(x_coord > *this->x_base + this->x_offset
+	&& x_coord < *this->x_base + this->x_offset + this->curr_width
+	&& y_coord > *this->y_base + this->y_offset
+	&& y_coord < *this->y_base + this->y_offset + this->curr_height){
 		return true;
 	}
 	return false;
-}
-
-/** Sets the scale of the HitRect
- * @param x_scale The X scale of the hitbox
- * @param y_scale The Y scale of the hitbox
- */
-void HitRect::setScale(double x_scale, double y_scale){
-	Hitbox::setScale(x_scale, y_scale);
-	this->curr_height = y_scale * this->base_height;
-	this->curr_width = x_scale * this->base_width;
 }
 
 /** Checks collision with another hitbox
@@ -86,35 +76,28 @@ bool HitRect::checkCollision(Hitbox* other){
  * @return The top hitbox bound
  */
 float HitRect::getTopBound(){
-	return *this->y_base + this->y_curr_offset;
+	return *this->y_base + this->y_offset;
 }
 
 /** Gets the bottom hitbox bound
  * @return The bottom hitbox bound
  */
 float HitRect::getBotBound(){
-	return *this->y_base + this->y_curr_offset + this->curr_height;
+	return *this->y_base + this->y_offset + this->curr_height;
 }
 
 /** Gets the left hitbox bound
  * @return The left hitbox bound
  */
 float HitRect::getLeftBound(){
-	return *this->x_base + this->x_curr_offset;
+	return *this->x_base + this->x_offset;
 }
 
 /** Gets the right hitbox bound
  * @return The right hitbox bound
  */
 float HitRect::getRightBound(){
-	return *this->x_base + this->x_curr_offset + this->curr_width;
-}
-
-/** Gets the draw axis of the hitbox
- * @return The draw axis of the hitbox
- */
-float HitRect::getDrawAxis(){
-	return *this->y_base + this->y_curr_offset + (this->curr_height / 2);
+	return *this->x_base + this->x_offset + this->curr_width;
 }
 
 /** Serialize the HitRect
@@ -126,11 +109,11 @@ void HitRect::serializeData(FILE* file){
 	fwrite(&shape, 1, 1, file);
 
 	//Write X offset
-	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_base_offset);
+	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_offset);
 	fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
 
 	//Write Y offset
-	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_base_offset);
+	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_offset);
 	fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
 
 	//Write X component (X radius/width)

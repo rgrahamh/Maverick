@@ -51,17 +51,7 @@ Engine::Engine(){
     //Initialization of control system
     control = new Control();
 
-    //Initialization of window and camera
-    SDL_DisplayMode display_mode;
-    if(SDL_GetDesktopDisplayMode(0, &display_mode)){
-        printf("Could not find display; exiting");
-        exit(-1);
-    }
-
-    int win_x = display_mode.w;
-    int win_y = display_mode.h;
-
-	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win_x, win_y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
         fflush(stdout);
@@ -81,7 +71,7 @@ Engine::Engine(){
     this->camera = new Camera(renderer, window, NULL);
 
     //Set up the screenshot blit surface
-    this->screen_blit_surface = SDL_CreateRGBSurface(0, win_x, win_y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    this->screen_blit_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
 
     //Setting up the texture hash table
@@ -89,11 +79,18 @@ Engine::Engine(){
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
 
+    int win_x, win_y;
+    SDL_GetRendererOutputSize(renderer, &win_x, &win_y);
+
     //Set scales
-    this->current_x_scale = 1.0;
-    this->current_y_scale = 1.0;
-    this->target_x_scale = 1.0;
-    this->target_y_scale = 1.0;
+    this->native_x_scale = win_x / SCREEN_WIDTH;
+    this->native_y_scale = win_y / SCREEN_HEIGHT;
+    this->current_x_scale = native_x_scale;
+    this->current_y_scale = native_y_scale;
+    this->target_x_scale = native_x_scale;
+    this->target_y_scale = native_y_scale;
+
+    this->camera->setScale(win_x / SCREEN_WIDTH, win_y / SCREEN_HEIGHT);
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -105,6 +102,8 @@ Engine::Engine(){
     this->entities.ui = nullptr;
 
     this->delta = 0;
+
+    this->gravity = 4;
 
     endian = getEndian();
 
@@ -150,11 +149,11 @@ void Engine::start(){
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global"));
-    //loadZone("global");
+    loadZone("global");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "Test Zone"));
-    //loadZone("Test Zone");
+    loadZone("Test Zone");
 
     //Loading the level editor
     //engine->addThread(new std::thread(loadZone, "led"));
@@ -162,7 +161,7 @@ void Engine::start(){
     //saveZone(this->getZone("global"));
     //saveZone(this->getZone("Test Zone"));
 
-    loadZone("FilterTest");
+    //loadZone("FilterTest");
 
     /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
@@ -176,11 +175,11 @@ void Engine::start(){
 void Engine::gameLoop(){
 	while(!exit_game){
         buildFullEntityList();
-        delta = SDL_GetTicks();
+        delta = SDL_GetTicks64();
 
         //Calculate the time that has passed since last frame
-        delta = SDL_GetTicks() - last_time;
-        last_time = SDL_GetTicks();
+        delta = SDL_GetTicks64() - last_time;
+        last_time = SDL_GetTicks64();
 
         //Action step (where actions occur)
         this->actionStep(&this->entities);
@@ -332,36 +331,38 @@ void Engine::collisionStep(ObjectList* all_objects){
             //The number of blocks in x & y directions
             const int x_block = 16, y_block = 9;
 
-            int win_width, win_height;
-            SDL_GetWindowSize(this->window, &win_width, &win_height);
-            int x_iter = win_width / x_block;
-            int y_iter = win_height / y_block;
+            int x_iter = SCREEN_WIDTH / x_block;
+            int y_iter = SCREEN_HEIGHT / y_block;
+            int x_max = SCREEN_WIDTH + camera->getX();
+            int y_max = SCREEN_HEIGHT + camera->getY();
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
-            for(int box_y = 0; box_y < win_height; box_y += y_iter){
-                //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
-                if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
-                    int i = 0;
-                    for(int box_x = 0; box_x < win_width; box_x += x_iter){
-                        //If the left bound is greater than box_x or the right bound is less than box_x, go to next
-                        if(!(left_bound > box_x + x_iter || right_bound < box_x)){
-                            //Insert the object in the list
-                            ObjectList* new_objectlst = new ObjectList;
-                            new_objectlst->next = object_matrix[i][j];
-                            new_objectlst->obj = curr_object;
-                            object_matrix[i][j] = new_objectlst;
+            if(x_iter > 0 && y_iter > 0){
+                for(int box_y = camera->getY(); box_y < y_max; box_y += y_iter){
+                    //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
+                    if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
+                        int i = 0;
+                        for(int box_x = camera->getX(); box_x < x_max; box_x += x_iter){
+                            //If the left bound is greater than box_x or the right bound is less than box_x, go to next
+                            if(!(left_bound > box_x + x_iter || right_bound < box_x)){
+                                //Insert the object in the list
+                                ObjectList* new_objectlst = new ObjectList;
+                                new_objectlst->next = object_matrix[i][j];
+                                new_objectlst->obj = curr_object;
+                                object_matrix[i][j] = new_objectlst;
 
-                            //Insert the hitbox in the list
-                            HitboxList* new_hitboxlst = new HitboxList;
-                            new_hitboxlst->next = hitbox_matrix[i][j];
-                            new_hitboxlst->hitbox = curr_hitbox;
-                            hitbox_matrix[i][j] = new_hitboxlst;
+                                //Insert the hitbox in the list
+                                HitboxList* new_hitboxlst = new HitboxList;
+                                new_hitboxlst->next = hitbox_matrix[i][j];
+                                new_hitboxlst->hitbox = curr_hitbox;
+                                hitbox_matrix[i][j] = new_hitboxlst;
+                            }
+                            i++;
                         }
-                        i++;
                     }
+                    j++;
                 }
-                j++;
             }
             object_hitboxes = object_hitboxes->next;
         }
@@ -375,11 +376,11 @@ void Engine::collisionStep(ObjectList* all_objects){
             //Iterate over every item in the list
             ObjectList* object_lst = object_matrix[i][j];
             HitboxList* hitbox_lst = hitbox_matrix[i][j];
-            while(hitbox_lst != NULL){
+            while(object_lst != nullptr && hitbox_lst != nullptr){
                 //Iterate over every item after the hitbox_lst
                 ObjectList* object_cursor = object_lst->next;
                 HitboxList* hitbox_cursor = hitbox_lst->next;
-                while(hitbox_cursor != NULL){
+                while(object_cursor != nullptr && hitbox_cursor != nullptr){
                     //Possible place for multi-threading!
 
                     //If both aren't environment and they collide, and the object isn't the same
@@ -431,12 +432,7 @@ void Engine::drawStep(EntityList* all_entities){
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
 
-    //Set scale back to normal for UI elements
-    camera->setScale(1.0, 1.0);
-
-    all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
-    this->camera->_draw(all_entities->ui, this->delta);
-
+    //Draw filter
     ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != nullptr){
         FilterList* filters = zone_cursor->zone->getFilters();
@@ -446,6 +442,12 @@ void Engine::drawStep(EntityList* all_entities){
         }
         zone_cursor = zone_cursor->next;
     }
+
+    //Set scale back to normal for UI elements
+    camera->setScale(native_x_scale, native_y_scale);
+
+    all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
+    this->camera->_draw(all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
 }
@@ -662,14 +664,22 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             double old_x = mov_obj->getOldX();
             double old_y = mov_obj->getOldY();
+            double old_z = mov_obj->getOldZ();
 
             double x = mov_obj->getX();
             double y = mov_obj->getY();
+            double z = mov_obj->getZ();
 
             double x_movement = old_x - x;
             double y_movement = old_y - y;
 
+            double depth = mov_box->getDepth();
+
             mov_obj->setEnvBump();
+
+            //Handle Z collision
+            //If we're hitting the ceiling
+            //If we're hitting the floor
 
             double x_iter = x_movement / ROLLBACK_STEP;
             double y_iter = y_movement / ROLLBACK_STEP;
@@ -987,6 +997,20 @@ ZoneList* Engine::getActiveZones(){
  */
 SoundBoard* Engine::getSoundBoard(){
     return this->sound_board;
+}
+
+/** Gets the global gravity val of the engine
+ * @return The global gravity val
+ */
+float Engine::getGravity(){
+    return this->gravity;
+}
+
+/** Sets the global gravity val of the engine
+ * @param gravity The global gravity val
+ */
+void Engine::setGravity(float gravity){
+    this->gravity = gravity;
 }
 
 /** Gets a texture from the engine

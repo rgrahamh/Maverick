@@ -9,8 +9,8 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitEllipse::HitEllipse(double* x_base, double* y_base, double x_offset, double y_offset, double x_radius, double y_radius, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
-	:Hitbox(x_base, y_base, x_offset, y_offset, type, hitbox_group, immunity_timer){
+HitEllipse::HitEllipse(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, double x_radius, double y_radius, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
+	:Hitbox(x_base, y_base, z_base, x_offset, y_offset, z_offset, depth, type, hitbox_group, immunity_timer){
 	this->x_base_radius = x_radius;
 	this->y_base_radius = y_radius;
 	this->x_curr_radius = x_radius;
@@ -34,16 +34,6 @@ float HitEllipse::getXRadius(){
  */
 float HitEllipse::getYRadius(){
 	return this->y_curr_radius;
-}
-
-/** Sets the scale of the HitRect
- * @param x_scale The X scale of the hitbox
- * @param y_scale The Y scale of the hitbox
- */
-void HitEllipse::setScale(double x_scale, double y_scale){
-	Hitbox::setScale(x_scale, y_scale);
-	this->x_curr_radius = x_scale * this->x_base_radius;
-	this->y_curr_radius = y_scale * this->y_base_radius;
 }
 
 /** Checks collision against the other hitbox
@@ -71,35 +61,28 @@ bool HitEllipse::checkCollision(Hitbox* other){
  * @return The top bound of the rectangle
  */
 float HitEllipse::getTopBound(){
-	return *this->y_base + this->y_curr_offset - this->y_curr_radius;
+	return *this->y_base + this->y_offset - this->y_curr_radius;
 }
 
 /** Gets the bottom bound of the rectangle
  * @return The bottom bound of the rectangle
  */
 float HitEllipse::getBotBound(){
-	return *this->y_base + this->y_curr_offset + this->y_curr_radius;
+	return *this->y_base + this->y_offset + this->y_curr_radius;
 }
 
 /** Gets the left bound of the rectangle
  * @return The left bound of the rectangle
  */
 float HitEllipse::getLeftBound(){
-	return *this->x_base + this->x_curr_offset - this->x_curr_radius;
+	return *this->x_base + this->x_offset - this->x_curr_radius;
 }
 
 /** Gets the right bound of the rectangle
  * @return The right bound of the rectangle
  */
 float HitEllipse::getRightBound(){
-	return *this->x_base + this->x_curr_offset + this->x_curr_radius;
-}
-
-/** Gets the draw axis of the hitbox
- * @return The draw axis of the hitbox
- */
-float HitEllipse::getDrawAxis(){
-	return *this->y_base + this->y_curr_offset;
+	return *this->x_base + this->x_offset + this->x_curr_radius;
 }
 
 /** Get if a point is inside of the hitbox
@@ -139,11 +122,11 @@ void HitEllipse::serializeData(FILE* file){
 	fwrite(&shape, 1, 1, file);
 
 	//Write X offset
-	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_base_offset);
+	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_offset);
 	fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
 
 	//Write Y offset
-	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_base_offset);
+	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_offset);
 	fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
 
 	//Write X component (X radius/width)

@@ -261,7 +261,7 @@ int Entity::setSpriteSet(const char* sprite_set){
  * @param immunity_timer The hitbox immunity timer
  * @return 0 on success, -1 if the animation doesn't exist
  */
-int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double x_element,
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double depth, double x_element,
                        double y_element, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
@@ -271,10 +271,10 @@ int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type, hitbox_group, immunity_timer);
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, depth, x_element, y_element, type, hitbox_group, immunity_timer);
     }
     else{
-        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), x_offset, y_offset, x_element, y_element, type, hitbox_group, immunity_timer);
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, depth, x_element, y_element, type, hitbox_group, immunity_timer);
     }
 
     animation->addHitbox(hitbox, sprite_num);
@@ -331,7 +331,7 @@ bool Entity::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
 
 /** Cleans up the hitbox immunity list; should be run in the _process step
  */
-void Entity::cleanupHitboxImmunity(uint32_t delta){
+void Entity::cleanupHitboxImmunity(uint64_t delta){
     HitboxImmunityList* cursor = this->hitbox_immunity;
     HitboxImmunityList* last_cursor = this->hitbox_immunity;
     while(cursor != nullptr){
@@ -402,33 +402,6 @@ int Entity::setAnimation(const char* animation_name){
     }
     else{
         return -1;
-    }
-}
-
-/** Sets the scale for a single animation
- * @param animation_name The animation name
- * @param x_scale The x scale factor
- * @param y_scale The y scale factor
- * @return 0 on success, -1 if the animation doesn't exist
- */
-int Entity::setScale(const char* animation_name, double x_scale, double y_scale){
-    Animation* animation = findAnimation(animation_name);
-    if(animation == nullptr){
-        return -1;
-    }
-    animation->setScale(x_scale, y_scale);
-    return 0;
-}
-
-/** Sets the scale for all animations
- * @param x_scale The x scale factor
- * @param y_scale The y scale factor
- */
-void Entity::setScale(double x_scale, double y_scale){
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->setScale(x_scale, y_scale);
-        animation_cursor = animation_cursor->next;
     }
 }
 

@@ -4,8 +4,8 @@
 class Engine;
 extern Engine* engine;
 
-Character::Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
-	: Object(name, start_x, start_y, friction, mass, draw_layer),
+Character::Character(const char* name, float start_x, float start_y, float start_z, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
+	: Object(name, start_x, start_y, start_z, friction, mass, true, draw_layer),
 	Race(race),
 	Style(style){
     this->type = EXTENDED_OBJECT_TYPE::CHARACTER;
@@ -216,7 +216,7 @@ void Character::action(Control* control){
 	}
 }
 
-void Character::process(uint32_t delta){
+void Character::process(uint64_t delta){
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
         //Checking to see if we're still sliding
         if(this->sliding == true){

@@ -49,7 +49,7 @@ class Animation{
 		void freeFrame(AnimationSeq* );
 		~Animation();
 
-		void advance(uint32_t delta);
+		void advance(uint64_t delta);
 		void start();
 
 		Sprite* getSprite();
@@ -66,9 +66,9 @@ class Animation{
 
 		void setPaused(bool paused);
 		int setSize(int width, int height);
-		int setScale(double x_scale, double y_scale);
 		void setNextAnimation(Animation* next_animation);
 		int setSpriteSet(const char* sprite_set);
+		void setDrawAxis(double draw_axis);
 
 		int addFrame(unsigned int keytime);
 		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
@@ -77,7 +77,7 @@ class Animation{
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(Sound* sound, int sequence_num);
 
-		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
+		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y);
 
 		void rotate(int direction, float rotation_amnt);
 
@@ -113,6 +113,9 @@ class Animation{
 		//Scale of the height and width
 		double x_scale;
 		double y_scale;
+
+		//Draw axis
+		double draw_axis;
 
 		//The time counter
 		unsigned int time_counter;
