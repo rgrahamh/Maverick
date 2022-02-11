@@ -37,8 +37,10 @@ void Camera::recenter(){
         return;
     } 
 
-    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((SCREEN_WIDTH / 2) / x_scale);
-    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((SCREEN_HEIGHT / 2) / y_scale);
+    int win_x, win_y;
+    SDL_GetRendererOutputSize(this->renderer, &win_x, &win_y);
+    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_x / 2) / x_scale);
+    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_y / 2) / y_scale);
     if(follow_mode == CAMERA_FOLLOW_MODE::FIXED_FOLLOW){
         this->current_x = obj_x;
         this->current_y = obj_y;

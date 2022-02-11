@@ -110,16 +110,16 @@ void Character::action(Control* control){
 			//If we're not sliding (in an actionable state)
 			if(!this->sliding){
 				if(keys[SDL_SCANCODE_W]){
-					this->yA -= 0.1;
+					this->yA -= WALK_SPEED;
 				}
 				if(keys[SDL_SCANCODE_S]){
-					this->yA += 0.1;
+					this->yA += WALK_SPEED;
 				}
 				if(keys[SDL_SCANCODE_A]){
-					this->xA -= 0.1;
+					this->xA -= WALK_SPEED;
 				}
 				if(keys[SDL_SCANCODE_D]){
-					this->xA += 0.1;
+					this->xA += WALK_SPEED;
 				}
 
 				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
@@ -207,8 +207,8 @@ void Character::action(Control* control){
 
 			//If we're not sliding (in an actionable state)
 			if(!this->sliding){
-				this->yA += pad->left_stick_y_axis * 0.1;
-				this->xA += pad->left_stick_x_axis * 0.1;
+				this->yA += pad->left_stick_y_axis * WALK_SPEED;
+				this->xA += pad->left_stick_x_axis * WALK_SPEED;
 
 				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
 			}

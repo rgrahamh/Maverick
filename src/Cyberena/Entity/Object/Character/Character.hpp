@@ -12,6 +12,8 @@
 #include "./Style/Style.hpp"
 #include "../../../../Maverick/Control/Control.hpp"
 
+#define WALK_SPEED 1
+
 typedef struct InventorySlot{
 	Item* item;
 	unsigned int amnt;

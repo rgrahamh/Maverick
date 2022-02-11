@@ -448,7 +448,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y){
+void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -467,7 +467,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
 	curr_rect->x = *this->x_base;
-	curr_rect->y = *this->y_base;
+	curr_rect->y = *this->y_base + z_coord;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);

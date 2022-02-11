@@ -10,7 +10,7 @@ void buildGlobal(){
     Zone* global = new Zone("global", 0, 0);
 
     //Create the player
-    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
+    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.25, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     global->addObject(player);
 
     //Create the pause menu

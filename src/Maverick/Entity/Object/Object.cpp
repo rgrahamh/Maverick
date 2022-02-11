@@ -1,5 +1,7 @@
 #include "./Object.hpp"
 #include "../../Zone/Zone.hpp"
+#include "../../Engine/Engine.hpp"
+extern Engine* engine;
 
 /** Object parameterized constructor
  * @param start_x The starting X location of the object
@@ -205,6 +207,9 @@ void Object::action(Control* control){
 void Object::_process(uint64_t delta){
     this->process(delta);
 
+    //Step size = 1 sec
+    double physics_step_size = ((double)delta) / 1000.0;
+
     //Updating old X & Y values
     if(fabs(this->x - this->old_x) > 1.0 || fabs(this->y - this->old_y) > 1.0){
         this->old_x = this->x;
@@ -218,37 +223,60 @@ void Object::_process(uint64_t delta){
     //Updating environmental bump
     this->env_bump = false;
 
+    uint force_of_friction = this->friction * this->mass * engine->getGravity() * physics_step_size;
+
     //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
-    this->xV -= this->friction * ((float)delta / 10.0) * this->xV;
-    if(this->xV < 0.1 && this->xV > -0.1){
-        this->xV = 0;
+    if(this->xV != 0){
+        int x_dir = (this->xV > 0)? 1 : -1;
+        if(force_of_friction < abs(this->xV)){
+            this->xV -=  force_of_friction * x_dir;
+        }
+        else if(force_of_friction > abs(this->xV)){
+            this->xV = 0;
+        }
+        if(this->xV > this->terminal_velocity){
+            this->xV = this->terminal_velocity;
+        }
+        else if(this->xV < this->terminal_velocity * -1){
+            this->xV = this->terminal_velocity * -1;
+        }
+        this->x += this->xV * delta;
+        this->xA = 0;
     }
-    if(abs(this->xV) > this->terminal_velocity){
-        this->xV = this->terminal_velocity;
-    }
-    this->x += this->xV * delta;
-    this->xA = 0;
 
     //Updating Y values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->yV += this->yA;
-    this->yV -= this->friction * ((float)delta / 10.0) * this->yV;
-    if(this->yV < 0.1 && this->yV > -0.1){
-        this->yV = 0;
+    if(this->yV != 0){
+        int y_dir = (this->yV > 0)? 1 : -1;
+        if(force_of_friction < abs(this->yV)){
+            this->yV -= force_of_friction * y_dir;
+        }
+        else if(force_of_friction > abs(this->yV)){
+            this->yV = 0;
+        }
+        if(this->yV > this->terminal_velocity){
+            this->yV = this->terminal_velocity;
+        }
+        else if(this->yV < this->terminal_velocity * -1){
+            this->yV = this->terminal_velocity * -1;
+        }
+        this->y += this->yV * delta;
+        this->yA = 0;
     }
-    this->y += this->yV * delta;
-    this->yA = 0;
 
     //Updating Z values
-    if(this->gravity){
-        this->zA -= 2 * delta;
+    if(this->z != this->ground_z){
+        if(this->gravity){
+            this->zA -= engine->getGravity() * delta;
+        }
+        this->zV += this->zA;
+        this->z += this->zV * delta;
+        if(this->z <= ground_z){
+            this->z = ground_z;
+        }
+        this->zA = 0;
     }
-    this->zV += this->zA;
-    this->z += this->zV * delta;
-    if(this->z <= ground_z){
-        this->z = ground_z;
-    }
-    this->zA = 0;
 
     cleanupHitboxImmunity(delta);
 }
@@ -269,7 +297,7 @@ void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int cam
  */
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     if(this->active_animation != nullptr){
-        this->active_animation->draw(renderer, delta, camera_x, camera_y);
+        this->active_animation->draw(renderer, delta, camera_x, camera_y, this->z);
     }
 }
 

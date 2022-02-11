@@ -103,7 +103,7 @@ Engine::Engine(){
 
     this->delta = 0;
 
-    this->gravity = 4;
+    this->gravity = 2;
 
     endian = getEndian();
 

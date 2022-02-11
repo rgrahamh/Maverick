@@ -77,7 +77,7 @@ class Animation{
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(Sound* sound, int sequence_num);
 
-		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y);
+		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord = 0);
 
 		void rotate(int direction, float rotation_amnt);
 
