@@ -12,7 +12,8 @@
 #include "./Style/Style.hpp"
 #include "../../../../Maverick/Control/Control.hpp"
 
-#define WALK_SPEED 1
+#define WALK_SPEED 10.0
+#define JUMP_SPEED 12.0
 
 typedef struct InventorySlot{
 	Item* item;

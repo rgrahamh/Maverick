@@ -103,7 +103,7 @@ Engine::Engine(){
 
     this->delta = 0;
 
-    this->gravity = 2;
+    this->gravity = 1;
 
     endian = getEndian();
 
@@ -181,19 +181,22 @@ void Engine::gameLoop(){
         delta = SDL_GetTicks64() - last_time;
         last_time = SDL_GetTicks64();
 
-        //Action step (where actions occur)
-        this->actionStep(&this->entities);
+        //No need to do anything if at least a ms hasn't passed
+        if(this->delta > 0){
+            //Action step (where actions occur)
+            this->actionStep(&this->entities);
 
-        if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT)){
-            //Physics step (where physics are calculated, obj positions updated, etc.)
-            this->physicsStep(this->entities.obj);
+            if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT)){
+                //Physics step (where physics are calculated, obj positions updated, etc.)
+                this->physicsStep(this->entities.obj);
 
-            //Collision step (where collision is determined)
-            this->collisionStep(this->entities.obj);
+                //Collision step (where collision is determined)
+                this->collisionStep(this->entities.obj);
+            }
+
+            //Different because we need to adjust the object list for draw order
+            this->drawStep(&this->entities);
         }
-
-        //Different because we need to adjust the object list for draw order
-        this->drawStep(&this->entities);
 
         //Thread cleanup
         this->threadGC();

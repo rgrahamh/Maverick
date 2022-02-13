@@ -208,75 +208,69 @@ void Object::_process(uint64_t delta){
     this->process(delta);
 
     //Step size = 1 sec
-    double physics_step_size = ((double)delta) / 1000.0;
+    double physics_step_size = ((double)delta) / 16.0;
 
     //Updating old X & Y values
-    if(fabs(this->x - this->old_x) > 1.0 || fabs(this->y - this->old_y) > 1.0){
+    if(fabs(this->x - this->old_x) > 0.2 * physics_step_size || fabs(this->y - this->old_y) > 0.2 * physics_step_size){
         this->old_x = this->x;
         this->old_y = this->y;
     }
 
-    if(fabs(this->z - this->old_z) > 1.0){
+    if(fabs(this->z - this->old_z) > 0.2){
         this->old_z = this->z;
     }
 
     //Updating environmental bump
     this->env_bump = false;
 
-    uint force_of_friction = this->friction * this->mass * engine->getGravity() * physics_step_size;
-
     //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
     if(this->xV != 0){
-        int x_dir = (this->xV > 0)? 1 : -1;
-        if(force_of_friction < abs(this->xV)){
-            this->xV -=  force_of_friction * x_dir;
-        }
-        else if(force_of_friction > abs(this->xV)){
+        this->xV -= this->xV * (1.0 - friction) * physics_step_size;
+        if(this->xV < 0.01 && this->xV > -0.01){
             this->xV = 0;
         }
-        if(this->xV > this->terminal_velocity){
+        else if(this->xV > this->terminal_velocity){
             this->xV = this->terminal_velocity;
         }
-        else if(this->xV < this->terminal_velocity * -1){
-            this->xV = this->terminal_velocity * -1;
+        else if(this->xV < this->terminal_velocity * -1.0){
+            this->xV = this->terminal_velocity * -1.0;
         }
-        this->x += this->xV * delta;
-        this->xA = 0;
+        this->x += this->xV * physics_step_size;
     }
+    this->xA = 0;
 
     //Updating Y values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->yV += this->yA;
     if(this->yV != 0){
-        int y_dir = (this->yV > 0)? 1 : -1;
-        if(force_of_friction < abs(this->yV)){
-            this->yV -= force_of_friction * y_dir;
-        }
-        else if(force_of_friction > abs(this->yV)){
+        this->yV -= this->yV * (1.0 - friction) * physics_step_size;
+        if(this->yV < 0.01 && this->yV > -0.01){
             this->yV = 0;
         }
-        if(this->yV > this->terminal_velocity){
+        else if(this->yV > this->terminal_velocity){
             this->yV = this->terminal_velocity;
         }
-        else if(this->yV < this->terminal_velocity * -1){
-            this->yV = this->terminal_velocity * -1;
+        else if(this->yV < this->terminal_velocity * -1.0){
+            this->yV = this->terminal_velocity * -1.0;
         }
-        this->y += this->yV * delta;
-        this->yA = 0;
+        this->y += this->yV * physics_step_size;
     }
+    this->yA = 0;
 
     //Updating Z values
-    if(this->z != this->ground_z){
-        if(this->gravity){
-            this->zA -= engine->getGravity() * delta;
-        }
-        this->zV += this->zA;
-        this->z += this->zV * delta;
+    if(this->z != this->ground_z && this->gravity){
+        this->zA -= engine->getGravity() * physics_step_size;
+    }
+
+    this->zV += this->zA;
+    if(this->zV != 0){
+        this->z += this->zV * physics_step_size;
         if(this->z <= ground_z){
             this->z = ground_z;
+            this->zV = 0;
         }
-        this->zA = 0;
     }
+    this->zA = 0;
 
     cleanupHitboxImmunity(delta);
 }

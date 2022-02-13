@@ -5,7 +5,7 @@ class Engine;
 extern Engine* engine;
 
 Character::Character(const char* name, float start_x, float start_y, float start_z, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
-	: Object(name, start_x, start_y, start_z, friction, mass, true, draw_layer),
+	: Object(name, start_x, start_y, start_z, friction, mass, 11, true, draw_layer),
 	Race(race),
 	Style(style){
     this->type = EXTENDED_OBJECT_TYPE::CHARACTER;
@@ -120,6 +120,9 @@ void Character::action(Control* control){
 				}
 				if(keys[SDL_SCANCODE_D]){
 					this->xA += WALK_SPEED;
+				}
+				if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground_z){
+					this->zA += JUMP_SPEED;
 				}
 
 				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
