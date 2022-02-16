@@ -105,17 +105,13 @@ HitboxList* Animation::getHitboxes(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
-	SDL_Rect* curr_rect = this->sequence->sprite[curr_sprite_set]->rect;
-	curr_rect->x = *this->x_base;
-	curr_rect->y = *this->y_base;
-
 	//If draw_axis is set
 	if(this->draw_axis != -1){
-		return this->draw_axis;
+		return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	//Otherwise, interpolate from the sequence
 	else if(this->sequence != NULL){
-		return curr_rect->y + curr_rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	//If we can't find the draw axis any other way
 	else{
