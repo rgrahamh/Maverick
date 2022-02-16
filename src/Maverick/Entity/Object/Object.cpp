@@ -204,8 +204,8 @@ void Object::action(Control* control){
 
 /** Called during the process step; performs object processing calculations
  */
-void Object::_process(uint64_t delta){
-    this->process(delta);
+void Object::_process(uint64_t delta, double step_size){
+    this->process(delta, step_size);
 
     //Step size = 1 sec
     double physics_step_size = ((double)delta) / 16.0;
@@ -277,7 +277,7 @@ void Object::_process(uint64_t delta){
 
 /** Called during the process step by _process; space for users to override with custom processing logics
  */
-void Object::process(uint64_t delta){
+void Object::process(uint64_t delta, double step_size){
 }
 
 /** Called during the draw step

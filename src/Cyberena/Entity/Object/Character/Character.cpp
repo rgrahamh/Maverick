@@ -49,13 +49,27 @@ bool Character::isWalking(){
     return strncmp("walk", this->active_animation->getName(), 4) == 0;
 }
 
+/** Clears out the character control struct; run at the start of every action step
+ */
+void Character::clearCharacterControl(){
+	character_control.x_movement = 0;
+	character_control.y_movement = 0;
+	character_control.jump = false;
+}
+
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
 void Character::action(Control* control){
+
+	//Only clear the control if it's a gamepad; otherwise, we'll want to retain these values
+	if(this->control == CONTROL_TYPE::GAMEPAD || this->control == CONTROL_TYPE::KEYBOARD){
+		this->clearCharacterControl();
+	}
+
 	const char* active_animation_name = this->active_animation->getName();
 
-    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
+    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE) && !this->sliding){
 		//If the character is in an actionable state
 		if(this->control == CONTROL_TYPE::KEYBOARD){
 			const uint8_t* keys = control->getKeys();
@@ -107,28 +121,26 @@ void Character::action(Control* control){
 				active_animation->setNextAnimation(findAnimation("walk_right"));
 			}
 
-			//If we're not sliding (in an actionable state)
-			if(!this->sliding){
-				if(keys[SDL_SCANCODE_W]){
-					this->yA -= WALK_SPEED;
-				}
-				if(keys[SDL_SCANCODE_S]){
-					this->yA += WALK_SPEED;
-				}
-				if(keys[SDL_SCANCODE_A]){
-					this->xA -= WALK_SPEED;
-				}
-				if(keys[SDL_SCANCODE_D]){
-					this->xA += WALK_SPEED;
-				}
-				if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground_z){
-					this->zA += JUMP_SPEED;
-				}
+			//Move the actual accel mod to processing?
+			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_S]){
+				character_control.y_movement = -1;
+			}
+			else if(keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_W]){
+				character_control.y_movement = 1;
+			}
 
-				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
+			if(keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_D]){
+				character_control.x_movement = -1;
+			}
+			else if(keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A]){
+				character_control.x_movement = 1;
+			}
+
+			if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground_z){
+				character_control.jump = true;
 			}
 		}
-		else if(this->control == CONTROL_TYPE::GAMEPAD){
+		else if(this->control == CONTROL_TYPE::GAMEPAD && !this->sliding){
 			const ControllerState* pad = control->getController(this->control_num);
 			double x_axis = pad->left_stick_x_axis;
 			double y_axis = pad->left_stick_y_axis;
@@ -209,25 +221,49 @@ void Character::action(Control* control){
 			}
 
 			//If we're not sliding (in an actionable state)
-			if(!this->sliding){
-				this->yA += pad->left_stick_y_axis * WALK_SPEED;
-				this->xA += pad->left_stick_x_axis * WALK_SPEED;
+			character_control.y_movement = pad->left_stick_y_axis;
+			character_control.x_movement = pad->left_stick_x_axis;
 
-				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
-			}
+			engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
 		}
 	}
 }
 
-void Character::process(uint64_t delta){
+void Character::process(uint64_t delta, double step_size){
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
         //Checking to see if we're still sliding
         if(this->sliding == true){
-            if(this->xV + this->yV < 1){
+            if(this->xV + this->yV < 0.5){
                 this->sliding = false;
             }
         }
     }
+
+	double x_walk = character_control.x_movement * WALK_SPEED * step_size;
+	if(xV + x_walk >= WALK_SPEED){
+		xV = WALK_SPEED;
+	}
+	else if(xV + x_walk <= WALK_SPEED * -1){
+		xV = WALK_SPEED * -1;
+	}
+	else{
+		xA += character_control.x_movement * WALK_SPEED * step_size;
+	}
+
+	double y_walk = character_control.y_movement * WALK_SPEED * step_size;
+	if(yV + y_walk >= WALK_SPEED){
+		yV = WALK_SPEED;
+	}
+	else if(yV + y_walk <= WALK_SPEED * -1){
+		yV = WALK_SPEED * -1;
+	}
+	else{
+		yA += character_control.y_movement * WALK_SPEED * step_size;
+	}
+
+	if(character_control.jump){
+		zA += JUMP_SPEED;
+	}
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.
@@ -239,6 +275,8 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 	//TODO: Make character-specific env collision feel better
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
+
+	printf("Collided!\n");
 
 	if(this_type & COLLISION){
 		if(other_type & COLLISION && other_type & MOVABLE){

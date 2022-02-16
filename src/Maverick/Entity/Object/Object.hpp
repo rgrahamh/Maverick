@@ -53,9 +53,9 @@ class Object : public Entity{
 		void applyForce(double xA, double yA);
 
 		//Processing functions
-		virtual void _process(uint64_t delta);
+		virtual void _process(uint64_t delta, double step_size);
 		//Need this for custom processing
-		virtual void process(uint64_t delta);
+		virtual void process(uint64_t delta, double step_size);
 
 		virtual void _action(Control* control);
 		virtual void action(Control* control);

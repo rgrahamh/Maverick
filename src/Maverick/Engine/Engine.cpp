@@ -268,7 +268,10 @@ void Engine::physicsStep(ObjectList* all_objects){
                 continue;
             }
 
-            all_objects->obj->_process(this->delta);
+            //A step is defined as 16ms (roughly one frame at 60fps)
+            double step_size = this->delta / 16.0;
+
+            all_objects->obj->_process(this->delta, step_size);
             all_objects = all_objects->next;
         }
     }

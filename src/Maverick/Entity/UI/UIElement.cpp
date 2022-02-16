@@ -52,17 +52,17 @@ UIElement::~UIElement(){
     }*/
 }
 
-void UIElement::process(uint64_t delta){
+void UIElement::process(uint64_t delta, double step_size){
     return;
 }
 
-void UIElement::_process(uint64_t delta){
-    this->process(delta);
+void UIElement::_process(uint64_t delta, double step_size){
+    this->process(delta, step_size);
 
     UIElementList* cursor = subelements;
     while(cursor != nullptr){
         if(cursor->element->isActive()){
-            cursor->element->_process(delta);
+            cursor->element->_process(delta, step_size);
         }
         cursor = cursor->next;
     }

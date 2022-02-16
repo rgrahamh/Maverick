@@ -105,15 +105,17 @@ HitboxList* Animation::getHitboxes(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
+	SDL_Rect* curr_rect = this->sequence->sprite[curr_sprite_set]->rect;
+	curr_rect->x = *this->x_base;
+	curr_rect->y = *this->y_base;
+
 	//If draw_axis is set
 	if(this->draw_axis != -1){
 		return this->draw_axis;
 	}
 	//Otherwise, interpolate from the sequence
 	else if(this->sequence != NULL){
-		return this->sequence->sprite[curr_sprite_set]->rect->y +
-		       this->sequence->sprite[curr_sprite_set]->rect->h +
-			   this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		return curr_rect->y + curr_rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	//If we can't find the draw axis any other way
 	else{
@@ -467,7 +469,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
 	curr_rect->x = *this->x_base;
-	curr_rect->y = *this->y_base - z_coord;
+	curr_rect->y = *this->y_base;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
@@ -475,7 +477,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 
 	SDL_Rect draw_rect = *curr_rect;
 	draw_rect.x -= camera_x;
-	draw_rect.y -= camera_y;
+	draw_rect.y -= camera_y + z_coord;
 
 	//Draw the sprite
 	if(sprite->rotation){

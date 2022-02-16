@@ -94,6 +94,12 @@ enum CONTROL_TYPE{
 	NETWORK = 8
 };
 
+struct CharacterControl{
+	double x_movement = 0;
+	double y_movement = 0;
+	bool jump = false;
+};
+
 class Character : public Object, public Race, public Style{
 	public:
 		Character(const char* name, float start_x, float start_y, float start_z, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment = NULL, InvSlot** inventory = NULL, int draw_layer = 1);
@@ -101,7 +107,7 @@ class Character : public Object, public Race, public Style{
 
 		//Useful for actions on other objects & input
 		virtual void action(Control* control);
-		virtual void process(uint64_t delta);
+		virtual void process(uint64_t delta, double step_size);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
@@ -118,6 +124,9 @@ class Character : public Object, public Race, public Style{
 		Mastery* mastery;
 		Equipment* equipment;
 		Abilities* abilities;
+		CharacterControl character_control;
+
+		void clearCharacterControl();
 };
 
 #endif

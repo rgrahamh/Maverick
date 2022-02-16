@@ -382,7 +382,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
 /** Handles UIText processing (like scrolling text print)
  * @param delta The amount of time that has passed since last processing (in ms)
  */
-void UIText::process(uint64_t delta){
+void UIText::process(uint64_t delta, double step_size){
     //Scrolling the text from the internal text representation to the print_buffer
     if(this->print_buff != nullptr && this->ref_buff != nullptr && this->text != nullptr && this->scroll_speed != 0.0){
         //Find the first differing character (we're finished if we never hit a differing character)

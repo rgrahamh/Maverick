@@ -31,8 +31,8 @@ class UIElement : public Entity{
         UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer = 0);
         virtual ~UIElement();
 
-		virtual void _process(uint64_t delta);
-		virtual void process(uint64_t delta);
+		virtual void _process(uint64_t delta, double step_size);
+		virtual void process(uint64_t delta, double step_size);
 		virtual void _action(Control* control);
 		virtual void action(Control* control);
         virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
