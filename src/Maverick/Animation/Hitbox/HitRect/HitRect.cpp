@@ -9,7 +9,7 @@
  * @param height The height of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
-HitRect::HitRect(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, float width, float height, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
+HitRect::HitRect(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, float width, float height, double depth, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
 	:Hitbox(x_base, y_base, z_base, x_offset, y_offset, z_offset, depth, type, hitbox_group, immunity_timer){
 	this->base_height = height;
 	this->curr_height = height;

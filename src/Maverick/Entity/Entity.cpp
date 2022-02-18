@@ -261,8 +261,8 @@ int Entity::setSpriteSet(const char* sprite_set){
  * @param immunity_timer The hitbox immunity timer
  * @return 0 on success, -1 if the animation doesn't exist
  */
-int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double depth, double x_element,
-                       double y_element, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
+int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element,
+                       double y_element, double depth, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
@@ -271,10 +271,10 @@ int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, depth, x_element, y_element, type, hitbox_group, immunity_timer);
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, depth, y_element, type, hitbox_group, immunity_timer);
     }
     else{
-        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, depth, x_element, y_element, type, hitbox_group, immunity_timer);
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
     }
 
     animation->addHitbox(hitbox, sprite_num);

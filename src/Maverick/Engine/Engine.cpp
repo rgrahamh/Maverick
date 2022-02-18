@@ -646,6 +646,7 @@ inline void Engine::threadGC(){
  * @param box2 The second hitbox in the collision
  */
 void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2){
+    printf("Default collision case\n");
     unsigned int box1_prop = box1->getType();
     unsigned int box2_prop = box2->getType();
 
@@ -689,6 +690,13 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             double x_iter = x_movement / ROLLBACK_STEP;
             double y_iter = y_movement / ROLLBACK_STEP;
+
+            if(x_iter == 0){
+                x_iter = -1;
+            }
+            if(y_iter == 0){
+                y_iter = -1;
+            }
 
             //Rollback to the point where we're no longer colliding
             for(int i = 0; mov_box->checkCollision(env_box); i++){
