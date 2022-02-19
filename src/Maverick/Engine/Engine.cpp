@@ -61,7 +61,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -150,6 +150,7 @@ void Engine::start(){
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global"));
     loadZone("global");
+    //loadZone("led");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "Test Zone"));
@@ -296,6 +297,7 @@ void Engine::collisionStep(ObjectList* all_objects){
             continue;
         }
         HitboxList* object_hitboxes = all_objects->obj->getHitboxes();
+
         //While we're not out of object hitboxes
         while(object_hitboxes != NULL){
             float top_bound, bot_bound, left_bound, right_bound;
@@ -431,7 +433,7 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
-    //Set custom scale for objects
+    //Set the current scale
     camera->setScale(current_x_scale, current_y_scale);
 
     //Draw operation
@@ -448,9 +450,6 @@ void Engine::drawStep(EntityList* all_entities){
         }
         zone_cursor = zone_cursor->next;
     }
-
-    //Set scale back to normal for UI elements
-    camera->setScale(native_x_scale, native_y_scale);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
@@ -671,16 +670,12 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             double old_x = mov_obj->getOldX();
             double old_y = mov_obj->getOldY();
-            double old_z = mov_obj->getOldZ();
 
             double x = mov_obj->getX();
             double y = mov_obj->getY();
-            double z = mov_obj->getZ();
 
-            double x_movement = old_x - x;
-            double y_movement = old_y - y;
-
-            double depth = mov_box->getDepth();
+            double x_movement = x - old_x;
+            double y_movement = y - old_y;
 
             mov_obj->setEnvBump();
 
@@ -688,8 +683,8 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             //If we're hitting the ceiling
             //If we're hitting the floor
 
-            double x_iter = x_movement / ROLLBACK_STEP;
-            double y_iter = y_movement / ROLLBACK_STEP;
+            double x_iter = x_movement;
+            double y_iter = y_movement;
 
             if(x_iter == 0){
                 x_iter = -1;
@@ -850,10 +845,6 @@ void Engine::addThread(std::thread* thread){
 void Engine::cleanupThread(std::thread::id thread_id){
     if(thread_id != base_thread_id){
         thread_cleanup_queue.load()->push(thread_id);
-        printf("Put thread %i being put in cleanup list\n", thread_id);
-    }
-    else{
-        printf("Protected against thread %i being put in cleanup list\n", thread_id);
     }
 }
 
@@ -861,10 +852,15 @@ void Engine::cleanupThread(std::thread::id thread_id){
  * @param zone The zone to add
  */
 void Engine::addZone(Zone* zone){
-    ZoneList* new_zone = new ZoneList;
-    new_zone->zone = zone;
-    new_zone->next = this->zones;
-    zones = new_zone;
+    if(getZone(zone->getName()) == nullptr){
+        ZoneList* new_zone = new ZoneList;
+        new_zone->zone = zone;
+        new_zone->next = this->zones;
+        zones = new_zone;
+    }
+    else{
+        delete zone;
+    }
 }
 
 /**Adds a surface to the sprite hash

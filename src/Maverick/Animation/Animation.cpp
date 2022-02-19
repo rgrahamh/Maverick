@@ -1,9 +1,9 @@
 #include "./Animation.hpp"
 
 #include "../Engine/Engine.hpp"
+#include "../Utility/Utility.hpp"
 
 extern Engine* engine;
-
 
 //FINISH MULTIPLE SPRITES
 
@@ -12,11 +12,7 @@ extern Engine* engine;
  * @param y_base A pointer to the int of the base object's Y location
  */
 Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets){
-    int name_len = strlen(name);
-    this->name = (char*)malloc(name_len + 1);
-    memcpy(this->name, name, name_len);
-    this->name[name_len] = '\0';
-
+    this->name = StrDeepCopy(name);
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
@@ -110,7 +106,7 @@ float Animation::getDrawAxis(){
 		return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	//Otherwise, interpolate from the sequence
-	else if(this->sequence != NULL){
+	else if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
 		return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 	}
 	//If we can't find the draw axis any other way
@@ -210,14 +206,9 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 		return -1;
 	}
 
-	unsigned int sprite_name_len = strlen(sprite_path);
-	char* sprite_name = (char*)malloc(sprite_name_len + 1);
-	memcpy(sprite_name, sprite_path, sprite_name_len);
-	sprite_name[sprite_name_len] = '\0';
-
 	//Create the sprite
 	Sprite* sprite = new Sprite();
-	sprite->name = sprite_name;
+	sprite->name = StrDeepCopy(sprite_path);
 	sprite->rotation = 0.0;
 
 	//Getting the texture

@@ -20,9 +20,9 @@ extern Engine* engine;
  * @param y_alignment The vertical alignment of the text
  */
 UIText::UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-               SDL_Window* window, int draw_layer, const char* font_path, const char* text,
+               int draw_layer, const char* font_path, const char* text,
                float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, draw_layer){
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT;
 
     //Setting the text's alignment
@@ -128,28 +128,26 @@ void UIText::setPoint(unsigned int point){
 
         //Set line size and num of 
         if(TTF_SizeUTF8(this->font, "W", &char_width, &char_height) == 0){
-            if(this->window != nullptr){
-                //Free the old buffers
-                if(this->print_buff != nullptr){
-                    for(unsigned int i = 0; i < this->num_lines; i++){
-                        free(this->print_buff[i]);
-                        free(this->ref_buff[i]);
-                    }
-                    free(this->print_buff);
-                    free(this->ref_buff);
+            //Free the old buffers
+            if(this->print_buff != nullptr){
+                for(unsigned int i = 0; i < this->num_lines; i++){
+                    free(this->print_buff[i]);
+                    free(this->ref_buff[i]);
                 }
+                free(this->print_buff);
+                free(this->ref_buff);
+            }
 
-                //Calculate the print_buffer attributes
-                this->num_lines = this->view_height * SCREEN_WIDTH / char_height;
-                this->chars_per_line = this->view_width * SCREEN_HEIGHT / char_width;
+            //Calculate the print_buffer attributes
+            this->num_lines = this->view_height * SCREEN_WIDTH / char_height;
+            this->chars_per_line = this->view_width * SCREEN_HEIGHT / char_width;
 
-                //Allocate space for the new buffers
-                this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
-                this->ref_buff = (char**)malloc(sizeof(char*) * num_lines);
-                for(unsigned int i = 0; i < num_lines; i++){
-                    this->print_buff[i] = (char*)calloc(1, chars_per_line + 1);
-                    this->ref_buff[i] = (char*)calloc(1, chars_per_line + 1);
-                }
+            //Allocate space for the new buffers
+            this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
+            this->ref_buff = (char**)malloc(sizeof(char*) * num_lines);
+            for(unsigned int i = 0; i < num_lines; i++){
+                this->print_buff[i] = (char*)calloc(1, chars_per_line + 1);
+                this->ref_buff[i] = (char*)calloc(1, chars_per_line + 1);
             }
         }
     }

@@ -17,14 +17,13 @@ extern Engine* engine;
 //DETERMINE USAGE OF TYPE!!!!!!!!!!!!!!!!
 
 
-UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer)
          : Entity(name, 0, 0, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
     this->view_y_offset = view_y_offset;
     this->view_width = view_width;
     this->view_height = view_height;
-    this->window = window;
 
     this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
@@ -42,14 +41,14 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    /*UIElementList* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
         UIElementList* tmp = cursor;
         delete cursor->element;
 
         cursor = cursor->next;
         delete tmp;
-    }*/
+    }
 }
 
 void UIElement::process(uint64_t delta, double step_size){

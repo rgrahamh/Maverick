@@ -27,7 +27,6 @@ class Object : public Entity{
 		virtual ~Object();
 		double getOldX();
 		double getOldY();
-		double getOldZ();
 		double getXVel();
 		double getYVel();
 		double getZVel();
@@ -69,7 +68,6 @@ class Object : public Entity{
 		//Previous position (used for rollback)
 		double old_x;
 		double old_y;
-		double old_z;
 
 		//The Z position of the ground
 		double ground_z;

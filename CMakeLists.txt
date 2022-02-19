@@ -5,6 +5,7 @@ project(Cyberena)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++11 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
 
+#Engine source
 set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp
 )
@@ -48,6 +49,7 @@ set(UISrc
 set(ObjectSrc
     ./src/Maverick/Entity/Object/Object.cpp
     ./src/Maverick/Entity/Object/CameraReference/CameraReference.cpp
+    ./src/Maverick/Entity/Object/LoadingZone/LoadingZone.cpp
 )
 
 set(EntitySrc
@@ -103,7 +105,7 @@ set(MaverickSrc
     ${MotorSrc}
 )
 
-#Cyberena source
+#Game source
 set(CyberenaObjectSrc
     ./src/Cyberena/Entity/Object/Character/Character.cpp
     ./src/Cyberena/Entity/Object/Character/Race/Race.cpp

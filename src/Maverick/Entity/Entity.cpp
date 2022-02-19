@@ -11,10 +11,7 @@ extern Engine* engine;
  * @param animation_name The number of animations
  */
 Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
-    int name_len = strlen(name);
-    this->name = (char*)malloc(name_len + 1);
-    memcpy(this->name, name, name_len);
-    this->name[name_len] = '\0';
+    this->name = StrDeepCopy(name);
     
     //Initializing position, velocity, and acceleration
     this->x = start_x;
@@ -186,7 +183,7 @@ int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned 
         return -1;
     }
     unsigned int ret = 0;
-    for(int i = 0; i < iter; i++){
+    for(unsigned int i = 0; i < iter; i++){
         ret |= animation->addFrame(keytime);
     }
     return ret; 

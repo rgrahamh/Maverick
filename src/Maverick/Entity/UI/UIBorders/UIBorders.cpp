@@ -16,8 +16,8 @@ extern Engine* engine;
  * @param border_types The border locations
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     SDL_Window* window, int draw_layer, char* border_pattern, uint8_t border_types)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, draw_layer){
+                     int draw_layer, char* border_pattern, uint8_t border_types)
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
 
     this->subelements = nullptr;
@@ -96,7 +96,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                         delete borders[i];
                     }
                     this->borders[i] = new UIElement(border_names[i], border_x / (double)SCREEN_WIDTH, border_y / (double)SCREEN_HEIGHT,
-                                                     border_width / (double)SCREEN_WIDTH, border_height / (double)SCREEN_HEIGHT, this->window, 1);
+                                                     border_width / (double)SCREEN_WIDTH, border_height / (double)SCREEN_HEIGHT, 1);
                     this->borders[i]->addAnimation("border", 1);
                     this->borders[i]->addFrame("border", 0);
                     this->borders[i]->addSprite("border", "default", sprite_path);

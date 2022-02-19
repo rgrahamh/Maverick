@@ -20,7 +20,6 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
     this->z = start_z;
     this->old_x = start_x;
     this->old_y = start_y;
-    this->old_z = start_z;
     this->xV = 0;
     this->yV = 0;
     this->zV = 0;
@@ -32,6 +31,7 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
     this->friction = friction;
     this->mass = mass;
     this->terminal_velocity = terminal_velocity;
+    this->gravity = gravity;
 
     this->collision_layer = layer;
 
@@ -55,13 +55,6 @@ double Object::getOldX(){
  */
 double Object::getOldY(){
     return this->old_y;
-}
-
-/** Gets the old Z value of the object
- * @return The old Z value of the object
- */
-double Object::getOldZ(){
-    return this->old_z;
 }
 
 /** Gets the X velocity of the object
@@ -211,14 +204,8 @@ void Object::_process(uint64_t delta, double step_size){
     double physics_step_size = ((double)delta) / 16.0;
 
     //Updating old X & Y values
-    if(fabs(this->x - this->old_x) > 0.2 * physics_step_size || fabs(this->y - this->old_y) > 0.2 * physics_step_size){
-        this->old_x = this->x;
-        this->old_y = this->y;
-    }
-
-    if(fabs(this->z - this->old_z) > 0.2){
-        this->old_z = this->z;
-    }
+    this->old_x = this->x;
+    this->old_y = this->y;
 
     //Updating environmental bump
     this->env_bump = false;

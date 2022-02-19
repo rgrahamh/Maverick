@@ -102,7 +102,7 @@ uint64_t Zone::getGlobalY(){
  * @param element The object to add to the zone
  */
 void Zone::addObject(Object* object){
-    if(this->objects->obj == NULL){
+    if(this->objects != NULL && this->objects->obj == NULL){
         this->objects->obj = object;
     }
     else{
@@ -117,7 +117,7 @@ void Zone::addObject(Object* object){
  * @param element The element to add to the zone
  */
 void Zone::addUIElement(UIElement* element){
-    if(this->ui->element == NULL){
+    if(this->ui != NULL && this->ui->element == NULL){
         this->ui->element = element;
     }
     else{

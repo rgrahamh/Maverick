@@ -28,7 +28,7 @@ struct UIElementList{
 
 class UIElement : public Entity{
     public:
-        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer = 0);
+        UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer = 0);
         virtual ~UIElement();
 
 		virtual void _process(uint64_t delta, double step_size);
@@ -55,9 +55,6 @@ class UIElement : public Entity{
         //All elements which are children of this one
         UIElementList* subelements;
         uint16_t num_subelements;
-
-        //The window (to calculate sizes)
-        SDL_Window* window;
 
         //The UI offsets/sizing
         double view_x_offset;

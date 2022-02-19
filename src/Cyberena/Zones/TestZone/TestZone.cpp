@@ -4,6 +4,7 @@ extern Engine* engine;
 
 void buildTestZone(){
     Zone* zone = new Zone("Test Zone", 0, 0);
+    engine->addZone(zone);
 
     //Create pillars
     zone->addObject(buildPillar("pillar1", 400.0, 500.0));
@@ -14,6 +15,7 @@ void buildTestZone(){
 
     zone->addObject(buildBackground("background", 0.0, 0.0));
 
-    engine->addZone(zone);
+    zone->addObject(new LoadingZone("ui_load", "led", 200.0, 100.0, 0.0, 200.0, 200.0, 30.0, EXTENDED_OBJECT_TYPE::CHARACTER));
+
     engine->activateZone(zone->getName());
 }

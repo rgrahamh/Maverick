@@ -96,13 +96,13 @@ void Character::action(Control* control){
 			}
 
 			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
-			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]
-			|| keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]){
+			if((keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+			|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
 				setAnimation("walk_up");
 				active_animation->setNextAnimation(findAnimation("walk_up"));
 			}
-			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]
-				 || !keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D]){
+			else if((!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+				 || (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
 				setAnimation("walk_down");
 				active_animation->setNextAnimation(findAnimation("walk_down"));
 			}
@@ -223,8 +223,6 @@ void Character::action(Control* control){
 			//If we're not sliding (in an actionable state)
 			character_control.y_movement = pad->left_stick_y_axis;
 			character_control.x_movement = pad->left_stick_x_axis;
-
-			engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
 		}
 	}
 }
@@ -276,8 +274,6 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
-	printf("Collided!\n");
-
 	if(this_type & COLLISION){
 		if(other_type & COLLISION && other_type & MOVABLE){
 			double x_diff = this->x - this->old_x;
@@ -292,20 +288,15 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 			float new_y = this->y;
 
 			this->y = this->old_y;
-
 			if(this_hitbox->checkCollision(other_hitbox)){
 				this->y = new_y;
 				this->x = this->old_x;
 				if(this_hitbox->checkCollision(other_hitbox)){
 					this->y = this->old_y;
-					this->x = new_x;
+					//If all else fails, hand it back to the generic collision handling function
 					if(this_hitbox->checkCollision(other_hitbox)){
-						this->y = this->old_y;
-						//If all else fails, hand it back to the generic collision handling function
-						if(this_hitbox->checkCollision(other_hitbox)){
-							this->x = new_x;
-							this->y = new_y;
-						}
+						this->x = new_x;
+						this->y = new_y;
 					}
 				}
 			}

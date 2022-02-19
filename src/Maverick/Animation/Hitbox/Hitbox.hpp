@@ -15,12 +15,13 @@ enum HITBOX_SHAPE{
 
 //The type of the hitbox (default flags that may be applied to a hitbox)
 enum HITBOX_TYPE{
-    ENVIRONMENT = 1,  //Environmental element (can skip check against other environmental collisions)
-    COLLISION = 2,    //A more general collision hitbox
-    MOVABLE = 4,      //Bumping into this collision hitbox will cause the object to move
-    DAMAGEBOX = 8,    //A damaging hitbox
-    HURTBOX = 16,      //A hitbox that you can get damaged
-    PROJECTILE = 32   //A projectile hitbox
+    ENVIRONMENT =     1, //Environmental element (can skip check against other environmental collisions)
+    COLLISION =       2, //A more general collision hitbox
+    MOVABLE =         4, //Bumping into this collision hitbox will cause the object to move
+    DAMAGEBOX =       8, //A damaging hitbox
+    HURTBOX =        16, //A hitbox that you can get damaged
+    GROUNDING_ZONE = 32, //A hitbox that checks what the ground position should be (generally to the bottom of this hitbox)
+    TRIGGER   = 64  //A hitbox that signifies that something should be loaded
 };
 
 class Hitbox{

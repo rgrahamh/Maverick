@@ -12,8 +12,8 @@ extern Engine* engine;
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
  * @param window The current window (used for viewport calculation)
  */
-UILevelPort::UILevelPort(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window)
-           : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, 0){
+UILevelPort::UILevelPort(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height)
+           : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, 0){
 }
 
 /** Handles actions for this UILevelPort
