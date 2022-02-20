@@ -11,7 +11,6 @@ extern Engine* engine;
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  * @param font_path The path to the font you want to use for the text
  * @param text The text you wish to display in the box
  * @param scroll_speed The scroll speed of the text

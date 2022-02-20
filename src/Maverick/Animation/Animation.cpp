@@ -8,8 +8,10 @@ extern Engine* engine;
 //FINISH MULTIPLE SPRITES
 
 /** The parameterized constructor of the Animation
+ * @param name The name of the animation
  * @param x_base A pointer to the int of the base object's X location
  * @param y_base A pointer to the int of the base object's Y location
+ * @param num_sprite_sets The max number of sprite sets that should be allocated for this animation
  */
 Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets){
     this->name = StrDeepCopy(name);
@@ -188,7 +190,9 @@ int Animation::addFrame(unsigned int keytime){
  */
 int Animation::addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width, int height){
 	if(this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
-		return -1;
+		if(this->addSpriteSet(sprite_set) != 0){
+			return -1;
+		}
 	}
 	uint16_t sprite_set_idx = this->sprite_sets[sprite_set];
 
@@ -250,6 +254,7 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 
 /** Adds a new sprite set to an animation
  * @param sprite_set The sprite set you'd like to add
+ * @return 0 if successful, -1 otherwise
  */
 int Animation::addSpriteSet(const char* sprite_set){
 	if(sprite_set_counter < num_sprite_sets && this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
@@ -261,6 +266,7 @@ int Animation::addSpriteSet(const char* sprite_set){
 
 /** Adds a new hitbox to an animation (to all sprites)
  * @param hitbox The hitbox to add
+ * @return 0 if successful, -1 otherwise
  */
 int Animation::addHitbox(Hitbox* hitbox){
 	AnimationSeq* cursor = this->sequence_start;
@@ -284,6 +290,7 @@ int Animation::addHitbox(Hitbox* hitbox){
 /** Adds a new hitbox to an animation (with sprite number)
  * @param hitbox The hitbox to add
  * @param sequence_num The sprite number (-1 adds to the last sprite)
+ * @return 0 if successful, -1 otherwise
  */
 int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 	if(this->sequence_start != nullptr){
@@ -322,6 +329,7 @@ int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 /** Adds a new sound to an animation (given the sprite number)
  * @param sound The sound to add
  * @param sequence_num The sequence number (-1 adds to the last element of the sequence)
+ * @return 0 if successful, -1 otherwise
  */
 int Animation::addSound(Sound* sound, int sequence_num){
 	if(this->sequence_start != nullptr){
@@ -359,6 +367,7 @@ void Animation::setNextAnimation(Animation* next_animation){
 /** Sets the size of the animation
  * @param x_scale The X size
  * @param y_scale the Y size
+ * @return 0 if successful, -1 otherwise
  */
 int Animation::setSize(int width, int height){
 	if(this->sequence_start == nullptr){
@@ -382,6 +391,10 @@ int Animation::setSize(int width, int height){
 	return 0;
 }
 
+/** Sets the currently used sprite set
+ * @param sprite_set The name of the sprite set
+ * @return 0 if the sprite set was set successfully, -1 otherwise (means it couldn't be found)
+ */
 int Animation::setSpriteSet(const char* sprite_set){
 	if(this->sprite_sets.find(sprite_set) != this->sprite_sets.end()){
 		this->curr_sprite_set = sprite_sets[sprite_set];
@@ -397,7 +410,8 @@ void Animation::setDrawAxis(double draw_axis){
 	this->draw_axis = draw_axis;
 }
 
-/** Advances the animation by a frame
+/** Advances the animation by a delta
+ * @param delta The number of ms that have passed since the last call to advance()
  */
 void Animation::advance(uint64_t delta){
 	if(this->isAnimated() && !this->paused){
@@ -540,8 +554,7 @@ bool Animation::hasSpriteSet(const char* sprite_set){
  * @param file The pointer to the open file to write to
  * @param written_sprites The set of sprites that have already been written to file
  * @param written_audio The set of audio assets that have already been written to file
- * @param written_music The set of music assets that have already been written to file (used just by objects that handle music)
- * @return The number of bytes that *buff_ptr is
+ * @return 0 if successful
  */
 int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio){
     AnimationSeq* cursor = sequence_start;
@@ -632,6 +645,10 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 	return 0;
 }
 
+/** Serialize animation data & write it to file
+ * @param file The file to write animation data to
+ * @return 0 on success
+ */
 int Animation::serializeData(FILE* file){
 	//Store animation identifier
 	uint16_t name_len = strlen(this->name);

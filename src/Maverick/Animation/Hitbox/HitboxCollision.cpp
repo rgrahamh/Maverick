@@ -103,6 +103,7 @@ bool collisionRectRect(HitRect* rect1, HitRect* rect2){
 	return false;
 }
 
+//Hard-coded to false for now; will come back to this
 bool collisionRectCone(HitRect* rect, HitCone* cone){
 	return false;
 }

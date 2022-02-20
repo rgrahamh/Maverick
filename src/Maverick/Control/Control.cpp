@@ -132,6 +132,8 @@ void Control::updateKeyboard(){
     }
 }
 
+/** Update mouse state
+ */
 void Control::updateMouse(){
     old_mouse = mouse;
     mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);

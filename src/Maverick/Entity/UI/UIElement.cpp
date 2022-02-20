@@ -11,11 +11,7 @@ extern Engine* engine;
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  */
-
-//DETERMINE USAGE OF TYPE!!!!!!!!!!!!!!!!
-
 
 UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer)
          : Entity(name, 0, 0, draw_layer){
@@ -51,10 +47,18 @@ UIElement::~UIElement(){
     }
 }
 
+/** Called every frame for processing; can be overridden by children
+ * @param delta The amount of time that has passed (in ms)
+ * @param step_size The step size used for physics calcluation (probably not needed here)
+ */
 void UIElement::process(uint64_t delta, double step_size){
     return;
 }
 
+/** Called every frame for processing
+ * @param delta The amount of time that has passed (in ms)
+ * @param step_size The step size used for physics calcluation (probably not needed here)
+ */
 void UIElement::_process(uint64_t delta, double step_size){
     this->process(delta, step_size);
 
@@ -77,7 +81,7 @@ void UIElement::action(Control* control){
 }
 
 /** Handles actions for this UIElement and all children UIElements
- * @param event The event that has occurred
+ * @param control The Control class that represents user input
  */
 void UIElement::_action(Control* control){
     this->action(control);
@@ -124,8 +128,8 @@ void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int c
 }
 
 /** Sets the scale of the UIElement
- * @param width The width
- * @param height The height
+ * @param view_width The viewport width (0.0 is none of the screen, 1.0 is the whole thing)
+ * @param view_height The viewport height (0.0 is none of the screen, 1.0 is the whole thing)
  */
 void UIElement::setViewSize(double view_width, double view_height){
     //Set scale for this element
@@ -254,6 +258,11 @@ bool UIElement::isMouseInside(Control* control){
     return false;
 }
 
+/** Serializing UI Elements (WIP)
+ * @param file An open file to write to
+ * @param base_zone The zone this object belongs to (used for zone-based offsets)
+ * @return 0 on success
+ */
 int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
     //Get X/Y offsets
     uint64_t view_x_offset_swap = EndianSwap((uint64_t*)&view_x_offset);
@@ -278,6 +287,12 @@ int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
     return 0;
 }
 
+/** Serializing UI Element assets (to be overridden by children, as necessary)
+ * @param file An open file to write to
+ * @param sprite_set The sprite sets that have already been written to file
+ * @param sprite_set The audio sets that have already been written to file
+ * @param sprite_set The music sets that have already been written to file
+ */
 int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
     UIElementList* subelement_cursor = subelements;
     while(subelement_cursor != nullptr){

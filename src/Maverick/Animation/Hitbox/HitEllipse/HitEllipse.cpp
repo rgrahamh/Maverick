@@ -3,10 +3,13 @@
 /** HitEllipse constructor
  * @param x_base A pointer to the base X component
  * @param y_base A pointer to the base Y component
- * @param x_offset The X offset of hitbox
- * @param y_offset The Y offset of hitbox
+ * @param z_base A pointer to the base Z component
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param z_offset The Z offset of the hitbox
  * @param width The width of the hitbox
  * @param height The height of the hitbox
+ * @param depth The depth of the hitbox
  * @param type The HITBOX_TYPE attributes
  */
 HitEllipse::HitEllipse(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double x_radius, double y_radius, double depth, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)

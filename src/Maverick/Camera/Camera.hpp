@@ -14,7 +14,6 @@ enum CAMERA_FOLLOW_MODE{
 class Camera{
 	public:
 		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference);
-		~Camera();
 
 		void setReference(Object* reference);
 		void _draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset = 0, double camera_y_offset = 0);

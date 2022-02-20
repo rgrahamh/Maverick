@@ -20,9 +20,6 @@ Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = N
     this->follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW;
 }
 
-Camera::~Camera(){
-}
-
 /** Sets the reference for the center of the camera
  * @param reference The reference object you wish to center on
  */

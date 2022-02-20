@@ -7,8 +7,9 @@
  * @param x_offset The hitbox offset from the base X position
  * @param y_offset The hitbox offset from the base Y position
  * @param z_offset The hitbox offset from the base Z position
+ * @param depth The depth of the hitbox
  * @param type The hitbox type (flags to specify what kind of hitbox it is)
- * @param group The hitbox group (other hitboxes that should be tied in with immunity will have the same value)
+ * @param hitbox_group The hitbox group (other hitboxes that should be tied in with immunity will have the same value)
  * @param immunity_timer The amount of time the hitbox won't interact with a given "other" object if hit
  */
 Hitbox::Hitbox(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, uint64_t type, int32_t hitbox_group, int32_t immunity_timer){

@@ -61,7 +61,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -427,6 +427,7 @@ void Engine::collisionStep(ObjectList* all_objects){
 }
 
 /** The draw step of the game engine
+ * @param all_entities An entity list of all entities to draw
  */
 void Engine::drawStep(EntityList* all_entities){
     SDL_Renderer* renderer = this->camera->getRenderer();
@@ -645,7 +646,6 @@ inline void Engine::threadGC(){
  * @param box2 The second hitbox in the collision
  */
 void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2){
-    printf("Default collision case\n");
     unsigned int box1_prop = box1->getType();
     unsigned int box2_prop = box2->getType();
 

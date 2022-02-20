@@ -8,7 +8,6 @@
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  * @param reference The object we're using for reference in the frame
  * @param border_pattern The pattern for the border texture files you wish to use
  * @param border_types The border locations

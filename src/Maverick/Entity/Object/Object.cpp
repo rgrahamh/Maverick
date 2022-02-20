@@ -4,11 +4,14 @@
 extern Engine* engine;
 
 /** Object parameterized constructor
+ * @param name The name of the object
  * @param start_x The starting X location of the object
- * @param start_y The starting Y location of the objcet
+ * @param start_y The starting Y location of the object
  * @param friction The object's coefficient of friction
- * @param draw_layer The draw layer of the object
- * @param animation_num The number of animations
+ * @param mass The object's mass
+ * @param terminal_velocity The object's terminal velocity
+ * @param gravity If the object should have gravity applied to it
+ * @param layer The default layer of the object
  */
 Object::Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity, int layer)
       : Entity(name, start_x, start_y, layer){
@@ -189,13 +192,15 @@ void Object::_action(Control* control){
 }
 
 /** Calculates any actions taken; should be overridden by children if used
- * @param event The event being interpreted
+ * @param control Contains the engine's Control entity
  */
 void Object::action(Control* control){
     return;
 }
 
 /** Called during the process step; performs object processing calculations
+ * @param delta The time that has passed since the last process() call (in ms)
+ * @param step_size The step size that should be applied
  */
 void Object::_process(uint64_t delta, double step_size){
     this->process(delta, step_size);
@@ -263,18 +268,27 @@ void Object::_process(uint64_t delta, double step_size){
 }
 
 /** Called during the process step by _process; space for users to override with custom processing logics
+ * @param delta The time that has passed since the last process() call (in ms)
+ * @param step_size The step size that should be applied
  */
 void Object::process(uint64_t delta, double step_size){
 }
 
 /** Called during the draw step
+ * @param renderer The object renderer
+ * @param delta The delta in ms since the last draw() operation
+ * @param camera_x The left-hand side of the screen's X coordinate
+ * @param camera_x The top side of hte screen's Y coordinate
  */
 void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     this->draw(renderer, delta, camera_x, camera_y);
 }
 
 /** Called during the draw step
- * @param window The window that content is being drawn to
+ * @param renderer The object renderer
+ * @param delta The delta in ms since the last draw() operation
+ * @param camera_x The left-hand side of the screen's X coordinate
+ * @param camera_x The top side of hte screen's Y coordinate
  */
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     if(this->active_animation != nullptr){
@@ -291,6 +305,11 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 	printf("Collided!\n");
 }
 
+/** Serializing object data (WIP)
+ * @param file An open file to write to
+ * @param base_zone The zone this object belongs to (used for zone-based offsets)
+ * @return 0 on success
+ */
 int Object::serializeExtendedData(FILE* file, Zone* base_zone){
     //Write X/Y offsets from the zone origin
     double write_x = this->x - base_zone->getGlobalX();
@@ -304,6 +323,12 @@ int Object::serializeExtendedData(FILE* file, Zone* base_zone){
     return 0;
 }
 
+/** Serializing object assets (to be overridden by children, as necessary)
+ * @param file An open file to write to
+ * @param sprite_set The sprite sets that have already been written to file
+ * @param sprite_set The audio sets that have already been written to file
+ * @param sprite_set The music sets that have already been written to file
+ */
 int Object::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
     return 0;
 }

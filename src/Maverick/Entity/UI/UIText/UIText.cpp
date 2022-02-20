@@ -11,7 +11,6 @@ extern Engine* engine;
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  * @param text The text to display
  * @param font_path The filepath to the .ttf file you wish to use
  * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
@@ -20,8 +19,8 @@ extern Engine* engine;
  * @param y_alignment The vertical alignment of the text
  */
 UIText::UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-               int draw_layer, const char* font_path, const char* text,
-               float scroll_speed, unsigned int point, ALIGNMENT x_alignment, ALIGNMENT y_alignment)
+               int draw_layer, const char* font_path, const char* text, float scroll_speed, unsigned int point,
+               ALIGNMENT x_alignment, ALIGNMENT y_alignment)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT;
 

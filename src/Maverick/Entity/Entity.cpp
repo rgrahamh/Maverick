@@ -3,12 +3,11 @@
 #include "../Engine/Engine.hpp"
 extern Engine* engine;
 
-/** Object parameterized constructor
- * @param start_x The starting X location of the object
- * @param start_y The starting Y location of the objcet
- * @param friction The object's coefficient of friction
- * @param draw_layer The draw layer of the object
- * @param animation_name The number of animations
+/** Entity parameterized constructor
+ * @param name The name of the entity
+ * @param start_x The starting X location of the entity
+ * @param start_y The starting Y location of the entity
+ * @param draw_layer The draw layer of the entity
  */
 Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
     this->name = StrDeepCopy(name);
@@ -32,7 +31,7 @@ Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
     this->attr = new AttributeHash(64);
 }
 
-/** Destructor for objects
+/** Destructor for entities
  */
 Entity::~Entity(){
     while(animations != nullptr){
@@ -44,29 +43,29 @@ Entity::~Entity(){
     free(name);
 }
 
-/** Gets the name of the object
- * @return The name of the object
+/** Gets the name of the entity
+ * @return The name of the entity
  */
 char* Entity::getName(){
     return this->name;
 }
 
-/** Gets the X value of the object
- * @return The X value of the object
+/** Gets the X value of the entity
+ * @return The X value of the entity
  */
 double Entity::getX(){
     return this->x;
 }
 
-/** Gets the Y value of the object
- * @return The Y value of the object
+/** Gets the Y value of the entity
+ * @return The Y value of the entity
  */
 double Entity::getY(){
     return this->y;
 }
 
-/** Gets the width of the object
- * @return The width of the object
+/** Gets the width of the entity
+ * @return The width of the entity
  */
 float Entity::getWidth(){
     if(this->active_animation == nullptr){
@@ -79,8 +78,8 @@ float Entity::getWidth(){
     return sprite->rect->w;
 }
 
-/** Gets the width of the object
- * @return The width of the object
+/** Gets the width of the entity
+ * @return The width of the entity
  */
 float Entity::getHeight(){
     if(this->active_animation == nullptr){
@@ -93,15 +92,15 @@ float Entity::getHeight(){
     return sprite->rect->h;
 }
 
-/** Gets the draw layer of the object
- * @return The draw layer of the object
+/** Gets the draw layer of the entity
+ * @return The draw layer of the entity
  */
 int16_t Entity::getDrawLayer(){
     return this->draw_layer;
 }
 
-/** Gets the draw axis of the object
- * @return The draw axis of the object
+/** Gets the draw axis of the entity
+ * @return The draw axis of the entity
  */
 double Entity::getDrawAxis(){
     if(this->active_animation == nullptr){
@@ -111,7 +110,7 @@ double Entity::getDrawAxis(){
 }
 
 /** Gets the hitboxes of the current animation state
- * @return The HitboxList containing the object's current hitboxes
+ * @return The HitboxList containing the entity's current hitboxes
  */
 HitboxList* Entity::getHitboxes(){
     if(this->active_animation == nullptr){
@@ -120,15 +119,15 @@ HitboxList* Entity::getHitboxes(){
     return this->active_animation->getHitboxes();
 }
 
-/** Sets if the current object is active (can be interacted with)
- * @return If the object is active
+/** Sets if the current entity is active (can be interacted with)
+ * @return If the entity is active
  */
 bool Entity::isActive(){
     return this->active;
 }
 
-/** Sets if the current object is visible (will/won't be drawn)
- * @return If the object is active
+/** Sets if the current entity is visible (will/won't be drawn)
+ * @return If the entity is active
  */
 bool Entity::isVisible(){
     return this->visible;
@@ -203,7 +202,7 @@ int Entity::addSprite(const char* animation_name, const char* sprite_set, const 
     return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
 }
 
-/** Sets the sprite set for a given animation in the object
+/** Sets the sprite set for a given animation in the entity
  * @param animation_name The animation set you'd like to add the sprite set to
  * @param sprite_set The sprite set you'd like to add
  * @return -1 if the sprite set add failed, 0 otherwise
@@ -217,7 +216,7 @@ int Entity::addSpriteSet(const char* animation_name, const char* sprite_set){
     return animation->addSpriteSet(sprite_set);
 }
 
-/** Sets the sprite set for a given animation in the object
+/** Sets the sprite set for a given animation in the entity
  * @param animation_name The animation set you'd like to swap the sprite set for
  * @param sprite_set The sprite set you'd like to swap to
  * @return -1 if the swap failed, 0 otherwise
@@ -231,8 +230,8 @@ int Entity::setSpriteSet(const char* animation_name, const char* sprite_set){
     return animation->setSpriteSet(sprite_set);
 }
 
-/** Sets the sprite set for all animations in the object
- * @param sprite_set The sprite set you'd like to swap all object animations to
+/** Sets the sprite set for all animations in the entity
+ * @param sprite_set The sprite set you'd like to swap all entity animations to
  * @return -1 if any setSpriteSet() calls failed, 0 otherwise
  */
 int Entity::setSpriteSet(const char* sprite_set){
@@ -278,7 +277,7 @@ int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     return 0;
 }
 
-/** Adds an immunity to the hitbox of another object
+/** Adds an immunity to the hitbox of another entity
  * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
  * @param hitbox The hitbox to add immunity for
  */
@@ -304,7 +303,7 @@ void Entity::addHitboxImmunity(Entity* other, Hitbox* hitbox){
     this->hitbox_immunity = new_immunity;
 }
 
-/** Checks immunity against the hitbox of another object
+/** Checks immunity against the hitbox of another entity
  * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
  * @param hitbox The hitbox to check immunity for
  */
@@ -430,14 +429,14 @@ void Entity::setSize(float width, float height){
 }
 
 /** Sets the activation of the current animation state
- * @return If the object is active
+ * @return If the entity is active
  */
 void Entity::setActive(bool active){
     this->active = active;
 }
 
 /** Sets the visibility of the current animation state
- * @return If the object is active
+ * @return If the entity is active
  */
 void Entity::setVisible(bool visible){
     this->visible = visible;
@@ -451,8 +450,8 @@ void Entity::setAttr(const char* key, void* val){
     this->attr->add(key, val);
 }
 
-/** Gets the object type
- * @return A uint32_t representation of the object type set in the constructor
+/** Gets the entity type
+ * @return A uint32_t representation of the entity type set in the constructor
  */
 uint32_t Entity::getType(){
     return this->type;
@@ -479,7 +478,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     }
 
     //GENERAL SECTION
-    //Write the object type
+    //Write the entity type
     uint32_t entity_type = EndianSwap(&this->type);
     fwrite(&entity_type, sizeof(entity_type), 1, file);
 
@@ -560,7 +559,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
  * @param file The pointer to the open file to write to
  * @param written_sprites The set of sprites that have already been written to file
  * @param written_audio The set of audio assets that have already been written to file
- * @param written_music The set of music assets that have already been written to file (used just by objects that handle music)
+ * @param written_music The set of music assets that have already been written to file (used just by entities that handle music)
  * @return The number of bytes that *buff_ptr is
  */
 int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio, std::unordered_set<std::string>& written_music){
