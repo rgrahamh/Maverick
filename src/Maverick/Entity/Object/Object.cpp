@@ -203,14 +203,14 @@ void Object::action(Control* control){
  * @param step_size The step size that should be applied
  */
 void Object::_process(uint64_t delta, double step_size){
+    //Updating old X & Y values
+    this->old_x = this->x;
+    this->old_y = this->y;
+
     this->process(delta, step_size);
 
     //Step size = 1 sec
     double physics_step_size = ((double)delta) / 16.0;
-
-    //Updating old X & Y values
-    this->old_x = this->x;
-    this->old_y = this->y;
 
     //Updating environmental bump
     this->env_bump = false;

@@ -70,7 +70,7 @@ Object* buildPillar(const char* name, float start_x, float start_y){
     pillar->addFrame("default");
     pillar->addSprite("default", "day", "./assets/sprites/environment/pillar.bmp");
     pillar->setAnimation("default");
-    pillar->addHitbox("default", ELLIPSE, 16, 120, 0, 8, 8, 12, COLLISION | ENVIRONMENT, 0);
+    pillar->addHitbox("default", ELLIPSE, 16, 120, 0, 18, 18, 120, COLLISION | ENVIRONMENT, 0);
     //pillar->addHitbox(0, RECT, 0, 112, 32, 16, COLLISION | ENVIRONMENT);
 
     return pillar;

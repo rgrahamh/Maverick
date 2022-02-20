@@ -674,8 +674,8 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             double x = mov_obj->getX();
             double y = mov_obj->getY();
 
-            double x_movement = x - old_x;
-            double y_movement = y - old_y;
+            double x_movement = old_x - x;
+            double y_movement = old_y - y;
 
             mov_obj->setEnvBump();
 

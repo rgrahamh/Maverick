@@ -26,6 +26,6 @@ void CameraReference::action(Control* control){
             this->xA += x_speed / engine->getGlobalXScale();
         }
 
-        engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::FIXED_FOLLOW);
+        engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
     }
 }
