@@ -61,7 +61,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -101,7 +101,7 @@ Engine::Engine(){
     this->entities.obj = nullptr;
     this->entities.ui = nullptr;
 
-    this->delta = 0;
+    this->delta = SDL_GetTicks64();
 
     this->gravity = 1;
 
@@ -174,6 +174,9 @@ void Engine::start(){
 /** The primary game loop
  */
 void Engine::gameLoop(){
+    uint64_t last_time = this->delta;
+
+    uint64_t physics_step_accumulator = 0;
 	while(!exit_game){
         buildFullEntityList();
         delta = SDL_GetTicks64();
@@ -182,14 +185,18 @@ void Engine::gameLoop(){
         delta = SDL_GetTicks64() - last_time;
         last_time = SDL_GetTicks64();
 
-        //No need to do anything if at least a ms hasn't passed
-        if(this->delta > 0){
+        physics_step_accumulator += delta;
+        uint64_t physics_step = physics_step_accumulator / PHYSICS_STEP_SIZE;
+        physics_step_accumulator %= PHYSICS_STEP_SIZE;
+
+        //No need to do anything if a step hasn't occurred
+        if(delta > 0){
             //Action step (where actions occur)
             this->actionStep(&this->entities);
 
-            if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT)){
+            if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
                 //Physics step (where physics are calculated, obj positions updated, etc.)
-                this->physicsStep(this->entities.obj);
+                this->physicsStep(this->entities.obj, physics_step);
 
                 //Collision step (where collision is determined)
                 this->collisionStep(this->entities.obj);
@@ -260,7 +267,7 @@ void Engine::globalAction(){
 /** The physics step of the game engine
  * @param all_objects All of the objects that physics should be simluated for
  */
-void Engine::physicsStep(ObjectList* all_objects){
+void Engine::physicsStep(ObjectList* all_objects, unsigned int steps){
     if(!this->checkState(GAME_STATE::PAUSE)){
         while(all_objects != NULL){
             Object* curr_object = all_objects->obj;
@@ -269,10 +276,7 @@ void Engine::physicsStep(ObjectList* all_objects){
                 continue;
             }
 
-            //A step is defined as 16ms (roughly one frame at 60fps)
-            double step_size = this->delta / 16.0;
-
-            all_objects->obj->_process(this->delta, step_size);
+            all_objects->obj->_process(this->delta, steps);
             all_objects = all_objects->next;
         }
     }
@@ -632,7 +636,6 @@ inline void Engine::threadGC(){
             std::thread* thread_ptr = thread_map[thread_id];
             if(thread_ptr != nullptr && thread_ptr->joinable()){
                 thread_ptr->join();
-                printf("Joined thread %i\n", thread_id);
                 thread_map.erase(thread_id);
             }
         }
@@ -683,13 +686,13 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             //If we're hitting the ceiling
             //If we're hitting the floor
 
-            double x_iter = x_movement;
-            double y_iter = y_movement;
+            double x_iter = x_movement / ROLLBACK_STEP;
+            double y_iter = y_movement / ROLLBACK_STEP;
 
-            if(x_iter == 0){
+            if(x_iter == 0.0){
                 x_iter = -1;
             }
-            if(y_iter == 0){
+            if(y_iter == 0.0){
                 y_iter = -1;
             }
 

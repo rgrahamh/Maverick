@@ -202,15 +202,12 @@ void Object::action(Control* control){
  * @param delta The time that has passed since the last process() call (in ms)
  * @param step_size The step size that should be applied
  */
-void Object::_process(uint64_t delta, double step_size){
+void Object::_process(uint64_t delta, unsigned int steps){
     //Updating old X & Y values
     this->old_x = this->x;
     this->old_y = this->y;
 
-    this->process(delta, step_size);
-
-    //Step size = 1 sec
-    double physics_step_size = ((double)delta) / 16.0;
+    this->process(delta, steps);
 
     //Updating environmental bump
     this->env_bump = false;
@@ -218,45 +215,51 @@ void Object::_process(uint64_t delta, double step_size){
     //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
     if(this->xV != 0){
-        this->xV -= this->xV * (1.0 - friction) * physics_step_size;
+        xV -= this->xV * (1.0 - friction);
         if(this->xV < 0.01 && this->xV > -0.01){
             this->xV = 0;
         }
-        else if(this->xV > this->terminal_velocity){
-            this->xV = this->terminal_velocity;
+        else{
+            double terminal_velocity_step = (double)this->terminal_velocity * steps;
+            if(this->xV > terminal_velocity_step){
+                this->xV = terminal_velocity_step;
+            }
+            else if(this->xV < terminal_velocity_step * -1.0){
+                this->xV = terminal_velocity_step * -1.0;
+            }
         }
-        else if(this->xV < this->terminal_velocity * -1.0){
-            this->xV = this->terminal_velocity * -1.0;
-        }
-        this->x += this->xV * physics_step_size;
+        this->x += this->xV * steps;
     }
     this->xA = 0;
 
     //Updating Y values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->yV += this->yA;
     if(this->yV != 0){
-        this->yV -= this->yV * (1.0 - friction) * physics_step_size;
+        this->yV -= this->yV * (1.0 - friction);
         if(this->yV < 0.01 && this->yV > -0.01){
             this->yV = 0;
         }
-        else if(this->yV > this->terminal_velocity){
-            this->yV = this->terminal_velocity;
+        else{
+            double terminal_velocity_step = (double)this->terminal_velocity * steps;
+            if(this->yV > terminal_velocity_step){
+                this->yV = terminal_velocity_step;
+            }
+            else if(this->yV < terminal_velocity_step * -1.0){
+                this->yV = terminal_velocity_step * -1.0;
+            }
         }
-        else if(this->yV < this->terminal_velocity * -1.0){
-            this->yV = this->terminal_velocity * -1.0;
-        }
-        this->y += this->yV * physics_step_size;
+        this->y += this->yV * steps;
     }
     this->yA = 0;
 
     //Updating Z values
     if(this->z != this->ground_z && this->gravity){
-        this->zA -= engine->getGravity() * physics_step_size;
+        this->zA -= engine->getGravity() * steps;
     }
 
     this->zV += this->zA;
     if(this->zV != 0){
-        this->z += this->zV * physics_step_size;
+        this->z += this->zV * steps;
         if(this->z <= ground_z){
             this->z = ground_z;
             this->zV = 0;
@@ -271,7 +274,7 @@ void Object::_process(uint64_t delta, double step_size){
  * @param delta The time that has passed since the last process() call (in ms)
  * @param step_size The step size that should be applied
  */
-void Object::process(uint64_t delta, double step_size){
+void Object::process(uint64_t delta, unsigned int steps){
 }
 
 /** Called during the draw step
@@ -302,7 +305,6 @@ void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	printf("Collided!\n");
 }
 
 /** Serializing object data (WIP)

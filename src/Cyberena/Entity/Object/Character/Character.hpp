@@ -12,7 +12,7 @@
 #include "./Style/Style.hpp"
 #include "../../../../Maverick/Control/Control.hpp"
 
-#define WALK_SPEED 10.0
+#define WALK_SPEED 12.0
 #define JUMP_SPEED 12.0
 
 typedef struct InventorySlot{
@@ -107,7 +107,7 @@ class Character : public Object, public Race, public Style{
 
 		//Useful for actions on other objects & input
 		virtual void action(Control* control);
-		virtual void process(uint64_t delta, double step_size);
+		virtual void process(uint64_t delta, unsigned int steps);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 

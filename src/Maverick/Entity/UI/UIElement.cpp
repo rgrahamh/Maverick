@@ -51,7 +51,7 @@ UIElement::~UIElement(){
  * @param delta The amount of time that has passed (in ms)
  * @param step_size The step size used for physics calcluation (probably not needed here)
  */
-void UIElement::process(uint64_t delta, double step_size){
+void UIElement::process(uint64_t delta, unsigned int steps){
     return;
 }
 
@@ -59,13 +59,13 @@ void UIElement::process(uint64_t delta, double step_size){
  * @param delta The amount of time that has passed (in ms)
  * @param step_size The step size used for physics calcluation (probably not needed here)
  */
-void UIElement::_process(uint64_t delta, double step_size){
-    this->process(delta, step_size);
+void UIElement::_process(uint64_t delta, unsigned int steps){
+    this->process(delta, steps);
 
     UIElementList* cursor = subelements;
     while(cursor != nullptr){
         if(cursor->element->isActive()){
-            cursor->element->_process(delta, step_size);
+            cursor->element->_process(delta, steps);
         }
         cursor = cursor->next;
     }

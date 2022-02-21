@@ -63,9 +63,9 @@ class Entity{
 		int setSpriteSet(const char* sprite_set);
 
 		//Processing functions
-		virtual void _process(uint64_t delta, double step_size) = 0;
+		virtual void _process(uint64_t delta, unsigned int steps) = 0;
 		//Need this for custom processing
-		virtual void process(uint64_t delta, double step_size) = 0;
+		virtual void process(uint64_t delta, unsigned int steps) = 0;
 
 		virtual void _action(Control* control) = 0;
 		virtual void action(Control* control) = 0;

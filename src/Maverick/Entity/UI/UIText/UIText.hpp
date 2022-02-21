@@ -16,7 +16,7 @@ class UIText : public UIElement{
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
-        void process(uint64_t delta, double step_size);
+        void process(uint64_t delta, unsigned int steps);
 
         //Set the displayed text
         void setText(const char* text);

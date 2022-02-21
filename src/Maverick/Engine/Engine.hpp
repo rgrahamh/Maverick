@@ -34,6 +34,7 @@
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 360
+#define PHYSICS_STEP_SIZE 4 //ms
 
 enum GAME_STATE : uint64_t{
 	TITLE = 1,
@@ -129,7 +130,7 @@ class Engine{
 		void collisionStep(ObjectList* all_objects);
 
 		//Physics step
-		void physicsStep(ObjectList* all_objects);
+		void physicsStep(ObjectList* all_objects, unsigned int steps);
 
 		//The thread garbage collector
 		void threadGC();
@@ -195,8 +196,6 @@ class Engine{
 		SoundHash* sound_hash;
 		MusicHash* music_hash;
 
-		//A frame counter so we can have timed events trigger every X frames
-		uint64_t last_time;
 		uint64_t delta;
 };
 

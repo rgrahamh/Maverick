@@ -227,7 +227,7 @@ void Character::action(Control* control){
 	}
 }
 
-void Character::process(uint64_t delta, double step_size){
+void Character::process(uint64_t delta, unsigned int steps){
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
         //Checking to see if we're still sliding
         if(this->sliding == true){
@@ -237,7 +237,7 @@ void Character::process(uint64_t delta, double step_size){
         }
     }
 
-	double x_walk = character_control.x_movement * WALK_SPEED * step_size;
+	double x_walk = character_control.x_movement * WALK_SPEED * steps;
 	if(xV + x_walk >= WALK_SPEED){
 		xV = WALK_SPEED;
 	}
@@ -245,10 +245,10 @@ void Character::process(uint64_t delta, double step_size){
 		xV = WALK_SPEED * -1;
 	}
 	else{
-		xA += character_control.x_movement * WALK_SPEED * step_size;
+		xA += character_control.x_movement * WALK_SPEED * steps;
 	}
 
-	double y_walk = character_control.y_movement * WALK_SPEED * step_size;
+	double y_walk = character_control.y_movement * WALK_SPEED * steps;
 	if(yV + y_walk >= WALK_SPEED){
 		yV = WALK_SPEED;
 	}
@@ -256,7 +256,7 @@ void Character::process(uint64_t delta, double step_size){
 		yV = WALK_SPEED * -1;
 	}
 	else{
-		yA += character_control.y_movement * WALK_SPEED * step_size;
+		yA += character_control.y_movement * WALK_SPEED * steps;
 	}
 
 	if(character_control.jump){
@@ -270,7 +270,7 @@ void Character::process(uint64_t delta, double step_size){
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	/*//TODO: Make character-specific env collision feel better
+	//TODO: Make character-specific env collision feel better
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
@@ -301,5 +301,5 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 				}
 			}
 		}
-	}*/
+	}
 }
