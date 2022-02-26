@@ -23,6 +23,7 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
     this->z = start_z;
     this->old_x = start_x;
     this->old_y = start_y;
+    this->old_z = start_z;
     this->xV = 0;
     this->yV = 0;
     this->zV = 0;
@@ -38,7 +39,8 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
 
     this->collision_layer = layer;
 
-    this->ground_z = 0;
+    this->ground = 0;
+    this->next_ground = this->ground;
 }
 
 /** Destructor for objects
@@ -88,6 +90,13 @@ double Object::getZ(){
     return this->z;
 }
 
+/** Gets the old Z value of the object
+ * @return The old Z value of the object
+ */
+double Object::getOldZ(){
+    return this->old_z;
+}
+
 /** Gets the mass of the object (in lbs)
  */
 float Object::getMass(){
@@ -125,6 +134,20 @@ int Object::getCollisionLayer(){
  */
 float Object::getTerminalVelocity(){
     return this->terminal_velocity;
+}
+
+/** Gets the ground Z position
+ * @return The ground Z position
+ */
+double Object::getGround(){
+    return this->ground;
+}
+
+/** Gets the next ground Z position
+ * @return The next ground Z position
+ */
+double Object::getNextGround(){
+    return this->next_ground;
 }
 
 /** Sets the X velocity
@@ -175,6 +198,20 @@ void Object::setCollisionLayer(int collision_layer){
     this->collision_layer = collision_layer;
 }
 
+/** Sets the ground Z position
+ * @param ground The ground Z position
+ */
+void Object::setGround(double ground){
+    this->ground = ground;
+}
+
+/** Sets the next ground Z position
+ * @param next_ground The next ground Z position
+ */
+void Object::setNextGround(double next_ground){
+    this->next_ground = next_ground;
+}
+
 /** Applies force to an object
  * @param xA The X newtons of the force
  * @param yA The Y newtons of the force
@@ -204,8 +241,17 @@ void Object::action(Control* control){
  */
 void Object::_process(uint64_t delta, unsigned int steps){
     //Updating old X & Y values
-    this->old_x = this->x;
-    this->old_y = this->y;
+    if(abs(this->old_x - this->x) > 0.1){
+        this->old_x = this->x;
+    }
+    if(abs(this->old_y - this->y) > 0.1){
+        this->old_y = this->y;
+    }
+    if(abs(this->old_z - this->z) > 0.1){
+        this->old_z = this->z;
+    }
+    this->ground = this->next_ground;
+    this->next_ground = 0;
 
     this->process(delta, steps);
 
@@ -253,15 +299,15 @@ void Object::_process(uint64_t delta, unsigned int steps){
     this->yA = 0;
 
     //Updating Z values
-    if(this->z != this->ground_z && this->gravity){
+    if(this->z != this->ground && this->gravity){
         this->zA -= engine->getGravity() * steps;
     }
 
     this->zV += this->zA;
     if(this->zV != 0){
         this->z += this->zV * steps;
-        if(this->z <= ground_z){
-            this->z = ground_z;
+        if(this->z <= ground){
+            this->z = ground;
             this->zV = 0;
         }
     }

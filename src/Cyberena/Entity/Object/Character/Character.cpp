@@ -136,7 +136,7 @@ void Character::action(Control* control){
 				character_control.x_movement = 1;
 			}
 
-			if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground_z){
+			if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground){
 				character_control.jump = true;
 			}
 		}
@@ -270,7 +270,7 @@ void Character::process(uint64_t delta, unsigned int steps){
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	//TODO: Make character-specific env collision feel better
+	/*//TODO: Make character-specific env collision feel better
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
@@ -301,5 +301,5 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 				}
 			}
 		}
-	}
+	}*/
 }

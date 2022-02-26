@@ -8,22 +8,26 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
     player->addAnimation("neutral_up", 1);
     player->addFrame("neutral_up", 0);
     player->addSprite("neutral_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp", 0, 0, 34, 64);
-    player->addHitbox("neutral_up", ELLIPSE, 17, 60, 0, 8, 5, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_up", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_up", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_down", 1);
     player->addFrame("neutral_down", 0);
     player->addSprite("neutral_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp", 0, 0, 34, 64);
-    player->addHitbox("neutral_down", ELLIPSE, 17, 54, 0, 8, 5, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_down", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_down", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_left", 1);
     player->addFrame("neutral_left", 0);
     player->addSprite("neutral_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp", 0, 0, 34, 64);
-    player->addHitbox("neutral_left", ELLIPSE, 17, 54, 0, 8, 5, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_left", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_left", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_right", 1);
     player->addFrame("neutral_right", 0);
     player->addSprite("neutral_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp", 0, 0, 34, 64);
-    player->addHitbox("neutral_right", ELLIPSE, 17, 54, 0, 8, 5, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_right", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, 0);
+    player->addHitbox("neutral_right", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, 0);
 
     //Walking position
     player->addAnimation("walk_up", 1);
@@ -51,10 +55,16 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Right_Foot.bmp", 0, 0, 34, 64);
 
     for(int i = 0; i < 3; i++){
-        player->addHitbox("walk_right", ELLIPSE, 16, 54, 0, 8, 5, 64, COLLISION | HURTBOX, i);
-        player->addHitbox("walk_left", ELLIPSE, 16, 54, 0, 8, 5, 64, COLLISION | HURTBOX, i);
-        player->addHitbox("walk_down", ELLIPSE, 16, 54, 0, 8, 5, 64, COLLISION | HURTBOX, i);
-        player->addHitbox("walk_up", ELLIPSE, 16, 54, 0, 8, 5, 64, COLLISION | HURTBOX, i);
+        player->addHitbox("walk_right", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, i);
+        player->addHitbox("walk_left", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, i);
+        player->addHitbox("walk_down", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, i);
+        player->addHitbox("walk_up", ELLIPSE, 17, 54, 0, 8, 8, 64, COLLISION | HURTBOX, i);
+
+        //Ground hitboxes
+        player->addHitbox("walk_right", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, i);
+        player->addHitbox("walk_left", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, i);
+        player->addHitbox("walk_down", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, i);
+        player->addHitbox("walk_up", ELLIPSE, 17, 54, -640, 8, 8, 640, GROUNDING_ZONE, i);
     }
 
     //Setting the starting animation
@@ -64,7 +74,7 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
 }
 
 Object* buildPillar(const char* name, float start_x, float start_y){
-    Object* pillar = new Object(name, start_x, start_y, 1, 1000, 1, 0);
+    Object* pillar = new Object(name, start_x, start_y, 0, 1, 1000, 0);
 
     pillar->addAnimation("default", 1);
     pillar->addFrame("default");
@@ -74,6 +84,19 @@ Object* buildPillar(const char* name, float start_x, float start_y){
     //pillar->addHitbox(0, RECT, 0, 112, 32, 16, COLLISION | ENVIRONMENT);
 
     return pillar;
+}
+
+Object* buildCrate(const char* name, float start_x, float start_y){
+    Object* crate = new Object(name, start_x, start_y, 0, 1, 500, 0);
+
+    crate->addAnimation("default", 1);
+    crate->addFrame("default");
+    crate->addSprite("default", "day", "./assets/sprites/environment/CrateTest.bmp");
+    crate->setAnimation("default");
+    crate->addHitbox("default", RECT, 0, 12, 0, 48, 36, 12, HITBOX_TYPE::COLLISION | HITBOX_TYPE::ENVIRONMENT, 0);
+    crate->setDrawAxis(17);
+
+    return crate;
 }
 
 Object* buildBackground(const char* name, float start_x, float start_y){

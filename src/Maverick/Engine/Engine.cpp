@@ -61,7 +61,7 @@ Engine::Engine(){
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -103,7 +103,7 @@ Engine::Engine(){
 
     this->delta = SDL_GetTicks64();
 
-    this->gravity = 1;
+    this->gravity = 0.1;
 
     endian = getEndian();
 
@@ -671,14 +671,31 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
+            /*if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
+                mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
+            }
+            else if(env_box->getZMax() >= mov_box->getZMin() && env_box->getZMax() <= mov_obj->getOldZ() - mov_box->getZOffset()){
+                mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
+            }*/
+            
+            if(mov_box->checkCollision(env_box) == false){
+                printf("Fixed Z position; exiting early");
+                return;
+            }
+
             double old_x = mov_obj->getOldX();
             double old_y = mov_obj->getOldY();
 
             double x = mov_obj->getX();
             double y = mov_obj->getY();
 
-            double x_movement = old_x - x;
-            double y_movement = old_y - y;
+            double x_movement = (old_x - x) / ROLLBACK_STEP;
+            double y_movement = (old_y - y) / ROLLBACK_STEP;
+
+            if(x_movement == 0.0 && y_movement == 0.0){
+                x_movement = -1.0;
+                y_movement = -1.0;
+            }
 
             mov_obj->setEnvBump();
 
@@ -686,20 +703,10 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
             //If we're hitting the ceiling
             //If we're hitting the floor
 
-            double x_iter = x_movement / ROLLBACK_STEP;
-            double y_iter = y_movement / ROLLBACK_STEP;
-
-            if(x_iter == 0.0){
-                x_iter = -1;
-            }
-            if(y_iter == 0.0){
-                y_iter = -1;
-            }
-
             //Rollback to the point where we're no longer colliding
             for(int i = 0; mov_box->checkCollision(env_box); i++){
-                x += x_iter;
-                y += y_iter;
+                x += x_movement;
+                y += y_movement;
                 mov_obj->setX(x);
                 mov_obj->setY(y);
             }
@@ -722,6 +729,24 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             obj2->setXVel(x_force);
             obj2->setYVel(y_force);
+        }
+    }
+    else if((box1_prop & ENVIRONMENT && box2_prop & GROUNDING_ZONE) || (box1_prop & GROUNDING_ZONE && box2_prop & ENVIRONMENT)){
+        Hitbox* env_box;
+        Object* grnd_obj;
+
+        if(box1_prop & GROUNDING_ZONE){
+            env_box = box2;
+            grnd_obj = obj1;
+        }
+        else{
+            env_box = box1;
+            grnd_obj = obj2;
+        }
+
+        double env_z = env_box->getZMax();
+        if(grnd_obj->getNextGround() < env_z){
+            grnd_obj->setNextGround(env_z);
         }
     }
 }
@@ -864,6 +889,34 @@ void Engine::addZone(Zone* zone){
     else{
         delete zone;
     }
+}
+
+/** Adds an object to the zone
+ * @param zone The zone we're adding an object to
+ * @param object The object we're adding to the zone
+ * @return -1 if the zone isn't found, 0 otherwise
+ */
+int Engine::addObject(const char* zone, Object* object){
+    Zone* zone_ptr = getZone(zone);
+    if(zone == nullptr){
+        return -1;
+    }
+
+    zone_ptr->addObject(object);
+}
+
+/** Adds an UI Element to the zone
+ * @param zone The zone we're adding a UI element to
+ * @param element The UI element we're adding to the zone
+ * @return -1 if the zone isn't found, 0 otherwise
+ */
+int Engine::addUIElement(const char* zone, UIElement* element){
+    Zone* zone_ptr = getZone(zone);
+    if(zone == nullptr){
+        return -1;
+    }
+
+    zone_ptr->addUIElement(element);
 }
 
 /**Adds a surface to the sprite hash

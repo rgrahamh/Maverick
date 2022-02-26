@@ -143,3 +143,24 @@ int32_t Hitbox::getHitboxGroup(){
 int32_t Hitbox::getImmunityTimer(){
 	return this->immunity_timer;
 }
+
+/** Returns the X offset
+ * @return The X offset
+ */
+double Hitbox::getXOffset(){
+	return this->x_offset;
+}
+
+/** Returns the Y offset
+ * @return The Y offset
+ */
+double Hitbox::getYOffset(){
+	return this->y_offset;
+}
+
+/** Returns the Z offset
+ * @return The Z offset
+ */
+double Hitbox::getZOffset(){
+	return this->z_offset;
+}

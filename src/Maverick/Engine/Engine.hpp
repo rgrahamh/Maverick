@@ -61,8 +61,8 @@ class Engine{
 		void start();
 
 		//Adds an object/UIElement to the engine
-		void addObject(Object* object);
-		void addUIElement(UIElement* ui);
+		int addObject(const char* zone, Object* object);
+		int addUIElement(const char* zone, UIElement* ui);
 
 		//Thread creation
 		void addThread(std::thread* thread);

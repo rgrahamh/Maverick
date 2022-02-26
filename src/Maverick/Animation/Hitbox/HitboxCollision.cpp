@@ -26,7 +26,7 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	
 	if(!(((rect_left_bound < ellipse_left_bound && rect_right_bound > ellipse_left_bound) || (ellipse_left_bound < rect_left_bound && ellipse_right_bound > rect_left_bound))
 	&& ((rect_top_bound < ellipse_top_bound && rect_bot_bound > ellipse_top_bound) || (ellipse_top_bound < rect_top_bound && ellipse_bot_bound > rect_top_bound)))
-	|| (rect_max_height < ellipse_min_height || ellipse_max_height < rect_min_height)){
+	|| (rect_max_height <= ellipse_min_height || ellipse_max_height <= rect_min_height)){
 		return false;
 	}
 
@@ -96,7 +96,7 @@ bool collisionRectRect(HitRect* rect1, HitRect* rect2){
 	
 	if(((rect1_left_bound < rect2_left_bound && rect1_right_bound > rect2_left_bound) || (rect2_left_bound < rect1_left_bound && rect2_right_bound > rect1_left_bound))
 	&& ((rect1_top_bound < rect2_top_bound && rect1_bot_bound > rect2_top_bound) || (rect2_top_bound < rect1_top_bound && rect2_bot_bound > rect1_top_bound))
-	&& !(rect1_max_height < rect2_min_height || rect2_max_height < rect1_min_height)){
+	&& !(rect1_max_height <= rect2_min_height || rect2_max_height <= rect1_min_height)){
 		return true;
 	}
 
@@ -130,7 +130,7 @@ bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
 	
 	if(!(((ellipse1_left_bound < ellipse2_left_bound && ellipse1_right_bound > ellipse2_left_bound) || (ellipse2_left_bound < ellipse1_left_bound && ellipse2_right_bound > ellipse1_left_bound))
 	&& ((ellipse1_top_bound < ellipse2_top_bound && ellipse1_bot_bound > ellipse2_top_bound) || (ellipse2_top_bound < ellipse1_top_bound && ellipse2_bot_bound > ellipse1_top_bound)))
-	|| (ellipse1_max_height < ellipse2_min_height || ellipse2_max_height < ellipse1_min_height)){
+	|| (ellipse1_max_height <= ellipse2_min_height || ellipse2_max_height <= ellipse1_min_height)){
 		return false;
 	}
 

@@ -61,6 +61,8 @@ class Entity{
 		void setAttr(const char* key, void* val);
 		int setSpriteSet(const char* animation_name, const char* sprite_set);
 		int setSpriteSet(const char* sprite_set);
+		int setDrawAxis(const char* animation_name, double draw_axis);
+		int setDrawAxis(double draw_axis);
 
 		//Processing functions
 		virtual void _process(uint64_t delta, unsigned int steps) = 0;

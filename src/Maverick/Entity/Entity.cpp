@@ -245,6 +245,37 @@ int Entity::setSpriteSet(const char* sprite_set){
     return ret;
 }
 
+/** Sets the draw axis for the specified animation in the entity
+ * @param animation_name The name of the animation you'd like to set the draw axis of
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ */
+int Entity::setDrawAxis(const char* animation_name, double draw_axis){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    animation->setDrawAxis(draw_axis);
+    return 0;
+}
+
+/** Sets the draw axis for all animations in the entity
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ */
+int Entity::setDrawAxis(double draw_axis){
+    if(animations == nullptr){
+        return -1;
+    }
+
+    AnimationList* cursor = animations;
+    while(cursor != nullptr){
+        cursor->animation->setDrawAxis(draw_axis);
+        cursor = cursor->next;
+    }
+
+    return 0;
+}
+
 /** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
  * @param animation_name The animation name
  * @param shape The hitbox shape
@@ -267,7 +298,7 @@ int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     Hitbox* hitbox;
     //We should never hit the CONE in this case.
     if(shape == RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, depth, y_element, type, hitbox_group, immunity_timer);
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
     }
     else{
         hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);

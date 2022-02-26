@@ -27,6 +27,7 @@ class Object : public Entity{
 		virtual ~Object();
 		double getOldX();
 		double getOldY();
+		double getOldZ();
 		double getXVel();
 		double getYVel();
 		double getZVel();
@@ -36,6 +37,8 @@ class Object : public Entity{
 		Sprite* getSprite();
 		int getCollisionLayer();
 		float getTerminalVelocity();
+		double getGround();
+		double getNextGround();
 
 		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
@@ -48,6 +51,8 @@ class Object : public Entity{
 		void setEnvBump();
 		void setFriction(float friction);
 		void setCollisionLayer(int collision_layer);
+		void setGround(double next_ground);
+		void setNextGround(double next_ground);
 
 		void applyForce(double xA, double yA);
 
@@ -68,9 +73,11 @@ class Object : public Entity{
 		//Previous position (used for rollback)
 		double old_x;
 		double old_y;
+		double old_z;
 
 		//The Z position of the ground
-		double ground_z;
+		double ground;
+		double next_ground;
 
 		//Velocity
 		double xV;
