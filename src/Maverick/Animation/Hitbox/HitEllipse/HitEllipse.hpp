@@ -6,7 +6,7 @@
 
 class HitEllipse : public Hitbox{
 	public:
-		HitEllipse(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, unsigned int type);
+		HitEllipse(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double x_radius, double y_radius, double depth, unsigned int type, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		virtual ~HitEllipse();
 
 		float getXRadius();
@@ -16,19 +16,19 @@ class HitEllipse : public Hitbox{
         float getLeftBound() override;
         float getTopBound() override;
         float getBotBound() override;
-		float getDrawAxis() override;
 
-		void setScale(float x_scale, float y_scale) override;
 		virtual bool checkCollision(Hitbox* other) override;
 
-		virtual bool isPointInside(float x_coord, float y_coord) override;
+		virtual bool isPointInside(double x_coord, double y_coord) override;
+
+		void serializeData(FILE* file);
 
 	protected:
-		float x_base_radius;
-		float x_curr_radius;
+		double x_base_radius;
+		double x_curr_radius;
 
-		float y_base_radius;
-		float y_curr_radius;
+		double y_base_radius;
+		double y_curr_radius;
 };
 
 #include "../HitboxCollision.hpp"

@@ -14,22 +14,24 @@ enum CAMERA_FOLLOW_MODE{
 class Camera{
 	public:
 		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference);
-		~Camera();
 
 		void setReference(Object* reference);
-		void _draw(ObjectList* obj_lst, uint32_t delta, double camera_x_offset = 0, double camera_y_offset = 0);
-		void _draw(UIElementList* element_lst, uint32_t delta);
-		SDL_Renderer* getRenderer();
+		void _draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset = 0, double camera_y_offset = 0);
+		void _draw(UIElementList* element_lst, uint64_t delta);
 
-		void setScale(float x_scale, float y_scale);
+		SDL_Renderer* getRenderer();
+		double getX();
+		double getY();
+
+		void setScale(double x_scale, double y_scale);
 		void setFollowMode(CAMERA_FOLLOW_MODE follow_mode);
 
 	private:
 		Object* reference;
 	    double current_x;
 		double current_y;
-		float x_scale;
-		float y_scale;
+		double x_scale;
+		double y_scale;
 
 		CAMERA_FOLLOW_MODE follow_mode;
 

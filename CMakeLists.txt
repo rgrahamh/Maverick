@@ -3,8 +3,9 @@ cmake_minimum_required(VERSION 2.2)
 project(Cyberena)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++17 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++11 -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
 
+#Engine source
 set(AnimationSrc
     ./src/Maverick/Animation/Animation.cpp
 )
@@ -15,6 +16,7 @@ set(AudioSrc
 
 set(HashSrc
     ./src/Maverick/HashTable/HashTable.cpp
+    ./src/Maverick/HashTable/AttributeHash/AttributeHash.cpp
     ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
     ./src/Maverick/HashTable/MusicHash/MusicHash.cpp
     ./src/Maverick/HashTable/SoundHash/SoundHash.cpp
@@ -47,6 +49,7 @@ set(UISrc
 set(ObjectSrc
     ./src/Maverick/Entity/Object/Object.cpp
     ./src/Maverick/Entity/Object/CameraReference/CameraReference.cpp
+    ./src/Maverick/Entity/Object/LoadingZone/LoadingZone.cpp
 )
 
 set(EntitySrc
@@ -67,6 +70,16 @@ set(FactorySrc
     ./src/Cyberena/Factory/Factory.cpp
 )
 
+set(FileHandlerSrc
+    ./src/Maverick/FileHandler/Saver/Saver.cpp
+    ./src/Maverick/FileHandler/Loader/Loader.cpp
+)
+
+set(FilterSrc
+    ./src/Maverick/Filter/Filter.cpp
+    ./src/Maverick/Filter/ColorFilter/ColorFilter.cpp
+)
+
 set(EngineSrc
     ./src/Maverick/Engine/Engine.cpp
 )
@@ -82,6 +95,8 @@ set(MotorSrc
     ${ZoneSrc}
     ${ZoneFactorySrc}
     ${FactorySrc}
+    ${FileHandlerSrc}
+    ${FilterSrc}
     ${EngineSrc}
 )
 
@@ -90,7 +105,7 @@ set(MaverickSrc
     ${MotorSrc}
 )
 
-#Cyberena source
+#Game source
 set(CyberenaObjectSrc
     ./src/Cyberena/Entity/Object/Character/Character.cpp
     ./src/Cyberena/Entity/Object/Character/Race/Race.cpp
@@ -108,6 +123,7 @@ set(CyberenaEntitySrc
 set(CyberenaZonesSrc
     ./src/Cyberena/Zones/TestZone/TestZone.cpp
     ./src/Cyberena/Zones/global/global.cpp
+    ./src/Cyberena/Zones/FilterTest/FilterTest.cpp
 )
 
 set(CyberenaSrc

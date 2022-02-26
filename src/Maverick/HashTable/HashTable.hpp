@@ -17,11 +17,12 @@ class HashTable{
 
 		void add(const char* key, void* val);
 		void* get(const char* key);
-	
+
 	protected:
 		unsigned int size;
-		HTEntry** table;
+		virtual unsigned int hash(const char* key);
 
-		unsigned int hash(const char* key);
+	private:
+		HTEntry** table;
 };
 #endif

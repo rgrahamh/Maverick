@@ -14,14 +14,19 @@ bool collisionRectEllipse(HitRect* rect, HitEllipse* ellipse){
 	float rect_bot_bound = rect->getBotBound();
 	float rect_left_bound = rect->getLeftBound();
 	float rect_right_bound = rect->getRightBound();
+	float rect_max_height = rect->getZMax();
+	float rect_min_height = rect->getZMin();
 
 	float ellipse_top_bound = ellipse->getTopBound();
 	float ellipse_bot_bound = ellipse->getBotBound();
 	float ellipse_left_bound = ellipse->getLeftBound();
 	float ellipse_right_bound = ellipse->getRightBound();
+	float ellipse_max_height = ellipse->getZMax();
+	float ellipse_min_height = ellipse->getZMin();
 	
 	if(!(((rect_left_bound < ellipse_left_bound && rect_right_bound > ellipse_left_bound) || (ellipse_left_bound < rect_left_bound && ellipse_right_bound > rect_left_bound))
-	&& ((rect_top_bound < ellipse_top_bound && rect_bot_bound > ellipse_top_bound) || (ellipse_top_bound < rect_top_bound && ellipse_bot_bound > rect_top_bound)))){
+	&& ((rect_top_bound < ellipse_top_bound && rect_bot_bound > ellipse_top_bound) || (ellipse_top_bound < rect_top_bound && ellipse_bot_bound > rect_top_bound)))
+	|| (rect_max_height <= ellipse_min_height || ellipse_max_height <= rect_min_height)){
 		return false;
 	}
 
@@ -79,20 +84,26 @@ bool collisionRectRect(HitRect* rect1, HitRect* rect2){
 	float rect1_bot_bound = rect1->getBotBound();
 	float rect1_left_bound = rect1->getLeftBound();
 	float rect1_right_bound = rect1->getRightBound();
+	float rect1_max_height = rect1->getZMax();
+	float rect1_min_height = rect1->getZMin();
 
 	float rect2_top_bound = rect2->getTopBound();
 	float rect2_bot_bound = rect2->getBotBound();
 	float rect2_left_bound = rect2->getLeftBound();
 	float rect2_right_bound = rect2->getRightBound();
+	float rect2_max_height = rect2->getZMax();
+	float rect2_min_height = rect2->getZMin();
 	
 	if(((rect1_left_bound < rect2_left_bound && rect1_right_bound > rect2_left_bound) || (rect2_left_bound < rect1_left_bound && rect2_right_bound > rect1_left_bound))
-	&& ((rect1_top_bound < rect2_top_bound && rect1_bot_bound > rect2_top_bound) || (rect2_top_bound < rect1_top_bound && rect2_bot_bound > rect1_top_bound))){
+	&& ((rect1_top_bound < rect2_top_bound && rect1_bot_bound > rect2_top_bound) || (rect2_top_bound < rect1_top_bound && rect2_bot_bound > rect1_top_bound))
+	&& !(rect1_max_height <= rect2_min_height || rect2_max_height <= rect1_min_height)){
 		return true;
 	}
 
 	return false;
 }
 
+//Hard-coded to false for now; will come back to this
 bool collisionRectCone(HitRect* rect, HitCone* cone){
 	return false;
 }
@@ -107,14 +118,19 @@ bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
 	float ellipse1_bot_bound = ellipse1->getBotBound();
 	float ellipse1_left_bound = ellipse1->getLeftBound();
 	float ellipse1_right_bound = ellipse1->getRightBound();
+	float ellipse1_max_height = ellipse1->getZMax();
+	float ellipse1_min_height = ellipse1->getZMin();
 
 	float ellipse2_top_bound = ellipse2->getTopBound();
 	float ellipse2_bot_bound = ellipse2->getBotBound();
 	float ellipse2_left_bound = ellipse2->getLeftBound();
 	float ellipse2_right_bound = ellipse2->getRightBound();
+	float ellipse2_max_height = ellipse2->getZMax();
+	float ellipse2_min_height = ellipse2->getZMin();
 	
 	if(!(((ellipse1_left_bound < ellipse2_left_bound && ellipse1_right_bound > ellipse2_left_bound) || (ellipse2_left_bound < ellipse1_left_bound && ellipse2_right_bound > ellipse1_left_bound))
-	&& ((ellipse1_top_bound < ellipse2_top_bound && ellipse1_bot_bound > ellipse2_top_bound) || (ellipse2_top_bound < ellipse1_top_bound && ellipse2_bot_bound > ellipse1_top_bound)))){
+	&& ((ellipse1_top_bound < ellipse2_top_bound && ellipse1_bot_bound > ellipse2_top_bound) || (ellipse2_top_bound < ellipse1_top_bound && ellipse2_bot_bound > ellipse1_top_bound)))
+	|| (ellipse1_max_height <= ellipse2_min_height || ellipse2_max_height <= ellipse1_min_height)){
 		return false;
 	}
 

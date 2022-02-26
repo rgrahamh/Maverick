@@ -3,7 +3,7 @@
 /** The zone constructor
  * @param name The name of the zone
  */
-Zone::Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord){
+Zone::Zone(const char* name, uint64_t global_x_coord, uint64_t global_y_coord){
     this->name = name;
 
     this->objects = new ObjectList;
@@ -13,6 +13,13 @@ Zone::Zone(const char* name, uint32_t global_x_coord, uint32_t global_y_coord){
     this->ui = new UIElementList;
     this->ui->element = NULL;
     this->ui->next = NULL;
+
+    this->filters = new FilterList;
+    this->filters->filter = nullptr;
+    this->filters->next = nullptr;
+
+    this->global_x_coord = global_x_coord;
+    this->global_y_coord = global_y_coord;
 }
 
 /** The zone default destructor
@@ -21,7 +28,9 @@ Zone::~Zone(){
     ObjectList* obj_cursor = objects;
     while(objects != NULL){
         obj_cursor = objects->next;
-        delete objects->obj;
+        if(objects->obj != nullptr){
+            delete objects->obj;
+        }
         delete objects;
         objects = obj_cursor;
     }
@@ -29,24 +38,43 @@ Zone::~Zone(){
     UIElementList* ui_cursor = ui;
     while(ui != NULL){
         ui_cursor = ui->next;
-        delete ui->element;
+        if(ui->element != nullptr){
+            delete ui->element;
+        }
         delete ui;
         ui = ui_cursor;
     }
+
+    FilterList* filter_cursor = filters;
+    while(filters != nullptr){
+        filter_cursor = filter_cursor->next;
+        if(filters->filter != nullptr){
+            delete filters->filter;
+        }
+        delete filters;
+        filters = filter_cursor;
+    }
 }
 
-/** Gets the all objects in the zone
+/** Gets all objects in the zone
  * @return An ObjectList* of all objects in the zone
  */
 ObjectList* Zone::getObjects(){
     return this->objects;
 }
 
-/** Gets the all objects in the zone
- * @return An ObjectList* of all objects in the zone
+/** Gets all UI Elements in the zone
+ * @return A UIElementList* of all UI Elements in the zone
  */
 UIElementList* Zone::getUIElements(){
     return this->ui;
+}
+
+/** Gets all Filters in the zone
+ * @return A FilterList* of all filters in the zone
+ */
+FilterList* Zone::getFilters(){
+    return this->filters;
 }
 
 /** Gets the name of the zone
@@ -56,11 +84,25 @@ const char* Zone::getName(){
     return this->name;
 }
 
+/** Gets the global X coordinate
+ * @return The global X coodrdinate
+ */
+uint64_t Zone::getGlobalX(){
+    return this->global_x_coord;
+}
+
+/** Gets the global Y coordinate
+ * @return The global Y coodrdinate
+ */
+uint64_t Zone::getGlobalY(){
+    return this->global_y_coord;
+}
+
 /** Adds an object to the zone
  * @param element The object to add to the zone
  */
 void Zone::addObject(Object* object){
-    if(this->objects->obj == NULL){
+    if(this->objects != NULL && this->objects->obj == NULL){
         this->objects->obj = object;
     }
     else{
@@ -75,7 +117,7 @@ void Zone::addObject(Object* object){
  * @param element The element to add to the zone
  */
 void Zone::addUIElement(UIElement* element){
-    if(this->ui->element == NULL){
+    if(this->ui != NULL && this->ui->element == NULL){
         this->ui->element = element;
     }
     else{
@@ -83,5 +125,17 @@ void Zone::addUIElement(UIElement* element){
         new_lst->next = this->ui;
         new_lst->element = element;
         this->ui = new_lst;
+    }
+}
+
+void Zone::addFilter(Filter* filter){
+    if(this->filters->filter == nullptr){
+        this->filters->filter = filter;
+    }
+    else{
+        FilterList* new_lst = new FilterList;
+        new_lst->next = this->filters;
+        new_lst->filter = filter;
+        this->filters = new_lst; 
     }
 }

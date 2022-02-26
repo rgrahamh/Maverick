@@ -11,33 +11,25 @@ extern Engine* engine;
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  */
 
-//DETERMINE USAGE OF TYPE!!!!!!!!!!!!!!!!
-
-
-UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, SDL_Window* window, int draw_layer)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer)
          : Entity(name, 0, 0, draw_layer){
     //Setting viewport position/scaling stats
     this->view_x_offset = view_x_offset;
     this->view_y_offset = view_y_offset;
     this->view_width = view_width;
     this->view_height = view_height;
-    this->window = window;
 
     this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
-    int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
-
-    this->x = view_x_offset * win_width;
-    this->y = view_y_offset * win_height;
+    this->x = view_x_offset * SCREEN_WIDTH;
+    this->y = view_y_offset * SCREEN_HEIGHT;
 
     this->draw_area.x = this->x;
     this->draw_area.y = this->y;
-    this->draw_area.w = view_width * win_width;
-    this->draw_area.h = view_height * win_height;
+    this->draw_area.w = view_width * SCREEN_WIDTH;
+    this->draw_area.h = view_height * SCREEN_HEIGHT;
 
     this->subelements = nullptr;
 }
@@ -45,30 +37,40 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    /*UIElementList* cursor = subelements;
+    UIElementList* cursor = subelements;
     while(cursor != nullptr){
         UIElementList* tmp = cursor;
         delete cursor->element;
 
         cursor = cursor->next;
         delete tmp;
-    }*/
+    }
 }
 
-void UIElement::process(uint32_t delta){
+/** Called every frame for processing; can be overridden by children
+ * @param delta The amount of time that has passed (in ms)
+ * @param step_size The step size used for physics calcluation (probably not needed here)
+ */
+void UIElement::process(uint64_t delta, unsigned int steps){
     return;
 }
 
-void UIElement::_process(uint32_t delta){
-    this->process(delta);
+/** Called every frame for processing
+ * @param delta The amount of time that has passed (in ms)
+ * @param step_size The step size used for physics calcluation (probably not needed here)
+ */
+void UIElement::_process(uint64_t delta, unsigned int steps){
+    this->process(delta, steps);
 
     UIElementList* cursor = subelements;
     while(cursor != nullptr){
         if(cursor->element->isActive()){
-            cursor->element->_process(delta);
+            cursor->element->_process(delta, steps);
         }
         cursor = cursor->next;
     }
+
+    cleanupHitboxImmunity(delta);
 }
 
 /** Handles actions for this UIElement
@@ -79,7 +81,7 @@ void UIElement::action(Control* control){
 }
 
 /** Handles actions for this UIElement and all children UIElements
- * @param event The event that has occurred
+ * @param control The Control class that represents user input
  */
 void UIElement::_action(Control* control){
     this->action(control);
@@ -100,7 +102,7 @@ void UIElement::_action(Control* control){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw this element
     this->draw(renderer, delta, camera_x, camera_y);
 
@@ -118,7 +120,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int 
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw this element
     if(active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y);
@@ -126,35 +128,14 @@ void UIElement::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int c
 }
 
 /** Sets the scale of the UIElement
- * @param x_scale The X scale
- * @param y_scale The Y scale
- */
-void UIElement::setScale(float x_scale, float y_scale){
-    //Set scale for this element
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->setScale(x_scale, y_scale);
-    }
-
-    //Set scale for all children elements
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
-        cursor->element->setScale(x_scale, y_scale);
-        cursor = cursor->next;
-    }
-}
-
-/** Sets the scale of the UIElement
- * @param width The width
- * @param height The height
+ * @param view_width The viewport width (0.0 is none of the screen, 1.0 is the whole thing)
+ * @param view_height The viewport height (0.0 is none of the screen, 1.0 is the whole thing)
  */
 void UIElement::setViewSize(double view_width, double view_height){
-    int win_width, win_height;
-    SDL_GetWindowSize(window, &win_width, &win_height);
     //Set scale for this element
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
-        animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
+        animation_cursor->animation->setSize(view_width * SCREEN_WIDTH, view_height * SCREEN_HEIGHT);
     }
 
     //Set scale for all children elements
@@ -202,26 +183,25 @@ void UIElement::setVisible(bool visible){
  * @param width The view width of the sprite (scales to element if -1)
  * @param height The view height of the sprite (scales to element if -1)
  */ 
-void UIElement::addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, float width, float height){
+int UIElement::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, float width, float height){
     Animation* animation = findAnimation(animation_name);
-    if(animation != nullptr){
-        int win_width, win_height;
-        SDL_GetWindowSize(window, &win_width, &win_height);
-
-        if(width != -1){
-            width *= (float)win_width;
-        }
-        else{
-            width = this->draw_area.w;
-        }
-        if(height != -1){
-            height *= (float)win_height;
-        }
-        else{
-            height = this->draw_area.h;
-        }
-        animation->addFrame(sprite_path, keytime, x_offset, y_offset, width, height);
+    if(animation == nullptr){
+        return -1;
     }
+
+    if(width != -1){
+        width *= (float)SCREEN_WIDTH;
+    }
+    else{
+        width = this->draw_area.w;
+    }
+    if(height != -1){
+        height *= (float)SCREEN_HEIGHT;
+    }
+    else{
+        height = this->draw_area.h;
+    }
+    return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
 }
 
 /** Adds an element to the child element list
@@ -232,6 +212,7 @@ void UIElement::addElement(UIElement* element){
     new_element->element = element;
     new_element->next = subelements;
     subelements = new_element;
+    num_subelements++;
 }
 
 /** Tries to get an element of the given name
@@ -277,6 +258,46 @@ bool UIElement::isMouseInside(Control* control){
     return false;
 }
 
-int UIElement::serializeData(FILE* file){
+/** Serializing UI Elements (WIP)
+ * @param file An open file to write to
+ * @param base_zone The zone this object belongs to (used for zone-based offsets)
+ * @return 0 on success
+ */
+int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
+    //Get X/Y offsets
+    uint64_t view_x_offset_swap = EndianSwap((uint64_t*)&view_x_offset);
+    uint64_t view_y_offset_swap = EndianSwap((uint64_t*)&view_y_offset);
+
+    //Get width/height
+    uint64_t view_width_swap = EndianSwap((uint64_t*)&view_width);
+    uint64_t view_height_swap = EndianSwap((uint64_t*)&view_height);
+
+    fwrite(&view_x_offset_swap, sizeof(view_x_offset_swap), 1, file);
+    fwrite(&view_y_offset_swap, sizeof(view_x_offset_swap), 1, file);
+
+    fwrite(&view_width_swap, sizeof(view_width_swap), 1, file);
+    fwrite(&view_height_swap, sizeof(view_height_swap), 1, file);
+
+    UIElementList* subelement_cursor = subelements;
+    while(subelement_cursor != nullptr){
+        subelement_cursor->element->serializeData(file, base_zone);
+        subelement_cursor = subelement_cursor->next;
+    }
+
+    return 0;
+}
+
+/** Serializing UI Element assets (to be overridden by children, as necessary)
+ * @param file An open file to write to
+ * @param sprite_set The sprite sets that have already been written to file
+ * @param sprite_set The audio sets that have already been written to file
+ * @param sprite_set The music sets that have already been written to file
+ */
+int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+    UIElementList* subelement_cursor = subelements;
+    while(subelement_cursor != nullptr){
+        subelement_cursor->element->serializeAssets(file, sprite_set, audio_set, music_set);
+        subelement_cursor = subelement_cursor->next;
+    }
     return 0;
 }

@@ -24,7 +24,6 @@ class SpriteHash : public HashTable{
 		SDL_Surface* get(const char* key);
 	
 	private:
-		unsigned int size;
 		std::atomic<THEntry**> table;
 };
 #endif

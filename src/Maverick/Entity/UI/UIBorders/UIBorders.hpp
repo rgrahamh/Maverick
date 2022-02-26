@@ -14,13 +14,12 @@ enum BORDER_TYPE{
 class UIBorders: public UIElement{
     public:
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                  SDL_Window* window, int draw_layer, char* border_pattern = "",
-                  uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
+                  int draw_layer, char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
         ~UIBorders();
 
         void addBorders(char* border_pattern, uint8_t border_types);
 
-        virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
     private:
         UIElement* borders[4];

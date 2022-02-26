@@ -2,8 +2,10 @@
 
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../Zone/ZoneFactory/ZoneFactory.hpp"
+#include "../FileHandler/Saver/Saver.hpp"
+#include "../FileHandler/Loader/Loader.hpp"
 
-std::atomic<bool> exit_game = false;
+std::atomic<bool> exit_game;
 
 bool endian;
 
@@ -15,6 +17,8 @@ extern Engine* engine;
  * @param zones The zones that the game engine is initialized with
  */
 Engine::Engine(){
+    exit_game = false;
+
     //Init SDL
     if(SDL_Init(SDL_INIT_EVERYTHING)){
         printf("Failed to init everything!\n");
@@ -47,17 +51,7 @@ Engine::Engine(){
     //Initialization of control system
     control = new Control();
 
-    //Initialization of window and camera
-    SDL_DisplayMode display_mode;
-    if(SDL_GetDesktopDisplayMode(0, &display_mode)){
-        printf("Could not find display; exiting");
-        exit(-1);
-    }
-
-    int win_x = display_mode.w;
-    int win_y = display_mode.h;
-
-	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, win_x, win_y, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
         fflush(stdout);
@@ -77,7 +71,7 @@ Engine::Engine(){
     this->camera = new Camera(renderer, window, NULL);
 
     //Set up the screenshot blit surface
-    this->screen_blit_surface = SDL_CreateRGBSurface(0, win_x, win_y, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    this->screen_blit_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
 
     //Setting up the texture hash table
@@ -85,11 +79,18 @@ Engine::Engine(){
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
 
+    int win_x, win_y;
+    SDL_GetRendererOutputSize(renderer, &win_x, &win_y);
+
     //Set scales
-    this->current_x_scale = 1.0;
-    this->current_y_scale = 1.0;
-    this->target_x_scale = 1.0;
-    this->target_y_scale = 1.0;
+    this->native_x_scale = win_x / SCREEN_WIDTH;
+    this->native_y_scale = win_y / SCREEN_HEIGHT;
+    this->current_x_scale = native_x_scale;
+    this->current_y_scale = native_y_scale;
+    this->target_x_scale = native_x_scale;
+    this->target_y_scale = native_y_scale;
+
+    this->camera->setScale(win_x / SCREEN_WIDTH, win_y / SCREEN_HEIGHT);
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -100,7 +101,9 @@ Engine::Engine(){
     this->entities.obj = nullptr;
     this->entities.ui = nullptr;
 
-    this->delta = 0;
+    this->delta = SDL_GetTicks64();
+
+    this->gravity = 0.1;
 
     endian = getEndian();
 
@@ -141,10 +144,13 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
+    //loadZoneFromFile("global");
+    //loadZoneFromFile("Test Zone");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "global"));
     loadZone("global");
+    //loadZone("led");
 
     //Loading the test zone as the first area
     //this->addThread(new std::thread(loadZone, "Test Zone"));
@@ -153,9 +159,14 @@ void Engine::start(){
     //Loading the level editor
     //engine->addThread(new std::thread(loadZone, "led"));
 
-    Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
+    //saveZone(this->getZone("global"));
+    //saveZone(this->getZone("Test Zone"));
+
+    //loadZone("FilterTest");
+
+    /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
-    sound_board->setMusicVolume(1, 0.0, 10000);
+    sound_board->setMusicVolume(1, 0.0, 10000);*/
 
     gameLoop();
 }
@@ -163,27 +174,37 @@ void Engine::start(){
 /** The primary game loop
  */
 void Engine::gameLoop(){
+    uint64_t last_time = this->delta;
+
+    uint64_t physics_step_accumulator = 0;
 	while(!exit_game){
         buildFullEntityList();
-        delta = SDL_GetTicks();
+        delta = SDL_GetTicks64();
 
         //Calculate the time that has passed since last frame
-        delta = SDL_GetTicks() - last_time;
-        last_time = SDL_GetTicks();
+        delta = SDL_GetTicks64() - last_time;
+        last_time = SDL_GetTicks64();
 
-        //Action step (where actions occur)
-        this->actionStep(&this->entities);
+        physics_step_accumulator += delta;
+        uint64_t physics_step = physics_step_accumulator / PHYSICS_STEP_SIZE;
+        physics_step_accumulator %= PHYSICS_STEP_SIZE;
 
-        if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT)){
-            //Physics step (where physics are calculated, obj positions updated, etc.)
-            this->physicsStep(this->entities.obj);
+        //No need to do anything if a step hasn't occurred
+        if(delta > 0){
+            //Action step (where actions occur)
+            this->actionStep(&this->entities);
 
-            //Collision step (where collision is determined)
-            this->collisionStep(this->entities.obj);
+            if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
+                //Physics step (where physics are calculated, obj positions updated, etc.)
+                this->physicsStep(this->entities.obj, physics_step);
+
+                //Collision step (where collision is determined)
+                this->collisionStep(this->entities.obj);
+            }
+
+            //Different because we need to adjust the object list for draw order
+            this->drawStep(&this->entities);
         }
-
-        //Different because we need to adjust the object list for draw order
-        this->drawStep(&this->entities);
 
         //Thread cleanup
         this->threadGC();
@@ -246,7 +267,7 @@ void Engine::globalAction(){
 /** The physics step of the game engine
  * @param all_objects All of the objects that physics should be simluated for
  */
-void Engine::physicsStep(ObjectList* all_objects){
+void Engine::physicsStep(ObjectList* all_objects, unsigned int steps){
     if(!this->checkState(GAME_STATE::PAUSE)){
         while(all_objects != NULL){
             Object* curr_object = all_objects->obj;
@@ -255,7 +276,7 @@ void Engine::physicsStep(ObjectList* all_objects){
                 continue;
             }
 
-            all_objects->obj->_process(this->delta);
+            all_objects->obj->_process(this->delta, steps);
             all_objects = all_objects->next;
         }
     }
@@ -280,6 +301,7 @@ void Engine::collisionStep(ObjectList* all_objects){
             continue;
         }
         HitboxList* object_hitboxes = all_objects->obj->getHitboxes();
+
         //While we're not out of object hitboxes
         while(object_hitboxes != NULL){
             float top_bound, bot_bound, left_bound, right_bound;
@@ -321,36 +343,38 @@ void Engine::collisionStep(ObjectList* all_objects){
             //The number of blocks in x & y directions
             const int x_block = 16, y_block = 9;
 
-            int win_width, win_height;
-            SDL_GetWindowSize(this->window, &win_width, &win_height);
-            int x_iter = win_width / x_block;
-            int y_iter = win_height / y_block;
+            int x_iter = SCREEN_WIDTH / x_block;
+            int y_iter = SCREEN_HEIGHT / y_block;
+            int x_max = SCREEN_WIDTH + camera->getX();
+            int y_max = SCREEN_HEIGHT + camera->getY();
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
-            for(int box_y = 0; box_y < win_height; box_y += y_iter){
-                //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
-                if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
-                    int i = 0;
-                    for(int box_x = 0; box_x < win_width; box_x += x_iter){
-                        //If the left bound is greater than box_x or the right bound is less than box_x, go to next
-                        if(!(left_bound > box_x + x_iter || right_bound < box_x)){
-                            //Insert the object in the list
-                            ObjectList* new_objectlst = new ObjectList;
-                            new_objectlst->next = object_matrix[i][j];
-                            new_objectlst->obj = curr_object;
-                            object_matrix[i][j] = new_objectlst;
+            if(x_iter > 0 && y_iter > 0){
+                for(int box_y = camera->getY(); box_y < y_max; box_y += y_iter){
+                    //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
+                    if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
+                        int i = 0;
+                        for(int box_x = camera->getX(); box_x < x_max; box_x += x_iter){
+                            //If the left bound is greater than box_x or the right bound is less than box_x, go to next
+                            if(!(left_bound > box_x + x_iter || right_bound < box_x)){
+                                //Insert the object in the list
+                                ObjectList* new_objectlst = new ObjectList;
+                                new_objectlst->next = object_matrix[i][j];
+                                new_objectlst->obj = curr_object;
+                                object_matrix[i][j] = new_objectlst;
 
-                            //Insert the hitbox in the list
-                            HitboxList* new_hitboxlst = new HitboxList;
-                            new_hitboxlst->next = hitbox_matrix[i][j];
-                            new_hitboxlst->hitbox = curr_hitbox;
-                            hitbox_matrix[i][j] = new_hitboxlst;
+                                //Insert the hitbox in the list
+                                HitboxList* new_hitboxlst = new HitboxList;
+                                new_hitboxlst->next = hitbox_matrix[i][j];
+                                new_hitboxlst->hitbox = curr_hitbox;
+                                hitbox_matrix[i][j] = new_hitboxlst;
+                            }
+                            i++;
                         }
-                        i++;
                     }
+                    j++;
                 }
-                j++;
             }
             object_hitboxes = object_hitboxes->next;
         }
@@ -364,20 +388,30 @@ void Engine::collisionStep(ObjectList* all_objects){
             //Iterate over every item in the list
             ObjectList* object_lst = object_matrix[i][j];
             HitboxList* hitbox_lst = hitbox_matrix[i][j];
-            while(hitbox_lst != NULL){
+            while(object_lst != nullptr && hitbox_lst != nullptr){
                 //Iterate over every item after the hitbox_lst
                 ObjectList* object_cursor = object_lst->next;
                 HitboxList* hitbox_cursor = hitbox_lst->next;
-                while(hitbox_cursor != NULL){
+                while(object_cursor != nullptr && hitbox_cursor != nullptr){
                     //Possible place for multi-threading!
 
                     //If both aren't environment and they collide, and the object isn't the same
                     if(object_lst->obj != object_cursor->obj && (!((hitbox_lst->hitbox->getType() & ENVIRONMENT) && (hitbox_cursor->hitbox->getType() & ENVIRONMENT))) &&
                        object_lst->obj->getCollisionLayer() == object_cursor->obj->getCollisionLayer() && hitbox_lst->hitbox->checkCollision(hitbox_cursor->hitbox)){
                         //We want the default collision handling to go last since it's the harshest (and might inhibit special collision cases)
-                        object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
-                        object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
-                        handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
+                        if(!object_lst->obj->checkHitboxImmunity(object_cursor->obj, hitbox_cursor->hitbox) &&
+                           !object_cursor->obj->checkHitboxImmunity(object_lst->obj, hitbox_lst->hitbox)){
+                            //Handle the base object collision & hitbox immunity
+                            object_cursor->obj->onCollide(object_lst->obj, hitbox_cursor->hitbox, hitbox_lst->hitbox);
+                            object_cursor->obj->addHitboxImmunity(object_lst->obj, hitbox_lst->hitbox);
+
+                            //Handle the other object collision & hitbox immunity
+                            object_lst->obj->onCollide(object_cursor->obj, hitbox_lst->hitbox, hitbox_cursor->hitbox);
+                            object_lst->obj->addHitboxImmunity(object_cursor->obj, hitbox_cursor->hitbox);
+
+                            //Handle default collision
+                            handleDefaultCollision(object_cursor->obj, hitbox_cursor->hitbox, object_lst->obj, hitbox_lst->hitbox);
+                        }
                     }
                     object_cursor = object_cursor->next;
                     hitbox_cursor = hitbox_cursor->next;
@@ -397,31 +431,35 @@ void Engine::collisionStep(ObjectList* all_objects){
 }
 
 /** The draw step of the game engine
+ * @param all_entities An entity list of all entities to draw
  */
 void Engine::drawStep(EntityList* all_entities){
     SDL_Renderer* renderer = this->camera->getRenderer();
 
     SDL_RenderClear(renderer);
 
-    //Set custom scale for objects
+    //Set the current scale
     camera->setScale(current_x_scale, current_y_scale);
 
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
 
-    //Set scale back to normal for UI elements
-    camera->setScale(1.0, 1.0);
+    //Draw filter
+    ZoneList* zone_cursor = this->active_zones;
+    while(zone_cursor != nullptr){
+        FilterList* filters = zone_cursor->zone->getFilters();
+        while(filters != nullptr && filters->filter != nullptr){
+            filters->filter->apply(renderer);
+            filters = filters->next;
+        }
+        zone_cursor = zone_cursor->next;
+    }
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
-
-    if(this->screen_blit_texture != nullptr){
-        SDL_DestroyTexture(this->screen_blit_texture);
-        this->screen_blit_texture = nullptr;
-    }
 }
 
 /** Recursively sorts the objects in the order of draw
@@ -563,14 +601,14 @@ void Engine::setState(uint64_t state){
 /** Sets the global X scale of the engine
  * @param x_scale The global X scale of the engine
  */
-void Engine::setGlobalXScale(float x_scale){
+void Engine::setGlobalXScale(double x_scale){
     this->target_x_scale = x_scale;
 }
 
 /** Sets the global Y scale of the engine
  * @param y_scale The global Y scale of the engine
  */
-void Engine::setGlobalYScale(float y_scale){
+void Engine::setGlobalYScale(double y_scale){
     this->target_y_scale = y_scale;
 }
 
@@ -598,7 +636,6 @@ inline void Engine::threadGC(){
             std::thread* thread_ptr = thread_map[thread_id];
             if(thread_ptr != nullptr && thread_ptr->joinable()){
                 thread_ptr->join();
-                printf("Joined thread %i\n", thread_id);
                 thread_map.erase(thread_id);
             }
         }
@@ -634,24 +671,42 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
-            float old_x = mov_obj->getOldX();
-            float old_y = mov_obj->getOldY();
+            /*if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
+                mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
+            }
+            else if(env_box->getZMax() >= mov_box->getZMin() && env_box->getZMax() <= mov_obj->getOldZ() - mov_box->getZOffset()){
+                mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
+            }*/
+            
+            if(mov_box->checkCollision(env_box) == false){
+                printf("Fixed Z position; exiting early");
+                return;
+            }
 
-            float x = mov_obj->getX();
-            float y = mov_obj->getY();
+            double old_x = mov_obj->getOldX();
+            double old_y = mov_obj->getOldY();
 
-            float x_movement = old_x - x;
-            float y_movement = old_y - y;
+            double x = mov_obj->getX();
+            double y = mov_obj->getY();
+
+            double x_movement = (old_x - x) / ROLLBACK_STEP;
+            double y_movement = (old_y - y) / ROLLBACK_STEP;
+
+            if(x_movement == 0.0 && y_movement == 0.0){
+                x_movement = -1.0;
+                y_movement = -1.0;
+            }
 
             mov_obj->setEnvBump();
 
-            float x_iter = x_movement / ROLLBACK_STEP;
-            float y_iter = y_movement / ROLLBACK_STEP;
+            //Handle Z collision
+            //If we're hitting the ceiling
+            //If we're hitting the floor
 
             //Rollback to the point where we're no longer colliding
             for(int i = 0; mov_box->checkCollision(env_box); i++){
-                x += x_iter;
-                y += y_iter;
+                x += x_movement;
+                y += y_movement;
                 mov_obj->setX(x);
                 mov_obj->setY(y);
             }
@@ -666,14 +721,32 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
 
             float mass_sum = obj1->getMass() + obj2->getMass();
 
-            float x_force = (obj1_x_force + obj2_x_force) / mass_sum;
-            float y_force = (obj1_y_force + obj2_y_force) / mass_sum;
+            double x_force = (obj1_x_force + obj2_x_force) / mass_sum;
+            double y_force = (obj1_y_force + obj2_y_force) / mass_sum;
 
             obj1->setXVel(x_force);
             obj1->setYVel(y_force);
 
             obj2->setXVel(x_force);
             obj2->setYVel(y_force);
+        }
+    }
+    else if((box1_prop & ENVIRONMENT && box2_prop & GROUNDING_ZONE) || (box1_prop & GROUNDING_ZONE && box2_prop & ENVIRONMENT)){
+        Hitbox* env_box;
+        Object* grnd_obj;
+
+        if(box1_prop & GROUNDING_ZONE){
+            env_box = box2;
+            grnd_obj = obj1;
+        }
+        else{
+            env_box = box1;
+            grnd_obj = obj2;
+        }
+
+        double env_z = env_box->getZMax();
+        if(grnd_obj->getNextGround() < env_z){
+            grnd_obj->setNextGround(env_z);
         }
     }
 }
@@ -737,6 +810,8 @@ void Engine::buildFullEntityList(){
         }
 
         zone_iter = zone_iter->next;
+
+        //For each filter in the zone
     }
 
     //Clean up all hanging nodes (this can happen if there are less objects this frame than the last)
@@ -798,10 +873,6 @@ void Engine::addThread(std::thread* thread){
 void Engine::cleanupThread(std::thread::id thread_id){
     if(thread_id != base_thread_id){
         thread_cleanup_queue.load()->push(thread_id);
-        printf("Put thread %i being put in cleanup list\n", thread_id);
-    }
-    else{
-        printf("Protected against thread %i being put in cleanup list\n", thread_id);
     }
 }
 
@@ -809,10 +880,43 @@ void Engine::cleanupThread(std::thread::id thread_id){
  * @param zone The zone to add
  */
 void Engine::addZone(Zone* zone){
-    ZoneList* new_zone = new ZoneList;
-    new_zone->zone = zone;
-    new_zone->next = this->zones;
-    zones = new_zone;
+    if(getZone(zone->getName()) == nullptr){
+        ZoneList* new_zone = new ZoneList;
+        new_zone->zone = zone;
+        new_zone->next = this->zones;
+        zones = new_zone;
+    }
+    else{
+        delete zone;
+    }
+}
+
+/** Adds an object to the zone
+ * @param zone The zone we're adding an object to
+ * @param object The object we're adding to the zone
+ * @return -1 if the zone isn't found, 0 otherwise
+ */
+int Engine::addObject(const char* zone, Object* object){
+    Zone* zone_ptr = getZone(zone);
+    if(zone == nullptr){
+        return -1;
+    }
+
+    zone_ptr->addObject(object);
+}
+
+/** Adds an UI Element to the zone
+ * @param zone The zone we're adding a UI element to
+ * @param element The UI element we're adding to the zone
+ * @return -1 if the zone isn't found, 0 otherwise
+ */
+int Engine::addUIElement(const char* zone, UIElement* element){
+    Zone* zone_ptr = getZone(zone);
+    if(zone == nullptr){
+        return -1;
+    }
+
+    zone_ptr->addUIElement(element);
 }
 
 /**Adds a surface to the sprite hash
@@ -923,6 +1027,30 @@ ZoneList* Engine::getZones(){
     return this->zones;
 }
 
+/** Gets a zone by name
+ * @param zone_name The name of the zone you want
+ * @return The requested zone
+ */
+Zone* Engine::getZone(const char* zone_name){
+    ZoneList* zone_cursor = this->zones;
+    while(zone_cursor != nullptr){
+        if(strcmp(zone_name, zone_cursor->zone->getName()) == 0){
+            return zone_cursor->zone;
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    zone_cursor = this->active_zones;
+    while(zone_cursor != nullptr){
+        if(strcmp(zone_name, zone_cursor->zone->getName()) == 0){
+            return zone_cursor->zone;
+        }
+        zone_cursor = zone_cursor->next;
+    }
+
+    return nullptr;
+}
+
 /** Gets all active zones
  * @return A ZoneList* of all active zones
  */
@@ -935,6 +1063,20 @@ ZoneList* Engine::getActiveZones(){
  */
 SoundBoard* Engine::getSoundBoard(){
     return this->sound_board;
+}
+
+/** Gets the global gravity val of the engine
+ * @return The global gravity val
+ */
+float Engine::getGravity(){
+    return this->gravity;
+}
+
+/** Sets the global gravity val of the engine
+ * @param gravity The global gravity val
+ */
+void Engine::setGravity(float gravity){
+    this->gravity = gravity;
 }
 
 /** Gets a texture from the engine

@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "../HashTable/HashTable.hpp"
+#include "../HashTable/AttributeHash/AttributeHash.hpp"
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
@@ -13,60 +13,74 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
+enum RESOURCE_TYPE{
+	BMP,
+	SOUND,
+	MUSIC,
+	CUT
+};
+
+class Zone;
+
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
 		virtual ~Entity();
 		char* getName();
-		float getX();
-		float getY();
+		double getX();
+		double getY();
 		float getWidth();
 		float getHeight();
 		HitboxList* getHitboxes();
-		int getDrawLayer();
-		float getDrawAxis();
-		bool isActive();
-		bool isVisible();
+		int16_t getDrawLayer();
+		double getDrawAxis();
 		void* getAttr(const char* key);
 		uint32_t getType();
+		bool isActive();
+		bool isVisible();
+		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
 
-		int addAnimation(const char* animation_name);
+		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
 
-		int addSprite(const char* animation_name, const char* sprite_path, unsigned int keytime, int x_offset, int y_offset, int width = -1, int height = -1);
+		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
+		int addSpriteSet(const char* animation_name, const char* sprite_set);
+		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop, int sprite_num);
-		int addHitbox(HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, float x_offset, float y_offset, float x_element, float y_element, unsigned int type, float angle, float slice_prop);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element, double y_element, double depth, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
+		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
-		void setX(float x);
-		void setY(float y);
+		void setX(double x);
+		void setY(double y);
 		int setAnimation(const char* animation_name);
-		int setScale(const char* animation_name, float x_scale, float y_scale);
-		void setScale(float x_scale, float y_scale);
 		int setSize(const char* animation_name, float width, float height);
 		void setSize(float width, float height);
 		void setActive(bool active);
 		void setVisible(bool visible);
 		void setAttr(const char* key, void* val);
+		int setSpriteSet(const char* animation_name, const char* sprite_set);
+		int setSpriteSet(const char* sprite_set);
+		int setDrawAxis(const char* animation_name, double draw_axis);
+		int setDrawAxis(double draw_axis);
 
 		//Processing functions
-		virtual void _process(uint32_t delta) = 0;
+		virtual void _process(uint64_t delta, unsigned int steps) = 0;
 		//Need this for custom processing
-		virtual void process(uint32_t delta) = 0;
+		virtual void process(uint64_t delta, unsigned int steps) = 0;
 
 		virtual void _action(Control* control) = 0;
 		virtual void action(Control* control) = 0;
 
-		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y) = 0;
+		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
+		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
-		virtual int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
-		virtual int serializeData(FILE* file);
+		//Call
+		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set) = 0;
+
+		int serializeData(FILE* file, Zone* base_zone);
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;
 		
 	protected:
 		//Name
@@ -76,11 +90,12 @@ class Entity{
 		uint32_t type;
 
         //Position
-        float x;
-        float y;
+        double x;
+        double y;
+		double z;
 
 		//Attributes
-		HashTable* attr;
+		AttributeHash* attr;
 
 		//If the object is active/visible
 		bool active;
@@ -89,12 +104,16 @@ class Entity{
 		//Animation
 		Animation* active_animation;
 		AnimationList* animations;
-		AnimationList* ignored_animations;
+		uint16_t num_animations;
+
+		//Hitbox group ignoring (key=other object; first tuple=hitbox group; second tuple=timer)
+		HitboxImmunityList* hitbox_immunity;
 
 		//Draw layer tracking
-		int draw_layer;
+		int16_t draw_layer;
 
 		Animation* findAnimation(const char* animation_name);
+		void cleanupHitboxImmunity(uint64_t delta);
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 
 struct Sprite{
@@ -31,7 +32,7 @@ struct Sprite{
 };
 
 typedef struct AnimationSequence{
-	Sprite* sprite = nullptr;
+	Sprite** sprite = nullptr;
 
 	Sound* sound = nullptr;
 
@@ -44,11 +45,11 @@ typedef struct AnimationSequence{
 
 class Animation{
 	public:
-		Animation(const char* name, float* x_base, float* y_base);
+		Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets);
 		void freeFrame(AnimationSeq* );
 		~Animation();
 
-		void advance(uint32_t delta);
+		void advance(uint64_t delta);
 		void start();
 
 		Sprite* getSprite();
@@ -60,22 +61,28 @@ class Animation{
 		const char* getName();
 		AnimationSeq* getSequenceStart();
 		AnimationSeq* getSequenceEnd();
+		uint16_t getSequenceLen();
+		bool hasSpriteSet(const char* sprite_set);
 
 		void setPaused(bool paused);
 		int setSize(int width, int height);
-		int setScale(float x_scale, float y_scale);
 		void setNextAnimation(Animation* next_animation);
+		int setSpriteSet(const char* sprite_set);
+		void setDrawAxis(double draw_axis);
 
-		int addFrame(const char* sprite_path, unsigned int keytime, float x_offset, float y_offset, int width = -1, int height = -1);
+		int addFrame(unsigned int keytime);
+		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
+		int addSpriteSet(const char* sprite_set);
 		int addHitbox(Hitbox* hitbox);
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(Sound* sound, int sequence_num);
 
-		void draw(SDL_Renderer* renderer, uint32_t delta, float camera_x, float camera_y);
+		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord = 0);
 
 		void rotate(int direction, float rotation_amnt);
 
-		unsigned int saveResources(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+		int serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio);
+		int serializeData(FILE* file);
 
 	private:
 		//Name
@@ -90,13 +97,25 @@ class Animation{
 		//Uses the animation rather than AnimationSeq so that we can enact lazy loading while bringing files in
 		Animation* next_animation;
 
+		//Keeps track of the current sprite set, and the number of sprite sets for this animation
+		uint16_t curr_sprite_set;
+		std::map<std::string, uint16_t> sprite_sets;
+		uint16_t num_sprite_sets;
+		uint16_t sprite_set_counter;
+
+		//The number of AnimationSeqs in the Animation
+		uint16_t sequence_len;
+
 		//Pointers to the X and Y base coords
-		float* x_base;
-		float* y_base;
+		double* x_base;
+		double* y_base;
 
 		//Scale of the height and width
-		float x_scale;
-		float y_scale;
+		double x_scale;
+		double y_scale;
+
+		//Draw axis
+		double draw_axis;
 
 		//The time counter
 		unsigned int time_counter;

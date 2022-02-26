@@ -5,10 +5,8 @@
 
 class HitCone : public HitEllipse{
 	public:
-		HitCone(float* x_base, float* y_base, float x_offset, float y_offset, float x_radius, float y_radius, float angle, float slice_prop, unsigned int type);
+		HitCone(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double depth, double x_radius, double y_radius, float angle, float slice_prop, unsigned int type);
 		~HitCone();
-
-		void setScale(float x_scale, float y_scale);
 
 		float getAngle();
 		float getProp();

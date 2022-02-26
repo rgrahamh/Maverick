@@ -32,6 +32,10 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 360
+#define PHYSICS_STEP_SIZE 4 //ms
+
 enum GAME_STATE : uint64_t{
 	TITLE = 1,
 	OVERWORLD = 2,
@@ -47,6 +51,7 @@ struct EntityList{
 	UIElementList* ui;
 };
 
+
 class Engine{
 	public:
 		Engine();
@@ -56,8 +61,8 @@ class Engine{
 		void start();
 
 		//Adds an object/UIElement to the engine
-		void addObject(Object* object);
-		void addUIElement(UIElement* ui);
+		int addObject(const char* zone, Object* object);
+		int addUIElement(const char* zone, UIElement* ui);
 
 		//Thread creation
 		void addThread(std::thread* thread);
@@ -82,8 +87,12 @@ class Engine{
 		Camera* getCamera();
 
 		//Global scale setters
-		void setGlobalXScale(float x_scale);
-		void setGlobalYScale(float y_scale);
+		void setGlobalXScale(double x_scale);
+		void setGlobalYScale(double y_scale);
+
+		//Sets/gets the gravity
+		void setGravity(float gravity);
+		float getGravity();
 
 		//Zone handling
 		void addZone(Zone* zone);
@@ -91,6 +100,7 @@ class Engine{
 		void deactivateZone(const char* zone_name);
 		void unloadZone(const char* zone_name);
 
+		Zone* getZone(const char* zone_name);
 		ZoneList* getZones();
 		ZoneList* getActiveZones();
 
@@ -120,7 +130,7 @@ class Engine{
 		void collisionStep(ObjectList* all_objects);
 
 		//Physics step
-		void physicsStep(ObjectList* all_objects);
+		void physicsStep(ObjectList* all_objects, unsigned int steps);
 
 		//The thread garbage collector
 		void threadGC();
@@ -170,18 +180,23 @@ class Engine{
 		float current_x_scale;
 		float current_y_scale;
 
-		//Scale
+		//Target scale
 		float target_x_scale;
 		float target_y_scale;
+
+		//Native scale
+		float native_x_scale;
+		float native_y_scale;
+
+		//Gravity val
+		float gravity;
 
 		//Resource Hashes
 		SpriteHash* sprite_hash;
 		SoundHash* sound_hash;
 		MusicHash* music_hash;
 
-		//A frame counter so we can have timed events trigger every X frames
-		uint32_t last_time;
-		uint32_t delta;
+		uint64_t delta;
 };
 
 #endif

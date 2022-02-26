@@ -4,16 +4,20 @@ extern Engine* engine;
 
 void buildTestZone(){
     Zone* zone = new Zone("Test Zone", 0, 0);
+    engine->addZone(zone);
 
     //Create pillars
-    zone->addObject(buildPillar("pillar1", 800.0, 600.0));
-    zone->addObject(buildPillar("pillar2", 900.0, 450.0));
-    zone->addObject(buildPillar("pillar3", 700.0, 300.0));
-    zone->addObject(buildPillar("pillar4", 750.0, 250.0));
-    zone->addObject(buildPillar("pillar5", 300.0, 200.0));
+    zone->addObject(buildPillar("pillar1", 400.0, 500.0));
+    zone->addObject(buildPillar("pillar2", 175.0, 350.0));
+    zone->addObject(buildPillar("pillar3", 200.0, 100.0));
+    zone->addObject(buildPillar("pillar4", 350.0, 250.0));
+    zone->addObject(buildPillar("pillar5", 100.0, 200.0));
 
     zone->addObject(buildBackground("background", 0.0, 0.0));
 
-    engine->addZone(zone);
+    zone->addObject(new LoadingZone("ui_load", "led", 200.0, 100.0, 0.0, 200.0, 200.0, 30.0, EXTENDED_OBJECT_TYPE::CHARACTER));
+
+    zone->addObject(buildCrate("crate1", 300.0, 200.0));
+
     engine->activateZone(zone->getName());
 }

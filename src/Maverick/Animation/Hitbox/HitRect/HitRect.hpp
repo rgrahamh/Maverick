@@ -5,29 +5,29 @@
 
 class HitRect : public Hitbox{
 	public:
-		HitRect(float* x_base, float* y_base, float x_offset, float y_offset, float width, float height, unsigned int type);
+		HitRect(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, float width, float height, double depth, unsigned int type, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		~HitRect();
 
-		float getWidth();
-		float getHeight();
+		double getWidth();
+		double getHeight();
 
         float getRightBound() override;
         float getLeftBound() override;
         float getTopBound() override;
         float getBotBound() override;
-		float getDrawAxis() override;
 
-		void setScale(float x_scale, float y_scale) override;
-		bool isPointInside(float x_coord, float y_coord) override;
+		bool isPointInside(double x_coord, double y_coord) override;
 
 		bool checkCollision(Hitbox* other) override;
 
-	private:
-		float curr_width;
-		float curr_height;
+		void serializeData(FILE* file);
 
-		float base_width;
-		float base_height;
+	private:
+		double curr_width;
+		double curr_height;
+
+		double base_width;
+		double base_height;
 };
 
 #include "../HitboxCollision.hpp"

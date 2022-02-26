@@ -2,8 +2,8 @@
 #include "../../../Engine/Engine.hpp"
 extern Engine* engine;
 
-CameraReference::CameraReference(const char* name, float start_x, float start_y, float x_speed, float y_speed)
-               : Object(name, start_x, start_y, 1, 0, 0){
+CameraReference::CameraReference(const char* name, float start_x, float start_y, double x_speed, double y_speed)
+               : Object(name, start_x, start_y, 1, 0, 0, 4){
     this->type = OBJECT_TYPE::CAMERA_REFERENCE;
 
     this->x_speed = x_speed;
@@ -26,6 +26,6 @@ void CameraReference::action(Control* control){
             this->xA += x_speed / engine->getGlobalXScale();
         }
 
-        engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::FIXED_FOLLOW);
+        engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
     }
 }

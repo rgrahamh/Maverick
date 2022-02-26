@@ -1,5 +1,8 @@
 #include "./UITextBox.hpp"
 
+#include "../../../Engine/Engine.hpp"
+extern Engine* engine;
+
 /** UITextBox constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement
@@ -8,7 +11,6 @@
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
  * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param window The current window (used for viewport calculation)
  * @param font_path The path to the font you want to use for the text
  * @param text The text you wish to display in the box
  * @param scroll_speed The scroll speed of the text
@@ -20,29 +22,25 @@
  * @param border_buff How much buffer the text should be given (how far inset you should start the text box)
  */
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     SDL_Window* window, int draw_layer, char* font_path, char* text, float scroll_speed,
-                     int point, ALIGNMENT text_x_alignment, ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types, int border_buff)
-    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, window, draw_layer){
+                     int draw_layer, char* font_path, char* text, float scroll_speed, int point, ALIGNMENT text_x_alignment,
+                     ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types, int border_buff)
+    : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT_BOX;
 
-    int window_width, window_height;
-    SDL_GetWindowSize(window, &window_width, &window_height);
+    double text_view_x_offset = ((view_x_offset * SCREEN_WIDTH) + border_buff) / SCREEN_WIDTH;
+    double text_view_y_offset = ((view_y_offset * SCREEN_HEIGHT) + border_buff) / SCREEN_HEIGHT;
 
-    double text_view_x_offset = ((view_x_offset * window_width) + border_buff) / window_width;
-    double text_view_y_offset = ((view_y_offset * window_height) + border_buff) / window_height;
+    double text_view_width = ((view_width * SCREEN_WIDTH) - (border_buff * 2)) / SCREEN_WIDTH;
+    double text_view_height = ((view_height * SCREEN_HEIGHT) - (border_buff * 2)) / SCREEN_HEIGHT;
 
-    double text_view_width = ((view_width * window_width) - (border_buff * 2)) / window_width;
-    double text_view_height = ((view_height * window_height) - (border_buff * 2)) / window_height;
-
-    this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height,
-                            window, draw_layer, font_path, text, scroll_speed,
-                            point, text_x_alignment, text_y_alignment);
+    this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height, draw_layer,
+                            font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);
 
     this->subelements = nullptr;
 
     if(border_pattern != nullptr){
-        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height, window,
-                                    draw_layer, border_pattern, border_types);
+        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height,
+                                      draw_layer, border_pattern, border_types);
     }
     else{
         this->borders = nullptr;
@@ -117,7 +115,7 @@ void UITextBox::setYAlignment(ALIGNMENT y_alignment){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UITextBox::draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y){
+void UITextBox::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw the textbox background
     if(active_animation != nullptr){
         active_animation->draw(renderer, delta, camera_x, camera_y);

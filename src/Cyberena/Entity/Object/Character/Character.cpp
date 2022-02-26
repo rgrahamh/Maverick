@@ -4,8 +4,8 @@
 class Engine;
 extern Engine* engine;
 
-Character::Character(const char* name, float start_x, float start_y, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
-	: Object(name, start_x, start_y, friction, mass, draw_layer),
+Character::Character(const char* name, float start_x, float start_y, float start_z, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
+	: Object(name, start_x, start_y, start_z, friction, mass, 11, true, draw_layer),
 	Race(race),
 	Style(style){
     this->type = EXTENDED_OBJECT_TYPE::CHARACTER;
@@ -49,13 +49,27 @@ bool Character::isWalking(){
     return strncmp("walk", this->active_animation->getName(), 4) == 0;
 }
 
+/** Clears out the character control struct; run at the start of every action step
+ */
+void Character::clearCharacterControl(){
+	character_control.x_movement = 0;
+	character_control.y_movement = 0;
+	character_control.jump = false;
+}
+
 /** Calculates any actions taken; should be overridden by children if used
  * @param event The event being interpreted
  */
 void Character::action(Control* control){
+
+	//Only clear the control if it's a gamepad; otherwise, we'll want to retain these values
+	if(this->control == CONTROL_TYPE::GAMEPAD || this->control == CONTROL_TYPE::KEYBOARD){
+		this->clearCharacterControl();
+	}
+
 	const char* active_animation_name = this->active_animation->getName();
 
-    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
+    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE) && !this->sliding){
 		//If the character is in an actionable state
 		if(this->control == CONTROL_TYPE::KEYBOARD){
 			const uint8_t* keys = control->getKeys();
@@ -82,11 +96,13 @@ void Character::action(Control* control){
 			}
 
 			//If (pressing no keys or pressing keys in opposite directions or pressing all keys) and was just walking
-			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+			if((keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+			|| (keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
 				setAnimation("walk_up");
 				active_animation->setNextAnimation(findAnimation("walk_up"));
 			}
-			else if(!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D]){
+			else if((!keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_D])
+				 || (!keys[SDL_SCANCODE_W] && keys[SDL_SCANCODE_A] && keys[SDL_SCANCODE_S] && keys[SDL_SCANCODE_D])){
 				setAnimation("walk_down");
 				active_animation->setNextAnimation(findAnimation("walk_down"));
 			}
@@ -105,28 +121,29 @@ void Character::action(Control* control){
 				active_animation->setNextAnimation(findAnimation("walk_right"));
 			}
 
-			//If we're not sliding (in an actionable state)
-			if(!this->sliding){
-				if(keys[SDL_SCANCODE_W]){
-					this->yA -= 0.1;
-				}
-				if(keys[SDL_SCANCODE_S]){
-					this->yA += 0.1;
-				}
-				if(keys[SDL_SCANCODE_A]){
-					this->xA -= 0.1;
-				}
-				if(keys[SDL_SCANCODE_D]){
-					this->xA += 0.1;
-				}
+			//Move the actual accel mod to processing?
+			if(keys[SDL_SCANCODE_W] && !keys[SDL_SCANCODE_S]){
+				character_control.y_movement = -1;
+			}
+			else if(keys[SDL_SCANCODE_S] && !keys[SDL_SCANCODE_W]){
+				character_control.y_movement = 1;
+			}
 
-				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
+			if(keys[SDL_SCANCODE_A] && !keys[SDL_SCANCODE_D]){
+				character_control.x_movement = -1;
+			}
+			else if(keys[SDL_SCANCODE_D] && !keys[SDL_SCANCODE_A]){
+				character_control.x_movement = 1;
+			}
+
+			if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground){
+				character_control.jump = true;
 			}
 		}
-		else if(this->control == CONTROL_TYPE::GAMEPAD){
+		else if(this->control == CONTROL_TYPE::GAMEPAD && !this->sliding){
 			const ControllerState* pad = control->getController(this->control_num);
-			float x_axis = pad->left_stick_x_axis;
-			float y_axis = pad->left_stick_y_axis;
+			double x_axis = pad->left_stick_x_axis;
+			double y_axis = pad->left_stick_y_axis;
 			//Q1
 			if(x_axis == 0.0 && y_axis == 0.0 && this->isWalking()){
 				if(strcmp("walk_up", active_animation_name) == 0){
@@ -204,25 +221,47 @@ void Character::action(Control* control){
 			}
 
 			//If we're not sliding (in an actionable state)
-			if(!this->sliding){
-				this->yA += pad->left_stick_y_axis * 0.1;
-				this->xA += pad->left_stick_x_axis * 0.1;
-
-				engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
-			}
+			character_control.y_movement = pad->left_stick_y_axis;
+			character_control.x_movement = pad->left_stick_x_axis;
 		}
 	}
 }
 
-void Character::process(uint32_t delta){
+void Character::process(uint64_t delta, unsigned int steps){
     if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
         //Checking to see if we're still sliding
         if(this->sliding == true){
-            if(this->xV + this->yV < 1){
+            if(this->xV + this->yV < 0.5){
                 this->sliding = false;
             }
         }
     }
+
+	double x_walk = character_control.x_movement * WALK_SPEED * steps;
+	if(xV + x_walk >= WALK_SPEED){
+		xV = WALK_SPEED;
+	}
+	else if(xV + x_walk <= WALK_SPEED * -1){
+		xV = WALK_SPEED * -1;
+	}
+	else{
+		xA += character_control.x_movement * WALK_SPEED * steps;
+	}
+
+	double y_walk = character_control.y_movement * WALK_SPEED * steps;
+	if(yV + y_walk >= WALK_SPEED){
+		yV = WALK_SPEED;
+	}
+	else if(yV + y_walk <= WALK_SPEED * -1){
+		yV = WALK_SPEED * -1;
+	}
+	else{
+		yA += character_control.y_movement * WALK_SPEED * steps;
+	}
+
+	if(character_control.jump){
+		zA += JUMP_SPEED;
+	}
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.
@@ -231,13 +270,14 @@ void Character::process(uint32_t delta){
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
+	/*//TODO: Make character-specific env collision feel better
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
 	if(this_type & COLLISION){
 		if(other_type & COLLISION && other_type & MOVABLE){
-			float x_diff = this->x - this->old_x;
-			float y_diff = this->y - this->old_y;
+			double x_diff = this->x - this->old_x;
+			double y_diff = this->y - this->old_y;
 
 			other->setX(other->getX() + x_diff);
 			other->setY(other->getY() + y_diff);
@@ -248,18 +288,18 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 			float new_y = this->y;
 
 			this->y = this->old_y;
-
 			if(this_hitbox->checkCollision(other_hitbox)){
 				this->y = new_y;
 				this->x = this->old_x;
 				if(this_hitbox->checkCollision(other_hitbox)){
 					this->y = this->old_y;
-					this->x = new_x;
+					//If all else fails, hand it back to the generic collision handling function
 					if(this_hitbox->checkCollision(other_hitbox)){
-						this->y = this->old_y;
+						this->x = new_x;
+						this->y = new_y;
 					}
 				}
 			}
 		}
-	}
+	}*/
 }

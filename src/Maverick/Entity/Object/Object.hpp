@@ -13,60 +13,81 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
+//This leaves room for plenty of objects to grow
 enum OBJECT_TYPE{
-    GENERIC_OBJECT,
+    GENERIC_OBJECT = 0x10000000,
     CAMERA_REFERENCE,
-	EXTENDED_OBJECT_TYPE_START = 4096
+	EXTENDED_OBJECT_TYPE_START = 0x10000800,
+	OBJECT_END   = 0x2FFFFFFF
 };
 
 class Object : public Entity{
 	public:
-		Object(const char* name, float start_x, float start_y, float friction, float mass, int layers = 1);
+		Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity = false, int layer = 1);
 		virtual ~Object();
-		float getOldX();
-		float getOldY();
-		float getXVel();
-		float getYVel();
+		double getOldX();
+		double getOldY();
+		double getOldZ();
+		double getXVel();
+		double getYVel();
+		double getZVel();
+		double getZ();
 		float getMass();
 		bool getEnvBump();
 		Sprite* getSprite();
 		int getCollisionLayer();
+		float getTerminalVelocity();
+		double getGround();
+		double getNextGround();
 
-		virtual int serializeData(FILE* file);
-		
-		void setXVel(float xV);
-		void setYVel(float yV);
+		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
+
+		void setXVel(double xV);
+		void setYVel(double yV);
+		void setZVel(double zV);
+		void setZ(double z);
+		void setGravity(bool gravity);
 		void setEnvBump();
 		void setFriction(float friction);
 		void setCollisionLayer(int collision_layer);
+		void setGround(double next_ground);
+		void setNextGround(double next_ground);
 
-		void applyForce(float xA, float yA);
+		void applyForce(double xA, double yA);
 
 		//Processing functions
-		virtual void _process(uint32_t delta);
+		virtual void _process(uint64_t delta, unsigned int steps);
 		//Need this for custom processing
-		virtual void process(uint32_t delta);
+		virtual void process(uint64_t delta, unsigned int steps);
 
 		virtual void _action(Control* control);
 		virtual void action(Control* control);
 
-		virtual void _draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
-		virtual void draw(SDL_Renderer* renderer, uint32_t delta, int camera_x, int camera_y);
+		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
-		
+
 	protected:
 		//Previous position (used for rollback)
-		float old_x;
-		float old_y;
+		double old_x;
+		double old_y;
+		double old_z;
+
+		//The Z position of the ground
+		double ground;
+		double next_ground;
 
 		//Velocity
-		float xV;
-		float yV;
+		double xV;
+		double yV;
+		double zV;
 
 		//Acceleration
-		float xA;
-		float yA;
+		double xA;
+		double yA;
+		double zA;
 
 		//Coefficient of friction
 		float friction;
@@ -76,6 +97,12 @@ class Object : public Entity{
 
 		//Environmental bump
 		bool env_bump;
+
+		//If gravity should be applied to this object
+		bool gravity;
+
+		//Velocity cap
+		float terminal_velocity;
 
 		//The collision layer
 		int collision_layer;

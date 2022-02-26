@@ -4,12 +4,12 @@
 
 class CameraReference : public Object{
     public:
-		CameraReference(const char* name, float start_x, float start_y, float x_speed = 1, float y_speed = 1);
+		CameraReference(const char* name, float start_x, float start_y, double x_speed = 1, double y_speed = 1);
 		void action(Control* control);
 
     private:
-        float x_speed;
-        float y_speed;
+        double x_speed;
+        double y_speed;
 };
 
 #endif
