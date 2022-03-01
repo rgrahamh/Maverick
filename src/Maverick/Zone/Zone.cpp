@@ -102,6 +102,9 @@ uint64_t Zone::getGlobalY(){
  * @param element The object to add to the zone
  */
 void Zone::addObject(Object* object){
+    if(object == nullptr){
+        return;
+    }
     if(this->objects != NULL && this->objects->obj == NULL){
         this->objects->obj = object;
     }

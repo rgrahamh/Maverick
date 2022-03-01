@@ -109,3 +109,27 @@ Object* buildBackground(const char* name, float start_x, float start_y){
 
     return background;
 }
+
+GlassBall* buildGlassBloodBall(const char* name, float start_x, float start_y){
+    GlassBall* glassBall = new GlassBall(name, start_x, start_y, 0, 0.04, 25, 20);
+
+    glassBall->addAnimation("neutral", 1);
+    glassBall->addFrame("neutral", 0);
+    glassBall->addSprite("neutral", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallNeutral.bmp");
+    glassBall->addHitbox("neutral", ELLIPSE, 0, 0, 0, 7, 7, 7, HITBOX_TYPE::COLLISION, 0);
+
+    glassBall->addAnimation("rolling", 1);
+    for(int i = 0; i < 7; i++){
+        glassBall->addFrame("rolling", 100);
+        glassBall->addHitbox("rolling", ELLIPSE, 0, 0, 0, 7, 7, 7, HITBOX_TYPE::COLLISION, 0);
+    }
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling1.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling2.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling3.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling4.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling5.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling6.bmp");
+    glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling7.bmp");
+
+    return glassBall;
+}
