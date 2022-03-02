@@ -54,7 +54,7 @@ class Object : public Entity{
 		void setGround(double next_ground);
 		void setNextGround(double next_ground);
 
-		void applyForce(double xA, double yA);
+		void applyForce(double xA, double yA, double zA = 0);
 
 		//Processing functions
 		virtual void _process(uint64_t delta, unsigned int steps);

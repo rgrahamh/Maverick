@@ -136,7 +136,7 @@ void Character::action(Control* control){
 				character_control.x_movement = 1;
 			}
 
-			if(keys[SDL_SCANCODE_SPACE] && this->z == this->ground){
+			if(digital[SDL_SCANCODE_SPACE] && this->z == this->ground){
 				character_control.jump = true;
 			}
 		}
@@ -270,12 +270,18 @@ void Character::process(uint64_t delta, unsigned int steps){
  * @param other_hitbox The hitbox that collided from the other object
  */
 void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-	/*//TODO: Make character-specific env collision feel better
+	//TODO: Make character-specific env collision feel better
 	unsigned int other_type = other_hitbox->getType();
 	unsigned int this_type = this_hitbox->getType();
 
 	if(this_type & COLLISION){
-		if(other_type & COLLISION && other_type & MOVABLE){
+		if(other_type & COLLISION && other->getType() == EXTENDED_OBJECT_TYPE::BALL){
+			double x_force = other_hitbox->getX() - this_hitbox->getX();
+			double y_force =  other_hitbox->getY() - this_hitbox->getY();
+			Normalize2DVector(&x_force, &y_force);
+			other->applyForce(x_force * KICK_SPEED, y_force * KICK_SPEED);
+		}
+		else if(other_type & COLLISION && other_type & MOVABLE){
 			double x_diff = this->x - this->old_x;
 			double y_diff = this->y - this->old_y;
 
@@ -301,5 +307,5 @@ void Character::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitb
 				}
 			}
 		}
-	}*/
+	}
 }

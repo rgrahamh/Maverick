@@ -671,15 +671,14 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
-            /*if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
+            if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
             }
             else if(env_box->getZMax() >= mov_box->getZMin() && env_box->getZMax() <= mov_obj->getOldZ() - mov_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
-            }*/
+            }
             
             if(mov_box->checkCollision(env_box) == false){
-                printf("Fixed Z position; exiting early");
                 return;
             }
 

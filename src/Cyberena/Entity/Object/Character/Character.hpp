@@ -14,6 +14,7 @@
 
 #define WALK_SPEED 6.0
 #define JUMP_SPEED 4.0
+#define KICK_SPEED 6.0
 
 typedef struct InventorySlot{
 	Item* item;
