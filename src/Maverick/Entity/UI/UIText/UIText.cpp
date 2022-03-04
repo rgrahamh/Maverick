@@ -138,8 +138,8 @@ void UIText::setPoint(unsigned int point){
             }
 
             //Calculate the print_buffer attributes
-            this->num_lines = this->view_height * SCREEN_WIDTH / char_height;
-            this->chars_per_line = this->view_width * SCREEN_HEIGHT / char_width;
+            this->num_lines = this->view_height * SCREEN_HEIGHT / char_height;
+            this->chars_per_line = this->view_width * SCREEN_WIDTH / char_width;
 
             //Allocate space for the new buffers
             this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
