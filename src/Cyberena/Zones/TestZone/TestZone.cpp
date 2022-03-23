@@ -19,5 +19,7 @@ void buildTestZone(){
 
     zone->addObject(buildCrate("crate1", 300.0, 200.0));
 
+    zone->addObject(buildGlassBloodBall("blood_ball", 80.0, 30.0));
+
     engine->activateZone(zone->getName());
 }

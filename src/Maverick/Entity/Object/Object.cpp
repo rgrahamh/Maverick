@@ -216,9 +216,10 @@ void Object::setNextGround(double next_ground){
  * @param xA The X newtons of the force
  * @param yA The Y newtons of the force
  */
-void Object::applyForce(double xA, double yA){
+void Object::applyForce(double xA, double yA, double zA){
     this->xA += xA / this->mass;
-    this->yA += yA;
+    this->yA += yA / this->mass;
+    this->zA += zA / this->mass;
 }
 
 /** Called during input step; calls action function
@@ -261,7 +262,7 @@ void Object::_process(uint64_t delta, unsigned int steps){
     //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
     if(this->xV != 0){
-        xV -= this->xV * (1.0 - friction);
+        xV -= this->xV * friction;
         if(this->xV < 0.01 && this->xV > -0.01){
             this->xV = 0;
         }
@@ -281,7 +282,7 @@ void Object::_process(uint64_t delta, unsigned int steps){
     //Updating Y values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->yV += this->yA;
     if(this->yV != 0){
-        this->yV -= this->yV * (1.0 - friction);
+        this->yV -= this->yV * friction;
         if(this->yV < 0.01 && this->yV > -0.01){
             this->yV = 0;
         }

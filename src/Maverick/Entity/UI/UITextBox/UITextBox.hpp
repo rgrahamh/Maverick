@@ -7,7 +7,7 @@
 class UITextBox : public UIElement{
     public:
         UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                  int draw_layer, char* font_path, char* text = "", float scroll_speed = 0.0, int point = 24,
+                  int draw_layer, char* font_path, char* text = "", float scroll_speed = 0.0, int point = 6,
                   ALIGNMENT text_x_alignment = ALIGNMENT::NORMAL, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER,
                   char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER,
                   int border_buff = 0);

@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 extern bool endian;
 
@@ -101,5 +102,19 @@ static inline char* StrDeepCopy(const char* str){
     memcpy(new_str, str, str_len);
     new_str[str_len] = '\0';
 	return new_str;
+}
+
+static inline void Normalize2DVector(double* x_force, double* y_force){
+	double hypotenuse = sqrt(pow(*x_force, 2) + pow(*y_force, 2));
+	*x_force /= hypotenuse;
+	*y_force /= hypotenuse;
+}
+
+static inline void Normalize3DVector(double* x_force, double* y_force, double* z_force){
+	double hypotenuse = sqrt(pow(*x_force, 2) + pow(*y_force, 2) + pow(*z_force, 2));
+
+	*x_force /= hypotenuse;
+	*y_force /= hypotenuse;
+	*z_force /= hypotenuse;
 }
 #endif

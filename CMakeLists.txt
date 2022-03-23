@@ -110,6 +110,7 @@ set(CyberenaObjectSrc
     ./src/Cyberena/Entity/Object/Character/Character.cpp
     ./src/Cyberena/Entity/Object/Character/Race/Race.cpp
     ./src/Cyberena/Entity/Object/Character/Style/Style.cpp
+    ./src/Cyberena/Entity/Object/GlassBall/GlassBall.cpp
 )
 
 set(CyberenaUISrc
