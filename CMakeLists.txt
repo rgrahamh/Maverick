@@ -11,7 +11,8 @@ set(AnimationSrc
 )
 
 set(AudioSrc
-    ./src/Maverick/Audio/SoundBoard.cpp
+    ./src/Maverick/Audio/SoundBoard/SoundBoard.cpp
+    ./src/Maverick/Audio/Music/Music.cpp
 )
 
 set(HashSrc

@@ -74,7 +74,7 @@ Engine::Engine(){
     this->screen_blit_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
 
-    //Setting up the texture hash table
+    //Setting up the hash tables
     this->sprite_hash = new SpriteHash(2048);
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
