@@ -69,60 +69,8 @@ Music* MusicHash::get(const char* key){
 		cursor = cursor->next;
 	}
 	if(cursor == NULL){
-		Music* new_music = loadMusic(key);
-		if(new_music == nullptr){
-			printf("Can't load the file: %s as a surface\n", key);
-			return NULL;
-		}
-		add(key, new_music);
-
-		return new_music;
-	}
-
-	return cursor->music;
-}
-
-/** Tries to load music based on a pattern
- * @param music_pattern The pattern string to build paths from
- * @return A pointer to the new Music; instruments that failed to load are nullptr. If no music was loaded, we return nullptr.
- */
-Music* MusicHash::loadMusic(const char* music_pattern){
-	int music_pattern_len = strlen(music_pattern);
-	//Pattern len + longest pattern extension ("rhythm_guitar.wav") + 1
-	char music_file[music_pattern_len + 19];
-	memcpy(music_file, music_pattern, music_pattern_len);
-	char* music_offset = music_file + music_pattern_len;
-
-	Music* music = new Music;
-	memcpy(music_offset, "_bass.wav", 10);
-	music->bass = Mix_LoadWAV(music_pattern);
-
-	memcpy(music_offset, "_lead_guitar.wav", 17);
-	music->lead_guitar = Mix_LoadWAV(music_pattern);
-
-	memcpy(music_offset, "_rhythm_guitar.wav", 19);
-	music->rhythm_guitar = Mix_LoadWAV(music_pattern);
-
-	memcpy(music_offset, "_drums.wav", 11);
-	music->drums = Mix_LoadWAV(music_pattern);
-
-	memcpy(music_offset, "_synth.wav", 11);
-	music->synth = Mix_LoadWAV(music_pattern);
-
-	memcpy(music_offset, "_misc.wav", 10);
-	music->misc = Mix_LoadWAV(music_pattern);
-
-	if(music->bass == nullptr && music->lead_guitar == nullptr && music->rhythm_guitar == nullptr && music->drums == nullptr && music->synth == nullptr && music->misc == nullptr){
 		return nullptr;
 	}
 
-	//Copying the key for permanent storage
-	unsigned int len = strlen(music_pattern);
-	char* name = (char*)malloc(len + 1);
-	strncpy(name, music_pattern, len);
-	name[len] = '\0';
-
-	music->name = name;
-
-	return music;
+	return cursor->music;
 }

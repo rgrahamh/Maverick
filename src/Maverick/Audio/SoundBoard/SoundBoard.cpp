@@ -41,15 +41,15 @@ int SoundBoard::playMusic(const char* music, unsigned int fade){
 
     //If channel 1 is playing anything
     if(this->music[0]->isPlaying()){
-        this->music[0]->fadeOut(fade);
-        this->music[1]->fadeIn(1, 1.0, fade);
+        this->music[0]->stop(fade);
+        this->music[1]->start(1, 1.0, fade);
     }
     //If channel 1 isn't playing anything (will hit both when nothing is playing & when just channel 2 is playing)
     else{
         if(this->music[1]->isPlaying()){
-            this->music[1]->fadeOut(fade);
+            this->music[1]->stop(fade);
         }
-        this->music[0]->fadeIn(1, 1.0, fade);
+        this->music[0]->start(1, 1.0, fade);
     }
 
     return 0;

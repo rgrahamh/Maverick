@@ -9,16 +9,13 @@
 class Music{
     public:
         Music(const char* name);
-        int start(int music_channel_index, int loops);
-        int stop();
+        int start(int music_channel_index, float volume = 1.0, unsigned int fade = 0);
+        int stop(unsigned int fade = 0);
         int resume();
         int pause();
-        int fadeIn(int music_channel_index, float volume, unsigned int fade);
-        int fadeOut(unsigned int fade);
-        int setVolume(float volume, unsigned int fade);
-        int setInstrumentVolume(const char* instrument_name, float volume, unsigned int fade);
+        void setVolume(float volume, unsigned int fade = 0);
+        int setInstrumentVolume(const char* instrument_name, float volume, unsigned int fade = 0);
         int addTrack(Sound* track);
-        int setVolume(float volume);
         
         bool isPlaying();
     private:

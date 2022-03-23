@@ -902,6 +902,8 @@ int Engine::addObject(const char* zone, Object* object){
     }
 
     zone_ptr->addObject(object);
+
+    return 0;
 }
 
 /** Adds an UI Element to the zone
@@ -916,6 +918,8 @@ int Engine::addUIElement(const char* zone, UIElement* element){
     }
 
     zone_ptr->addUIElement(element);
+
+    return 0;
 }
 
 /**Adds a surface to the sprite hash

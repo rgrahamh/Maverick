@@ -8,23 +8,44 @@ Music::Music(const char* name){
     this->name = StrDeepCopy(name);
 }
 
-int Music::start(int music_channel_index, int loops){
+int Music::start(int music_channel_index, float volume, unsigned int fade){
+    if(this->playing){
+        return -1;
+    }
+
     int channel_offset = music_channel_index * MAX_MUSIC_TRACKS;
-    for(int i = 0; i < this->num_tracks; i++){
-        Mix_PlayChannel(i + channel_offset, tracks[i]->sample, loops);
+    if(fade == 0){
+        for(int i = 0; i < this->num_tracks; i++){
+            Mix_PlayChannel(i + channel_offset, tracks[i]->sample, -1);
+        }
+    }
+    else{
+        this->music_channel_index = music_channel_index;
+        int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
+        if(!playing){
+            for(int i = 0; i < this->num_tracks; i++){
+                Mix_Volume(i + channel_offset, 0);
+                Mix_PlayChannel(i + channel_offset, tracks[i]->sample, -1);
+                std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade);
+            }
+        }
     }
     this->music_channel_index = music_channel_index;
     this->playing = true;
+
+    return 0;
 }
 
-int Music::stop(){
+int Music::stop(unsigned int fade){
     if(!this->playing){
         return -1;
     }
 
-    int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
-    for(int i = 0; i < this->num_tracks; i++){
-        Mix_HaltChannel(i);
+    if(fade == 0){
+        Mix_HaltGroup(this->music_channel_index + 1);
+    }
+    else{
+        Mix_FadeOutGroup(this->music_channel_index + 1, fade);
     }
     this->playing = false;
 
@@ -38,7 +59,7 @@ int Music::pause(){
 
     int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
     for(int i = 0; i < this->num_tracks; i++){
-        Mix_Pause(i);
+        Mix_Pause(i + channel_offset);
     }
     this->playing = false;
 
@@ -52,34 +73,10 @@ int Music::resume(){
 
     int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
     for(int i = 0; i < this->num_tracks; i++){
-        Mix_Resume(i);
+        Mix_Resume(i + channel_offset);
     }
     this->playing = false;
 
-    return 0;
-}
-
-//Fold fadeIn/fadeOut into start/stop
-int Music::fadeIn(int music_channel_index, float volume, unsigned int fade){
-    this->music_channel_index = music_channel_index;
-    int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
-    if(!playing){
-        for(int i = 0; i < this->num_tracks; i++){
-            Mix_Volume(i + channel_offset, 0);
-            Mix_PlayChannel(i + channel_offset, tracks[i]->sample, -1);
-        }
-        this->playing = true;
-    }
-}
-
-int Music::fadeOut(unsigned int fade){
-    if(!playing){
-        return -1;
-    }
-
-    // +1 since the channel groups are 1-indexed
-    Mix_FadeOutGroup(this->music_channel_index + 1, fade);
-    this->playing = false;
     return 0;
 }
 
@@ -95,7 +92,7 @@ int Music::setInstrumentVolume(const char* instrument_name, float volume, unsign
     return -1;
 }
 
-int Music::setVolume(float volume, unsigned int fade){
+void Music::setVolume(float volume, unsigned int fade){
     int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
     for(int i = 0; i < this->num_tracks; i++){
         if(fade == 0){

@@ -25,6 +25,5 @@ class MusicHash : public HashTable{
 	
 	private:
 		std::atomic<MHEntry**> table;
-		Music* loadMusic(const char* music_pattern);
 };
 #endif
