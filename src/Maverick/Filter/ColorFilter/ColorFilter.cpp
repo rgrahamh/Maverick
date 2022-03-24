@@ -144,17 +144,20 @@ inline void ColorFilter::apply(SDL_Renderer* renderer){
     draw_rect.w = this->width;
     draw_rect.h = this->height;
 
-    if(draw_rect.x > SCREEN_WIDTH || draw_rect.y > SCREEN_HEIGHT ||
+    int win_width, win_height;
+    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
+    if(draw_rect.x > win_width || draw_rect.y > win_height ||
        draw_rect.x + draw_rect.w <= 0 || draw_rect.y + draw_rect.h <= 0){
         return;
     }
 
     //Cropping off unnecessary right/bottom section
-    if(draw_rect.x + draw_rect.w > SCREEN_WIDTH){
-        draw_rect.w = SCREEN_WIDTH - draw_rect.x;
+    if(draw_rect.x + draw_rect.w > win_width){
+        draw_rect.w = win_height - draw_rect.x;
     }
-    if(draw_rect.y + draw_rect.h > SCREEN_HEIGHT){
-        draw_rect.h = SCREEN_HEIGHT - draw_rect.y;
+    if(draw_rect.y + draw_rect.h > win_width){
+        draw_rect.h = win_height - draw_rect.y;
     }
 
     //Cropping off unnecessary left/top section

@@ -137,9 +137,12 @@ void UIText::setPoint(unsigned int point){
                 free(this->ref_buff);
             }
 
+            int win_width, win_height;
+            SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
             //Calculate the print_buffer attributes
-            this->num_lines = this->view_height * SCREEN_HEIGHT / char_height;
-            this->chars_per_line = this->view_width * SCREEN_WIDTH / char_width;
+            this->num_lines = this->view_height * win_height / char_height;
+            this->chars_per_line = this->view_width * win_width / char_width;
 
             //Allocate space for the new buffers
             this->print_buff = (char**)malloc(sizeof(char*) * num_lines);

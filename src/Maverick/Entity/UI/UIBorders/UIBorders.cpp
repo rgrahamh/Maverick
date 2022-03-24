@@ -90,12 +90,15 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                         }
                     }
 
+                    int win_width, win_height;
+                    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
                     //Draw layer doesn't matter here because we're drawing them manually w/ the text box
                     if(borders[i] != nullptr){
                         delete borders[i];
                     }
-                    this->borders[i] = new UIElement(border_names[i], border_x / (double)SCREEN_WIDTH, border_y / (double)SCREEN_HEIGHT,
-                                                     border_width / (double)SCREEN_WIDTH, border_height / (double)SCREEN_HEIGHT, 1);
+                    this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
+                                                     border_width / (double)win_width, border_height / (double)win_height, 1);
                     this->borders[i]->addAnimation("border", 1);
                     this->borders[i]->addFrame("border", 0);
                     this->borders[i]->addSprite("border", "default", sprite_path);

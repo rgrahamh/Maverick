@@ -32,8 +32,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 360
+#define BASE_SCREEN_WIDTH 640
+#define BASE_SCREEN_HEIGHT 360
 #define PHYSICS_STEP_SIZE 4 //ms
 
 enum GAME_STATE : uint64_t{
