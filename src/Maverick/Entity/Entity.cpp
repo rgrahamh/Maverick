@@ -344,7 +344,7 @@ bool Entity::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
     }
 
     HitboxImmunityList* cursor = this->hitbox_immunity;
-    int32_t hitbox_group = cursor->hitbox_group;
+    uint32_t hitbox_group = cursor->hitbox_group;
     while(cursor != nullptr){
         if(cursor->hitbox == hitbox || (other == cursor->entity && cursor->hitbox_group == hitbox_group)){
             return true;

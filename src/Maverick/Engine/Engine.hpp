@@ -23,7 +23,7 @@
 #include "../Entity/UI/UIElement.hpp"
 #include "../Entity/Object/Object.hpp"
 
-#include "../Audio/SoundBoard.hpp"
+#include "../Audio/SoundBoard/SoundBoard.hpp"
 
 #include "../Utility/Utility.hpp"
 

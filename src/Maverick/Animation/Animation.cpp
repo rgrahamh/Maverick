@@ -432,7 +432,7 @@ void Animation::advance(uint64_t delta){
 
 			//Play the new sound, if it exists
 			if(sequence->sound != nullptr && progressed){
-				engine->getSoundBoard()->playSound(sequence->sound->sample, 0);
+				engine->getSoundBoard()->playSound(sequence->sound, 0);
 			}
 
 			//If we're on the last frame of the sequence & next_animation is null, maintain the current frame

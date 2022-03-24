@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <atomic>
 
-#include "../../Audio/SoundBoard.hpp"
+#include "../../Audio/Music/Music.hpp"
 #include "../HashTable.hpp"
 
 typedef struct MusicHashEntry{
@@ -25,6 +25,5 @@ class MusicHash : public HashTable{
 	
 	private:
 		std::atomic<MHEntry**> table;
-		Music* loadMusic(const char* music_pattern);
 };
 #endif
