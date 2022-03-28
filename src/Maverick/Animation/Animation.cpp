@@ -619,21 +619,7 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 			Sound* sound = cursor->sound;
 			//Also have a place for saving audio (once that's implemented in the system)
 			if(sound != nullptr && written_audio.find(cursor->sound->name) == written_audio.end()){
-				//Identifier len
-				uint16_t identifier_len = strlen(cursor->sound->name);
-				uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-				uint8_t asset_type = RESOURCE_TYPE::SOUND;
-				fwrite(&asset_type, 1, 1, file);
-
-				//Identifier
-				fwrite(&identifier_len_swapped, 2, 1, file);
-				fwrite(cursor->sound->name, 1, identifier_len, file);
-
-				//Writing the audio buffer (from the mixer chunk) to file
-				uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
-				fwrite(&audio_len, 1, 1, file);
-				fwrite(cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
+				SerializeSound(file, cursor->sound);
 
 				//Insert the audio
 				written_audio.insert(cursor->sound->name);

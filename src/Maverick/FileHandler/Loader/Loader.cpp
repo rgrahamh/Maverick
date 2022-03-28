@@ -56,7 +56,6 @@ inline void loadBMP(FILE* file){
  */
 inline void loadSound(FILE* file){
 	uint16_t identifier_len;
-
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
 
@@ -81,7 +80,33 @@ inline void loadSound(FILE* file){
  * @param file The file to load the music from
  */
 inline void loadMusic(FILE* file){
-	return;
+	uint16_t identifier_len;
+	fread(&identifier_len, sizeof(identifier_len), 1, file);
+	identifier_len = EndianSwap(&identifier_len);
+
+	char identifier[identifier_len+1];
+	fread(&identifier, 1, identifier_len, file);
+	identifier[identifier_len] = '\0';
+
+	Music* new_music = new Music(identifier);
+
+	uint16_t num_tracks;
+	fread(&num_tracks, sizeof(num_tracks), 1, file);
+	num_tracks = EndianSwap(&num_tracks);
+
+	for(int i = 0; i < num_tracks; i++){
+		uint16_t track_identifier_len;
+		fread(&track_identifier_len, sizeof(track_identifier_len), 1, file);
+		track_identifier_len = EndianSwap(&track_identifier_len);
+
+		char track_identifier[track_identifier_len + 1];
+		fread(&track_identifier, 1, track_identifier_len, file);
+		track_identifier[track_identifier_len] = '\0';
+
+		new_music->addTrack(engine->getSound(track_identifier));
+	}
+
+	engine->addMusic(identifier, new_music);
 }
 
 inline void loadCutscene(FILE* file){

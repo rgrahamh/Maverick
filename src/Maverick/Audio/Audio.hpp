@@ -15,4 +15,6 @@ struct Sound{
     Mix_Chunk* sample = nullptr;
 };
 
+int SerializeSound(FILE* file, Sound* sound);
+
 #endif

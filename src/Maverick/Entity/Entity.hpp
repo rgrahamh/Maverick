@@ -13,13 +13,6 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
-enum RESOURCE_TYPE{
-	BMP,
-	SOUND,
-	MUSIC,
-	CUT
-};
-
 class Zone;
 
 class Entity{

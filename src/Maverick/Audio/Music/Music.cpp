@@ -5,6 +5,7 @@ extern Engine* engine;
 Music::Music(const char* name){
     this->playing = false;
     this->music_channel_index = 0;
+    this->num_tracks = 0;
     this->name = StrDeepCopy(name);
 }
 
@@ -137,4 +138,31 @@ int Music::addTrack(Sound* track){
 
 bool Music::isPlaying(){
     return this->playing;
+}
+
+int Music::serialize(FILE* file, std::unordered_set<std::string>& music_set){
+    if(file == nullptr || music_set.find(this->name) == music_set.end()){
+        return -1;
+    }
+
+    //Identifier len
+    uint16_t identifier_len = strlen(this->name);
+    uint16_t identifier_len_swap = EndianSwap(&identifier_len);
+    fwrite(&identifier_len_swap, sizeof(identifier_len_swap), 1, file);
+
+    //Identifier
+    fwrite(this->name, 1, identifier_len, file);
+
+    //Num tracks
+    uint16_t num_tracks_swap = EndianSwap(&this->num_tracks);
+    fwrite(&num_tracks_swap, sizeof(num_tracks_swap), 1, file);
+
+    //Tracks
+    for(int i = 0; i < num_tracks; i++){
+        SerializeSound(file, tracks[i]);
+    }
+
+    music_set.insert(this->name);
+
+    return 0;
 }

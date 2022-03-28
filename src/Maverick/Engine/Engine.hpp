@@ -46,6 +46,13 @@ enum GAME_STATE : uint64_t{
 	EXIT = 64
 };
 
+enum RESOURCE_TYPE{
+	BMP,
+	SOUND,
+	MUSIC,
+	CUT
+};
+
 struct EntityList{
 	ObjectList* obj;
 	UIElementList* ui;
