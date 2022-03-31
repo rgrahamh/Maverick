@@ -950,6 +950,14 @@ void Engine::addMusic(const char* key, Music* music){
     this->music_hash->add(key, music);
 }
 
+/**Adds a font to the sprite hash
+ * @param key The key representing the font
+ * @param font The font being added to the hash
+ */
+void Engine::addFont(const char* key, Font* font){
+    this->font_hash->add(key, font);
+}
+
 /** Moves a Zone to the active_zones ZoneList
  * @param zone_name The name of the zone you wish to move
  */
@@ -1108,4 +1116,12 @@ Sound* Engine::getSound(const char* key){
  */
 Music* Engine::getMusic(const char* key){
     return this->music_hash->get(key);
+}
+
+/** Gets a font from the engine
+ * @param key The font's identifier in the hash table
+ * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
+ */
+Font* Engine::getFont(const char* key){
+    return this->font_hash->get(key);
 }

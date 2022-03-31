@@ -297,14 +297,12 @@ int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
 
 /** Serializing UI Element assets (to be overridden by children, as necessary)
  * @param file An open file to write to
- * @param sprite_set The sprite sets that have already been written to file
- * @param sprite_set The audio sets that have already been written to file
- * @param sprite_set The music sets that have already been written to file
+ * @param serialize_set The serialization set (logs saved assets)
  */
-int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+int UIElement::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
     UIElementList* subelement_cursor = subelements;
     while(subelement_cursor != nullptr){
-        subelement_cursor->element->serializeAssets(file, sprite_set, audio_set, music_set);
+        subelement_cursor->element->serializeAssets(file, serialize_set);
         subelement_cursor = subelement_cursor->next;
     }
     return 0;

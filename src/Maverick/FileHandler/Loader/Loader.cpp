@@ -4,22 +4,9 @@
 
 extern Engine* engine;
 
-/** Loads a BMP from file & inserts it into the engine
- * @param file The file to load the BMP from
- */
-inline void loadBMP(FILE* file){
+inline SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;
-	uint16_t identifier_len;
 	uint32_t width, height, rmask, gmask, bmask, amask;
-
-	if(fread(&identifier_len, sizeof(identifier_len), 1, file) == 0){
-		printf("Cannot read in vals!\n");
-	}
-	identifier_len = EndianSwap(&identifier_len);
-
-	char identifier[identifier_len+1];
-	fread(&identifier, 1, identifier_len, file);
-	identifier[identifier_len] = '\0';
 
 	fread(&width, sizeof(width), 1, file);
 	fread(&height, sizeof(height), 1, file);
@@ -46,6 +33,26 @@ inline void loadBMP(FILE* file){
 	new_surface->pixels = (uint8_t*)malloc(byte_size);
 
 	fread(new_surface->pixels, 1, byte_size, file);
+
+	return new_surface;
+}
+
+/** Loads a BMP from file & inserts it into the engine
+ * @param file The file to load the BMP from
+ */
+inline void loadBMP(FILE* file){
+	uint16_t identifier_len;
+
+	if(fread(&identifier_len, sizeof(identifier_len), 1, file) == 0){
+		printf("Cannot read in vals!\n");
+	}
+	identifier_len = EndianSwap(&identifier_len);
+
+	char identifier[identifier_len+1];
+	fread(&identifier, 1, identifier_len, file);
+	identifier[identifier_len] = '\0';
+
+	SDL_Surface* new_surface = readSurface(file);
 
 	engine->addSurface(identifier, new_surface);
 }
@@ -109,6 +116,37 @@ inline void loadMusic(FILE* file){
 	engine->addMusic(identifier, new_music);
 }
 
+inline void loadFont(FILE* file){
+	uint16_t identifier_len;
+	fread(&identifier_len, sizeof(identifier_len), 1, file);
+	identifier_len = EndianSwap(&identifier_len);
+
+	char identifier[identifier_len+1];
+	fread(&identifier, 1, identifier_len, file);
+	identifier[identifier_len] = '\0';
+
+	Font* new_font = new Font(identifier);
+
+	uint8_t style_num;
+	fread(&style_num, sizeof(style_num), 1, file);
+
+	for(uint8_t i; i < style_num; i++){
+		uint8_t style_type, char_num;
+		fread(&style_type, sizeof(style_type), 1, file);
+		fread(&char_num, sizeof(char_num), 1, file);
+
+		for(uint8_t j; j < char_num; j++){
+			char new_char;
+			fread(&new_char, sizeof(new_char), 1, file);
+
+			SDL_Surface* new_surface = readSurface(file);
+			new_font->setCharacter(new_char, new_surface, (enum FONT_STYLE)style_type);
+		}
+	}
+
+	engine->addFont(identifier, new_font);
+}
+
 inline void loadCutscene(FILE* file){
 	return;
 }
@@ -141,6 +179,9 @@ int loadAssets(const char* zone_name)
 			//Implement later
 			case(RESOURCE_TYPE::MUSIC):
 				loadMusic(file);
+				break;
+			case(RESOURCE_TYPE::FONT):
+				loadFont(file);
 				break;
 			//Implement later
 			case(RESOURCE_TYPE::CUT):

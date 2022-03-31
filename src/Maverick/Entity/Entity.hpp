@@ -15,6 +15,13 @@
 
 class Zone;
 
+struct SerializeSet{
+	std::unordered_set<std::string> sprite_set;
+	std::unordered_set<std::string> audio_set;
+	std::unordered_set<std::string> music_set;
+	std::unordered_set<std::string> font_set;
+};
+
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
@@ -69,8 +76,8 @@ class Entity{
 		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
 		//Call
-		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
-		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set) = 0;
+		int serializeAssets(FILE* file, SerializeSet& serialize_set);
+		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) = 0;
 
 		int serializeData(FILE* file, Zone* base_zone);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;

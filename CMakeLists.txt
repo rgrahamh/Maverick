@@ -16,12 +16,17 @@ set(AudioSrc
     ./src/Maverick/Audio/SoundBoard/SoundBoard.cpp
 )
 
+set(FortSrc
+    ./src/Maverick/Font/Font.cpp
+)
+
 set(HashSrc
     ./src/Maverick/HashTable/HashTable.cpp
     ./src/Maverick/HashTable/AttributeHash/AttributeHash.cpp
     ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
     ./src/Maverick/HashTable/MusicHash/MusicHash.cpp
     ./src/Maverick/HashTable/SoundHash/SoundHash.cpp
+    ./src/Maverick/HashTable/FontHash/FontHash.cpp
 )
 
 set(HitboxSrc

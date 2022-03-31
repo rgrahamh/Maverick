@@ -27,21 +27,19 @@ int saveZone(Zone* zone){
 	ObjectList* objects = zone->getObjects();
 	UIElementList* elements = zone->getUIElements();
 
-	std::unordered_set<std::string> sprite_set;
-	std::unordered_set<std::string> audio_set;
-	std::unordered_set<std::string> music_set;
+	SerializeSet serialize_set;
 
 	//Save resources used in this zone (both by UI elements & objects)
 	while(elements != nullptr && elements->element != nullptr){
 		UIElement* element = elements->element;
-		element->serializeAssets(asset_file, sprite_set, audio_set, music_set);
+		element->serializeAssets(asset_file, serialize_set);
 		element->serializeData(zone_file, zone);
 
 		elements = elements->next;
 	}
 	while(objects != nullptr && objects->obj != nullptr){
 		Object* obj = objects->obj;
-		obj->serializeAssets(asset_file, sprite_set, audio_set, music_set);
+		obj->serializeAssets(asset_file, serialize_set);
 		obj->serializeData(zone_file, zone);
 
 		objects = objects->next;

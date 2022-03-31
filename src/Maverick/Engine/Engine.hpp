@@ -15,6 +15,7 @@
 #include "../HashTable/SpriteHash/SpriteHash.hpp"
 #include "../HashTable/MusicHash/MusicHash.hpp"
 #include "../HashTable/SoundHash/SoundHash.hpp"
+#include "../HashTable/FontHash/FontHash.hpp"
 
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
@@ -50,6 +51,7 @@ enum RESOURCE_TYPE{
 	BMP,
 	SOUND,
 	MUSIC,
+	FONT,
 	CUT
 };
 
@@ -120,6 +122,8 @@ class Engine{
 		Sound* getSound(const char* key);
 		void addMusic(const char* key, Music* music);
 		Music* getMusic(const char* key);
+		void addFont(const char* key, Font* font);
+		Font* getFont(const char* key);
 
 	private:
 		void gameLoop();
@@ -202,6 +206,7 @@ class Engine{
 		SpriteHash* sprite_hash;
 		SoundHash* sound_hash;
 		MusicHash* music_hash;
+		FontHash* font_hash;
 
 		uint64_t delta;
 };

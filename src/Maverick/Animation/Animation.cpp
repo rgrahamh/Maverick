@@ -556,7 +556,7 @@ bool Animation::hasSpriteSet(const char* sprite_set){
  * @param written_audio The set of audio assets that have already been written to file
  * @return 0 if successful
  */
-int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio){
+int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
     AnimationSeq* cursor = sequence_start;
     if(cursor != NULL){
         do{
@@ -564,7 +564,7 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 				if(cursor->sprite != nullptr){
 					Sprite* sprite = cursor->sprite[sprite_set.second];
 					//If this asset's not been saved in this file yet
-					if(sprite != nullptr && written_sprites.find(sprite->name) == written_sprites.end()){
+					if(sprite != nullptr && serialize_set.sprite_set.find(sprite->name) == serialize_set.sprite_set.end()){
 						//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
 						SDL_Surface* surface = engine->getSurface(sprite->name);
 
@@ -610,7 +610,7 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
 
 							//Log this sprite as written
-							written_sprites.insert(sprite->name);
+							serialize_set.sprite_set.insert(sprite->name);
 						}
 					}
 				}
@@ -618,11 +618,11 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 
 			Sound* sound = cursor->sound;
 			//Also have a place for saving audio (once that's implemented in the system)
-			if(sound != nullptr && written_audio.find(cursor->sound->name) == written_audio.end()){
+			if(sound != nullptr && serialize_set.audio_set.find(cursor->sound->name) == serialize_set.audio_set.end()){
 				SerializeSound(file, cursor->sound);
 
 				//Insert the audio
-				written_audio.insert(cursor->sound->name);
+				serialize_set.audio_set.insert(cursor->sound->name);
 			}
 			cursor = cursor->next;
         } while(cursor != sequence_start && cursor != nullptr);

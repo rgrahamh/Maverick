@@ -81,7 +81,7 @@ class Animation{
 
 		void rotate(int direction, float rotation_amnt);
 
-		int serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio);
+		int serializeAssets(FILE* file, SerializeSet& serialize_set);
 		int serializeData(FILE* file);
 
 	private:

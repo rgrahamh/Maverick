@@ -7,7 +7,7 @@
 
 #define NUM_STYLES 3
 enum FONT_STYLE{
-    NORMAL,
+    NORMAL = 0,
     BOLD,
     ITALIC
 };
