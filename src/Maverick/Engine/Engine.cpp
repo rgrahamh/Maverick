@@ -60,6 +60,9 @@ Engine::Engine(){
 
     SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
+    int win_width, win_height;
+    SDL_GetWindowSize(this->window, &win_width, &win_height);
+
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL){
@@ -71,7 +74,7 @@ Engine::Engine(){
     this->camera = new Camera(renderer, window, NULL);
 
     //Set up the screenshot blit surface
-    this->screen_blit_surface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+    this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
 
     //Setting up the hash tables
@@ -79,18 +82,16 @@ Engine::Engine(){
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
 
-    int win_x, win_y;
-    SDL_GetRendererOutputSize(renderer, &win_x, &win_y);
-
     //Set scales
-    this->native_x_scale = win_x / SCREEN_WIDTH;
-    this->native_y_scale = win_y / SCREEN_HEIGHT;
+    //We want to scale both X & Y by the Y element, so stuff doesn't get squashed
+    this->native_x_scale = win_height / BASE_SCREEN_HEIGHT;
+    this->native_y_scale = win_height / BASE_SCREEN_HEIGHT;
     this->current_x_scale = native_x_scale;
     this->current_y_scale = native_y_scale;
     this->target_x_scale = native_x_scale;
     this->target_y_scale = native_y_scale;
 
-    this->camera->setScale(win_x / SCREEN_WIDTH, win_y / SCREEN_HEIGHT);
+    this->camera->setScale(this->native_x_scale, this->native_y_scale);
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -343,10 +344,12 @@ void Engine::collisionStep(ObjectList* all_objects){
             //The number of blocks in x & y directions
             const int x_block = 16, y_block = 9;
 
-            int x_iter = SCREEN_WIDTH / x_block;
-            int y_iter = SCREEN_HEIGHT / y_block;
-            int x_max = SCREEN_WIDTH + camera->getX();
-            int y_max = SCREEN_HEIGHT + camera->getY();
+            int win_width, win_height;
+            SDL_GetWindowSize(this->window, &win_width, &win_height);
+            int x_iter = win_width / x_block;
+            int y_iter = win_height / y_block;
+            int x_max = win_width + camera->getX();
+            int y_max = win_height + camera->getY();
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
@@ -438,7 +441,6 @@ void Engine::drawStep(EntityList* all_entities){
 
     SDL_RenderClear(renderer);
 
-    //Set the current scale
     camera->setScale(current_x_scale, current_y_scale);
 
     //Draw operation
@@ -455,6 +457,8 @@ void Engine::drawStep(EntityList* all_entities){
         }
         zone_cursor = zone_cursor->next;
     }
+
+    camera->setScale(1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
@@ -946,6 +950,14 @@ void Engine::addMusic(const char* key, Music* music){
     this->music_hash->add(key, music);
 }
 
+/**Adds a font to the sprite hash
+ * @param key The key representing the font
+ * @param font The font being added to the hash
+ */
+void Engine::addFont(const char* key, Font* font){
+    this->font_hash->add(key, font);
+}
+
 /** Moves a Zone to the active_zones ZoneList
  * @param zone_name The name of the zone you wish to move
  */
@@ -1104,4 +1116,12 @@ Sound* Engine::getSound(const char* key){
  */
 Music* Engine::getMusic(const char* key){
     return this->music_hash->get(key);
+}
+
+/** Gets a font from the engine
+ * @param key The font's identifier in the hash table
+ * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
+ */
+Font* Engine::getFont(const char* key){
+    return this->font_hash->get(key);
 }

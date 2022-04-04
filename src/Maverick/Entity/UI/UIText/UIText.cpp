@@ -137,9 +137,12 @@ void UIText::setPoint(unsigned int point){
                 free(this->ref_buff);
             }
 
+            int win_width, win_height;
+            SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
             //Calculate the print_buffer attributes
-            this->num_lines = this->view_height * SCREEN_HEIGHT / char_height;
-            this->chars_per_line = this->view_width * SCREEN_WIDTH / char_width;
+            this->num_lines = this->view_height * win_height / char_height;
+            this->chars_per_line = this->view_width * win_width / char_width;
 
             //Allocate space for the new buffers
             this->print_buff = (char**)malloc(sizeof(char*) * num_lines);
@@ -348,7 +351,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
             }
         }
 
-        if(this->y_alignment == ALIGNMENT::CENTER){
+        if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
             draw_rect.y = draw_area.y + ((draw_area.h - (draw_rect.h * drawn_lines)) / 2);
         }
 
@@ -358,7 +361,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
             //Set width of the rect
             draw_rect.w = strlen(buff[i]) * width;
 
-            if(this->x_alignment == ALIGNMENT::CENTER){
+            if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
                 draw_rect.x = draw_area.x + ((draw_area.w - draw_rect.w) / 2);
             }
 

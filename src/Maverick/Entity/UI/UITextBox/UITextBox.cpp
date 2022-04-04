@@ -27,11 +27,14 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT_BOX;
 
-    double text_view_x_offset = ((view_x_offset * SCREEN_WIDTH) + border_buff) / SCREEN_WIDTH;
-    double text_view_y_offset = ((view_y_offset * SCREEN_HEIGHT) + border_buff) / SCREEN_HEIGHT;
+    int win_width, win_height;
+    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
-    double text_view_width = ((view_width * SCREEN_WIDTH) - (border_buff * 2)) / SCREEN_WIDTH;
-    double text_view_height = ((view_height * SCREEN_HEIGHT) - (border_buff * 2)) / SCREEN_HEIGHT;
+    double text_view_x_offset = ((view_x_offset * win_width) + border_buff) / win_width;
+    double text_view_y_offset = ((view_y_offset * win_height) + border_buff) / win_height;
+
+    double text_view_width = ((view_width * win_width) - (border_buff * 2)) / win_width;
+    double text_view_height = ((view_height * win_height) - (border_buff * 2)) / win_height;
 
     this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height, draw_layer,
                             font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);

@@ -374,10 +374,8 @@ int Object::serializeExtendedData(FILE* file, Zone* base_zone){
 
 /** Serializing object assets (to be overridden by children, as necessary)
  * @param file An open file to write to
- * @param sprite_set The sprite sets that have already been written to file
- * @param sprite_set The audio sets that have already been written to file
- * @param sprite_set The music sets that have already been written to file
+ * @param serialize_set The serialization set (logs saved assets)
  */
-int Object::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+int Object::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
     return 0;
 }

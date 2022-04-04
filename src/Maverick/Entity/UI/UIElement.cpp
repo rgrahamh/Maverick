@@ -23,13 +23,16 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 
     this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
-    this->x = view_x_offset * SCREEN_WIDTH;
-    this->y = view_y_offset * SCREEN_HEIGHT;
+    int win_width, win_height;
+    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
+    this->x = view_x_offset * win_width;
+    this->y = view_y_offset * win_height;
 
     this->draw_area.x = this->x;
     this->draw_area.y = this->y;
-    this->draw_area.w = view_width * SCREEN_WIDTH;
-    this->draw_area.h = view_height * SCREEN_HEIGHT;
+    this->draw_area.w = view_width * win_width;
+    this->draw_area.h = view_height * win_height;
 
     this->subelements = nullptr;
 }
@@ -135,7 +138,9 @@ void UIElement::setViewSize(double view_width, double view_height){
     //Set scale for this element
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
-        animation_cursor->animation->setSize(view_width * SCREEN_WIDTH, view_height * SCREEN_HEIGHT);
+        int win_width, win_height;
+        SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+        animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
     }
 
     //Set scale for all children elements
@@ -189,14 +194,17 @@ int UIElement::addSprite(const char* animation_name, const char* sprite_set, con
         return -1;
     }
 
+    int win_width, win_height;
+    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
     if(width != -1){
-        width *= (float)SCREEN_WIDTH;
+        width *= (float)win_width;
     }
     else{
         width = this->draw_area.w;
     }
     if(height != -1){
-        height *= (float)SCREEN_HEIGHT;
+        height *= (float)win_height;
     }
     else{
         height = this->draw_area.h;
@@ -289,14 +297,12 @@ int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
 
 /** Serializing UI Element assets (to be overridden by children, as necessary)
  * @param file An open file to write to
- * @param sprite_set The sprite sets that have already been written to file
- * @param sprite_set The audio sets that have already been written to file
- * @param sprite_set The music sets that have already been written to file
+ * @param serialize_set The serialization set (logs saved assets)
  */
-int UIElement::serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set){
+int UIElement::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
     UIElementList* subelement_cursor = subelements;
     while(subelement_cursor != nullptr){
-        subelement_cursor->element->serializeAssets(file, sprite_set, audio_set, music_set);
+        subelement_cursor->element->serializeAssets(file, serialize_set);
         subelement_cursor = subelement_cursor->next;
     }
     return 0;

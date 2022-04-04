@@ -13,13 +13,6 @@
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
-enum RESOURCE_TYPE{
-	BMP,
-	SOUND,
-	MUSIC,
-	CUT
-};
-
 class Zone;
 
 class Entity{
@@ -76,8 +69,8 @@ class Entity{
 		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
 		//Call
-		int serializeAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set);
-		virtual int serializeExtendedAssets(FILE* file, std::unordered_set<std::string>& sprite_set, std::unordered_set<std::string>& audio_set, std::unordered_set<std::string>& music_set) = 0;
+		int serializeAssets(FILE* file, SerializeSet& serialize_set);
+		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) = 0;
 
 		int serializeData(FILE* file, Zone* base_zone);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;

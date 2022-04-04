@@ -593,16 +593,16 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
  * @param written_music The set of music assets that have already been written to file (used just by entities that handle music)
  * @return The number of bytes that *buff_ptr is
  */
-int Entity::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio, std::unordered_set<std::string>& written_music){
+int Entity::serializeAssets(FILE* file, SerializeSet& serialize_set){
     if(file == nullptr){
         return -1;
     }
 
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
-        animation_cursor->animation->serializeAssets(file, written_sprites, written_audio);
+        animation_cursor->animation->serializeAssets(file, serialize_set);
         animation_cursor = animation_cursor->next;
     }
 
-    return this->serializeExtendedAssets(file, written_sprites, written_audio, written_music);
+    return this->serializeExtendedAssets(file, serialize_set);
 }

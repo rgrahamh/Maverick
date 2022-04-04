@@ -6,13 +6,13 @@
 #include "../UIElement.hpp"
 
 enum ALIGNMENT{
-    CENTER,
-    NORMAL
+    CENTER_ALIGN,
+    STANDARD_ALIGN
 };
 
 class UIText : public UIElement{
     public:
-        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::NORMAL, ALIGNMENT y_alignment = ALIGNMENT::NORMAL);
+        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);

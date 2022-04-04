@@ -4,7 +4,7 @@
 #include "../Audio/Audio.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
@@ -81,7 +81,7 @@ class Animation{
 
 		void rotate(int direction, float rotation_amnt);
 
-		int serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio);
+		int serializeAssets(FILE* file, SerializeSet& serialize_set);
 		int serializeData(FILE* file);
 
 	private:

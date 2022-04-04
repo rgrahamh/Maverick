@@ -15,6 +15,7 @@
 #include "../HashTable/SpriteHash/SpriteHash.hpp"
 #include "../HashTable/MusicHash/MusicHash.hpp"
 #include "../HashTable/SoundHash/SoundHash.hpp"
+#include "../HashTable/FontHash/FontHash.hpp"
 
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
@@ -25,15 +26,15 @@
 
 #include "../Audio/SoundBoard/SoundBoard.hpp"
 
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 360
+#define BASE_SCREEN_WIDTH 640
+#define BASE_SCREEN_HEIGHT 360
 #define PHYSICS_STEP_SIZE 4 //ms
 
 enum GAME_STATE : uint64_t{
@@ -50,7 +51,6 @@ struct EntityList{
 	ObjectList* obj;
 	UIElementList* ui;
 };
-
 
 class Engine{
 	public:
@@ -113,6 +113,8 @@ class Engine{
 		Sound* getSound(const char* key);
 		void addMusic(const char* key, Music* music);
 		Music* getMusic(const char* key);
+		void addFont(const char* key, Font* font);
+		Font* getFont(const char* key);
 
 	private:
 		void gameLoop();
@@ -195,6 +197,7 @@ class Engine{
 		SpriteHash* sprite_hash;
 		SoundHash* sound_hash;
 		MusicHash* music_hash;
+		FontHash* font_hash;
 
 		uint64_t delta;
 };

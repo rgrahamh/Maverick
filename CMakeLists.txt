@@ -11,8 +11,13 @@ set(AnimationSrc
 )
 
 set(AudioSrc
+    ./src/Maverick/Audio/Audio.cpp
     ./src/Maverick/Audio/Music/Music.cpp
     ./src/Maverick/Audio/SoundBoard/SoundBoard.cpp
+)
+
+set(FontSrc
+    ./src/Maverick/Font/Font.cpp
 )
 
 set(HashSrc
@@ -21,6 +26,7 @@ set(HashSrc
     ./src/Maverick/HashTable/SpriteHash/SpriteHash.cpp
     ./src/Maverick/HashTable/MusicHash/MusicHash.cpp
     ./src/Maverick/HashTable/SoundHash/SoundHash.cpp
+    ./src/Maverick/HashTable/FontHash/FontHash.cpp
 )
 
 set(HitboxSrc
@@ -45,6 +51,7 @@ set(UISrc
     ./src/Maverick/Entity/UI/UIText/UIText.cpp
     ./src/Maverick/Entity/UI/UITextBox/UITextBox.cpp
     ./src/Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.cpp
+    ${FontSrc}
 )
 
 set(ObjectSrc

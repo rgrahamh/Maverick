@@ -1,7 +1,7 @@
 #include "./Animation.hpp"
 
 #include "../Engine/Engine.hpp"
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 extern Engine* engine;
 
@@ -556,7 +556,7 @@ bool Animation::hasSpriteSet(const char* sprite_set){
  * @param written_audio The set of audio assets that have already been written to file
  * @return 0 if successful
  */
-int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& written_sprites, std::unordered_set<std::string>& written_audio){
+int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
     AnimationSeq* cursor = sequence_start;
     if(cursor != NULL){
         do{
@@ -564,53 +564,23 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 				if(cursor->sprite != nullptr){
 					Sprite* sprite = cursor->sprite[sprite_set.second];
 					//If this asset's not been saved in this file yet
-					if(sprite != nullptr && written_sprites.find(sprite->name) == written_sprites.end()){
+					if(sprite != nullptr && serialize_set.sprite_set.find(sprite->name) == serialize_set.sprite_set.end()){
 						//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
 						SDL_Surface* surface = engine->getSurface(sprite->name);
 
 						if(surface != nullptr){
-							//Gather necessary info
-							//Width/Height are naturally ints (so size varies), meaning we need to truncate first
-							uint32_t width = surface->w;
-							uint32_t width_swap = EndianSwap(&width);
-							uint32_t height = surface->h;
-							uint32_t height_swap = EndianSwap(&height);
-
-							//Bit depth of the image
-							uint8_t depth = surface->format->BitsPerPixel;
-
-							//The RGBA masks
-							uint32_t rmask = EndianSwap(&surface->format->Rmask);
-							uint32_t gmask = EndianSwap(&surface->format->Gmask);
-							uint32_t bmask = EndianSwap(&surface->format->Bmask);
-							uint32_t amask = EndianSwap(&surface->format->Amask);
-
 							//Identifier len
 							uint16_t identifier_len = strlen(sprite->name);
 							uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-							uint8_t asset_type = RESOURCE_TYPE::BMP;
-							fwrite(&asset_type, 1, 1, file);
 
 							//Identifier
 							fwrite(&identifier_len_swapped, 2, 1, file);
 							fwrite(sprite->name, 1, identifier_len, file);
 
-							//Write the image header info
-							fwrite(&width_swap, sizeof(width_swap), 1, file);
-							fwrite(&height_swap, sizeof(height_swap), 1, file);
-							fwrite(&depth, 1, 1, file);
-							fwrite(&rmask, sizeof(rmask), 1, file);
-							fwrite(&gmask, sizeof(gmask), 1, file);
-							fwrite(&bmask, sizeof(bmask), 1, file);
-							fwrite(&amask, sizeof(amask), 1, file);
-
-							//Write the actual image data ((w * h * bpp) bytes)
-							fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
-							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
+							SerializeSurface(file, sprite->surface);
 
 							//Log this sprite as written
-							written_sprites.insert(sprite->name);
+							serialize_set.sprite_set.insert(sprite->name);
 						}
 					}
 				}
@@ -618,25 +588,11 @@ int Animation::serializeAssets(FILE* file, std::unordered_set<std::string>& writ
 
 			Sound* sound = cursor->sound;
 			//Also have a place for saving audio (once that's implemented in the system)
-			if(sound != nullptr && written_audio.find(cursor->sound->name) == written_audio.end()){
-				//Identifier len
-				uint16_t identifier_len = strlen(cursor->sound->name);
-				uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-				uint8_t asset_type = RESOURCE_TYPE::SOUND;
-				fwrite(&asset_type, 1, 1, file);
-
-				//Identifier
-				fwrite(&identifier_len_swapped, 2, 1, file);
-				fwrite(cursor->sound->name, 1, identifier_len, file);
-
-				//Writing the audio buffer (from the mixer chunk) to file
-				uint32_t audio_len = EndianSwap(&cursor->sound->sample->alen);
-				fwrite(&audio_len, 1, 1, file);
-				fwrite(cursor->sound->sample->abuf, 1, cursor->sound->sample->alen, file);
+			if(sound != nullptr && serialize_set.audio_set.find(cursor->sound->name) == serialize_set.audio_set.end()){
+				SerializeSound(file, cursor->sound);
 
 				//Insert the audio
-				written_audio.insert(cursor->sound->name);
+				serialize_set.audio_set.insert(cursor->sound->name);
 			}
 			cursor = cursor->next;
         } while(cursor != sequence_start && cursor != nullptr);
