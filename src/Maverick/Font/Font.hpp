@@ -19,11 +19,11 @@ enum FONT_STYLE{
 class Font{
     public:
         Font(const char* name);
-        void setCharacter(char value, SDL_Surface* surface, enum FONT_STYLE = STANDARD_STYLE);
+        void setCharacter(unsigned char value, SDL_Surface* surface, enum FONT_STYLE = STANDARD_STYLE);
         void setStyle(enum FONT_STYLE);
 
-        SDL_Surface* getCharacter(char val);
-        SDL_Surface* getCharacter(char value, enum FONT_STYLE style);
+        SDL_Surface* getCharacter(unsigned char val);
+        SDL_Surface* getCharacter(unsigned char value, enum FONT_STYLE style);
 
         int serialize(FILE* file, std::unordered_set<std::string> font_set);
 

@@ -7,11 +7,11 @@ Font::Font(const char* name){
     memset(this->num_chars, 0, NUM_STYLES);
 }
 
-SDL_Surface* Font::getCharacter(char value){
+SDL_Surface* Font::getCharacter(unsigned char value){
     return this->typesetter[this->style][value];
 }
 
-SDL_Surface* Font::getCharacter(char value, enum FONT_STYLE style){
+SDL_Surface* Font::getCharacter(unsigned char value, enum FONT_STYLE style){
     return this->typesetter[style][value];
 }
 
@@ -19,7 +19,7 @@ void Font::setStyle(enum FONT_STYLE style){
     this->style = style;
 }
 
-void Font::setCharacter(char value, SDL_Surface* surface, enum FONT_STYLE style){
+void Font::setCharacter(unsigned char value, SDL_Surface* surface, enum FONT_STYLE style){
     this->typesetter[style][value] = surface;
     this->num_chars[style]++;
 }
@@ -49,4 +49,6 @@ int Font::serialize(FILE* file, std::unordered_set<std::string> font_set){
             }
         }
     }
+
+    return 0;
 }

@@ -93,7 +93,7 @@ void* AttributeHash::get(const char* key){
 unsigned int AttributeHash::dump(AttributeHashEntry** hash_ptr){
 	unsigned int entries = 0;
 	AttributeHashEntry* ht_dump = nullptr;
-	for(int i = 0; i < size; i++){
+	for(unsigned int i = 0; i < size; i++){
 		while(table[i] != nullptr){
 			if(ht_dump == nullptr){
 				ht_dump = new AttributeHashEntry;

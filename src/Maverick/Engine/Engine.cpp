@@ -11,7 +11,7 @@ bool endian;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
-extern Engine* engine;
+Engine* engine;
 
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with
@@ -162,8 +162,6 @@ void Engine::start(){
 
     //saveZone(this->getZone("global"));
     //saveZone(this->getZone("Test Zone"));
-
-    //loadZone("FilterTest");
 
     /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
     sound_board->playMusic(song1);
@@ -446,17 +444,6 @@ void Engine::drawStep(EntityList* all_entities){
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
-
-    //Draw filter
-    ZoneList* zone_cursor = this->active_zones;
-    while(zone_cursor != nullptr){
-        FilterList* filters = zone_cursor->zone->getFilters();
-        while(filters != nullptr && filters->filter != nullptr){
-            filters->filter->apply(renderer);
-            filters = filters->next;
-        }
-        zone_cursor = zone_cursor->next;
-    }
 
     camera->setScale(1.0, 1.0);
 
@@ -813,8 +800,6 @@ void Engine::buildFullEntityList(){
         }
 
         zone_iter = zone_iter->next;
-
-        //For each filter in the zone
     }
 
     //Clean up all hanging nodes (this can happen if there are less objects this frame than the last)
