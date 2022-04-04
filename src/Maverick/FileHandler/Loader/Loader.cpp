@@ -1,5 +1,5 @@
 #include "Loader.hpp"
-#include "../../../Maverick/Utility/Utility.hpp"
+#include "../../../Maverick/Global/Global.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
 
 extern Engine* engine;

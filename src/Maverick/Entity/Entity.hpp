@@ -15,13 +15,6 @@
 
 class Zone;
 
-struct SerializeSet{
-	std::unordered_set<std::string> sprite_set;
-	std::unordered_set<std::string> audio_set;
-	std::unordered_set<std::string> music_set;
-	std::unordered_set<std::string> font_set;
-};
-
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);

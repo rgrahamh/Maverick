@@ -121,7 +121,7 @@ GlassBall* buildGlassBloodBall(const char* name, float start_x, float start_y){
     glassBall->addAnimation("rolling", 1);
     for(int i = 0; i < 7; i++){
         glassBall->addFrame("rolling", 100);
-        glassBall->addHitbox("rolling", ELLIPSE, 0, 0, 0, 7, 7, 7, HITBOX_TYPE::COLLISION | HITBOX_TYPE::MOVABLE, 0);
+        glassBall->addHitbox("rolling", ELLIPSE, 0, 0, 0, 7, 7, 7, HITBOX_TYPE::COLLISION | HITBOX_TYPE::MOVABLE, i);
     }
     glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling1.bmp");
     glassBall->addSprite("rolling", "day", "./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallRolling2.bmp");

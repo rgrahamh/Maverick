@@ -26,7 +26,7 @@
 
 #include "../Audio/SoundBoard/SoundBoard.hpp"
 
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -47,19 +47,10 @@ enum GAME_STATE : uint64_t{
 	EXIT = 64
 };
 
-enum RESOURCE_TYPE{
-	BMP,
-	SOUND,
-	MUSIC,
-	FONT,
-	CUT
-};
-
 struct EntityList{
 	ObjectList* obj;
 	UIElementList* ui;
 };
-
 
 class Engine{
 	public:

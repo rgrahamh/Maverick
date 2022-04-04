@@ -4,7 +4,7 @@
 #include "../Audio/Audio.hpp"
 #include "./Hitbox/Hitbox.hpp"
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>

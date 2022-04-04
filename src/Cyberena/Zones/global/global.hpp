@@ -1,5 +1,5 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef GLOBALLVL_H
+#define GLOBALLVL_H
 #include "../../Factory/Factory.hpp"
 
 void buildGlobal();

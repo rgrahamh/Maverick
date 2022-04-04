@@ -16,7 +16,7 @@ set(AudioSrc
     ./src/Maverick/Audio/SoundBoard/SoundBoard.cpp
 )
 
-set(FortSrc
+set(FontSrc
     ./src/Maverick/Font/Font.cpp
 )
 
@@ -51,6 +51,7 @@ set(UISrc
     ./src/Maverick/Entity/UI/UIText/UIText.cpp
     ./src/Maverick/Entity/UI/UITextBox/UITextBox.cpp
     ./src/Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.cpp
+    ${FontSrc}
 )
 
 set(ObjectSrc

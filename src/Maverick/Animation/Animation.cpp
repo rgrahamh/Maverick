@@ -1,7 +1,7 @@
 #include "./Animation.hpp"
 
 #include "../Engine/Engine.hpp"
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 
 extern Engine* engine;
 
@@ -569,45 +569,15 @@ int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
 						SDL_Surface* surface = engine->getSurface(sprite->name);
 
 						if(surface != nullptr){
-							//Gather necessary info
-							//Width/Height are naturally ints (so size varies), meaning we need to truncate first
-							uint32_t width = surface->w;
-							uint32_t width_swap = EndianSwap(&width);
-							uint32_t height = surface->h;
-							uint32_t height_swap = EndianSwap(&height);
-
-							//Bit depth of the image
-							uint8_t depth = surface->format->BitsPerPixel;
-
-							//The RGBA masks
-							uint32_t rmask = EndianSwap(&surface->format->Rmask);
-							uint32_t gmask = EndianSwap(&surface->format->Gmask);
-							uint32_t bmask = EndianSwap(&surface->format->Bmask);
-							uint32_t amask = EndianSwap(&surface->format->Amask);
-
 							//Identifier len
 							uint16_t identifier_len = strlen(sprite->name);
 							uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
-							uint8_t asset_type = RESOURCE_TYPE::BMP;
-							fwrite(&asset_type, 1, 1, file);
 
 							//Identifier
 							fwrite(&identifier_len_swapped, 2, 1, file);
 							fwrite(sprite->name, 1, identifier_len, file);
 
-							//Write the image header info
-							fwrite(&width_swap, sizeof(width_swap), 1, file);
-							fwrite(&height_swap, sizeof(height_swap), 1, file);
-							fwrite(&depth, 1, 1, file);
-							fwrite(&rmask, sizeof(rmask), 1, file);
-							fwrite(&gmask, sizeof(gmask), 1, file);
-							fwrite(&bmask, sizeof(bmask), 1, file);
-							fwrite(&amask, sizeof(amask), 1, file);
-
-							//Write the actual image data ((w * h * bpp) bytes)
-							fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
-							fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
+							SerializeSurface(file, sprite->surface);
 
 							//Log this sprite as written
 							serialize_set.sprite_set.insert(sprite->name);

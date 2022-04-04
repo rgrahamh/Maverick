@@ -1,4 +1,4 @@
-#include "../Utility/Utility.hpp"
+#include "../Global/Global.hpp"
 #include "../Engine/Engine.hpp"
 
 int SerializeSound(FILE* file, Sound* sound){

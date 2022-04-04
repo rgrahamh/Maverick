@@ -24,7 +24,7 @@ void buildGlobal(){
     pause_menu->setAnimation("default");
 
     //Create the pause text
-    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "./assets/fonts/nokiafc22.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER, ALIGNMENT::CENTER);
+    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "./assets/fonts/nokiafc22.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     pause_text->setColor(255, 255, 255);
     pause_menu->addElement(pause_text);
 

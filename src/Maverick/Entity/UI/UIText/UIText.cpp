@@ -351,7 +351,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
             }
         }
 
-        if(this->y_alignment == ALIGNMENT::CENTER){
+        if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
             draw_rect.y = draw_area.y + ((draw_area.h - (draw_rect.h * drawn_lines)) / 2);
         }
 
@@ -361,7 +361,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
             //Set width of the rect
             draw_rect.w = strlen(buff[i]) * width;
 
-            if(this->x_alignment == ALIGNMENT::CENTER){
+            if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
                 draw_rect.x = draw_area.x + ((draw_area.w - draw_rect.w) / 2);
             }
 

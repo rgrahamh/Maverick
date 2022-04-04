@@ -4,7 +4,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "../../Utility/Utility.hpp"
+#include "../../Global/Global.hpp"
 
 //The shape of the hitbox
 enum HITBOX_SHAPE{
