@@ -8,7 +8,26 @@
 
 #include <SDL2/SDL.h>
 
+#if _WIN32
+#include <windows.h>
+#else
+#include <dirent.h>
+#endif
+
 extern bool endian;
+
+enum FILE_TYPE{
+	REG_FILE,
+	DIRECTORY,
+	SYMLINK,
+	OTHER_FILE
+};
+
+struct File{
+	char* name;
+	enum FILE_TYPE type;
+	struct File* next;
+};
 
 enum RESOURCE_TYPE{
 	BMP = 0,
@@ -122,6 +141,22 @@ static inline char* StrDeepCopy(const char* str){
 	return new_str;
 }
 
+static inline void ToLower(char* str){
+	for(int i = 0; str[i] != '\0'; i++){
+		if(str[i] >= 'A' && str[i] <= 'Z'){
+			str[i] += 0x20;
+		}
+	}
+}
+
+static inline void ToUpper(char* str){
+	for(int i = 0; str[i] != '\0'; i++){
+		if(str[i] >= 'a' && str[i] <= 'z'){
+			str[i] -= 0x20;
+		}
+	}
+}
+
 static inline void Normalize2DVector(double* x_force, double* y_force){
 	double hypotenuse = sqrt(pow(*x_force, 2) + pow(*y_force, 2));
 	*x_force /= hypotenuse;
@@ -172,5 +207,53 @@ static inline int SerializeSurface(FILE* file, SDL_Surface* surface){
 	fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
 	fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
 	 return 0;
+}
+
+static inline File* ReadDirectory(const char* dir_name){
+//If Windows
+#if _WIN32
+	//Figure this out when I compile on a Windows machine ig lol
+//else if __linux__ or __APPLE__ (assume some POSIX standard machine)
+#else
+	File* files = nullptr;
+	DIR* dir = opendir(dir_name);
+	struct dirent* dir_cursor = readdir(dir);
+	while(dir_cursor != nullptr){
+		if(files == nullptr){
+			files = new File;
+			files->next = nullptr;
+		}
+		else{
+			File* new_file = new File;
+			new_file->next = files;
+			files = new_file;
+		}
+
+		files->name = StrDeepCopy(dir_cursor->d_name);
+		switch(dir_cursor->d_type){
+			case(DT_REG):{
+				files->type = FILE_TYPE::REG_FILE;
+				break;
+			}
+			case(DT_DIR):{
+				files->type = FILE_TYPE::DIRECTORY;
+				break;
+			}
+			case(DT_LNK):{
+				files->type = FILE_TYPE::SYMLINK;
+				break;
+			}
+			default:{
+				files->type = FILE_TYPE::REG_FILE;
+			}
+		}
+		dir_cursor = readdir(dir);
+	}
+
+	closedir(dir);
+
+	return files;
+	
+#endif
 }
 #endif
