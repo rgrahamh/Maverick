@@ -14,6 +14,7 @@
 #include <dirent.h>
 #endif
 
+//Called in the engine's constructor to set endianness
 extern bool endian;
 
 enum FILE_TYPE{
@@ -133,6 +134,10 @@ static inline int16_t EndianSwap(int16_t* input){
 	}
 }
 
+/** Does a deep copy of a string
+ * @param str The string to deep copy
+ * @return A new string with the contents of a passed-in string
+ */
 static inline char* StrDeepCopy(const char* str){
     int str_len = strlen(str);
     char* new_str = (char*)malloc(str_len + 1);
@@ -141,6 +146,9 @@ static inline char* StrDeepCopy(const char* str){
 	return new_str;
 }
 
+/** Converts a passed-in string to all lowercase
+ * @param str The string to convert to lowercase
+ */
 static inline void ToLower(char* str){
 	for(int i = 0; str[i] != '\0'; i++){
 		if(str[i] >= 'A' && str[i] <= 'Z'){
@@ -149,12 +157,85 @@ static inline void ToLower(char* str){
 	}
 }
 
+/** Converts a passed-in string to all uppercase
+ * @param str The string to convert to uppercase
+ */
 static inline void ToUpper(char* str){
 	for(int i = 0; str[i] != '\0'; i++){
 		if(str[i] >= 'a' && str[i] <= 'z'){
 			str[i] -= 0x20;
 		}
 	}
+}
+
+/** Modifies the passed-in str to add null bytes where delimiters are, and passes back a char*[args] with references to the start of each arg
+ * @param str The string to parse
+ * @param delims All delims that should be considered params
+ * @return A list of references to places in the string where the arguments start
+ */
+static inline char** getArgs(char* str, char* delims){
+	//The new argument list
+	unsigned int max_args = strlen(str) / 2;
+	char** arg_lst = (char**)calloc(sizeof(char*), max_args);
+	arg_lst[0] = str;
+	int arg_iter = 1;
+
+	//Calculated length pre-loop
+	int len = strlen(str);
+	//Tracks the delimiter number
+	int delim_num = strlen(delims);
+	//Use
+	char capped_quote = '\0';
+
+	//Parsing through the arguments
+	for(int i = 0; i < len; i++){
+		//Quote capturing
+		if(str[i] == '\"' || str[i] == '\''){
+			if(capped_quote == '\0'){
+				capped_quote = str[i];
+				continue;
+			}
+			else if(capped_quote == str[i]){
+				capped_quote = '\0';
+				continue;
+			}
+		}
+		//Dealing with escaped characters
+		else if(str[i] == '\\'){
+			char* curr_addr = &(str[i]);
+			strcpy(curr_addr, curr_addr+1);
+			continue;
+		}
+		//Checking against all specified separation delimeters
+		for(int j = 0; j < delim_num; j++){
+			if(str[i] == delims[j] && capped_quote == '\0'){
+				str[i] = '\0';
+
+				//If there's a next argument, add it
+				if(i + 1 < len){
+					arg_lst[arg_iter++] = str + i + 1;
+				}
+
+				//If we go over the max iterations
+				if(arg_iter > max_args){
+					return NULL;
+				}
+			}
+		}
+	}
+	if(capped_quote == '\"' || capped_quote == '\''){
+		return NULL;
+	}
+
+	for(int i = 0; i < arg_iter; i++){
+		int arg_len = strlen(arg_lst[i]);
+		if(arg_len >= 2 && ((arg_lst[i][0] == '\'' && arg_lst[i][arg_len-1] == '\'') || (arg_lst[i][0] == '\"' && arg_lst[i][arg_len-1] == '\"'))){
+			arg_lst[i][arg_len-1] = '\0';
+			arg_lst[i] = arg_lst[i] + 1;
+		}
+	}
+
+	return arg_lst;
 }
 
 static inline void Normalize2DVector(double* x_force, double* y_force){

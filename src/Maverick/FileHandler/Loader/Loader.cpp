@@ -1,5 +1,4 @@
 #include "Loader.hpp"
-#include "../../../Maverick/Global/Global.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
 
 extern Engine* engine;
@@ -40,7 +39,7 @@ inline SDL_Surface* readSurface(FILE* file){
 /** Loads a BMP from file & inserts it into the engine
  * @param file The file to load the BMP from
  */
-inline void loadBMP(FILE* file){
+inline char* loadBMP(FILE* file){
 	uint16_t identifier_len;
 
 	if(fread(&identifier_len, sizeof(identifier_len), 1, file) == 0){
@@ -55,13 +54,15 @@ inline void loadBMP(FILE* file){
 	SDL_Surface* new_surface = readSurface(file);
 
 	engine->addSurface(identifier, new_surface);
+
+	return identifier;
 }
 
 
 /** Loads a sound from file & inserts it into the engine
  * @param file The file to load the sound from
  */
-inline void loadSound(FILE* file){
+inline char* loadSound(FILE* file){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
@@ -81,12 +82,14 @@ inline void loadSound(FILE* file){
 	fread(&new_sound->sample->abuf, 1, audio_len, file);
 
 	engine->addSound(identifier, new_sound);
+
+	return identifier;
 }
 
 /** Loads a unit of music from file & inserts it into the engine
  * @param file The file to load the music from
  */
-inline void loadMusic(FILE* file){
+inline char* loadMusic(FILE* file){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
@@ -114,9 +117,11 @@ inline void loadMusic(FILE* file){
 	}
 
 	engine->addMusic(identifier, new_music);
+
+	return identifier;
 }
 
-inline void loadFont(FILE* file){
+inline char* loadFont(FILE* file){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
@@ -145,6 +150,8 @@ inline void loadFont(FILE* file){
 	}
 
 	engine->addFont(identifier, new_font);
+
+	return identifier;
 }
 
 inline void loadCutscene(FILE* file){
@@ -176,7 +183,6 @@ int loadAssets(const char* zone_name)
 				loadSound(file);
 				break;
 			}
-			//Implement later
 			case(RESOURCE_TYPE::MUSIC):
 				loadMusic(file);
 				break;
