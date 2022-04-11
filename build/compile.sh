@@ -13,3 +13,10 @@ make
 chmod +x led
 cp led ../../bin
 cd ../../bin
+
+cd ../src/red
+cmake .
+make
+chmod +x red
+cp red ../../bin
+cd ../../bin

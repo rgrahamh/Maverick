@@ -24,8 +24,13 @@ void Font::setCharacter(unsigned char value, SDL_Surface* surface, enum FONT_STY
     this->num_chars[style]++;
 }
 
-int Font::serialize(FILE* file, std::unordered_set<std::string> font_set){
-    if(font_set.find(this->name) == font_set.end()){
+void Font::removeCharacter(unsigned char value, enum FONT_STYLE style){
+    this->typesetter[style][value] = nullptr;
+    this->num_chars[style]--;
+}
+
+int Font::serialize(FILE* file){
+    if(file == nullptr){
         return -1;
     }
 

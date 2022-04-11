@@ -36,6 +36,6 @@ add_executable(cyberena
     ${CyberenaSrc}
 )
 
-target_include_directories(cyberena
+target_include_directories(cyberena PUBLIC
     ../../bin
 )

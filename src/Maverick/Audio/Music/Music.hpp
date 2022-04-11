@@ -17,7 +17,7 @@ class Music{
         void setVolume(float volume, unsigned int fade = 0);
         int setInstrumentVolume(const char* instrument_name, float volume, unsigned int fade = 0);
         int addTrack(Sound* track);
-        int serialize(FILE* file, std::unordered_set<std::string>& music_set);
+        int serialize(FILE* file);
         bool isPlaying();
 
     private:

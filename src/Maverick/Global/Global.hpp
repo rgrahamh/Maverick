@@ -178,17 +178,17 @@ static inline char** getArgs(char* str, char* delims){
 	unsigned int max_args = strlen(str) / 2;
 	char** arg_lst = (char**)calloc(sizeof(char*), max_args);
 	arg_lst[0] = str;
-	int arg_iter = 1;
+	unsigned int arg_iter = 1;
 
 	//Calculated length pre-loop
-	int len = strlen(str);
+	unsigned int len = strlen(str);
 	//Tracks the delimiter number
-	int delim_num = strlen(delims);
+	unsigned int delim_num = strlen(delims);
 	//Use
 	char capped_quote = '\0';
 
 	//Parsing through the arguments
-	for(int i = 0; i < len; i++){
+	for(unsigned int i = 0; i < len; i++){
 		//Quote capturing
 		if(str[i] == '\"' || str[i] == '\''){
 			if(capped_quote == '\0'){
@@ -207,7 +207,7 @@ static inline char** getArgs(char* str, char* delims){
 			continue;
 		}
 		//Checking against all specified separation delimeters
-		for(int j = 0; j < delim_num; j++){
+		for(unsigned int j = 0; j < delim_num; j++){
 			if(str[i] == delims[j] && capped_quote == '\0'){
 				str[i] = '\0';
 
@@ -227,7 +227,7 @@ static inline char** getArgs(char* str, char* delims){
 		return NULL;
 	}
 
-	for(int i = 0; i < arg_iter; i++){
+	for(unsigned int i = 0; i < arg_iter; i++){
 		int arg_len = strlen(arg_lst[i]);
 		if(arg_len >= 2 && ((arg_lst[i][0] == '\'' && arg_lst[i][arg_len-1] == '\'') || (arg_lst[i][0] == '\"' && arg_lst[i][arg_len-1] == '\"'))){
 			arg_lst[i][arg_len-1] = '\0';

@@ -24,8 +24,9 @@ class Font{
 
         SDL_Surface* getCharacter(unsigned char val);
         SDL_Surface* getCharacter(unsigned char value, enum FONT_STYLE style);
+        void removeCharacter(unsigned char value, enum FONT_STYLE style);
 
-        int serialize(FILE* file, std::unordered_set<std::string> font_set);
+        int serialize(FILE* file);
 
     private:
         char* name;
