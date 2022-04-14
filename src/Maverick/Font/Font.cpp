@@ -34,6 +34,9 @@ int Font::serialize(FILE* file){
         return -1;
     }
 
+    uint8_t resource_type = RESOURCE_TYPE::FONT;
+    fwrite(&resource_type, sizeof(resource_type), 1, file);
+
     uint8_t num_styles = 0;
     for(int i = 0; i < NUM_STYLES; i++){
         if(num_chars[i] > 0){

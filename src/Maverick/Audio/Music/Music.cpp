@@ -145,6 +145,9 @@ int Music::serialize(FILE* file){
         return -1;
     }
 
+    uint8_t resource_type = RESOURCE_TYPE::MUSIC;
+    fwrite(&resource_type, sizeof(resource_type), 1, file);
+
     //Identifier len
     uint16_t identifier_len = strlen(this->name);
     uint16_t identifier_len_swap = EndianSwap(&identifier_len);

@@ -272,9 +272,6 @@ static inline int SerializeSurface(FILE* file, SDL_Surface* surface){
 	uint32_t bmask = EndianSwap(&surface->format->Bmask);
 	uint32_t amask = EndianSwap(&surface->format->Amask);
 
-	uint8_t asset_type = RESOURCE_TYPE::BMP;
-	fwrite(&asset_type, 1, 1, file);
-
 	//Write the image header info
 	fwrite(&width_swap, sizeof(width_swap), 1, file);
 	fwrite(&height_swap, sizeof(height_swap), 1, file);

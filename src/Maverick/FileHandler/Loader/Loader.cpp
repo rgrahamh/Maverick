@@ -27,6 +27,9 @@ inline SDL_Surface* readSurface(FILE* file){
 	amask = EndianSwap(&amask);
 
 	SDL_Surface* new_surface = SDL_CreateRGBSurface(0, width, height, depth, rmask, gmask, bmask, amask);
+	if(new_surface == nullptr){
+		return nullptr;
+	}
 
 	uint64_t byte_size = width * height * bytes_per_pixel;
 	new_surface->pixels = (uint8_t*)malloc(byte_size);
@@ -39,36 +42,41 @@ inline SDL_Surface* readSurface(FILE* file){
 /** Loads a BMP from file & inserts it into the engine
  * @param file The file to load the BMP from
  */
-inline char* loadBMP(FILE* file){
-	uint16_t identifier_len;
-
-	if(fread(&identifier_len, sizeof(identifier_len), 1, file) == 0){
-		printf("Cannot read in vals!\n");
+inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
+	if(file == nullptr){
+		return nullptr;
 	}
+
+	uint16_t identifier_len;
+	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
 
 	char identifier[identifier_len+1];
-	fread(&identifier, 1, identifier_len, file);
+	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
 	SDL_Surface* new_surface = readSurface(file);
 
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
 	engine->addSurface(identifier, new_surface);
 
-	return identifier;
+	return new_surface;
 }
 
 
 /** Loads a sound from file & inserts it into the engine
  * @param file The file to load the sound from
  */
-inline char* loadSound(FILE* file){
+inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
 
 	char* identifier = (char*)malloc(identifier_len+1);
-	fread(&identifier, 1, identifier_len, file);
+	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
 	Sound* new_sound = new Sound;
@@ -81,21 +89,25 @@ inline char* loadSound(FILE* file){
 
 	fread(&new_sound->sample->abuf, 1, audio_len, file);
 
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
 	engine->addSound(identifier, new_sound);
 
-	return identifier;
+	return new_sound;
 }
 
 /** Loads a unit of music from file & inserts it into the engine
  * @param file The file to load the music from
  */
-inline char* loadMusic(FILE* file){
+inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
 
 	char identifier[identifier_len+1];
-	fread(&identifier, 1, identifier_len, file);
+	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
 	Music* new_music = new Music(identifier);
@@ -116,18 +128,22 @@ inline char* loadMusic(FILE* file){
 		new_music->addTrack(engine->getSound(track_identifier));
 	}
 
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
 	engine->addMusic(identifier, new_music);
 
-	return identifier;
+	return new_music;
 }
 
-inline char* loadFont(FILE* file){
+inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	fread(&identifier_len, sizeof(identifier_len), 1, file);
 	identifier_len = EndianSwap(&identifier_len);
 
 	char identifier[identifier_len+1];
-	fread(&identifier, 1, identifier_len, file);
+	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
 	Font* new_font = new Font(identifier);
@@ -149,9 +165,13 @@ inline char* loadFont(FILE* file){
 		}
 	}
 
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
 	engine->addFont(identifier, new_font);
 
-	return identifier;
+	return new_font;
 }
 
 inline void loadCutscene(FILE* file){

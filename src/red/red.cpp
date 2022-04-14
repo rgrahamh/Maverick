@@ -2,9 +2,9 @@
 #include "../Maverick/FileHandler/Loader/Loader.hpp"
 #include "../Maverick/Engine/Engine.hpp"
 
-extern Engine* engine;
+extern 	Engine* engine;
 
-inline int printHelp(char* help_section){
+inline void printHelp(char* help_section){
 	if(strcmp(help_section, "main_loop") == 0){
 		printf("You may use the following options:\n");
 		printf("ls: Show resource files in the input directory\n");
@@ -13,10 +13,15 @@ inline int printHelp(char* help_section){
 		printf("rm <file_name>: Remove a resource\n");
 		printf("help: Ask for help (you may have already found this one lol)\n");
 		printf("quit: Quit red\n\n");
+		printf("Resouce types:\n");
+		printf("sprite\n");
+		printf("font\n");
+		printf("sound\n");
+		printf("music\n");
 	}
 	else if(strcmp(help_section, "args") == 0){
 		printf("Please use the following format:\n");
-		printf("./aed [-d <working_directory>]\n\n");
+		printf("./aed [-d <working_directory>]\n");
 	}
 }
 
@@ -34,12 +39,10 @@ inline void lsAsset(const char* dir){
 	while(file_cursor != nullptr){
 		int dir_name_len = strlen(file_cursor->name);
 		const int file_extension_num = 5;
-		char file_extensions[file_extension_num][5] = {".fnt", ".mus", ".snd", ".pxl", ".cut"};
+		char file_extensions[file_extension_num][5] = {".fnt", ".mus", ".snd", ".spr", ".cut"};
 
 		if(strcmp(file_cursor->name, ".") != 0 && strcmp(file_cursor->name, "..") != 0){
 			if(file_cursor->type == FILE_TYPE::DIRECTORY){
-				printf("Directory found: %s\n", file_cursor->name);
-
 				//Recurse into the new dir to look for more resource files
 				int new_dir_name_len = dir_name_len + strlen(dir) + 2;
 				char new_dir_name[new_dir_name_len];
@@ -66,8 +69,8 @@ inline void lsAsset(const char* dir){
 	}
 }
 
-char* loadAsset(FILE* file, uint8_t* resource_type){
-	fread(&resource_type, sizeof(*resource_type), 1, file);
+void* loadAsset(FILE* file, uint8_t* resource_type, char* key_buff, unsigned int max_len){
+	fread(resource_type, 1, 1, file);
 	if(*resource_type == RESOURCE_TYPE::BMP){
 		return loadBMP(file);
 	}
@@ -213,8 +216,8 @@ bool editMusic(Music* music){
 }
 
 void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
-if(resource_type == RESOURCE_TYPE::BMP){
-	printf("Surfaces shouldn't be edited; if you want to change a sound, do a rm & add");
+	if(resource_type == RESOURCE_TYPE::BMP){
+		printf("Sprites shouldn't be edited; if you want to change a sound, do a rm & add");
 	}
 	else if(resource_type == RESOURCE_TYPE::FONT){
 		if(editFont((Font*)base_resource)){
@@ -245,27 +248,29 @@ void addAsset(char* name, uint8_t resource_type){
 	if(resource_type == RESOURCE_TYPE::BMP){
 		strcat(new_file, ".spr");
 		
-		char surface_file[MAX_LINE_LEN];
-		promptUser("Please enter the surface's file name:", surface_file);
+		char sprite_file[MAX_LINE_LEN];
+		promptUser("Please enter the sprite's file name:", sprite_file);
 		
-		//Build the surface
-		SDL_Surface* new_surface = IMG_Load(surface_file);
-		if(new_surface == nullptr){
-			printf("Couldn't open the sound at %s; will not write to fiile\n\n", surface_file);
+		//Build the sprite
+		SDL_Surface* new_sprite = IMG_Load(sprite_file);
+		if(new_sprite == nullptr){
+			printf("Couldn't open the sprite at %s; will not write to fiile\n\n", sprite_file);
 		}
 
 		FILE* file = fopen(new_file, "wb");
+
+		fwrite(&resource_type, sizeof(resource_type), 1, file);
 
 		//Identifier len
 		uint16_t identifier_len = strlen(name);
 		uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
 
 		//Identifier
-		fwrite(&identifier_len_swapped, 2, 1, file);
+		fwrite(&identifier_len_swapped, sizeof(identifier_len_swapped), 1, file);
 		fwrite(name, 1, identifier_len, file);
 		
-		if(SerializeSurface(file, new_surface) != 0){
-			printf("Something went wrong in serialization; could not write the surface!\n\n");
+		if(SerializeSurface(file, new_sprite) != 0){
+			printf("Something went wrong in serialization; could not write the sprite!\n\n");
 		}
 		else{
 			printf("Surface written successfully!\n\n");
@@ -295,6 +300,8 @@ void addAsset(char* name, uint8_t resource_type){
 
 		FILE* file = fopen(new_file, "wb");
 
+		fwrite(&resource_type, sizeof(resource_type), 1, file);
+
 		if(SerializeSound(file, &sound) != 0){
 			printf("Something went wrong in serialization; could not write the sound!\n\n");
 		}
@@ -311,7 +318,10 @@ void addAsset(char* name, uint8_t resource_type){
 }
 
 int main(int argc, char** argv){
-	printf("Welcome to red, your REsource Editor!\n");
+	engine = new Engine();
+	SDL_DestroyWindow(engine->getWindow());
+
+	printf("Welcome to red, your Resource EDitor!\n");
 	char* working_dir = ".";
 	for(int i = 1; i < argc; i++){
 		if(strcmp(argv[i], "-d") == 0){
@@ -352,7 +362,7 @@ int main(int argc, char** argv){
 		}
 		else if(command_args[2] != nullptr && strcmp(command_args[0], "add") == 0){
 			ToLower(command_args[1]);
-			if(strcmp(command_args[1], "sprite") == 0){
+			if(strcmp(command_args[1], "surface") == 0){
 				addAsset(command_args[2], RESOURCE_TYPE::BMP);
 			}
 			else if(strcmp(command_args[1], "font") == 0){
@@ -372,8 +382,9 @@ int main(int argc, char** argv){
 			FILE* file = fopen(command_args[1], "rb");
 			if(file != nullptr){
 				uint8_t resource_type;
-				char* key = loadAsset(file, &resource_type);
-				editAsset(command_args[1], resource_type, getAsset(key, resource_type));
+				char key[MAX_LINE_LEN];
+				void* resource = loadAsset(file, &resource_type, key, MAX_LINE_LEN);
+				editAsset(command_args[1], resource_type, resource);
 			}
 			else{
 				printf("%s could not be opened for reading; double-check the path!\n", command_args[1]);
