@@ -81,6 +81,7 @@ Engine::Engine(){
     this->sprite_hash = new SpriteHash(2048);
     this->sound_hash = new SoundHash(2048);
     this->music_hash = new MusicHash(2048);
+    this->font_hash = new FontHash(2048);
 
     //Set scales
     //We want to scale both X & Y by the Y element, so stuff doesn't get squashed

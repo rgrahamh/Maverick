@@ -3,7 +3,7 @@
 Font::Font(const char* name){
     this->name = StrDeepCopy(name);
     this->style = FONT_STYLE::STANDARD_STYLE;
-    memset(this->typesetter, 0, NUM_STYLES * MAX_CHARS);
+    memset(this->typesetter, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Surface*));
     memset(this->num_chars, 0, NUM_STYLES);
 }
 

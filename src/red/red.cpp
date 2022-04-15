@@ -139,7 +139,7 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 		}
 	
 		free(command_args);
-	} while(strcmp(command_args[0], "save") != 0);
+	} while(strcmp(command_str, "save") != 0);
 }
 
 /** Edits a font
@@ -155,15 +155,15 @@ bool editFont(Font* font){
 		ToLower(command_args[0]);
 
 		//Doing an edit operation for a given font style
-		if(strcmp(command_args[0], "edit") && command_args[1] != nullptr){
+		if(strcmp(command_args[0], "edit") == 0 && command_args[1] != nullptr){
 			uint8_t font_style = FONT_STYLE::STANDARD_STYLE;
-			if(strcmp(command_args[1], "standard")){
+			if(strcmp(command_args[1], "standard") == 0){
 				font_style = FONT_STYLE::STANDARD_STYLE;
 			}
-			else if(strcmp(command_args[1], "italic")){
+			else if(strcmp(command_args[1], "italic") == 0){
 				font_style = FONT_STYLE::ITALIC_STYLE;
 			}
-			else if(strcmp(command_args[1], "bold")){
+			else if(strcmp(command_args[1], "bold") == 0){
 				font_style = FONT_STYLE::BOLD_STYLE;
 			}
 
@@ -172,11 +172,11 @@ bool editFont(Font* font){
 		else if(strcmp(command_args[0], "quit") != 0 && strcmp(command_args[0], "save") != 0){
 			printf("Invalid input detected; please try again");
 		}
-	
-		free(command_args);
-	} while(strcmp(command_args[0], "quit") != 0 && strcmp(command_args[0], "save") != 0);
 
-	return (strcmp(command_args[0], "save") == 0);
+		free(command_args);
+	} while(strcmp(command_str, "quit") != 0 && strcmp(command_str, "save") != 0);
+
+	return (strcmp(command_str, "save") == 0);
 }
 
 /** Edits music
@@ -210,9 +210,9 @@ bool editMusic(Music* music){
 		}
 	
 		free(command_args);
-	} while(strcmp(command_args[0], "quit") != 0 && strcmp(command_args[0], "save") != 0);
+	} while(strcmp(command_str, "quit") != 0 && strcmp(command_str, "save") != 0);
 
-	return (strcmp(command_args[0], "save") == 0);
+	return (strcmp(command_str, "save") == 0);
 }
 
 void editAsset(char* file_name, uint8_t resource_type, void* base_resource){

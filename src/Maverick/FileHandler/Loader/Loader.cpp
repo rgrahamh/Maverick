@@ -55,11 +55,16 @@ inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
-	SDL_Surface* new_surface = readSurface(file);
-
 	if(key_buff != nullptr){
 		strncpy(key_buff, identifier, max_len);
 	}
+
+	SDL_Surface* new_surface = engine->getSurface(identifier);
+	if(new_surface != nullptr){
+		return new_surface;
+	}
+
+	new_surface = readSurface(file);
 
 	engine->addSurface(identifier, new_surface);
 
@@ -79,7 +84,16 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
-	Sound* new_sound = new Sound;
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
+	Sound* new_sound = engine->getSound(identifier);
+	if(new_sound != nullptr){
+		return new_sound;
+	}
+
+	new_sound = new Sound;
 	new_sound->name = identifier;
 
 	uint32_t audio_len;
@@ -88,10 +102,6 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	new_sound->sample->alen = audio_len;
 
 	fread(&new_sound->sample->abuf, 1, audio_len, file);
-
-	if(key_buff != nullptr){
-		strncpy(key_buff, identifier, max_len);
-	}
 
 	engine->addSound(identifier, new_sound);
 
@@ -110,7 +120,16 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
-	Music* new_music = new Music(identifier);
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
+	Music* new_music = engine->getMusic(identifier);
+	if(new_music != nullptr){
+		return new_music;
+	}
+
+	new_music = new Music(identifier);
 
 	uint16_t num_tracks;
 	fread(&num_tracks, sizeof(num_tracks), 1, file);
@@ -128,10 +147,6 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 		new_music->addTrack(engine->getSound(track_identifier));
 	}
 
-	if(key_buff != nullptr){
-		strncpy(key_buff, identifier, max_len);
-	}
-
 	engine->addMusic(identifier, new_music);
 
 	return new_music;
@@ -146,7 +161,16 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
-	Font* new_font = new Font(identifier);
+	if(key_buff != nullptr){
+		strncpy(key_buff, identifier, max_len);
+	}
+
+	Font* new_font = engine->getFont(identifier);
+	if(new_font != nullptr){
+		return new_font;
+	}
+
+	new_font = new Font(identifier);
 
 	uint8_t style_num;
 	fread(&style_num, sizeof(style_num), 1, file);
@@ -163,10 +187,6 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 			SDL_Surface* new_surface = readSurface(file);
 			new_font->setCharacter(new_char, new_surface, (enum FONT_STYLE)style_type);
 		}
-	}
-
-	if(key_buff != nullptr){
-		strncpy(key_buff, identifier, max_len);
 	}
 
 	engine->addFont(identifier, new_font);
