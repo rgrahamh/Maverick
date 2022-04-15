@@ -23,10 +23,30 @@ inline void printHelp(char* help_section){
 		printf("Please use the following format:\n");
 		printf("./aed [-d <working_directory>]\n");
 	}
+	else if(strcmp(help_section, "font") == 0){
+		printf("You may use the following options:\n");
+		printf("edit <style>: Edit a style for the font. Valid styles are standard, italic, or bold\n");
+		printf("save: Save changes and exit\n");
+		printf("quit: Abort changes and exit\n");
+	}
+	else if(strcmp(help_section, "font_style") == 0){
+		printf("You may use the following options:\n");
+		printf("add <char> <file_name>: Add a new character-surface mapping for the font\n");
+		printf("rm <char>: Remove the surface for a character\n");
+		printf("import <file_pattern>: Try a bulk import with the standard file structure (EXPERIMENTAL)\n");
+		printf("save: Save changes and exit\n");
+		printf("quit: Abort changes and exit\n");
+	}
+	else if(strcmp(help_section, "music") == 0){
+		printf("You may use the following options:\n");
+		printf("add <instrument_name> <file_name>: Add an instrument to the song, where <file_name> is a .wav\n");
+		printf("save: Save changes and exit\n");
+		printf("quit: Abort changes and exit\n");
+	}
 }
 
-inline void promptUser(char* prompt, char* response){
-	printf("\n%s\n> ", prompt);
+inline void promptUser(char* prompt, char* app_location, char* response){
+	printf("\n%s\n[%s]> ", prompt, app_location);
 	fgets(response, MAX_LINE_LEN, stdin);
 	char* first_newline = strchr(response, '\n');
 	if(first_newline != nullptr){
@@ -102,7 +122,7 @@ void* getAsset(char* key, uint8_t resource_type){
 	return nullptr;
 }
 
-/** Edits a font
+/** Edits a font style
  * @param font The font you wish to edit
  * @param font_style The font style enum
  * @return If you want to save the font
@@ -111,7 +131,7 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 	char command_str[MAX_LINE_LEN];
 	char** command_args = nullptr;
 	do{
-		promptUser("Enter in a character, and the associated filename (.bmp)", command_str);
+		promptUser("Enter in a character, and the associated filename (.bmp)", "font-style", command_str);
 		command_args = getArgs(command_str, " ");
 		ToLower(command_args[0]);
 
@@ -134,8 +154,11 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 			strcpy(file_pattern, command_args[1]);
 			int file_pattern_offset = strlen(file_pattern);
 		}
+		else if(strcmp(command_args[0], "help") == 0){
+			printHelp("font_style");
+		}
 		else if(strcmp(command_args[0], "save") != 0){
-			printf("Invalid input detected; please try again");
+			printf("Invalid input detected; please try again\n");
 		}
 	
 		free(command_args);
@@ -150,7 +173,7 @@ bool editFont(Font* font){
 	char command_str[MAX_LINE_LEN];
 	char** command_args = nullptr;
 	do{
-		promptUser("What font group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", command_str);
+		promptUser("What font group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", "font", command_str);
 		command_args = getArgs(command_str, " ");
 		ToLower(command_args[0]);
 
@@ -169,8 +192,11 @@ bool editFont(Font* font){
 
 			editFontStyle(font, (FONT_STYLE)font_style);
 		}
+		else if(strcmp(command_args[0], "help") == 0){
+			printHelp("font");
+		}
 		else if(strcmp(command_args[0], "quit") != 0 && strcmp(command_args[0], "save") != 0){
-			printf("Invalid input detected; please try again");
+			printf("Invalid input detected; please try again\n");
 		}
 
 		free(command_args);
@@ -187,7 +213,7 @@ bool editMusic(Music* music){
 	char command_str[MAX_LINE_LEN];
 	char** command_args = nullptr;
 	do{
-		promptUser("What music group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", command_str);
+		promptUser("What music group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", "music", command_str);
 		command_args = getArgs(command_str, " ");
 		ToLower(command_args[0]);
 
@@ -205,8 +231,11 @@ bool editMusic(Music* music){
 				printf("Couldn't open the sound at %s; will not write to file\n", command_args[2]);
 			}
 		}
+		else if(strcmp(command_args[0], "help") == 0){
+			printHelp("music");
+		}
 		else if(strcmp(command_args[0], "quit") != 0 && strcmp(command_args[0], "save") != 0){
-			printf("Invalid input detected; please try again");
+			printf("Invalid input detected; please try again\n");
 		}
 	
 		free(command_args);
@@ -217,7 +246,7 @@ bool editMusic(Music* music){
 
 void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
 	if(resource_type == RESOURCE_TYPE::BMP){
-		printf("Sprites shouldn't be edited; if you want to change a sound, do a rm & add");
+		printf("Sprites shouldn't be edited; if you want to change a sound, do a rm & add\n");
 	}
 	else if(resource_type == RESOURCE_TYPE::FONT){
 		if(editFont((Font*)base_resource)){
@@ -227,7 +256,7 @@ void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
 		}
 	}
 	else if(resource_type == RESOURCE_TYPE::SOUND){
-		printf("Sounds shouldn't be edited; if you want to change a sound, do a rm & add");
+		printf("Sounds shouldn't be edited; if you want to change a sound, do a rm & add\n");
 	}
 	else if(resource_type == RESOURCE_TYPE::MUSIC){
 		if(editMusic((Music*)base_resource)){
@@ -249,12 +278,12 @@ void addAsset(char* name, uint8_t resource_type){
 		strcat(new_file, ".spr");
 		
 		char sprite_file[MAX_LINE_LEN];
-		promptUser("Please enter the sprite's file name:", sprite_file);
+		promptUser("Please enter the sprite's file name:", "sprite", sprite_file);
 		
 		//Build the sprite
 		SDL_Surface* new_sprite = IMG_Load(sprite_file);
 		if(new_sprite == nullptr){
-			printf("Couldn't open the sprite at %s; will not write to fiile\n\n", sprite_file);
+			printf("Couldn't open the sprite at %s; will not write to fiile\n", sprite_file);
 		}
 
 		FILE* file = fopen(new_file, "wb");
@@ -270,10 +299,10 @@ void addAsset(char* name, uint8_t resource_type){
 		fwrite(name, 1, identifier_len, file);
 		
 		if(SerializeSurface(file, new_sprite) != 0){
-			printf("Something went wrong in serialization; could not write the sprite!\n\n");
+			printf("Something went wrong in serialization; could not write the sprite!\n");
 		}
 		else{
-			printf("Surface written successfully!\n\n");
+			printf("Surface written successfully!\n");
 		}
 		fclose(file);
 	}
@@ -286,7 +315,7 @@ void addAsset(char* name, uint8_t resource_type){
 		strcat(new_file, ".snd");
 
 		char sound_file[MAX_LINE_LEN];
-		promptUser("Please enter the sound's file name:", sound_file);
+		promptUser("Please enter the sound's file name:", "sound", sound_file);
 		
 		//Build the surface
 		Mix_Chunk* chunk = Mix_LoadWAV(sound_file);
@@ -341,7 +370,7 @@ int main(int argc, char** argv){
 
 	char command_str[MAX_LINE_LEN];
 	do{
-		promptUser("What would you like to do?", command_str);
+		promptUser("What would you like to do?", "red", command_str);
 		char** command_args = getArgs(command_str, " ");
 		if(command_args == nullptr || command_args[0] == nullptr){
 			printHelp("main_loop");
@@ -408,7 +437,7 @@ int main(int argc, char** argv){
 
 	} while(strcmp(command_str, "quit") != 0);
 
-	printf("Enjoy using the new resources; come back soon!\n");
+	printf("\nEnjoy using the new resources; come back soon!\n");
 
 	return 0;
 }
