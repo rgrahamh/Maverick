@@ -44,6 +44,7 @@ int Font::serialize(FILE* file){
         }
     }
 
+    fwrite(&num_styles, sizeof(num_styles), 1, file);
     for(int i = 0; i < NUM_STYLES; i++){
         if(num_chars[i] > 0){
             uint8_t font_style = this->style;
