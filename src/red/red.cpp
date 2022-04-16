@@ -2,8 +2,11 @@
 #include "../Maverick/FileHandler/Loader/Loader.hpp"
 #include "../Maverick/Engine/Engine.hpp"
 
-extern 	Engine* engine;
+extern Engine* engine;
 
+/** Prints out help for the program
+ * @param help_section The section of the app you'd like help for
+ */
 inline void printHelp(char* help_section){
 	if(strcmp(help_section, "main_loop") == 0){
 		printf("You may use the following options:\n");
@@ -45,6 +48,11 @@ inline void printHelp(char* help_section){
 	}
 }
 
+/** Prompt the user for input
+ * @param prompt The text prompt you'd like to display
+ * @param app_location The text that will display in the box before the prompt arrow
+ * @param response A char* that will contain the response after calling this function
+ */
 inline void promptUser(char* prompt, char* app_location, char* response){
 	printf("\n%s\n[%s]> ", prompt, app_location);
 	fgets(response, MAX_LINE_LEN, stdin);
@@ -54,6 +62,9 @@ inline void promptUser(char* prompt, char* app_location, char* response){
 	}
 }
 
+/** Does a recursive ls for resource files (useful for finding pre-existing resources)
+ * @param dir The directory you'd like to start the ls in
+ */
 inline void lsAsset(const char* dir){
 	File* file_cursor = ReadDirectory(dir);
 	while(file_cursor != nullptr){
@@ -89,23 +100,33 @@ inline void lsAsset(const char* dir){
 	}
 }
 
-void* loadAsset(FILE* file, uint8_t* resource_type, char* key_buff, unsigned int max_len){
-	fread(resource_type, 1, 1, file);
-	if(*resource_type == RESOURCE_TYPE::BMP){
+/** Loads an asset into the engine
+ * @param file The file you're reading the asset from
+ * @param resource_type_ptr A ptr to the resource type of the asset (will be populated with the asset type)
+ * @return The asset if it exists in the engine, otherwise a nullptr
+ */
+void* loadAsset(FILE* file, uint8_t* resource_type_ptr, char* key_buff, unsigned int max_len){
+	fread(resource_type_ptr, 1, 1, file);
+	if(*resource_type_ptr == RESOURCE_TYPE::BMP){
 		return loadBMP(file);
 	}
-	else if(*resource_type == RESOURCE_TYPE::FONT){
+	else if(*resource_type_ptr == RESOURCE_TYPE::FONT){
 		return loadFont(file);
 	}
-	else if(*resource_type == RESOURCE_TYPE::SOUND){
+	else if(*resource_type_ptr == RESOURCE_TYPE::SOUND){
 		return loadSound(file);
 	}
-	else if(*resource_type == RESOURCE_TYPE::MUSIC){
+	else if(*resource_type_ptr == RESOURCE_TYPE::MUSIC){
 		return loadMusic(file);
 	}
 	return nullptr;
 }
 
+/** Gets an asset from the engine
+ * @param key The asset key
+ * @param resource_type The asset type
+ * @return The asset if it exists in the engine, otherwise a nullptr
+ */
 void* getAsset(char* key, uint8_t resource_type){
 	if(resource_type == RESOURCE_TYPE::BMP){
 		return engine->getSurface(key);
@@ -122,6 +143,54 @@ void* getAsset(char* key, uint8_t resource_type){
 	return nullptr;
 }
 
+/** Tries adding a new character based upon a file path & information regarding what the characer is
+ * @param font A pointer to the font object
+ * @param style The style of the font
+ * @param file_path The file path of the surface
+ * @param val The char val you'd like to set
+ * @return -1 on error, 0 otherwise
+ */
+inline int addFontCharacter(Font* font, FONT_STYLE style, const char* file_path, char val){
+	SDL_Surface* new_surface = IMG_Load(file_path);
+	if(new_surface == nullptr){
+		return -1;
+	}
+
+	font->setCharacter(val, new_surface, style);
+	return 0;
+}
+
+/** Tries a bulk import based upon a file pattern with a range of characters
+ * @param start The starting character
+ * @param end The ending character (inclusive)
+ * @param file_pattern The file pattern leading up to the character
+ * @param font A pointer to the font object
+ * @param style The style of the font
+ * @return The number of imported characters
+ */
+inline int importChars(char start, char end, const char* file_pattern, Font* font, FONT_STYLE style){
+	if(start > end){
+		return 0;
+	}
+
+	int import_num = 0;
+	int file_pattern_offset = strlen(file_pattern);
+	//Checking against null byte is needed here, since we'll never print a null byte & 255 might be used in the extended char set
+	for(char i = start; i <= end && i != '\0'; i++){
+		char file_name[MAX_LINE_LEN + 7];
+		file_name[0] = '\0';
+		strcpy(file_name, file_pattern);
+		sprintf(file_name + file_pattern_offset, "_%c.bmp", i);
+
+		if(addFontCharacter(font, style, file_name, i) == 0){
+			printf("Added %c from %s\n", i, file_name);
+			import_num++;
+		}
+	}
+
+	return import_num;
+}
+
 /** Edits a font style
  * @param font The font you wish to edit
  * @param font_style The font style enum
@@ -131,19 +200,17 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 	char command_str[MAX_LINE_LEN];
 	char** command_args = nullptr;
 	do{
-		promptUser("Enter in a character, and the associated filename (.bmp)", "font-style", command_str);
+		promptUser("Enter in a character and the associated filename (.bmp), or use a file pattern to import in bulk", "font-style", command_str);
 		command_args = getArgs(command_str, " ");
 		ToLower(command_args[0]);
 
 		//Doing an edit operation for a given font style
 		if(strcmp(command_args[0], "add") == 0 && command_args[2] != nullptr){
-			SDL_Surface* new_surface = IMG_Load(command_args[2]);
-			if(new_surface != nullptr){
-				font->setCharacter(command_args[1][0], new_surface, font_style);
-				printf("Set %c to %s\n", command_args[1][0], command_args[2]);
+			if(addFontCharacter(font, font_style, command_args[2], command_args[1][0]) == 0){
+				printf("Added %c from %s\n", command_args[1][0], command_args[2]);
 			}
 			else{
-				printf("Cannot open file %s; please check the path\n >", command_args[2]);
+				printf("Cannot open file %s; please check the path\n", command_args[2]);
 			}
 		}
 		else if(strcmp(command_args[0], "rm") == 0 && command_args[1] != nullptr){
@@ -151,8 +218,34 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 		}
 		else if(strcmp(command_args[0], "import") == 0 && command_args[1] != nullptr){
 			char file_pattern[MAX_LINE_LEN];
+			file_pattern[0] = '\0';
 			strcpy(file_pattern, command_args[1]);
 			int file_pattern_offset = strlen(file_pattern);
+
+			//Try an import on everything in the printable character set
+			importChars(' ', '~', file_pattern, font, font_style);
+
+			char caps_file_pattern[MAX_LINE_LEN + 3];
+			caps_file_pattern[0] = '\0';
+			strcpy(caps_file_pattern, file_pattern);
+			strcat(caps_file_pattern, "CAP");
+			//Try an import on the caps letters exceptions
+			importChars('A', 'Z', caps_file_pattern, font, font_style);
+
+			//Try the exception files
+			const unsigned int exception_num = 8;
+			char* except_str[] = {"_backslash", "_colon", "_forwardslash", "_greaterthan", "_lessthan", "_openquote", "_questionmark", "_star"};
+			char except_char[] = {'\\', ',', '/', '>', '<', '"', '?', '*'};
+			for(unsigned int i = 0; i < exception_num; i++){
+				char file_path[MAX_LINE_LEN + 15];
+				file_path[0] = '\0';
+				strcpy(file_path, file_pattern);
+				sprintf(file_path + file_pattern_offset, "_%s.bmp", except_str[i]);
+
+				if(addFontCharacter(font, font_style, file_path, except_char[i]) == 0){
+					printf("Added %c from %s\n", except_char[i], file_path);
+				}
+			}
 		}
 		else if(strcmp(command_args[0], "help") == 0){
 			printHelp("font_style");
@@ -244,6 +337,11 @@ bool editMusic(Music* music){
 	return (strcmp(command_str, "save") == 0);
 }
 
+/** Edits an asset
+ * @param file_name The name of the file you'd like to save to
+ * @param resource_type The type of resource you're editing
+ * @param base_resource The base resource you're editing
+ */
 void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
 	if(resource_type == RESOURCE_TYPE::BMP){
 		printf("Sprites shouldn't be edited; if you want to change a sound, do a rm & add\n");
@@ -267,6 +365,10 @@ void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
 	}
 }
 
+/** Adds an asset
+ * @param name The name of the asset you'd like to add
+ * @param resource_type The type of resource you're editing
+ */
 void addAsset(char* name, uint8_t resource_type){
 	//Allocate a string with extra space for the file extension
 	int new_file_len = strlen(name) + 4;
