@@ -140,10 +140,13 @@ bool Music::isPlaying(){
     return this->playing;
 }
 
-int Music::serialize(FILE* file, std::unordered_set<std::string>& music_set){
-    if(file == nullptr || music_set.find(this->name) == music_set.end()){
+int Music::serialize(FILE* file){
+    if(file == nullptr){
         return -1;
     }
+
+    uint8_t resource_type = RESOURCE_TYPE::MUSIC;
+    fwrite(&resource_type, sizeof(resource_type), 1, file);
 
     //Identifier len
     uint16_t identifier_len = strlen(this->name);
@@ -161,8 +164,6 @@ int Music::serialize(FILE* file, std::unordered_set<std::string>& music_set){
     for(int i = 0; i < num_tracks; i++){
         SerializeSound(file, tracks[i]);
     }
-
-    music_set.insert(this->name);
 
     return 0;
 }

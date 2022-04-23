@@ -8,7 +8,27 @@
 
 #include <SDL2/SDL.h>
 
+#if _WIN32
+#include <windows.h>
+#else
+#include <dirent.h>
+#endif
+
+//Called in the engine's constructor to set endianness
 extern bool endian;
+
+enum FILE_TYPE{
+	REG_FILE,
+	DIRECTORY,
+	SYMLINK,
+	OTHER_FILE
+};
+
+struct File{
+	char* name;
+	enum FILE_TYPE type;
+	struct File* next;
+};
 
 enum RESOURCE_TYPE{
 	BMP = 0,
@@ -114,12 +134,108 @@ static inline int16_t EndianSwap(int16_t* input){
 	}
 }
 
+/** Does a deep copy of a string
+ * @param str The string to deep copy
+ * @return A new string with the contents of a passed-in string
+ */
 static inline char* StrDeepCopy(const char* str){
     int str_len = strlen(str);
     char* new_str = (char*)malloc(str_len + 1);
     memcpy(new_str, str, str_len);
     new_str[str_len] = '\0';
 	return new_str;
+}
+
+/** Converts a passed-in string to all lowercase
+ * @param str The string to convert to lowercase
+ */
+static inline void ToLower(char* str){
+	for(int i = 0; str[i] != '\0'; i++){
+		if(str[i] >= 'A' && str[i] <= 'Z'){
+			str[i] += 0x20;
+		}
+	}
+}
+
+/** Converts a passed-in string to all uppercase
+ * @param str The string to convert to uppercase
+ */
+static inline void ToUpper(char* str){
+	for(int i = 0; str[i] != '\0'; i++){
+		if(str[i] >= 'a' && str[i] <= 'z'){
+			str[i] -= 0x20;
+		}
+	}
+}
+
+/** Modifies the passed-in str to add null bytes where delimiters are, and passes back a char*[args] with references to the start of each arg
+ * @param str The string to parse
+ * @param delims All delims that should be considered params
+ * @return A list of references to places in the string where the arguments start
+ */
+static inline char** getArgs(char* str, char* delims){
+	//The new argument list
+	unsigned int max_args = strlen(str) / 2;
+	char** arg_lst = (char**)calloc(sizeof(char*), max_args);
+	arg_lst[0] = str;
+	unsigned int arg_iter = 1;
+
+	//Calculated length pre-loop
+	unsigned int len = strlen(str);
+	//Tracks the delimiter number
+	unsigned int delim_num = strlen(delims);
+	//Use
+	char capped_quote = '\0';
+
+	//Parsing through the arguments
+	for(unsigned int i = 0; i < len; i++){
+		//Quote capturing
+		if(str[i] == '\"' || str[i] == '\''){
+			if(capped_quote == '\0'){
+				capped_quote = str[i];
+				continue;
+			}
+			else if(capped_quote == str[i]){
+				capped_quote = '\0';
+				continue;
+			}
+		}
+		//Dealing with escaped characters
+		else if(str[i] == '\\'){
+			char* curr_addr = &(str[i]);
+			strcpy(curr_addr, curr_addr+1);
+			continue;
+		}
+		//Checking against all specified separation delimeters
+		for(unsigned int j = 0; j < delim_num; j++){
+			if(str[i] == delims[j] && capped_quote == '\0'){
+				str[i] = '\0';
+
+				//If there's a next argument, add it
+				if(i + 1 < len){
+					arg_lst[arg_iter++] = str + i + 1;
+				}
+
+				//If we go over the max iterations
+				if(arg_iter > max_args){
+					return NULL;
+				}
+			}
+		}
+	}
+	if(capped_quote == '\"' || capped_quote == '\''){
+		return NULL;
+	}
+
+	for(unsigned int i = 0; i < arg_iter; i++){
+		int arg_len = strlen(arg_lst[i]);
+		if(arg_len >= 2 && ((arg_lst[i][0] == '\'' && arg_lst[i][arg_len-1] == '\'') || (arg_lst[i][0] == '\"' && arg_lst[i][arg_len-1] == '\"'))){
+			arg_lst[i][arg_len-1] = '\0';
+			arg_lst[i] = arg_lst[i] + 1;
+		}
+	}
+
+	return arg_lst;
 }
 
 static inline void Normalize2DVector(double* x_force, double* y_force){
@@ -156,9 +272,6 @@ static inline int SerializeSurface(FILE* file, SDL_Surface* surface){
 	uint32_t bmask = EndianSwap(&surface->format->Bmask);
 	uint32_t amask = EndianSwap(&surface->format->Amask);
 
-	uint8_t asset_type = RESOURCE_TYPE::BMP;
-	fwrite(&asset_type, 1, 1, file);
-
 	//Write the image header info
 	fwrite(&width_swap, sizeof(width_swap), 1, file);
 	fwrite(&height_swap, sizeof(height_swap), 1, file);
@@ -172,5 +285,53 @@ static inline int SerializeSurface(FILE* file, SDL_Surface* surface){
 	fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
 	fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
 	 return 0;
+}
+
+static inline File* ReadDirectory(const char* dir_name){
+//If Windows
+#if _WIN32
+	//Figure this out when I compile on a Windows machine ig lol
+//else if __linux__ or __APPLE__ (assume some POSIX standard machine)
+#else
+	File* files = nullptr;
+	DIR* dir = opendir(dir_name);
+	struct dirent* dir_cursor = readdir(dir);
+	while(dir_cursor != nullptr){
+		if(files == nullptr){
+			files = new File;
+			files->next = nullptr;
+		}
+		else{
+			File* new_file = new File;
+			new_file->next = files;
+			files = new_file;
+		}
+
+		files->name = StrDeepCopy(dir_cursor->d_name);
+		switch(dir_cursor->d_type){
+			case(DT_REG):{
+				files->type = FILE_TYPE::REG_FILE;
+				break;
+			}
+			case(DT_DIR):{
+				files->type = FILE_TYPE::DIRECTORY;
+				break;
+			}
+			case(DT_LNK):{
+				files->type = FILE_TYPE::SYMLINK;
+				break;
+			}
+			default:{
+				files->type = FILE_TYPE::REG_FILE;
+			}
+		}
+		dir_cursor = readdir(dir);
+	}
+
+	closedir(dir);
+
+	return files;
+	
+#endif
 }
 #endif

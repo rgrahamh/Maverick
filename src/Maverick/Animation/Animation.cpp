@@ -573,6 +573,9 @@ int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
 							uint16_t identifier_len = strlen(sprite->name);
 							uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
 
+							uint8_t resource_type = RESOURCE_TYPE::BMP;
+							fwrite(&resource_type, sizeof(resource_type), 1, file);
+
 							//Identifier
 							fwrite(&identifier_len_swapped, 2, 1, file);
 							fwrite(sprite->name, 1, identifier_len, file);

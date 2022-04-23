@@ -5,7 +5,6 @@
 #include "../../../led/Zones/led/led.hpp"
 #include "../../../Cyberena/Zones/TestZone/TestZone.hpp"
 #include "../../../Cyberena/Zones/global/global.hpp"
-#include "../../../Cyberena/Zones/FilterTest/FilterTest.hpp"
 
 void loadZone(const char* zone_name);
 
