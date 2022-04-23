@@ -4,6 +4,7 @@
 #include "../Global/Global.hpp"
 
 extern Engine* engine;
+extern bool debug;
 
 //FINISH MULTIPLE SPRITES
 
@@ -489,6 +490,94 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	else{
 		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
 			printf(SDL_GetError());
+		}
+	}
+
+	if(debug == true){
+		//Draw hitboxes
+		HitboxList* hitboxes = this->getHitboxes();
+		while(hitboxes != nullptr){
+			Hitbox* hitbox = hitboxes->hitbox;
+			
+			//Determine hitbox color depending on type
+			SDL_Color color;
+			memset(&color, 0, sizeof(SDL_Color));
+			
+			//Performing a mask, since stuff may be collision & environment
+			uint64_t hitbox_type = hitbox->getType();
+			if(hitbox_type & HITBOX_TYPE::COLLISION){
+				color.g = 255;
+			}
+			else if(hitbox_type & HITBOX_TYPE::DAMAGEBOX){
+				color.r = 255;
+			}
+			else if(hitbox_type & HITBOX_TYPE::HURTBOX){
+				color.b = 255;
+			}
+			else if(hitbox_type & HITBOX_TYPE::ENVIRONMENT){
+				color.r = 255;
+				color.b = 255;
+			}
+			else if(hitbox_type & HITBOX_TYPE::GROUNDING_ZONE){
+				color.g = 255;
+				color.b = 255;
+			}
+			else{
+				color.r = 0;
+				color.g = 0;
+				color.b = 0;
+			}
+
+			enum HITBOX_SHAPE shape = hitbox->getShape();
+			if(shape == HITBOX_SHAPE::RECT){
+				HitRect* hit_rect = (HitRect*)hitbox;
+				SDL_Rect rect;
+				rect.h = hit_rect->getHeight();
+				rect.w = hit_rect->getWidth();
+				rect.x = hit_rect->getX() - camera_x;
+				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() + z_coord;
+				unsigned int depth = hit_rect->getDepth();
+				
+				//Draw the base (will be white to differentiate from the rest)
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				DrawSDL_Rect(renderer, rect);
+				SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+
+				//Draw the sides
+				SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x, rect.y - depth);
+				SDL_RenderDrawLine(renderer, rect.x + rect.w, rect.y, rect.x + rect.w, rect.y - depth);
+				SDL_RenderDrawLine(renderer, rect.x, rect.y + rect.h, rect.x, rect.y + rect.h - depth);
+				SDL_RenderDrawLine(renderer, rect.x + rect.w, rect.y + rect.h, rect.x + rect.w, rect.y + rect.h - depth);
+
+				//Draw the top
+				rect.y -= depth;
+				DrawSDL_Rect(renderer, rect);
+			}
+			else if(shape == HITBOX_SHAPE::ELLIPSE){
+				HitEllipse* hit_ellipse = (HitEllipse*)hitbox;
+				unsigned int center_x = hit_ellipse->getX() - camera_x;
+				unsigned int center_y = hit_ellipse->getY() - camera_y + hit_ellipse->getZOffset() - z_coord;
+				float x_radius = hit_ellipse->getXRadius();
+				float y_radius = hit_ellipse->getYRadius();
+				unsigned int depth = hit_ellipse->getDepth();
+
+				//Draw the base
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				DrawSDL_Ellipse(renderer, center_x, center_y, x_radius, y_radius);
+				SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+
+				//Draw the sides
+				unsigned int left_x = center_x - x_radius;
+				unsigned int right_x = center_x + x_radius;
+				SDL_RenderDrawLine(renderer, left_x, center_y, left_x, center_y - depth);
+				SDL_RenderDrawLine(renderer, right_x, center_y, right_x, center_y - depth);
+
+				//Draw the top
+				center_y -= depth;
+				DrawSDL_Ellipse(renderer, center_x, center_y, x_radius, y_radius);
+			}
+
+			hitboxes = hitboxes->next;
 		}
 	}
 }

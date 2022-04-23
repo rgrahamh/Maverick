@@ -14,6 +14,9 @@
 #include <dirent.h>
 #endif
 
+//Approx. pi; all I can remember rn lol
+#define PI 3.1415926535897932384626433832795028841971
+
 //Called in the engine's constructor to set endianness
 extern bool endian;
 
@@ -333,5 +336,21 @@ static inline File* ReadDirectory(const char* dir_name){
 	return files;
 	
 #endif
+}
+
+static void DrawSDL_Rect(SDL_Renderer* renderer, SDL_Rect& rect){
+	SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x + rect.w, rect.y);
+	SDL_RenderDrawLine(renderer, rect.x, rect.y + rect.h, rect.x + rect.w, rect.y + rect.h);
+	SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x, rect.y + rect.h);
+	SDL_RenderDrawLine(renderer, rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + rect.h);
+}
+
+static void DrawSDL_Ellipse(SDL_Renderer* renderer, float center_x, float center_y, float x_radius, float y_radius){
+	const float radian_convert = PI / 180;
+	double degree_iter = 0;
+	for(int i = 0; i < 720; i++){
+		SDL_RenderDrawPoint(renderer, (x_radius * cos(degree_iter * radian_convert)) + center_x, (y_radius * sin(degree_iter * radian_convert)) + center_y);
+		degree_iter += 0.5;
+	}
 }
 #endif

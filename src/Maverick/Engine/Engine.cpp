@@ -8,6 +8,7 @@
 std::atomic<bool> exit_game;
 
 bool endian;
+bool debug = true;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
@@ -70,7 +71,6 @@ Engine::Engine(){
         fflush(stdout);
         exit(-1);
     }
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     this->camera = new Camera(renderer, window, NULL);
 
     //Set up the screenshot blit surface
@@ -438,6 +438,7 @@ void Engine::collisionStep(ObjectList* all_objects){
 void Engine::drawStep(EntityList* all_entities){
     SDL_Renderer* renderer = this->camera->getRenderer();
 
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
     camera->setScale(current_x_scale, current_y_scale);
