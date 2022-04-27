@@ -101,17 +101,9 @@ bool HitEllipse::isPointInside(double x_coord, double y_coord){
 	double y_diff = abs(y_center - y_coord);
 
 	//Avoiding divide by zero
-	if(x_diff == 0){
-		if(y_diff < y_curr_radius){
-			return true;
-		}
-	}
-	else{
-		float angle = atan(y_diff / x_diff);
-
-		if(x_curr_radius * cos(angle) > x_diff && y_curr_radius * sin(angle) > y_diff){
-			return true;
-		}
+	if((x_diff == 0 && y_diff < y_curr_radius) ||
+	   (x_curr_radius > x_diff && y_curr_radius > y_diff)){
+		return true;
 	}
 	return false;
 }

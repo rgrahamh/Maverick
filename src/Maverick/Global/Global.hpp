@@ -338,14 +338,14 @@ static inline File* ReadDirectory(const char* dir_name){
 #endif
 }
 
-static void DrawSDL_Rect(SDL_Renderer* renderer, SDL_Rect& rect){
+static inline void DrawSDL_Rect(SDL_Renderer* renderer, SDL_Rect& rect){
 	SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x + rect.w, rect.y);
 	SDL_RenderDrawLine(renderer, rect.x, rect.y + rect.h, rect.x + rect.w, rect.y + rect.h);
 	SDL_RenderDrawLine(renderer, rect.x, rect.y, rect.x, rect.y + rect.h);
 	SDL_RenderDrawLine(renderer, rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + rect.h);
 }
 
-static void DrawSDL_Ellipse(SDL_Renderer* renderer, float center_x, float center_y, float x_radius, float y_radius){
+static inline void DrawSDL_Ellipse(SDL_Renderer* renderer, float center_x, float center_y, float x_radius, float y_radius){
 	const float radian_convert = PI / 180;
 	double degree_iter = 0;
 	for(int i = 0; i < 720; i++){

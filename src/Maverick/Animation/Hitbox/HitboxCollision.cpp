@@ -114,70 +114,11 @@ bool collisionRectCone(HitRect* rect, HitCone* cone){
  * @return If the two ellipses are colliding
  */
 bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
-	float ellipse1_top_bound = ellipse1->getTopBound();
-	float ellipse1_bot_bound = ellipse1->getBotBound();
-	float ellipse1_left_bound = ellipse1->getLeftBound();
-	float ellipse1_right_bound = ellipse1->getRightBound();
-	float ellipse1_max_height = ellipse1->getZMax();
-	float ellipse1_min_height = ellipse1->getZMin();
-
-	float ellipse2_top_bound = ellipse2->getTopBound();
-	float ellipse2_bot_bound = ellipse2->getBotBound();
-	float ellipse2_left_bound = ellipse2->getLeftBound();
-	float ellipse2_right_bound = ellipse2->getRightBound();
-	float ellipse2_max_height = ellipse2->getZMax();
-	float ellipse2_min_height = ellipse2->getZMin();
-	
-	if(!(((ellipse1_left_bound < ellipse2_left_bound && ellipse1_right_bound > ellipse2_left_bound) || (ellipse2_left_bound < ellipse1_left_bound && ellipse2_right_bound > ellipse1_left_bound))
-	&& ((ellipse1_top_bound < ellipse2_top_bound && ellipse1_bot_bound > ellipse2_top_bound) || (ellipse2_top_bound < ellipse1_top_bound && ellipse2_bot_bound > ellipse1_top_bound)))
-	|| (ellipse1_max_height <= ellipse2_min_height || ellipse2_max_height <= ellipse1_min_height)){
-		return false;
-	}
-
-	//At this point, we know that the rect is at least partially inside of the bounding box
-	float ellipse1_x = ellipse1->getX();
-	float ellipse1_y = ellipse1->getY();
-	float ellipse1_x_radius = ellipse1->getXRadius();
-	float ellipse1_y_radius = ellipse1->getYRadius();
-
-	float ellipse2_x = ellipse2->getX();
-	float ellipse2_y = ellipse2->getY();
-	float ellipse2_x_radius = ellipse2->getXRadius();
-	float ellipse2_y_radius = ellipse2->getYRadius();
-
-	//Quicker to look up than to compute
-	float ellipse_45 = 0.70710678118;
-
-	float ellipse1_x_45 = ellipse1_x_radius * ellipse_45;
-	float ellipse1_y_45 = ellipse1_y_radius * ellipse_45;
-
-	float ellipse2_x_45 = ellipse2_x_radius * ellipse_45;
-	float ellipse2_y_45 = ellipse2_y_radius * ellipse_45;
-
-	//We calc if the first ellipse's points of interest are inside of the other
-	if(ellipse2->isPointInside(ellipse1_left_bound, ellipse1_y)
-			|| ellipse2->isPointInside(ellipse1_right_bound, ellipse1_y)
-			|| ellipse2->isPointInside(ellipse1_x, ellipse1_bot_bound)
-			|| ellipse2->isPointInside(ellipse1_x, ellipse1_top_bound)
-			|| ellipse2->isPointInside(ellipse1_x + ellipse1_x_45, ellipse1_y + ellipse1_y_45)
-			|| ellipse2->isPointInside(ellipse1_x + ellipse1_x_45, ellipse1_y - ellipse1_y_45)
-			|| ellipse2->isPointInside(ellipse1_x - ellipse1_x_45, ellipse1_y + ellipse1_y_45)
-			|| ellipse2->isPointInside(ellipse1_x - ellipse1_x_45, ellipse1_y - ellipse1_y_45)){
-		return true;
-	}
-	//We test if the ellipse's points of interest are inside of the other ellipse
-	if(ellipse1->isPointInside(ellipse2_left_bound, ellipse2_y)
-			|| ellipse1->isPointInside(ellipse2_right_bound, ellipse2_y)
-			|| ellipse1->isPointInside(ellipse2_x, ellipse2_bot_bound)
-			|| ellipse1->isPointInside(ellipse2_x, ellipse2_top_bound)
-			|| ellipse1->isPointInside(ellipse2_x + ellipse2_x_45, ellipse2_y + ellipse2_y_45)
-			|| ellipse1->isPointInside(ellipse2_x + ellipse2_x_45, ellipse2_y - ellipse2_y_45)
-			|| ellipse1->isPointInside(ellipse2_x - ellipse2_x_45, ellipse2_y + ellipse2_y_45)
-			|| ellipse1->isPointInside(ellipse2_x - ellipse2_x_45, ellipse2_y - ellipse2_y_45)){
-		return true;
-	}
-
-	return false;
+	double angle = atan2(ellipse2->getY() - ellipse1->getY(), ellipse2->getX() - ellipse1->getX());
+	double sin_angle = sin(angle);
+	double cos_angle = cos(angle);
+	return ellipse2->isPointInside(ellipse1->getX() + (ellipse1->getXRadius() * cos_angle), ellipse1->getY() + (ellipse1->getYRadius() * sin_angle)) ||
+	       ellipse1->isPointInside(ellipse2->getX() + (ellipse2->getXRadius() * (cos_angle * -1)), ellipse2->getY() + (ellipse2->getYRadius() * (sin_angle * -1)));
 }
 
 bool collisionEllipseCone(HitEllipse* ellipse, HitCone* cone){
