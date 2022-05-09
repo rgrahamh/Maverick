@@ -1,9 +1,8 @@
 #ifndef UITEXT_H
 #define UITEXT_H
 
-#include <SDL2/SDL_ttf.h>
-
 #include "../UIElement.hpp"
+#include "../../../Font/Font.hpp"
 
 enum ALIGNMENT{
     CENTER_ALIGN,
@@ -12,23 +11,23 @@ enum ALIGNMENT{
 
 class UIText : public UIElement{
     public:
-        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int point = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN);
+        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int size = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
-        void process(uint64_t delta, unsigned int steps);
+        void process(uint64_t delta, unsigned int steps) override;
 
         //Set the displayed text
         void setText(const char* text);
 
         //Sets the font
-        void setFont(const char* font_path);
+        void setFont(const char* font_name);
 
         //Sets the style (strikethrough, bold, etc.)
-        void setStyle(uint8_t style);
+        void setStyle(enum FONT_STYLE style);
 
-        //Sets the point (size)
-        void setPoint(unsigned int point);
+        //Sets the size
+        void setSize(unsigned int size);
 
         //Sets the text color
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
@@ -50,35 +49,44 @@ class UIText : public UIElement{
         bool hitTextEnd();
 
         //If we hit the character limit
-        bool hitCharLimit();
+        bool hitDrawEnd();
 
     private:
         //Gets the next line break
         char* getNextBreak(char* str);
+
+        //Gets the letter height
+        float getCharHeight();
 
         //Flushes current print & ref buffers
         void flushBuffers();
 
         //The text
         char* text;
+
+        //The start of the next text selection
         char* text_buff_cursor;
 
         //The reference buffer (and where it is on the text)
-        char** ref_buff;
+        char* ref_buff;
 
         //The printing buffer
-        char** print_buff;
+        char* print_buff;
 
         //The font object & filepath
-        TTF_Font* font;
-        const char* font_path;
+        Font* font;
+        
+        //Text size (scaling factor)
+        uint8_t size;
 
-        //Font size
-        unsigned int point;
+        //Text style (italics, bold, etc.)
+        enum FONT_STYLE style;
 
         //Text wrapping characteristics
         unsigned int chars_per_line;
         unsigned int num_lines;
+
+        bool hit_end;
 
         //The scroll speed (chars per second)
         float scroll_speed;

@@ -10,6 +10,8 @@
 //led includes
 #include "../../Entity/UI/UILevelPort/UILevelPort.hpp"
 
+#include "stdio.h"
+
 void buildEditor();
 
 #endif

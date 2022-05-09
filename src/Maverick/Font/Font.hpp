@@ -4,6 +4,7 @@
 #include "../Global/Global.hpp"
 
 #include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <SDL2/SDL.h>
 
@@ -12,27 +13,26 @@
 #define NUM_STYLES 3
 enum FONT_STYLE{
     STANDARD_STYLE = 0,
-    BOLD_STYLE,
-    ITALIC_STYLE
+    BOLD_STYLE = 1,
+    ITALIC_STYLE = 2
 };
 
 class Font{
     public:
         Font(const char* name);
-        void setCharacter(unsigned char value, SDL_Surface* surface, enum FONT_STYLE = STANDARD_STYLE);
-        void setStyle(enum FONT_STYLE);
+        void setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style = STANDARD_STYLE);
 
-        SDL_Surface* getCharacter(unsigned char val);
-        SDL_Surface* getCharacter(unsigned char value, enum FONT_STYLE style);
+        SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE, uint8_t size = 1);
+        SDL_Surface* getCharacterSurface(unsigned char val, uint8_t style = STANDARD_STYLE);
         void removeCharacter(unsigned char value, enum FONT_STYLE style);
 
         int serialize(FILE* file);
 
     private:
         char* name;
-        FONT_STYLE style;
         SDL_Surface* typesetter[NUM_STYLES][MAX_CHARS];
         uint8_t num_chars[NUM_STYLES];
+        std::unordered_map<uint8_t, SDL_Texture*> type_textures[NUM_STYLES][MAX_CHARS];
 };
 
 #endif

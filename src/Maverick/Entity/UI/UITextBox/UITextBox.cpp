@@ -57,7 +57,9 @@ UITextBox::~UITextBox(){
         delete this->borders;
     }
 
-    delete this->text;
+    if(this->text != nullptr){
+        delete this->text;
+    }
 }
 
 /** Sets the text in the textbox
@@ -77,7 +79,7 @@ void UITextBox::setFont(const char* font_path){
 /** Sets the text's style
  * @param style The text's new style
  */
-void UITextBox::setStyle(uint8_t style){
+void UITextBox::setStyle(enum FONT_STYLE style){
     this->text->setStyle(style);
 }
 
@@ -133,4 +135,12 @@ void UITextBox::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int c
     if(this->borders != nullptr){
         this->borders->_draw(renderer, delta, camera_x, camera_y);
     }
+}
+
+/** Called every frame for processing; can be overridden by children
+ * @param delta The amount of time that has passed (in ms)
+ * @param step_size The step size used for physics calcluation (probably not needed here)
+ */
+void UITextBox::process(uint64_t delta, unsigned int steps){
+    this->text->_process(delta, steps);
 }

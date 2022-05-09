@@ -17,6 +17,12 @@
 //Approx. pi; all I can remember rn lol
 #define PI 3.1415926535897932384626433832795028841971
 
+#define likely(x) __builtin_expect((x),1)
+#define unlikely(x) __builtin_expect((x),0)
+#define MS_PER_FRAME 167
+#define ZOOM_RATE 0.08
+#define ROLLBACK_STEP 6.0
+
 //Called in the engine's constructor to set endianness
 extern bool endian;
 

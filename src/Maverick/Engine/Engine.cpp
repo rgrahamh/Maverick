@@ -30,10 +30,6 @@ Engine::Engine(){
         printf("IMG_Init: %s\n", IMG_GetError());
         exit(-1);
     }
-    if(TTF_Init() < 0){
-        printf("Failed to init TTF! ERR: %s\n", TTF_GetError());
-        exit(-1);
-    }
     //Don't need to init w/ anything else; we're just using WAVs
     if(Mix_Init(MIX_INIT_MP3) < 0){
         printf("Failed to init Mixer! ERR: %s\n", Mix_GetError());
@@ -134,7 +130,6 @@ Engine::~Engine(){
     SDL_DestroyRenderer(camera->getRenderer());
     SDL_DestroyWindow(window);
     delete camera;
-    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
     Mix_CloseAudio();
@@ -196,7 +191,7 @@ void Engine::gameLoop(){
 
             if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
                 //Physics step (where physics are calculated, obj positions updated, etc.)
-                this->physicsStep(this->entities.obj, physics_step);
+                this->physicsStep(&this->entities, physics_step);
 
                 //Collision step (where collision is determined)
                 this->collisionStep(this->entities.obj);
@@ -267,18 +262,25 @@ void Engine::globalAction(){
 /** The physics step of the game engine
  * @param all_objects All of the objects that physics should be simluated for
  */
-void Engine::physicsStep(ObjectList* all_objects, unsigned int steps){
+void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
+    ObjectList* all_objects = all_entities->obj;
     if(!this->checkState(GAME_STATE::PAUSE)){
-        while(all_objects != NULL){
+        while(all_objects != nullptr){
             Object* curr_object = all_objects->obj;
-            if(unlikely(curr_object->isActive() == false)){
-                all_objects = all_objects->next;
-                continue;
+            if(unlikely(curr_object->isActive() != false)){
+                all_objects->obj->_process(this->delta, steps);
             }
-
-            all_objects->obj->_process(this->delta, steps);
             all_objects = all_objects->next;
         }
+    }
+
+    UIElementList* all_elements = all_entities->ui;
+    while(all_elements != nullptr){
+        UIElement* curr_element = all_elements->element;
+        if(unlikely(curr_element->isActive() != false)){
+            all_elements->element->_process(this->delta, steps);
+        }
+        all_elements = all_elements->next;
     }
 
     this->current_x_scale += (this->target_x_scale - this->current_x_scale) * ZOOM_RATE;

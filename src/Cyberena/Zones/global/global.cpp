@@ -2,6 +2,7 @@
 #include "../../../Maverick/Engine/Engine.hpp"
 #include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
 #include "../../../Cyberena/Entity/Object/Character/Character.hpp"
+#include "../../../Maverick/FileHandler/Loader/Loader.hpp"
 extern Engine* engine;
 
 void buildGlobal(){
@@ -9,6 +10,14 @@ void buildGlobal(){
 
     Zone* global = new Zone("global", 0, 0);
     engine->addZone(global);
+
+    FILE* file = fopen("./assets/fonts/cybfont.fnt", "rb");
+    if(file == nullptr){
+        printf("Can't find the Cyberena font file!\n");
+    }
+    int resource_type;
+    fread(&resource_type, 1, 1, file);
+    loadFont(file, "cybfont");
 
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
@@ -24,7 +33,7 @@ void buildGlobal(){
     pause_menu->setAnimation("default");
 
     //Create the pause text
-    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "./assets/fonts/nokiafc22.ttf", "Paused", 0.0, 24, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
+    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "cybfont", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     pause_text->setColor(255, 255, 255);
     pause_menu->addElement(pause_text);
 
