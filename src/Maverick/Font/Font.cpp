@@ -9,35 +9,16 @@ Font::Font(const char* name){
     memset(this->num_chars, 0, NUM_STYLES);
 }
 
-SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style, uint8_t size){
+SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style){
     //If the texture exists
-    if(type_textures[style][value].find(size) != type_textures[value][style].end()){
-        return type_textures[style][value][size];
-    }
-    
-    //Create a new, properly-sized surface to make a texture from
-    SDL_Surface* ref_surface = typesetter[style][value];
-    if(ref_surface == nullptr){
-        return nullptr;
+    if(type_textures[style][value] != nullptr){
+        return type_textures[style][value];
     }
 
-    SDL_Rect new_rect;
-    new_rect.w = ref_surface->w * engine->getGlobalXScale() * size;
-    new_rect.h = ref_surface->h * engine->getGlobalYScale() * size;
-    new_rect.x = 0;
-    new_rect.y = 0;
-    SDL_Surface* new_surface = SDL_CreateRGBSurface(0, new_rect.w, new_rect.h, ref_surface->format->BitsPerPixel,
-                                                    ref_surface->format->Rmask, ref_surface->format->Gmask,
-                                                    ref_surface->format->Bmask, ref_surface->format->Amask);
-    SDL_BlitSurface(ref_surface, nullptr, new_surface, &new_rect);
-
-    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(engine->getCamera()->getRenderer(), new_surface);
+    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(engine->getCamera()->getRenderer(), typesetter[style][value]);
     
-    //Free the surface, now that the texture is created
-    SDL_FreeSurface(new_surface);
-
     //Store & return the new texture
-    type_textures[style][value][size] = new_texture;
+    type_textures[style][value] = new_texture;
     return new_texture;
 }
 

@@ -22,7 +22,7 @@ class Font{
         Font(const char* name);
         void setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style = STANDARD_STYLE);
 
-        SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE, uint8_t size = 1);
+        SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE);
         SDL_Surface* getCharacterSurface(unsigned char val, uint8_t style = STANDARD_STYLE);
         void removeCharacter(unsigned char value, enum FONT_STYLE style);
 
@@ -32,7 +32,7 @@ class Font{
         char* name;
         SDL_Surface* typesetter[NUM_STYLES][MAX_CHARS];
         uint8_t num_chars[NUM_STYLES];
-        std::unordered_map<uint8_t, SDL_Texture*> type_textures[NUM_STYLES][MAX_CHARS];
+        SDL_Texture* type_textures[NUM_STYLES][MAX_CHARS];
 };
 
 #endif

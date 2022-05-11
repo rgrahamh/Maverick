@@ -6,7 +6,7 @@ extern Engine* engine;
 /** UIText constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement
- * @param view_y_offset The viewport X offset of the UIElement
+ * @param view_y_offset The viewport Y offset of the UIElement
  * @param view_width The viewport width of the UIElement
  * @param view_height The viewport height of the UIElement
  * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
@@ -186,10 +186,7 @@ float UIText::getCharHeight(){
     for(int i = 0; i < 256; i++){
         SDL_Surface* character = font->getCharacterSurface(i, this->style);
         if(character != nullptr){
-            unsigned int char_height = character->h * this->size * engine->getGlobalYScale();
-            if(char_height != 0){
-                return char_height;
-            }
+            return character->h * this->size * engine->getGlobalYScale();
         }
     }
 
@@ -238,14 +235,8 @@ void UIText::nextPage(){
             if(character != nullptr){
                 unsigned int letter_width = character->w * this->size * engine->getGlobalXScale();
                 if(letter_width + line_len > max_line_len){
-                    //If we hyphenate, we want to re-print the last letter
-                    if(hyphenate){
-                        if(word_iter > 1){
-                            word_iter--;
-                        }
-                    }
-                    //Otherwise, repeat the word
-                    else{
+                    //Repeat the word if not hyphenating
+                    if(!hyphenate){
                         word_iter = 0;
                     }
                     newline = true;
@@ -337,18 +328,23 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
 
     unsigned int x_draw = this->x;
     unsigned int y_draw = this->y;
-    unsigned int letter_width_factor = engine->getGlobalXScale() * size;
     for(int i = 0; print_buff[i] != '\0'; i++){
         if(print_buff[i] == '\n'){
             x_draw = this->x;
             y_draw += char_height;
         }
         else{
-            SDL_Texture* letter = font->getCharacterTexture(print_buff[i], this->style, this->size);
+            SDL_Texture* letter = font->getCharacterTexture(print_buff[i], this->style);
             if(letter != nullptr){
-                SDL_RenderCopy(renderer, letter, nullptr, nullptr);
+                SDL_Rect dst_rect;
+                dst_rect.x = x_draw;
+                dst_rect.y = y_draw;
+                dst_rect.w = font->getCharacterSurface(print_buff[i], this->style)->w * this->size * engine->getGlobalXScale();
+                dst_rect.h = char_height;
 
-                x_draw += font->getCharacterSurface(print_buff[i], this->style)->w * letter_width_factor;
+                SDL_RenderCopy(renderer, letter, nullptr, &dst_rect);
+
+                x_draw += dst_rect.w;
             }
         }
     }
