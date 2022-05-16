@@ -215,77 +215,68 @@ void UIText::nextPage(){
 
     char* ref_cursor = ref_buff;
     char* text_cursor = text;
-    bool hyphenate = true;
 
     //Get max length & height
     const float max_line_len = this->getWidth();
     const float max_line_height = this->getHeight();
 
     unsigned int total_height = 0;
+    unsigned int line_len = 0;
+    unsigned int word_len = 0;
+    bool printed = false;
+    while(text_cursor[word_len] != '\0' && total_height < max_line_height){
+        SDL_Surface* character = font->getCharacterSurface(text_cursor[word_len], this->style);
+        if(character == nullptr){
+            word_len++;
+            continue;
+        }
 
-    //Populate the print buffer
-    //While we haven't hit the end of the text and still have more space to print
-    while(*text_cursor != '\0' && total_height < max_line_height){
-        bool newline = false;
-        char* word = text_cursor;
-        unsigned int word_iter = 0;
-        unsigned int line_len = 0;
-        while(likely(word[word_iter] != '\0' && word[word_iter] != '\n' && word[word_iter] != '\t' && word[word_iter] != ' ' && word[word_iter] != '-')){
-            SDL_Surface* character = font->getCharacterSurface(word[word_iter], this->style);
-            if(character != nullptr){
-                unsigned int letter_width = character->w * this->size * engine->getGlobalXScale();
-                if(letter_width + line_len > max_line_len){
-                    //Repeat the word if not hyphenating
-                    if(!hyphenate){
-                        word_iter = 0;
-                    }
-                    newline = true;
-                    break;
-                }
-                word_iter++;
-                line_len += letter_width;
+        unsigned int letter_width = character->w * this->size * engine->getGlobalXScale() + font->getSpacing() * engine->getGlobalXScale();
+
+        if(text_cursor[word_len] == ' ' || text_cursor[word_len] == '-' || text_cursor[word_len] == '\t' || text_cursor[word_len] == '\n'){
+            if(text_cursor[word_len] == '\n'){
+                printed = false;
             }
             else{
-                word_iter++;
+                printed = true;
             }
-        }
 
-        //Copy over current word (if word_iter > 0)
-        if(word_iter > 0){
-            memcpy(ref_cursor, word, word_iter);
-            ref_cursor += word_iter;
-            text_cursor += word_iter;
+            //Print
+            memcpy(ref_cursor, text_cursor, ++word_len);
+            text_cursor += word_len;
+            ref_cursor += word_len;
+            word_len = 0;
+            line_len = 0;
+            total_height += char_height;
         }
+        if(line_len > max_line_len){
+            if(!printed){
+                //Print & hyphenate
+                memcpy(ref_cursor, text_cursor, ++word_len);
+                text_cursor += word_len;
+                ref_cursor += word_len;
 
-        //If any of the characters that don't cause a newline by default
-        if(unlikely(word[word_iter] == '\t' || word[word_iter] == ' ' || word[word_iter] == '-')){
-            hyphenate = false;
-            *ref_cursor++ = word[word_iter];
-            text_cursor++;
-        }
-        //If a null byte, break
-        else if(word[word_iter] == '\0'){
-            text_buff_cursor = word + word_iter;
-            break;
-        }
-        //If a newline character
-        else if(word[word_iter] == '\n'){
-            newline = true;
-        }
-        //If we should hyphenate
-        else if(hyphenate){
-            *ref_cursor++ = '-';
-        }
+                *ref_cursor = '-';
+                ref_cursor++;
+            }
+            *ref_cursor = '\n';
+            ref_cursor++;
 
-        //If we should do a line break
-        if(newline){
-            hyphenate = true;
-            *ref_cursor++ = '\n';
-            total_height += max_line_height;
+            total_height += char_height;
+            word_len = 0;
+            line_len = 0;
+            printed = false;
         }
-
-        text_buff_cursor = word + word_iter;
+        else{
+            line_len += letter_width;
+            word_len++;
+        }
     }
+    if(word_len > 0){
+        memcpy(ref_cursor, text_cursor, ++word_len);
+        ref_cursor += word_len;
+    }
+    *ref_cursor = '\0';
 
     if(scroll_speed == 0){
         strcpy(this->print_buff, this->ref_buff);
@@ -326,6 +317,9 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
         return;
     }
 
+    int win_width, win_height;
+    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+
     unsigned int x_draw = this->x;
     unsigned int y_draw = this->y;
     for(int i = 0; print_buff[i] != '\0'; i++){
@@ -341,10 +335,11 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
                 dst_rect.y = y_draw;
                 dst_rect.w = font->getCharacterSurface(print_buff[i], this->style)->w * this->size * engine->getGlobalXScale();
                 dst_rect.h = char_height;
+                if(dst_rect.x + dst_rect.w <= win_width){
+                    SDL_RenderCopy(renderer, letter, nullptr, &dst_rect);
+                }
 
-                SDL_RenderCopy(renderer, letter, nullptr, &dst_rect);
-
-                x_draw += dst_rect.w;
+                x_draw += dst_rect.w + font->getSpacing() * engine->getGlobalXScale();
             }
         }
     }

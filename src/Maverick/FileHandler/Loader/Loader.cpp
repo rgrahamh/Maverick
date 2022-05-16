@@ -161,6 +161,10 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
+	uint16_t spacing;
+	fread(&spacing, sizeof(spacing), 1, file);
+	spacing = EndianSwap(&spacing);
+
 	if(key_buff != nullptr){
 		strncpy(key_buff, identifier, max_len);
 	}
@@ -170,7 +174,7 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 		return new_font;
 	}
 
-	new_font = new Font(identifier);
+	new_font = new Font(identifier, spacing);
 
 	uint8_t style_num;
 	fread(&style_num, sizeof(style_num), 1, file);

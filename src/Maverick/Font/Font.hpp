@@ -19,11 +19,13 @@ enum FONT_STYLE{
 
 class Font{
     public:
-        Font(const char* name);
+        Font(const char* name, uint16_t spacing = 0);
         void setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style = STANDARD_STYLE);
+        void setSpacing(uint16_t spacing);
 
         SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE);
         SDL_Surface* getCharacterSurface(unsigned char val, uint8_t style = STANDARD_STYLE);
+        uint16_t getSpacing();
         void removeCharacter(unsigned char value, enum FONT_STYLE style);
 
         int serialize(FILE* file);
@@ -33,6 +35,7 @@ class Font{
         SDL_Surface* typesetter[NUM_STYLES][MAX_CHARS];
         uint8_t num_chars[NUM_STYLES];
         SDL_Texture* type_textures[NUM_STYLES][MAX_CHARS];
+        uint16_t spacing;
 };
 
 #endif
