@@ -253,6 +253,38 @@ UIElementList* UIElement::getSubelements(){
     return this->subelements;
 }
 
+/** Gets the width of the UI element (in pixels)
+ * @return The width of the UI element (in pixels)
+ */
+float UIElement::getWidth(){
+    int height, width;
+    SDL_GetWindowSize(engine->getWindow(), &width, &height);
+    return width * this->view_width;
+}
+
+/** Gets the pixel height of the UI element
+ * @return The pixel height of the UI element
+ */
+float UIElement::getHeight(){
+    int height, width;
+    SDL_GetWindowSize(engine->getWindow(), &width, &height);
+    return height * this->view_height;
+}
+
+/** Gets the view width of the UI element
+ * @return The view width of the UI element
+ */
+double UIElement::getViewWidth(){
+    return this->view_width;
+}
+
+/** Gets the view height of the UI element
+ * @return The view height of the UI element
+ */
+double UIElement::getViewHeight(){
+    return this->view_height;
+}
+
 /** Returns true if the mouse is inside the draw area, and false otherwise
  * @return If the mouse is within the draw area
  */

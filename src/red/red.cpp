@@ -234,8 +234,8 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 
 			//Try the exception files
 			const unsigned int exception_num = 8;
-			char* except_str[] = {"_backslash", "_colon", "_forwardslash", "_greaterthan", "_lessthan", "_openquote", "_questionmark", "_star"};
-			char except_char[] = {'\\', ',', '/', '>', '<', '"', '?', '*'};
+			char* except_str[] = {"_backslash", "_colon", "_comma", "_forwardslash", "_greaterthan", "_lessthan", "_openquote", "_questionmark", "_star"};
+			char except_char[] = {'\\', ':', ',', '/', '>', '<', '"', '?', '*'};
 			for(unsigned int i = 0; i < exception_num; i++){
 				char file_path[MAX_LINE_LEN + 15];
 				file_path[0] = '\0';
@@ -266,7 +266,7 @@ bool editFont(Font* font){
 	char command_str[MAX_LINE_LEN];
 	char** command_args = nullptr;
 	do{
-		promptUser("What font group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", "font", command_str);
+		promptUser("What would you like to edit? You may edit the font group (standard/bold/italic) or spacing, or use save/quit to save or abort.", "font", command_str);
 		command_args = getArgs(command_str, " ");
 		ToLower(command_args[0]);
 
@@ -281,6 +281,12 @@ bool editFont(Font* font){
 			}
 			else if(strcmp(command_args[1], "bold") == 0){
 				font_style = FONT_STYLE::BOLD_STYLE;
+			}
+			else if(strcmp(command_args[1], "spacing") == 0){
+				char spacing_str[MAX_LINE_LEN];
+				promptUser("Please specify the font spacing:", "font", spacing_str);
+				font->setSpacing(strtoul(spacing_str, nullptr, 10));
+				printf("Set font spacing to %d\n", font->getSpacing());
 			}
 
 			editFontStyle(font, (FONT_STYLE)font_style);
@@ -409,8 +415,8 @@ void addAsset(char* name, uint8_t resource_type){
 		fclose(file);
 	}
 	else if(resource_type == RESOURCE_TYPE::FONT){
-		strcat(new_file, ".fnt");
 		Font font(name);
+		strcat(new_file, ".fnt");
 		editAsset(new_file, resource_type, &font);
 	}
 	else if(resource_type == RESOURCE_TYPE::SOUND){

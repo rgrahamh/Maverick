@@ -1,27 +1,43 @@
 #include "./Font.hpp"
 
-Font::Font(const char* name){
+#include "../Engine/Engine.hpp"
+extern Engine* engine;
+
+Font::Font(const char* name, uint16_t spacing){
     this->name = StrDeepCopy(name);
-    this->style = FONT_STYLE::STANDARD_STYLE;
     memset(this->typesetter, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Surface*));
     memset(this->num_chars, 0, NUM_STYLES);
+    this->spacing = spacing;
 }
 
-SDL_Surface* Font::getCharacter(unsigned char value){
-    return this->typesetter[this->style][value];
+SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style){
+    //If the texture exists
+    if(type_textures[style][value] != nullptr){
+        return type_textures[style][value];
+    }
+
+    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(engine->getCamera()->getRenderer(), typesetter[style][value]);
+    
+    //Store & return the new texture
+    type_textures[style][value] = new_texture;
+    return new_texture;
 }
 
-SDL_Surface* Font::getCharacter(unsigned char value, enum FONT_STYLE style){
+SDL_Surface* Font::getCharacterSurface(unsigned char value, uint8_t style){
     return this->typesetter[style][value];
 }
 
-void Font::setStyle(enum FONT_STYLE style){
-    this->style = style;
+uint16_t Font::getSpacing(){
+    return this->spacing;
 }
 
-void Font::setCharacter(unsigned char value, SDL_Surface* surface, enum FONT_STYLE style){
+void Font::setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style){
     this->typesetter[style][value] = surface;
     this->num_chars[style]++;
+}
+
+void Font::setSpacing(uint16_t spacing){
+    this->spacing = spacing;
 }
 
 void Font::removeCharacter(unsigned char value, enum FONT_STYLE style){
@@ -37,6 +53,14 @@ int Font::serialize(FILE* file){
     uint8_t resource_type = RESOURCE_TYPE::FONT;
     fwrite(&resource_type, sizeof(resource_type), 1, file);
 
+    uint16_t identifier_len = strlen(name);
+    uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
+    fwrite(&identifier_len_swapped, sizeof(identifier_len), 1, file);
+    fwrite(name, 1, identifier_len, file);
+
+    uint16_t spacing_swapped = EndianSwap(&this->spacing);
+    fwrite(&spacing_swapped, sizeof(spacing_swapped), 1, file);
+
     uint8_t num_styles = 0;
     for(int i = 0; i < NUM_STYLES; i++){
         if(num_chars[i] > 0){
@@ -47,12 +71,14 @@ int Font::serialize(FILE* file){
     fwrite(&num_styles, sizeof(num_styles), 1, file);
     for(int i = 0; i < NUM_STYLES; i++){
         if(num_chars[i] > 0){
-            uint8_t font_style = this->style;
+            uint8_t font_style = i;
             fwrite(&font_style, sizeof(font_style), 1, file);
             fwrite(&this->num_chars[i], sizeof(num_chars[i]), 1, file);
 
             for(int j = 0; j < MAX_CHARS; j++){
                 if(typesetter[font_style][j] != nullptr){
+                    char new_char = j;
+                    fwrite(&new_char, sizeof(new_char), 1, file);
                     SerializeSurface(file, typesetter[font_style][j]);
                 }
             }

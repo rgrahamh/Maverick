@@ -22,8 +22,8 @@ class Entity{
 		char* getName();
 		double getX();
 		double getY();
-		float getWidth();
-		float getHeight();
+		virtual float getWidth();
+		virtual float getHeight();
 		HitboxList* getHitboxes();
 		int16_t getDrawLayer();
 		double getDrawAxis();

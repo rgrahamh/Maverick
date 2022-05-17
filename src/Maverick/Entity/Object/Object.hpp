@@ -40,8 +40,8 @@ class Object : public Entity{
 		double getGround();
 		double getNextGround();
 
-		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set);
-		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
+		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) override;
+		virtual int serializeExtendedData(FILE* file, Zone* base_zone) override;
 
 		void setXVel(double xV);
 		void setYVel(double yV);
@@ -57,15 +57,15 @@ class Object : public Entity{
 		void applyForce(double xA, double yA, double zA = 0);
 
 		//Processing functions
-		virtual void _process(uint64_t delta, unsigned int steps);
+		virtual void _process(uint64_t delta, unsigned int steps) override;
 		//Need this for custom processing
-		virtual void process(uint64_t delta, unsigned int steps);
+		virtual void process(uint64_t delta, unsigned int steps) override;
 
-		virtual void _action(Control* control);
-		virtual void action(Control* control);
+		virtual void _action(Control* control) override;
+		virtual void action(Control* control) override;
 
-		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
-		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
 
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 

@@ -161,6 +161,10 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
+	uint16_t spacing;
+	fread(&spacing, sizeof(spacing), 1, file);
+	spacing = EndianSwap(&spacing);
+
 	if(key_buff != nullptr){
 		strncpy(key_buff, identifier, max_len);
 	}
@@ -170,22 +174,22 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 		return new_font;
 	}
 
-	new_font = new Font(identifier);
+	new_font = new Font(identifier, spacing);
 
 	uint8_t style_num;
 	fread(&style_num, sizeof(style_num), 1, file);
 
-	for(uint8_t i; i < style_num; i++){
+	for(uint8_t i = 0; i < style_num; i++){
 		uint8_t style_type, char_num;
 		fread(&style_type, sizeof(style_type), 1, file);
 		fread(&char_num, sizeof(char_num), 1, file);
 
-		for(uint8_t j; j < char_num; j++){
+		for(uint8_t j = 0; j < char_num; j++){
 			char new_char;
 			fread(&new_char, sizeof(new_char), 1, file);
 
 			SDL_Surface* new_surface = readSurface(file);
-			new_font->setCharacter(new_char, new_surface, (enum FONT_STYLE)style_type);
+			new_font->setCharacter(new_char, new_surface, style_type);
 		}
 	}
 

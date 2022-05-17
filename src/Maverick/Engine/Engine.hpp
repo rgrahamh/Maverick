@@ -1,13 +1,6 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#define ROLLBACK_STEP 6.0
-
-#define likely(x) __builtin_expect((x),1)
-#define unlikely(x) __builtin_expect((x),0)
-#define MS_PER_FRAME 167
-#define ZOOM_RATE 0.08
-
 #include <thread>
 #include <atomic>
 #include <queue>
@@ -29,7 +22,6 @@
 #include "../Global/Global.hpp"
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -132,7 +124,7 @@ class Engine{
 		void collisionStep(ObjectList* all_objects);
 
 		//Physics step
-		void physicsStep(ObjectList* all_objects, unsigned int steps);
+		void physicsStep(EntityList* all_objects, unsigned int steps);
 
 		//The thread garbage collector
 		void threadGC();

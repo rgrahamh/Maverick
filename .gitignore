@@ -7,3 +7,8 @@ cmake_install.cmake
 build/Makefile
 ./*.pld
 ./*.pad
+**/Makefile
+**/*.so*
+bin
+src/led/led
+src/red/red

@@ -15,13 +15,14 @@ class UITextBox : public UIElement{
 
         void setText(const char* text);
         void setFont(const char* font_path);
-        void setStyle(uint8_t style);
+        void setStyle(enum FONT_STYLE style);
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
         void setScrollSpeed(float scroll_speed);
         void setXAlignment(ALIGNMENT x_alignment);
         void setYAlignment(ALIGNMENT y_alignment);
 
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+		virtual void process(uint64_t delta, unsigned int steps) override;
 
     private:
         UIText* text;

@@ -31,12 +31,12 @@ class UIElement : public Entity{
         UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer = 0);
         virtual ~UIElement();
 
-		virtual void _process(uint64_t delta, unsigned int steps);
-		virtual void process(uint64_t delta, unsigned int steps);
-		virtual void _action(Control* control);
-		virtual void action(Control* control);
-        virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void _process(uint64_t delta, unsigned int steps) override;
+		virtual void process(uint64_t delta, unsigned int steps) override;
+		virtual void _action(Control* control) override;
+		virtual void action(Control* control) override;
+        virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
 
 		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
@@ -50,6 +50,11 @@ class UIElement : public Entity{
 
         UIElement* getElement(const char* name);
         UIElementList* getSubelements();
+
+        float getWidth() override;
+        float getHeight() override;
+        double getViewWidth();
+        double getViewHeight();
 
     protected:
         //All elements which are children of this one
