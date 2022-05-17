@@ -232,10 +232,12 @@ void UIText::nextPage(){
         }
 
         unsigned int letter_width = character->w * this->size * engine->getGlobalXScale() + font->getSpacing() * engine->getGlobalXScale();
+        line_len += letter_width;
 
         if(text_cursor[word_len] == ' ' || text_cursor[word_len] == '-' || text_cursor[word_len] == '\t' || text_cursor[word_len] == '\n'){
             if(text_cursor[word_len] == '\n'){
                 printed = false;
+                line_len = 0;
             }
             else{
                 printed = true;
@@ -246,13 +248,15 @@ void UIText::nextPage(){
             text_cursor += word_len;
             ref_cursor += word_len;
             word_len = 0;
-            line_len = 0;
             total_height += char_height;
         }
         if(line_len > max_line_len){
             if(!printed){
                 //Print & hyphenate
-                memcpy(ref_cursor, text_cursor, ++word_len);
+                if(word_len > 1){
+                    word_len--;
+                }
+                memcpy(ref_cursor, text_cursor, word_len);
                 text_cursor += word_len;
                 ref_cursor += word_len;
 
@@ -268,7 +272,6 @@ void UIText::nextPage(){
             printed = false;
         }
         else{
-            line_len += letter_width;
             word_len++;
         }
     }

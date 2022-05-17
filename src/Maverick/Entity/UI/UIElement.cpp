@@ -258,7 +258,7 @@ UIElementList* UIElement::getSubelements(){
  */
 float UIElement::getWidth(){
     int height, width;
-    SDL_GetWindowSize(engine->getWindow(), &height, &width);
+    SDL_GetWindowSize(engine->getWindow(), &width, &height);
     return width * this->view_width;
 }
 
@@ -267,7 +267,7 @@ float UIElement::getWidth(){
  */
 float UIElement::getHeight(){
     int height, width;
-    SDL_GetWindowSize(engine->getWindow(), &height, &width);
+    SDL_GetWindowSize(engine->getWindow(), &width, &height);
     return height * this->view_height;
 }
 

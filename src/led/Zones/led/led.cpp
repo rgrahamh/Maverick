@@ -21,7 +21,7 @@ void buildEditor(){
     object_list->setAnimation("background");
     led->addUIElement(object_list);
 
-    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "cybfont", "All draw layers", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border");
+    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "cybfont", "All draw layers", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 9);
     layer_display->addAnimation("background", 1);
     layer_display->addFrame("background", 0);
     layer_display->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
