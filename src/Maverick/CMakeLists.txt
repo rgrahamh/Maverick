@@ -109,7 +109,6 @@ add_library(maverick SHARED
 target_link_libraries(maverick
     SDL2
     SDL2_image
-    SDL2_ttf
     SDL2_mixer
     GL
 )

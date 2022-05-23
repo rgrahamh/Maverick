@@ -6,6 +6,7 @@ extern Engine* engine;
 Font::Font(const char* name, uint16_t spacing){
     this->name = StrDeepCopy(name);
     memset(this->typesetter, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Surface*));
+    memset(this->type_textures, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Texture*));
     memset(this->num_chars, 0, NUM_STYLES);
     this->spacing = spacing;
 }

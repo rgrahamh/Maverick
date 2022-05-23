@@ -6,7 +6,6 @@
 #include "./Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Global/Global.hpp"
 
-#include <SFML/Graphics.hpp>
 #include <SDL2/SDL.h>
 #include <unordered_map>
 #include <map>

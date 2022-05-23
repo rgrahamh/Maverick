@@ -56,7 +56,6 @@ target_link_directories(led PUBLIC ../../bin)
 target_link_libraries(led
     SDL2
     SDL2_image
-    SDL2_ttf
     SDL2_mixer
     GL
     maverick

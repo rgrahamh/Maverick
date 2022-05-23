@@ -57,7 +57,6 @@ target_link_directories(red PUBLIC
 target_link_libraries(red
     SDL2
     SDL2_image
-    SDL2_ttf
     SDL2_mixer
     GL
     maverick
