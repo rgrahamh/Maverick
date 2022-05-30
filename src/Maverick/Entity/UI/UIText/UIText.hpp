@@ -82,15 +82,13 @@ class UIText : public UIElement{
         //Text style (italics, bold, etc.)
         enum FONT_STYLE style;
 
-        //Text wrapping characteristics
-        unsigned int chars_per_line;
-        unsigned int num_lines;
-
-        bool hit_end;
-
         //The scroll speed (chars per second)
         float scroll_speed;
         uint32_t timer;
+
+        //Line characteristics
+        uint* line_start_x;
+        uint num_lines;
 
         //The foreground & background colors
         SDL_Color font_color;

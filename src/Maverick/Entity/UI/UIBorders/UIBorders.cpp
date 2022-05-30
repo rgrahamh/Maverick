@@ -18,6 +18,8 @@ UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offse
                      int draw_layer, char* border_pattern, uint8_t border_types)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
+    this->height_buff = 0;
+    this->width_buff = 0;
 
     this->subelements = nullptr;
 
@@ -36,11 +38,27 @@ UIBorders::~UIBorders(){
     }
 }
 
+/** Returns the height buffer for this set of borders
+ * @return The height buffer for this set of borders
+ */
+unsigned int UIBorders::getHeightBuff(){
+    return this->height_buff;
+}
+
+/** Returns the width buffer for this set of borders
+ * @return The width buffer for this set of borders
+ */
+unsigned int UIBorders::getWidthBuff(){
+    return this->width_buff;
+}
+
 /** Creates & adds borders based upon the border_pattern & border_types
  * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
 void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
+    this->height_buff = 0;
+    this->width_buff = 0;
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
         char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
@@ -62,30 +80,46 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                     switch(1 << i){
                         case(BORDER_TYPE::TOP_BORDER):{
                             border_width = draw_area.w;
-                            border_height = border_surface->h;
+                            border_height = border_surface->h * engine->getGlobalYScale();
                             border_x = draw_area.x;
                             border_y = draw_area.y;
+
+                            if(border_height > this->height_buff){
+                                this->height_buff = border_height;
+                            }
                             break;
                         }
                         case(BORDER_TYPE::BOTTOM_BORDER):{
                             border_width = draw_area.w;
-                            border_height = border_surface->h;
+                            border_height = border_surface->h * engine->getGlobalYScale();
                             border_x = draw_area.x;
-                            border_y = draw_area.y + this->draw_area.h - border_surface->h;
+                            border_y = draw_area.y + this->draw_area.h - border_height;
+
+                            if(border_height > this->height_buff){
+                                this->height_buff = border_height;
+                            }
                             break;
                         }
                         case(BORDER_TYPE::LEFT_BORDER):{
-                            border_width = border_surface->w;
+                            border_width = border_surface->w * engine->getGlobalXScale();
                             border_height = draw_area.h;
                             border_x = draw_area.x;
                             border_y = draw_area.y;
+
+                            if(border_width > this->width_buff){
+                                this->width_buff = border_width;
+                            }
                             break;
                         }
                         case(BORDER_TYPE::RIGHT_BORDER):{
-                            border_width = border_surface->w;
+                            border_width = border_surface->w * engine->getGlobalXScale();
                             border_height = draw_area.h;
-                            border_x = draw_area.x + this->draw_area.w - border_surface->w;
+                            border_x = draw_area.x + this->draw_area.w - border_width;
                             border_y = draw_area.y;
+
+                            if(border_width > this->width_buff){
+                                this->width_buff = border_width;
+                            }
                             break;
                         }
                     }

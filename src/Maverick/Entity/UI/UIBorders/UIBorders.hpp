@@ -17,13 +17,17 @@ class UIBorders: public UIElement{
                   int draw_layer, char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
         ~UIBorders();
 
+        unsigned int getHeightBuff();
+        unsigned int getWidthBuff();
+
         void addBorders(char* border_pattern, uint8_t border_types);
 
         virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
 
     private:
         UIElement* borders[4];
-
+        unsigned int height_buff;
+        unsigned int width_buff;
 };
 
 #endif
