@@ -34,14 +34,14 @@ UIText::UIText(const char* name, double view_x_offset, double view_y_offset, dou
     this->size = size;
     this->scroll_speed = scroll_speed;
 
-    this->num_lines = 0;
-    this->chars_per_line = 0;
-
     this->print_buff = nullptr;
     this->ref_buff = nullptr;
     this->text = nullptr;
     this->font = nullptr;
     this->style = FONT_STYLE::STANDARD_STYLE;
+
+    this->line_start_x = nullptr;
+    this->num_lines = 0;
 
     this->setFont(font_name);
     this->setSize(size);
@@ -81,7 +81,7 @@ void UIText::setText(const char* text){
     if(this->print_buff != nullptr){
         free(this->print_buff);
     }
-    this->print_buff = (char*)malloc((len + 1) * 2);
+    this->print_buff = (char*)calloc((len + 1) * 2, sizeof(char));
 
     if(this->ref_buff != nullptr){
         free(this->ref_buff);
@@ -213,6 +213,8 @@ void UIText::nextPage(){
         return;
     }
 
+    this->num_lines = 1;
+
     char* ref_cursor = ref_buff;
     char* text_cursor = text;
 
@@ -238,6 +240,8 @@ void UIText::nextPage(){
             if(text_cursor[word_len] == '\n'){
                 printed = false;
                 line_len = 0;
+                num_lines++;
+                total_height += char_height;
             }
             else{
                 printed = true;
@@ -248,7 +252,6 @@ void UIText::nextPage(){
             text_cursor += word_len;
             ref_cursor += word_len;
             word_len = 0;
-            total_height += char_height;
         }
         if(line_len > max_line_len){
             if(!printed){
@@ -270,6 +273,8 @@ void UIText::nextPage(){
             word_len = 0;
             line_len = 0;
             printed = false;
+
+            num_lines++;
         }
         else{
             word_len++;
@@ -283,6 +288,29 @@ void UIText::nextPage(){
 
     if(scroll_speed == 0){
         strcpy(this->print_buff, this->ref_buff);
+    }
+
+    if(this->line_start_x != nullptr){
+        free(this->line_start_x);
+    }
+    this->line_start_x = (uint*)calloc(sizeof(uint), num_lines);
+
+    int line_num = 0;
+    for(int i = 0; ref_buff[i] != '\0' && line_num < num_lines; i++){
+        if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
+            unsigned int total_width = 0;
+            for(; ref_buff[i] != '\0' && ref_buff[i] != '\n'; i++){
+                SDL_Surface* letter = font->getCharacterSurface(ref_buff[i], this->style);
+                if(letter != nullptr){
+                    total_width += letter->w  * engine->getGlobalXScale() + this->font->getSpacing() * engine->getGlobalXScale();
+                }
+            }
+
+            this->line_start_x[line_num++] = this->x + ((this->getWidth() - total_width) / 2);
+        }
+        else{
+            this->line_start_x[line_num++] = this->x;
+        }
     }
 }
 
@@ -323,14 +351,21 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     int win_width, win_height;
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
-    unsigned int x_draw = this->x;
-    unsigned int y_draw = this->y;
-    for(int i = 0; print_buff[i] != '\0'; i++){
-        if(print_buff[i] == '\n'){
-            x_draw = this->x;
-            y_draw += char_height;
-        }
-        else{
+    //Set starting Y draw position
+    uint y_draw;
+    if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
+        y_draw = this->y + ((this->getHeight() / 2) - (this->num_lines * char_height / 2));
+    }
+    else{
+        y_draw = this->y;
+    }
+
+    int line_num = 0;
+    uint x_draw;
+    for(int i = 0; print_buff[i] != '\0' && line_num < num_lines; i++){
+        //Set the line X draw position
+        x_draw = line_start_x[line_num++];
+        for(; print_buff[i] != '\0' && print_buff[i] != '\n'; i++){
             SDL_Texture* letter = font->getCharacterTexture(print_buff[i], this->style);
             if(letter != nullptr){
                 SDL_Rect dst_rect;
@@ -345,6 +380,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
                 x_draw += dst_rect.w + font->getSpacing() * engine->getGlobalXScale();
             }
         }
+        y_draw += char_height;
     }
 }
 
@@ -364,7 +400,7 @@ void UIText::process(uint64_t delta, unsigned int steps){
         this->timer += delta;
         unsigned int max_chars = timer * this->scroll_speed / 1000;
 
-        for(unsigned int i = 0; i < max_chars && print_buff_len + i < ref_buff_len; i++){
+        for(unsigned int i = print_buff_len; i < max_chars && i < ref_buff_len; i++){
             print_buff[i] = ref_buff[i];
         }
     }

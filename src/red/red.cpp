@@ -287,6 +287,7 @@ bool editFont(Font* font){
 				promptUser("Please specify the font spacing:", "font", spacing_str);
 				font->setSpacing(strtoul(spacing_str, nullptr, 10));
 				printf("Set font spacing to %d\n", font->getSpacing());
+				continue;
 			}
 
 			editFontStyle(font, (FONT_STYLE)font_style);

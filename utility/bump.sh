@@ -5,10 +5,11 @@ if [ "$FILES" == "" ]; then
 	exit -1
 fi
 
+IFS=$'\n'
 for FILE in $FILES; do
 	NEW_FILE="${FILE%.*}.bmp"
 	echo "$FILE -> $NEW_FILE"
-	magick convert "$FILE" "$NEW_FILE"
+	convert "$FILE" "$NEW_FILE"
 	if [ $? -eq 0 ]; then
 		rm "$FILE"
 	else

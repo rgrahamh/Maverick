@@ -19,7 +19,7 @@ extern Engine* engine;
  * @param text_y_alignment The vertical alignment strategy
  * @param border_pattern The pattern for the border texture files you wish to use
  * @param border_types The border locations
- * @param border_buff How much buffer the text should be given (how far inset you should start the text box)
+ * @param border_buff How much additional buffer the text should be given (how far inset you should start the text box past the borders)
  */
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      int draw_layer, char* font_path, char* text, float scroll_speed, int point, ALIGNMENT text_x_alignment,
@@ -30,24 +30,29 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
     int win_width, win_height;
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
-    double text_view_x_offset = ((view_x_offset * win_width) + border_buff) / win_width;
-    double text_view_y_offset = ((view_y_offset * win_height) + border_buff) / win_height;
+    unsigned int height_buff = 0, width_buff = 0;
+    if(border_pattern != nullptr){
+        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height,
+                                      draw_layer, border_pattern, border_types);
+        if(this->borders != nullptr){
+            height_buff = borders->getHeightBuff() + (border_buff * engine->getGlobalXScale());
+            width_buff = borders->getWidthBuff() + (border_buff * engine->getGlobalYScale());
+        }
+    }
+    else{
+        this->borders = nullptr;
+    }
 
-    double text_view_width = ((view_width * win_width) - (border_buff * 2)) / win_width;
-    double text_view_height = ((view_height * win_height) - (border_buff * 2)) / win_height;
+    double text_view_x_offset = ((view_x_offset * win_width) + width_buff) / win_width;
+    double text_view_y_offset = ((view_y_offset * win_height) + height_buff) / win_height;
+
+    double text_view_width = ((view_width * win_width) - (width_buff * 2)) / win_width;
+    double text_view_height = ((view_height * win_height) - (height_buff * 2)) / win_height;
 
     this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height, draw_layer,
                             font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);
 
     this->subelements = nullptr;
-
-    if(border_pattern != nullptr){
-        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height,
-                                      draw_layer, border_pattern, border_types);
-    }
-    else{
-        this->borders = nullptr;
-    }
 }
 
 /** Default destructor
