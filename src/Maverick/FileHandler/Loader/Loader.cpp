@@ -7,24 +7,17 @@ inline SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;
 	uint32_t width, height, rmask, gmask, bmask, amask;
 
-	fread(&width, sizeof(width), 1, file);
-	fread(&height, sizeof(height), 1, file);
-	width = EndianSwap(&width);
-	height = EndianSwap(&height);
+	ReadVar(width, file);
+	ReadVar(height, file);
 
 	fread(&depth, sizeof(depth), 1, file);
 
-	fread(&rmask, sizeof(rmask), 1, file);
-	fread(&gmask, sizeof(gmask), 1, file);
-	fread(&bmask, sizeof(bmask), 1, file);
-	fread(&amask, sizeof(amask), 1, file);
+	ReadVar(rmask, file);
+	ReadVar(gmask, file);
+	ReadVar(bmask, file);
+	ReadVar(amask, file);
 
 	fread(&bytes_per_pixel, sizeof(bytes_per_pixel), 1, file);
-
-	rmask = EndianSwap(&rmask);
-	gmask = EndianSwap(&gmask);
-	bmask = EndianSwap(&bmask);
-	amask = EndianSwap(&amask);
 
 	SDL_Surface* new_surface = SDL_CreateRGBSurface(0, width, height, depth, rmask, gmask, bmask, amask);
 	if(new_surface == nullptr){
@@ -48,8 +41,7 @@ inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
 	}
 
 	uint16_t identifier_len;
-	fread(&identifier_len, sizeof(identifier_len), 1, file);
-	identifier_len = EndianSwap(&identifier_len);
+	ReadVar(identifier_len, file);
 
 	char identifier[identifier_len+1];
 	fread(identifier, 1, identifier_len, file);
@@ -77,8 +69,7 @@ inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
  */
 inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
-	fread(&identifier_len, sizeof(identifier_len), 1, file);
-	identifier_len = EndianSwap(&identifier_len);
+	ReadVar(identifier_len, file);
 
 	char* identifier = (char*)malloc(identifier_len+1);
 	fread(identifier, 1, identifier_len, file);
@@ -97,8 +88,7 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	new_sound->name = identifier;
 
 	uint32_t audio_len;
-	fread(&audio_len, sizeof(audio_len), 1, file);
-	audio_len = EndianSwap(&audio_len);
+	ReadVar(audio_len, file);
 	new_sound->sample->alen = audio_len;
 
 	fread(&new_sound->sample->abuf, 1, audio_len, file);
@@ -113,8 +103,7 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
  */
 inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
-	fread(&identifier_len, sizeof(identifier_len), 1, file);
-	identifier_len = EndianSwap(&identifier_len);
+	ReadVar(identifier_len, file);
 
 	char identifier[identifier_len+1];
 	fread(identifier, 1, identifier_len, file);
@@ -132,13 +121,11 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	new_music = new Music(identifier);
 
 	uint16_t num_tracks;
-	fread(&num_tracks, sizeof(num_tracks), 1, file);
-	num_tracks = EndianSwap(&num_tracks);
+	ReadVar(num_tracks, file);
 
 	for(int i = 0; i < num_tracks; i++){
 		uint16_t track_identifier_len;
-		fread(&track_identifier_len, sizeof(track_identifier_len), 1, file);
-		track_identifier_len = EndianSwap(&track_identifier_len);
+		ReadVar(track_identifier_len, file);
 
 		char track_identifier[track_identifier_len + 1];
 		fread(&track_identifier, 1, track_identifier_len, file);
@@ -154,16 +141,14 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 
 inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
-	fread(&identifier_len, sizeof(identifier_len), 1, file);
-	identifier_len = EndianSwap(&identifier_len);
+	ReadVar(identifier_len, file);
 
 	char identifier[identifier_len+1];
 	fread(identifier, 1, identifier_len, file);
 	identifier[identifier_len] = '\0';
 
 	uint16_t spacing;
-	fread(&spacing, sizeof(spacing), 1, file);
-	spacing = EndianSwap(&spacing);
+	ReadVar(spacing, file);
 
 	if(key_buff != nullptr){
 		strncpy(key_buff, identifier, max_len);
@@ -259,11 +244,8 @@ Zone* loadData(const char* zone_name){
 	}
 
 	int64_t global_x_coord, global_y_coord;
-	fread(&global_x_coord, sizeof(global_x_coord), 1, file);
-	fread(&global_y_coord, sizeof(global_y_coord), 1, file);
-
-	global_x_coord = EndianSwap(&global_x_coord);
-	global_y_coord = EndianSwap(&global_y_coord);
+	ReadVar(global_x_coord, file);
+	ReadVar(global_y_coord, file);
 
 	Zone* zone = new Zone(zone_name, global_x_coord, global_y_coord);
 

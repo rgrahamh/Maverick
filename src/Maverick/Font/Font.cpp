@@ -55,12 +55,10 @@ int Font::serialize(FILE* file){
     fwrite(&resource_type, sizeof(resource_type), 1, file);
 
     uint16_t identifier_len = strlen(name);
-    uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-    fwrite(&identifier_len_swapped, sizeof(identifier_len), 1, file);
+    WriteVar(identifier_len, uint16_t, file);
     fwrite(name, 1, identifier_len, file);
 
-    uint16_t spacing_swapped = EndianSwap(&this->spacing);
-    fwrite(&spacing_swapped, sizeof(spacing_swapped), 1, file);
+    WriteVar(this->spacing, uint16_t, file);
 
     uint8_t num_styles = 0;
     for(int i = 0; i < NUM_STYLES; i++){

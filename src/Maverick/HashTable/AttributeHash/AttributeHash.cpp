@@ -5,7 +5,7 @@
  */
 AttributeHash::AttributeHash(unsigned int size){
 	this->size = size;
-	this->table = (AHEntry**)calloc(sizeof(AHEntry*), size);
+	this->table = (Attribute**)calloc(sizeof(Attribute*), size);
 }
 
 /** The destructor for the AttributeHash
@@ -13,9 +13,9 @@ AttributeHash::AttributeHash(unsigned int size){
 AttributeHash::~AttributeHash(){
 	for(unsigned int i = 0; i < this->size; i++){
 		if(this->table[i] != NULL){
-			AHEntry* cursor = this->table[i];
+			Attribute* cursor = this->table[i];
 			while(cursor != NULL){
-				AHEntry* tmp = cursor;
+				Attribute* tmp = cursor;
 				cursor = cursor->next;
 
 				free(tmp->key);
@@ -39,40 +39,58 @@ unsigned int AttributeHash::hash(const char* key){
 
 /** Adds a new entry to the hash table
  * @param key The string (filepath) that is being hashed
- * @param surface The texture that is being put into the table
+ * @param val The attribute value
+ * @param type The type of the value
  */
-void AttributeHash::add(const char* key, void* val){
-	unsigned int hash_val = this->hash(key);
+void AttributeHash::set(const char* key, void* val, ATTR_DATA_TYPE type){
+	//Make a deep copy if it's a string
+	if(type == ATTR_DATA_TYPE::STRING){
+		val = StrDeepCopy((const char*)val);
+	}
 
-	//Copying the key for permanent storage
-	unsigned int len = strlen(key);
-	char* perm_key = (char*)malloc(len + 1);
-	strncpy(perm_key, key, len);
-	perm_key[len] = '\0';
+	//Add a new attribute if it doesn't exist, or overwrite the old value
+	Attribute* entry = this->get(key);
+	if(entry == nullptr){
+		unsigned int hash_val = this->hash(key);
 
-	//Storing in the table
-	AHEntry* new_entry = (AHEntry*)malloc(sizeof(AHEntry));
-	new_entry->key = perm_key;
-	new_entry->val = val;
+		//Copying the key for permanent storage
+		unsigned int len = strlen(key);
+		char* perm_key = (char*)malloc(len + 1);
+		strncpy(perm_key, key, len);
+		perm_key[len] = '\0';
 
-	//Setting it as the first thing in the linked list (for constant-time insertion)
-	if(table[hash_val] == NULL){
-		new_entry->next = NULL;
+		//Storing in the table
+		Attribute* new_entry = (Attribute*)malloc(sizeof(Attribute));
+		new_entry->key = perm_key;
+		new_entry->val = val;
+		new_entry->type = type;
+
+		//Setting it as the first thing in the linked list (for constant-time insertion)
+		if(table[hash_val] == NULL){
+			new_entry->next = NULL;
+		}
+		else{
+			new_entry->next = table[hash_val];
+		}
+		table[hash_val] = new_entry;
 	}
 	else{
-		new_entry->next = table[hash_val];
+		if(entry->type == ATTR_DATA_TYPE::STRING && entry->val != nullptr){
+			free(entry->val);
+		}
+		entry->val = val;
+		entry->type = type;
 	}
-	table[hash_val] = new_entry;
 }
 
 /** Gets the texture from the hash table
  * @param key The string (filepath) that is being hashed
- * @return The texture with the given key
+ * @return A pointer to the attribute entry, or nullptr of no such entry exists
  */
-void* AttributeHash::get(const char* key){
+Attribute* AttributeHash::get(const char* key){
 	unsigned int hash_val = this->hash(key);
 
-	AHEntry* cursor = this->table[hash_val];
+	Attribute* cursor = this->table[hash_val];
 
 	//Iterate until we hit a matching case
 	while(cursor != NULL && strcmp(cursor->key, key) != 0){
@@ -83,24 +101,24 @@ void* AttributeHash::get(const char* key){
         return NULL;
     }
     else{
-        return &(cursor->val);
+        return cursor;
     }
 }
 
 /** Iterates over & dumps the AttributeHash
- * @return A AttributeHashEntry ptr to a new list (MUST iterate over elements to delete them all)
+ * @return A Attribute ptr to a new list (MUST iterate over elements to delete them all)
  */
-unsigned int AttributeHash::dump(AttributeHashEntry** hash_ptr){
+unsigned int AttributeHash::dump(Attribute** hash_ptr){
 	unsigned int entries = 0;
-	AttributeHashEntry* ht_dump = nullptr;
+	Attribute* ht_dump = nullptr;
 	for(unsigned int i = 0; i < size; i++){
 		while(table[i] != nullptr){
 			if(ht_dump == nullptr){
-				ht_dump = new AttributeHashEntry;
+				ht_dump = new Attribute;
 				ht_dump->next = nullptr;
 			}
 			else{
-				AttributeHashEntry* ht_tmp = new AttributeHashEntry;
+				Attribute* ht_tmp = new Attribute;
 				ht_tmp->next = ht_dump;
 				ht_dump = ht_tmp;
 			}

@@ -41,6 +41,8 @@ class UIElement : public Entity{
 		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone);
 
+		virtual int deserializeExtendedData(FILE* file);
+
         virtual void setViewSize(double view_width, double view_height);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);

@@ -150,15 +150,13 @@ int Music::serialize(FILE* file){
 
     //Identifier len
     uint16_t identifier_len = strlen(this->name);
-    uint16_t identifier_len_swap = EndianSwap(&identifier_len);
-    fwrite(&identifier_len_swap, sizeof(identifier_len_swap), 1, file);
+    WriteVar(identifier_len, uint16_t, file);
 
     //Identifier
     fwrite(this->name, 1, identifier_len, file);
 
     //Num tracks
-    uint16_t num_tracks_swap = EndianSwap(&this->num_tracks);
-    fwrite(&num_tracks_swap, sizeof(num_tracks_swap), 1, file);
+    WriteVar(this->num_tracks, uint16_t, file);
 
     //Tracks
     for(int i = 0; i < num_tracks; i++){

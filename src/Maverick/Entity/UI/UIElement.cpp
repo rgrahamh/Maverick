@@ -304,19 +304,13 @@ bool UIElement::isMouseInside(Control* control){
  * @return 0 on success
  */
 int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
-    //Get X/Y offsets
-    uint64_t view_x_offset_swap = EndianSwap((uint64_t*)&view_x_offset);
-    uint64_t view_y_offset_swap = EndianSwap((uint64_t*)&view_y_offset);
+    //Write X/Y offsets
+    WriteVar((uint64_t)view_x_offset, uint64_t, file);
+    WriteVar((uint64_t)view_y_offset, uint64_t, file);
 
-    //Get width/height
-    uint64_t view_width_swap = EndianSwap((uint64_t*)&view_width);
-    uint64_t view_height_swap = EndianSwap((uint64_t*)&view_height);
-
-    fwrite(&view_x_offset_swap, sizeof(view_x_offset_swap), 1, file);
-    fwrite(&view_y_offset_swap, sizeof(view_x_offset_swap), 1, file);
-
-    fwrite(&view_width_swap, sizeof(view_width_swap), 1, file);
-    fwrite(&view_height_swap, sizeof(view_height_swap), 1, file);
+    //Write width/height
+    WriteVar((uint64_t)view_width, uint64_t, file);
+    WriteVar((uint64_t)view_height, uint64_t, file);
 
     UIElementList* subelement_cursor = subelements;
     while(subelement_cursor != nullptr){
@@ -337,5 +331,9 @@ int UIElement::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
         subelement_cursor->element->serializeAssets(file, serialize_set);
         subelement_cursor = subelement_cursor->next;
     }
+    return 0;
+}
+
+int UIElement::deserializeExtendedData(FILE* file){
     return 0;
 }

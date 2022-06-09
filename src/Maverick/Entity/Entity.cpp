@@ -31,6 +31,23 @@ Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
     this->attr = new AttributeHash(64);
 }
 
+/** Construct the entity from file
+ * @param file The file you wish to construct the entity with, pointing to the object type indicator
+ */
+Entity::Entity(FILE* file){
+    if(this->deserializeData(file)){
+        printf("Object deserialization failed\n");
+    }
+    if(this->deserializeExtendedData(file)){
+        if(this->name != nullptr){
+            printf("Extended object deserialization of %s failed\n", this->name);
+        }
+        else{
+            printf("Extended object deserialization failed\n");
+        }
+    }
+}
+
 /** Destructor for entities
  */
 Entity::~Entity(){
@@ -143,6 +160,7 @@ void* Entity::getAttr(const char* key){
 
 /** Creates a new animation (you MUST do this before adding hitboxes/sprites)
  * @param animation_name The name of the new animation
+ * @param num_sprite_sets The number of sprite sets
  */
 int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
     //If the animation already exists, just return
@@ -153,6 +171,29 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
     Animation* new_animation = new Animation(animation_name, &x, &y, num_sprite_sets);
     AnimationList* new_animation_list = new AnimationList;
     new_animation_list->animation = new_animation;
+    new_animation_list->next = nullptr;
+
+    if(animations == nullptr){
+        animations = new_animation_list;
+    }
+    else{
+        new_animation_list->next = animations;
+        animations = new_animation_list;
+    }
+    this->num_animations++;
+    return 0;
+}
+
+/** Creates a new animation (you MUST do this before adding hitboxes/sprites)
+ * @param animation A pointer to the new animation
+ */
+int Entity::addAnimation(Animation* animation){
+    if(findAnimation(animation->getName()) != nullptr){
+        return -1;
+    }
+
+    AnimationList* new_animation_list = new AnimationList;
+    new_animation_list->animation = animation;
     new_animation_list->next = nullptr;
 
     if(animations == nullptr){
@@ -473,12 +514,44 @@ void Entity::setVisible(bool visible){
     this->visible = visible;
 }
 
-/** Sets the attribute key to the specified val
+/** Sets the attribute key to the specified (as a bool)
  * @param key The key you wish to set
  * @param val The val you wish to set
  */
-void Entity::setAttr(const char* key, void* val){
-    this->attr->add(key, val);
+void Entity::setAttr(const char* key, bool val){
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::BOOL);
+}
+
+/** Sets the attribute key to the specified val (as a char)
+ * @param key The key you wish to set
+ * @param val The val you wish to set
+ */
+void Entity::setAttr(const char* key, char val){
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::CHAR);
+}
+
+/** Sets the attribute key to the specified val (as a signed int)
+ * @param key The key you wish to set
+ * @param val The val you wish to set
+ */
+void Entity::setAttr(const char* key, int64_t val){
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::INT);
+}
+
+/** Sets the attribute key to the specified val (as an unsigned int)
+ * @param key The key you wish to set
+ * @param val The val you wish to set
+ */
+void Entity::setAttr(const char* key, uint64_t val){
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::UINT);
+}
+
+/** Sets the attribute key to the specified val (as a string)
+ * @param key The key you wish to set
+ * @param val The val you wish to set
+ */
+void Entity::setAttr(const char* key, char* val){
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::STRING);
 }
 
 /** Gets the entity type
@@ -510,55 +583,53 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
 
     //GENERAL SECTION
     //Write the entity type
-    uint32_t entity_type = EndianSwap(&this->type);
-    fwrite(&entity_type, sizeof(entity_type), 1, file);
+    WriteVar(this->type, uint32_t, file);
 
     //Identifier
     uint16_t identifier_len = strlen(this->name);
-    uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-    fwrite(&identifier_len_swapped, sizeof(identifier_len_swapped), 1, file);
+    WriteVar(identifier_len, uint16_t, file);
     fwrite(this->name, 1, identifier_len, file);
 
     //Draw layer
-    int16_t draw_layer_swap = EndianSwap(&this->draw_layer);
-    fwrite(&draw_layer_swap, sizeof(draw_layer_swap), 1, file);
+    WriteVar(draw_layer, int16_t, file);
 
     //ATTRIBUTE SECTION
-    AttributeHashEntry* attr_list;
+    Attribute* attr_list;
     uint32_t num_entries = attr->dump(&attr_list);
-    num_entries = EndianSwap(&num_entries);
-    fwrite(&num_entries, sizeof(num_entries), 1, file);
+    WriteVar(num_entries, uint32_t, file);
 
     while(attr_list != nullptr){
         //Attribute type
         uint16_t attr_type = attr_list->type;
-        attr_type = EndianSwap(&attr_type);
-        fwrite(&attr_type, sizeof(attr_type), 1, file);
+        WriteVar(attr_type, uint16_t, file);
 
-        //The attribute
-        switch(attr_list->type){
+        //Write the key info
+        uint16_t attr_key_len = strlen(attr_list->key);
+        WriteVar(attr_key_len, uint16_t, file);
+        fwrite(attr_list->key, attr_key_len, 1, file);
+
+        //Write the val info
+        switch(attr_type){
             //Writing chars & bools (1 byte)
-            case ATTR_DATA_TYPE::BOOL_PTR:
-            case ATTR_DATA_TYPE::CHAR_PTR:{
-                uint8_t* attr_val = (uint8_t*)attr_list->val;
-                fwrite(attr_val, sizeof(attr_val), 1, file);
+            case ATTR_DATA_TYPE::BOOL:
+            case ATTR_DATA_TYPE::CHAR:{
+                uint8_t attr_val = (uint8_t)((uint64_t)attr_list->val & 0xFF);
+                WriteVar(attr_val, uint8_t, file);
                 break;
             }
 
             //Writing ints/uints (8 bytes)
-            case ATTR_DATA_TYPE::INT_PTR:
-            case ATTR_DATA_TYPE::UINT_PTR:{
-                uint64_t* attr_val = (uint64_t*)attr_list->val;
-                fwrite(attr_val, sizeof(attr_val), 1, file);
+            case ATTR_DATA_TYPE::INT:
+            case ATTR_DATA_TYPE::UINT:{
+                WriteVar((uint64_t)attr_list->val, uint64_t, file);
                 break;
             }
 
-            //Writing stings (? bytes)
+            //Writing strings (? bytes)
             case ATTR_DATA_TYPE::STRING:{
                 char* attr_str = (char*)attr_list->val;
                 uint16_t attr_val_len = strlen(attr_str);
-                uint16_t attr_val_len_swapped = EndianSwap(&attr_val_len);
-                fwrite(&attr_val_len_swapped, sizeof(attr_val_len_swapped), 1, file);
+                WriteVar(attr_val_len, uint16_t, file);
                 fwrite(attr_str, 1, attr_val_len, file);
                 break;
             }
@@ -566,8 +637,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     }
 
     //ANIMATION SECTION
-    uint16_t num_animations = EndianSwap(&this->num_animations);
-    fwrite(&num_animations, sizeof(num_animations), 1, file);
+    WriteVar(this->num_animations, uint16_t, file);
 
     AnimationList* animation_cursor = this->animations;
     while(animation_cursor != nullptr){
@@ -578,12 +648,125 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     if(this->active_animation != nullptr){
         const char* starting_animation = this->active_animation->getName();
         uint16_t starting_animation_len = strlen(starting_animation);
-        uint16_t starting_animation_len_swapped = EndianSwap(&starting_animation_len);
-        fwrite(&starting_animation_len_swapped, sizeof(starting_animation_len_swapped), 1, file);
+        WriteVar(starting_animation_len, uint16_t, file);
         fwrite(starting_animation, 1, starting_animation_len, file);
+    }
+    else{
+        Animation* default_animation = this->animations->animation;
+        if(default_animation != nullptr){
+            const char* starting_animation = default_animation->getName();
+            uint16_t starting_animation_len = strlen(starting_animation);
+            WriteVar(starting_animation_len, uint16_t, file);
+            fwrite(starting_animation, 1, starting_animation_len, file);
+        }
+        else{
+            const uint16_t zero = 0;
+            fwrite(&zero, sizeof(zero), 1, file);
+        }
     }
 
     return this->serializeExtendedData(file, base_zone);
+}
+
+int Entity::deserializeData(FILE* file){
+    if(file == nullptr){
+        return -1;
+    }
+
+    //Entity type
+    ReadVar(this->type, file);
+
+    //Identifier
+    uint16_t identifier_len;
+    ReadVar(identifier_len, file);
+    this->name = (char*)malloc(identifier_len + 1);
+    fread(&this->name, sizeof(char), identifier_len, file);
+    name[identifier_len] = '\0';
+
+    //Draw layer
+    ReadVar(this->draw_layer, file);
+
+    //ATTRIBUTE SECTION
+    uint32_t num_entries;
+    ReadVar(num_entries, file);
+
+    for(uint i = 0; i < num_entries; i++){
+        //Attribute type
+        uint16_t attr_type;
+        ReadVar(attr_type, file);
+
+        //Attribute key
+        uint16_t attr_key_len;
+        ReadVar(attr_key_len, file);
+        char attr_key[attr_key_len + 1];
+        fread(attr_key, attr_key_len, 1, file);
+        attr_key[attr_key_len] = '\0';
+
+        switch(attr_type){
+            //Reading chars & bools (1 byte)
+            case ATTR_DATA_TYPE::BOOL:{
+                bool attr_val;
+                ReadVar(attr_val, file);
+                this->setAttr(attr_key, attr_val);
+                break;
+            }
+            case ATTR_DATA_TYPE::CHAR:{
+                char attr_val;
+                ReadVar(attr_val, file);
+                this->setAttr(attr_key, attr_val);
+                break;
+            }
+
+            //Reading ints/uints (8 bytes)
+            case ATTR_DATA_TYPE::INT:{
+                int64_t attr_val;
+                ReadVar(attr_val, file);
+                this->setAttr(attr_key, attr_val);
+                break;
+            }
+            case ATTR_DATA_TYPE::UINT:{
+                uint64_t attr_val;
+                ReadVar(attr_val, file);
+                this->setAttr(attr_key, attr_val);
+                break;
+            }
+
+            //Reading strings (? bytes)
+            case ATTR_DATA_TYPE::STRING:{
+                uint16_t attr_str_len;
+                ReadVar(attr_str_len, file);
+                char attr_str[attr_str_len + 1];
+                fread(attr_str, 1, attr_str_len, file);
+                attr_str[attr_str_len] = '\0';
+                this->setAttr(attr_key, attr_str);
+                break;
+            }
+        }
+    }
+
+    //ANIMATION SECTION
+    uint16_t num_animations;
+    ReadVar(num_animations, file);
+    for(int i = 0; i < num_animations; i++){
+        Animation* new_animation = new Animation(file);
+        this->addAnimation(new_animation);
+    }
+
+    //Set staring animation
+    uint16_t starting_str_len;
+    ReadVar(starting_str_len, file);
+    if(starting_str_len > 0){
+        char starting_str[starting_str_len + 1];
+        fread(starting_str, starting_str_len, 1, file);
+        starting_str[starting_str_len] = '\0';
+        this->setAnimation(starting_str);
+    }
+
+    return this->deserializeExtendedData(file);
+}
+
+int Entity::deserializeExtendedData(FILE* file){
+    return 0;
 }
 
 /** Saves the resources of the entity to a char*'s (which should be freed upon return)

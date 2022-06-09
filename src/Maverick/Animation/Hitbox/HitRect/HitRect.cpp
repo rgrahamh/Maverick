@@ -111,31 +111,20 @@ void HitRect::serializeData(FILE* file){
 	uint8_t shape = this->shape;
 	fwrite(&shape, 1, 1, file);
 
-	//Write X offset
-	uint64_t x_offset_swap = EndianSwap((uint64_t*)&this->x_offset);
-	fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
+	//Write X & Y offsets
+	WriteVar((uint64_t)this->x_offset, uint64_t, file);
+	WriteVar((uint64_t)this->y_offset, uint64_t, file);
 
-	//Write Y offset
-	uint64_t y_offset_swap = EndianSwap((uint64_t*)&this->y_offset);
-	fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
-
-	//Write X component (X radius/width)
-	uint64_t width_swap = EndianSwap((uint64_t*)&this->base_width);
-	fwrite(&width_swap, sizeof(width_swap), 1, file);
-
-	//Write Y component (Y radius/height)
-	uint64_t height_swap = EndianSwap((uint64_t*)&this->base_height);
-	fwrite(&height_swap, sizeof(height_swap), 1, file);
+	//Write X & Y components (widths)
+	WriteVar((uint64_t)this->base_width, uint64_t, file);
+	WriteVar((uint64_t)this->base_height, uint64_t, file);
 
 	//Hitbox flags
-	uint64_t type_swap = EndianSwap(&this->type);
-	fwrite(&type_swap, sizeof(type_swap), 1, file);
+	WriteVar(this->type, uint64_t, file);
 
 	//Hitbox group
-	uint32_t hitbox_group_swap = EndianSwap(&this->hitbox_group);
-	fwrite(&hitbox_group_swap, sizeof(hitbox_group_swap), 1, file);
+	WriteVar(this->hitbox_group, uint32_t, file);
 
 	//Immunity timer
-	uint32_t immunity_timer_swap = EndianSwap(&this->immunity_timer);
-	fwrite(&immunity_timer_swap, sizeof(immunity_timer_swap), 1, file);
+	WriteVar(this->immunity_timer, uint32_t, file);
 }

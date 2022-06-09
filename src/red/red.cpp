@@ -399,12 +399,9 @@ void addAsset(char* name, uint8_t resource_type){
 
 		fwrite(&resource_type, sizeof(resource_type), 1, file);
 
-		//Identifier len
-		uint16_t identifier_len = strlen(name);
-		uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
 		//Identifier
-		fwrite(&identifier_len_swapped, sizeof(identifier_len_swapped), 1, file);
+		uint16_t identifier_len = strlen(name);
+		WriteVar(identifier_len, uint16_t, file);
 		fwrite(name, 1, identifier_len, file);
 		
 		if(SerializeSurface(file, new_sprite) != 0){
