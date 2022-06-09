@@ -6,8 +6,6 @@
 extern Engine* engine;
 
 void buildGlobal(){
-    SDL_Window* window = engine->getWindow();
-
     Zone* global = new Zone("global", 0, 0);
     engine->addZone(global);
 

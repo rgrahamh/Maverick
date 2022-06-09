@@ -67,81 +67,96 @@ static inline bool getEndian(){
 	}
 }
 
-static inline uint64_t EndianSwap(uint64_t* input){
+static inline uint64_t EndianSwap(uint64_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		uint64_t output;
 		for(int i = 0; i < 8; i++){
-			((uint8_t*)&output)[i] = ((uint8_t*)input)[8 - i - 1];
+			((uint8_t*)&output)[i] = ((uint8_t*)&input)[8 - i - 1];
 		}
 		return output;
 	}
 }
 
-static inline int64_t EndianSwap(int64_t* input){
+static inline int64_t EndianSwap(int64_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		int64_t output;
 		for(int i = 0; i < 8; i++){
-			((uint8_t*)&output)[i] = ((uint8_t*)input)[8 - i - 1];
+			((uint8_t*)&output)[i] = ((uint8_t*)&input)[8 - i - 1];
 		}
 		return output;
 	}
 }
 
-static inline uint32_t EndianSwap(uint32_t* input){
+static inline uint32_t EndianSwap(uint32_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		uint32_t output;
 		for(int i = 0; i < 4; i++){
-			((uint8_t*)&output)[i] = ((uint8_t*)input)[4 - i - 1];
+			((uint8_t*)&output)[i] = ((uint8_t*)&input)[4 - i - 1];
 		}
 		return output;
 	}
 }
 
-static inline int32_t EndianSwap(int32_t* input){
+static inline int32_t EndianSwap(int32_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		int32_t output;
 		for(int i = 0; i < 4; i++){
-			((uint8_t*)&output)[i] = ((uint8_t*)input)[4 - i - 1];
+			((uint8_t*)&output)[i] = ((uint8_t*)&input)[4 - i - 1];
 		}
 		return output;
 	}
 }
 
-static inline uint16_t EndianSwap(uint16_t* input){
+static inline uint16_t EndianSwap(uint16_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		uint16_t output;
-		((uint8_t*)&output)[0] = ((uint8_t*)input)[1];
-		((uint8_t*)&output)[1] = ((uint8_t*)input)[0];
+		((uint8_t*)&output)[0] = ((uint8_t*)&input)[1];
+		((uint8_t*)&output)[1] = ((uint8_t*)&input)[0];
 		return output;
 	}
 }
 
-static inline int16_t EndianSwap(int16_t* input){
+static inline int16_t EndianSwap(int16_t input){
 	if(endian == 0){
-		return *input;
+		return input;
 	}
 	else{
 		int16_t output;
-		((uint8_t*)&output)[0] = ((uint8_t*)input)[1];
-		((uint8_t*)&output)[1] = ((uint8_t*)input)[0];
+		((uint8_t*)&output)[0] = ((uint8_t*)&input)[1];
+		((uint8_t*)&output)[1] = ((uint8_t*)&input)[0];
 		return output;
 	}
 }
+
+#define ReadVar(var_name, file_name)\
+	fread(&var_name, 1, sizeof(var_name), file_name);\
+	if(sizeof(var_name) > 1){\
+		var_name = EndianSwap(var_name);\
+	}
+
+#define WriteVar(var_name, type, file_name)\
+    {\
+	 type write_swapped_var;\
+		if(sizeof(var_name) > 1){\
+			write_swapped_var = EndianSwap(var_name);\
+		}\
+		fwrite(&write_swapped_var, sizeof(write_swapped_var), 1, file);\
+	}
 
 /** Does a deep copy of a string
  * @param str The string to deep copy
@@ -268,32 +283,31 @@ static inline int SerializeSurface(FILE* file, SDL_Surface* surface){
 
 	//Width/Height are naturally ints (so size varies), meaning we may need to truncate first
 	uint32_t width = surface->w;
-	uint32_t width_swap = EndianSwap(&width);
 	uint32_t height = surface->h;
-	uint32_t height_swap = EndianSwap(&height);
 
 	//Bit depth of the image
 	uint8_t depth = surface->format->BitsPerPixel;
 
 	//The RGBA masks
-	uint32_t rmask = EndianSwap(&surface->format->Rmask);
-	uint32_t gmask = EndianSwap(&surface->format->Gmask);
-	uint32_t bmask = EndianSwap(&surface->format->Bmask);
-	uint32_t amask = EndianSwap(&surface->format->Amask);
+	uint32_t rmask = surface->format->Rmask;
+	uint32_t gmask = surface->format->Gmask;
+	uint32_t bmask = surface->format->Bmask;
+	uint32_t amask = surface->format->Amask;
 
 	//Write the image header info
-	fwrite(&width_swap, sizeof(width_swap), 1, file);
-	fwrite(&height_swap, sizeof(height_swap), 1, file);
-	fwrite(&depth, 1, 1, file);
-	fwrite(&rmask, sizeof(rmask), 1, file);
-	fwrite(&gmask, sizeof(gmask), 1, file);
-	fwrite(&bmask, sizeof(bmask), 1, file);
-	fwrite(&amask, sizeof(amask), 1, file);
+	WriteVar(width, uint32_t, file);
+	WriteVar(height, uint32_t, file);
+	WriteVar(depth, uint8_t, file);
+	WriteVar(rmask, uint32_t, file)
+	WriteVar(gmask, uint32_t, file)
+	WriteVar(bmask, uint32_t, file)
+	WriteVar(amask, uint32_t, file)
 
 	//Write the actual image data ((w * h * bpp) bytes)
 	fwrite(&surface->format->BytesPerPixel, 1, sizeof(surface->format->BytesPerPixel), file);
 	fwrite(surface->pixels, 1, width * height * surface->format->BytesPerPixel, file);
-	 return 0;
+	
+	return 0;
 }
 
 static inline File* ReadDirectory(const char* dir_name){

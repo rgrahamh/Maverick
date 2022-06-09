@@ -2,8 +2,6 @@
 extern Engine* engine;
 
 void buildEditor(){
-    SDL_Window* window = engine->getWindow();
-
     Zone* led = new Zone("led", 0, 0);
     engine->addZone(led);
 

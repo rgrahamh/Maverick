@@ -43,6 +43,8 @@ class Object : public Entity{
 		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) override;
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone) override;
 
+		virtual int deserializeExtendedData(FILE* file);
+
 		void setXVel(double xV);
 		void setYVel(double yV);
 		void setZVel(double zV);

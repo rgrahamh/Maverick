@@ -33,6 +33,10 @@ Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t 
 	this->next_animation = nullptr;
 }
 
+Animation::Animation(FILE* file){
+	this->deserializeData(file);
+}
+
 /** Animation destructor
  */
 Animation::~Animation(){
@@ -658,15 +662,12 @@ int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
 						SDL_Surface* surface = engine->getSurface(sprite->name);
 
 						if(surface != nullptr){
-							//Identifier len
-							uint16_t identifier_len = strlen(sprite->name);
-							uint16_t identifier_len_swapped = EndianSwap(&identifier_len);
-
 							uint8_t resource_type = RESOURCE_TYPE::BMP;
 							fwrite(&resource_type, sizeof(resource_type), 1, file);
 
 							//Identifier
-							fwrite(&identifier_len_swapped, 2, 1, file);
+							uint16_t identifier_len = strlen(sprite->name);
+							WriteVar(identifier_len, uint16_t, file);
 							fwrite(sprite->name, 1, identifier_len, file);
 
 							SerializeSurface(file, sprite->surface);
@@ -700,13 +701,11 @@ int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
 int Animation::serializeData(FILE* file){
 	//Store animation identifier
 	uint16_t name_len = strlen(this->name);
-	uint16_t name_len_swap = EndianSwap(&name_len);
-	fwrite(&name_len_swap, sizeof(name_len_swap), 1, file);
+	WriteVar(name_len, uint16_t, file);
 	fwrite(this->name, 1, name_len, file);
 
 	//Number of frames
-	uint16_t sequence_len_swap = EndianSwap(&this->sequence_len);
-	fwrite(&sequence_len_swap, sizeof(sequence_len_swap), 1, file);
+	WriteVar(this->sequence_len, uint16_t, file);
 
 	//Per frame
 	AnimationSeq* sequence_cursor = this->sequence_start;
@@ -720,45 +719,32 @@ int Animation::serializeData(FILE* file){
 				}
 			}
 
-			uint16_t sprite_num_swap = EndianSwap(&sprite_num);
-			fwrite(&sprite_num_swap, sizeof(sprite_num_swap), 1, file);
+			WriteVar(sprite_num, uint16_t, file);
 
 			//Recording the sprite & attributes in this frame
 			for(auto& sprite_set:sprite_sets){
 				if(sequence_cursor->sprite[sprite_set.second] != nullptr){
 					const char* sprite_set_name = sprite_set.first.c_str();
 					uint16_t sprite_set_name_len = strlen(sprite_set_name);
-					uint16_t sprite_set_name_len_swap = EndianSwap(&sprite_set_name_len);
-					fwrite(&sprite_set_name_len_swap, sizeof(sprite_set_name_len_swap), 1, file);
+					WriteVar(sprite_set_name_len, uint16_t, file);
 					fwrite(&sprite_set_name, 1, sprite_set_name_len, file);
 
-					uint16_t x_offset_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->base_x_offset);
-					fwrite(&x_offset_swap, sizeof(x_offset_swap), 1, file);
-
-					uint16_t y_offset_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->base_y_offset);
-					fwrite(&y_offset_swap, sizeof(y_offset_swap), 1, file);
-
-					uint16_t width_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->rect->w);
-					fwrite(&width_swap, sizeof(width_swap), 1, file);
-
-					uint16_t height_swap = EndianSwap(&sequence_cursor->sprite[sprite_set.second]->rect->h);
-					fwrite(&height_swap, sizeof(height_swap), 1, file);
-
-					uint64_t rotation_swap = EndianSwap((uint64_t*)&sequence_cursor->sprite[sprite_set.second]->rotation);
-					fwrite(&rotation_swap, sizeof(rotation_swap), 1, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->base_x_offset, uint16_t, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->base_y_offset, uint16_t, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->w, uint16_t, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->h, uint16_t, file);
+					WriteVar((uint64_t)sequence_cursor->sprite[sprite_set.second]->rotation, uint64_t, file);
 				}
 			}
 
 			//Record the keytime
-			uint32_t keytime_swap = EndianSwap(&sequence_cursor->keytime);
-			fwrite(&keytime_swap, sizeof(keytime_swap), 1, file);
+			WriteVar(sequence_cursor->keytime, uint32_t, file);
 
 			//Record the sound
 			if(sequence_cursor->sound != nullptr){
 				const char* sound_name = sequence_cursor->sound->name;
 				uint16_t sound_name_len = strlen(sound_name);
-				uint16_t sound_name_swapped = EndianSwap(&sound_name_len);
-				fwrite(&sound_name_swapped, sizeof(sound_name_swapped), 1, file);
+				WriteVar(sound_name_len, uint16_t, file);
 				fwrite(&sound_name, 1, sound_name_len, file);
 			}
 			else{
@@ -778,5 +764,10 @@ int Animation::serializeData(FILE* file){
 		}while(sequence_cursor != nullptr && sequence_cursor != sequence_start);
 	}
 
+	return 0;
+}
+
+int Animation::deserializeData(FILE* file){
+	//TODO
 	return 0;
 }

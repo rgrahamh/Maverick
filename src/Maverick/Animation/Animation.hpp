@@ -45,7 +45,7 @@ typedef struct AnimationSequence{
 class Animation{
 	public:
 		Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets);
-		void freeFrame(AnimationSeq* );
+		Animation(FILE* file);
 		~Animation();
 
 		void advance(uint64_t delta);
@@ -82,6 +82,8 @@ class Animation{
 
 		int serializeAssets(FILE* file, SerializeSet& serialize_set);
 		int serializeData(FILE* file);
+
+		int deserializeData(FILE* file);
 
 	private:
 		//Name

@@ -364,10 +364,8 @@ int Object::serializeExtendedData(FILE* file, Zone* base_zone){
     double write_x = this->x - base_zone->getGlobalX();
     double write_y = this->y - base_zone->getGlobalY();
 
-    uint64_t write_x_swap = EndianSwap((uint64_t*)&write_x);
-    uint64_t write_y_swap = EndianSwap((uint64_t*)&write_y);
-    fwrite(&write_x_swap, sizeof(write_x_swap), 1, file);
-    fwrite(&write_y_swap, sizeof(write_y_swap), 1, file);
+    WriteVar((uint64_t)write_x, uint64_t, file);
+    WriteVar((uint64_t)write_y, uint64_t, file);
 
     return 0;
 }
@@ -377,5 +375,9 @@ int Object::serializeExtendedData(FILE* file, Zone* base_zone){
  * @param serialize_set The serialization set (logs saved assets)
  */
 int Object::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
+    return 0;
+}
+
+int Object::deserializeExtendedData(FILE* file){
     return 0;
 }

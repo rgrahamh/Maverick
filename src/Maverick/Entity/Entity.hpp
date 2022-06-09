@@ -18,6 +18,7 @@ class Zone;
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
+		Entity(FILE* file);
 		virtual ~Entity();
 		char* getName();
 		double getX();
@@ -33,6 +34,7 @@ class Entity{
 		bool isVisible();
 		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
 
+		int addAnimation(Animation* animation);
 		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
 
 		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
@@ -51,11 +53,17 @@ class Entity{
 		void setSize(float width, float height);
 		void setActive(bool active);
 		void setVisible(bool visible);
-		void setAttr(const char* key, void* val);
 		int setSpriteSet(const char* animation_name, const char* sprite_set);
 		int setSpriteSet(const char* sprite_set);
 		int setDrawAxis(const char* animation_name, double draw_axis);
 		int setDrawAxis(double draw_axis);
+
+		//Sets an attribute
+		void setAttr(const char* key, bool val);
+		void setAttr(const char* key, char val);
+		void setAttr(const char* key, int64_t val);
+		void setAttr(const char* key, uint64_t val);
+		void setAttr(const char* key, char* val);
 
 		//Processing functions
 		virtual void _process(uint64_t delta, unsigned int steps) = 0;
@@ -74,6 +82,9 @@ class Entity{
 
 		int serializeData(FILE* file, Zone* base_zone);
 		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;
+
+		int deserializeData(FILE* file);
+		virtual int deserializeExtendedData(FILE* file);
 		
 	protected:
 		//Name
