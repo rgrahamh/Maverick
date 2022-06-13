@@ -201,7 +201,7 @@ inline void editFontStyle(Font* font, FONT_STYLE font_style){
 	char** command_args = nullptr;
 	do{
 		promptUser("Enter in a character and the associated filename (.bmp), or use a file pattern to import in bulk", "font-style", command_str);
-		command_args = getArgs(command_str, " ");
+		command_args = GetArgs(command_str, " ");
 		ToLower(command_args[0]);
 
 		//Doing an edit operation for a given font style
@@ -267,7 +267,7 @@ bool editFont(Font* font){
 	char** command_args = nullptr;
 	do{
 		promptUser("What would you like to edit? You may edit the font group (standard/bold/italic) or spacing, or use save/quit to save or abort.", "font", command_str);
-		command_args = getArgs(command_str, " ");
+		command_args = GetArgs(command_str, " ");
 		ToLower(command_args[0]);
 
 		//Doing an edit operation for a given font style
@@ -314,7 +314,7 @@ bool editMusic(Music* music){
 	char** command_args = nullptr;
 	do{
 		promptUser("What music group would you like to edit (standard/bold/italic)? Or use save to save changes, or quit to abort.", "music", command_str);
-		command_args = getArgs(command_str, " ");
+		command_args = GetArgs(command_str, " ");
 		ToLower(command_args[0]);
 
 		//Doing an edit operation for a given music style
@@ -477,7 +477,7 @@ int main(int argc, char** argv){
 	char command_str[MAX_LINE_LEN];
 	do{
 		promptUser("What would you like to do?", "red", command_str);
-		char** command_args = getArgs(command_str, " ");
+		char** command_args = GetArgs(command_str, " ");
 		if(command_args == nullptr || command_args[0] == nullptr){
 			printHelp("main_loop");
 			continue;

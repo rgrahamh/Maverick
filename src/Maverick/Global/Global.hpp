@@ -144,18 +144,18 @@ static inline int16_t EndianSwap(int16_t input){
 }
 
 #define ReadVar(var_name, file_name)\
-	fread(&var_name, 1, sizeof(var_name), file_name);\
+	fread(&var_name, 1, sizeof(var_name), (file_name));\
 	if(sizeof(var_name) > 1){\
-		var_name = EndianSwap(var_name);\
+		(var_name) = EndianSwap(var_name);\
 	}
 
 #define WriteVar(var_name, type, file_name)\
     {\
-	 type write_swapped_var;\
+		type write_swapped_var = var_name;\
 		if(sizeof(var_name) > 1){\
 			write_swapped_var = EndianSwap(var_name);\
 		}\
-		fwrite(&write_swapped_var, sizeof(write_swapped_var), 1, file);\
+		fwrite(&write_swapped_var, sizeof(type), 1, (file_name));\
 	}
 
 /** Does a deep copy of a string
@@ -197,7 +197,7 @@ static inline void ToUpper(char* str){
  * @param delims All delims that should be considered params
  * @return A list of references to places in the string where the arguments start
  */
-static inline char** getArgs(char* str, char* delims){
+static inline char** GetArgs(char* str, char* delims){
 	//The new argument list
 	unsigned int max_args = strlen(str) / 2;
 	char** arg_lst = (char**)calloc(sizeof(char*), max_args);
@@ -226,7 +226,7 @@ static inline char** getArgs(char* str, char* delims){
 		}
 		//Dealing with escaped characters
 		else if(str[i] == '\\'){
-			char* curr_addr = &(str[i]);
+			char* curr_addr = str + i;
 			strcpy(curr_addr, curr_addr+1);
 			continue;
 		}

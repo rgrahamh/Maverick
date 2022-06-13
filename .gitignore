@@ -12,3 +12,4 @@ build/Makefile
 bin
 src/led/led
 src/red/red
+src/Test/Maverick/test_file

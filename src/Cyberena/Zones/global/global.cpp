@@ -9,14 +9,14 @@ void buildGlobal(){
     Zone* global = new Zone("global", 0, 0);
     engine->addZone(global);
 
-    FILE* file = fopen("./assets/fonts/mavfont.fnt", "rb");
+    FILE* file = fopen("./assets/fonts/mavwhite.fnt", "rb");
     if(file == nullptr){
         printf("Can't find the Maverick font file!\n");
         return;
     }
     int resource_type;
     fread(&resource_type, 1, 1, file);
-    loadFont(file, "mavfont");
+    loadFont(file, "mavwhite");
 
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
@@ -32,7 +32,7 @@ void buildGlobal(){
     pause_menu->setAnimation("default");
 
     //Create the pause text
-    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "mavfont", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
+    UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "mavwhite", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     pause_text->setColor(255, 255, 255);
     pause_menu->addElement(pause_text);
 

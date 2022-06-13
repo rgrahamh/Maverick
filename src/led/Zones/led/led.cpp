@@ -5,21 +5,21 @@ void buildEditor(){
     Zone* led = new Zone("led", 0, 0);
     engine->addZone(led);
 
-    UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, "mavfont", "Zone Placeholder", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, "mavwhite", "Zone Placeholder", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     zone_name->addAnimation("background", 1);
     zone_name->addFrame("background", 0);
     zone_name->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     zone_name->setAnimation("background");
     led->addUIElement(zone_name);
 
-    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, "mavfont", "Objects in zone:", 0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, "mavwhite", "Objects in zone:", 0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     object_list->addAnimation("background", 1);
     object_list->addFrame("background", 0);
     object_list->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     object_list->setAnimation("background");
     led->addUIElement(object_list);
 
-    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "mavfont", "All draw layers", 5.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "mavwhite", "All draw layers", 5.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     layer_display->addAnimation("background", 1);
     layer_display->addFrame("background", 0);
     layer_display->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
@@ -39,21 +39,21 @@ void buildEditor(){
         led->addUIElement(hotbar);
     }
 
-    UITextBox* status_bar = new UITextBox("status_bar", 0.1, 0.97, 0.7, 0.03, 1, "mavfont", "Ready", 0.0, 1);
+    UITextBox* status_bar = new UITextBox("status_bar", 0.1, 0.97, 0.7, 0.03, 1, "mavwhite", "Ready", 0.0, 1);
     status_bar->addAnimation("background", 1);
     status_bar->addFrame("background", 0);
     status_bar->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     status_bar->setAnimation("background");
     led->addUIElement(status_bar);
 
-    UITextBox* tool_selection = new UITextBox("tool_select", 0.8, 0.97, 0.2, 0.03, 1, "mavfont", "Select", 0.0, 1);
+    UITextBox* tool_selection = new UITextBox("tool_select", 0.8, 0.97, 0.2, 0.03, 1, "mavwhite", "Select", 0.0, 1);
     tool_selection->addAnimation("background", 1);
     tool_selection->addFrame("background", 0);
     tool_selection->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     tool_selection->setAnimation("background");
     led->addUIElement(tool_selection);
 
-    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, "mavfont", "Selected object attributes", 0.0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, "mavwhite", "Selected object attributes", 0.0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     object_attr->addAnimation("background", 1);
     object_attr->addFrame("background", 0);
     object_attr->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
