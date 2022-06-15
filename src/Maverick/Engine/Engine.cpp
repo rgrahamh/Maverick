@@ -42,6 +42,10 @@ Engine::Engine(){
         exit(-1);
     }
 
+    for(int i = 0; i < SDL_GetNumAudioDevices(0); i++){
+        printf("Audio device %i: %s\n", i, SDL_GetAudioDeviceName(i, 0));
+    }
+
     //Initialization of the sound board
     this->sound_board = new SoundBoard();
 
@@ -159,9 +163,14 @@ void Engine::start(){
     //saveZone(this->getZone("global"));
     //saveZone(this->getZone("Test Zone"));
 
-    /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
-    sound_board->playMusic(song1);
-    sound_board->setMusicVolume(1, 0.0, 10000);*/
+    Music* song1 = new Music("song1");
+    Sound* sound = new Sound;
+    sound->name = "bass";
+    sound->sample = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
+    song1->addTrack(sound);
+    engine->addMusic("song1", song1);
+    sound_board->playMusic("song1");
+    sound_board->setMusicVolume(1, 1.0, 10000);
 
     gameLoop();
 }
@@ -172,9 +181,9 @@ void Engine::gameLoop(){
     uint64_t last_time = this->delta;
 
     uint64_t physics_step_accumulator = 0;
+    delta = SDL_GetTicks64();
 	while(!exit_game){
         buildFullEntityList();
-        delta = SDL_GetTicks64();
 
         //Calculate the time that has passed since last frame
         delta = SDL_GetTicks64() - last_time;

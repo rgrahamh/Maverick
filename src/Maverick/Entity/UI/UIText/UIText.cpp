@@ -201,10 +201,10 @@ void UIText::nextPage(){
     }
 
     //Clear buffers
-    if(strlen(print_buff) > 0){
+    if(print_buff != nullptr && strlen(print_buff) > 0){
         memset(print_buff, 0, strlen(print_buff));
     }
-    if(strlen(ref_buff) > 0){
+    if(ref_buff != nullptr && strlen(ref_buff) > 0){
         memset(ref_buff, 0, strlen(ref_buff));
     }
 

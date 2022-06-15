@@ -18,6 +18,11 @@ void buildGlobal(){
     fread(&resource_type, 1, 1, file);
     loadFont(file, "mavwhite");
 
+    Sound* new_sound = new Sound;
+    new_sound->name = "step";
+    new_sound->sample = Mix_LoadWAV("./assets/audio/effects/step.wav");
+	engine->addSound("step", new_sound);
+
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     global->addObject(player);

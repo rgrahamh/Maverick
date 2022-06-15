@@ -31,30 +31,42 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
 
     //Walking position
     player->addAnimation("walk_up", 1);
-    player->addFrame("walk_up", 256, 3);
+    player->addFrame("walk_up", 256, 4);
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Left_Foot.bmp", 0, 0, 34, 44);
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_up", "./assets/audio/effects/step.wav", 1);
     player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Right_Foot.bmp", 0, 0, 34, 44);
+    player->addSprite("walk_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_up", "./assets/audio/effects/step.wav", 3);
 
     player->addAnimation("walk_down", 1);
-    player->addFrame("walk_down", 256, 3);
+    player->addFrame("walk_down", 256, 4);
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Left_Foot.bmp", 0, 0, 34, 44);
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_down", "./assets/audio/effects/step.wav", 1);
     player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Right_Foot.bmp", 0, 0, 34, 44);
+    player->addSprite("walk_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_down", "./assets/audio/effects/step.wav", 3);
     
     player->addAnimation("walk_left", 1);
-    player->addFrame("walk_left", 256, 3);
+    player->addFrame("walk_left", 256, 4);
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Left_Foot.bmp", 0, 0, 34, 44);
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_left", "./assets/audio/effects/step.wav", 1);
     player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Right_Foot.bmp", 0, 0, 34, 44);
+    player->addSprite("walk_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_left", "./assets/audio/effects/step.wav", 3);
 
     player->addAnimation("walk_right", 1);
-    player->addFrame("walk_right", 256, 3);
+    player->addFrame("walk_right", 256, 4);
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Left_Foot.bmp", 0, 0, 34, 44);
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_right", "./assets/audio/effects/step.wav", 1);
     player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Right_Foot.bmp", 0, 0, 34, 44);
+    player->addSprite("walk_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp", 0, 0, 34, 44);
+    player->addSound("walk_right", "./assets/audio/effects/step.wav", 3);
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 4; i++){
         player->addHitbox("walk_right", ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, i);
         player->addHitbox("walk_left", ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, i);
         player->addHitbox("walk_down", ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, i);

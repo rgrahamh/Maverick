@@ -211,10 +211,7 @@ int Entity::addAnimation(Animation* animation){
  * @param animation_name The animation name
  * @param sprite_path The filepath to the sprite you're adding
  * @param keytime The number of frames until the animation progresses
- * @param x_offset The X offset of the sprite
- * @param y_offset The Y offset of the sprite
- * @param width The width of the sprite (default if -1)
- * @param height The height of the sprite (default if -1)
+ * @param iter The number of frames you'd like to add
  * @return 0 on success, -1 if the animation doesn't exist
  */ 
 int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
@@ -427,20 +424,16 @@ void Entity::cleanupHitboxImmunity(uint64_t delta){
 
 /** Adds a sound to a given animation
  * @param animation_name The animation name
- * @param sprite_path The filepath to the sprite you're adding
- * @param keytime The number of frames until the animation progresses
- * @param x_offset The X offset of the sprite
- * @param y_offset The Y offset of the sprite
- * @param width The width of the sprite (default if -1)
- * @param height The height of the sprite (default if -1)
+ * @param sound_id The identifier of the sound you're adding
+ * @param sequence_num The sequence number you'd like to add the sound to
  * @return 0 on success, -1 if the animation doesn't exist
  */
-int Entity::addSound(const char* animation_name, const char* sound_path, int sequence_num){
+int Entity::addSound(const char* animation_name, const char* sound_id, int sequence_num){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
-    return animation->addSound(engine->getSound(sound_path), sequence_num);
+    return animation->addSound(engine->getSound(sound_id), sequence_num);
 }
 
 /** Sets the X posision

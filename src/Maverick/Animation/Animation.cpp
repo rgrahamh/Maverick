@@ -57,7 +57,7 @@ Animation::~Animation(){
 			for(auto& sprite_set:this->sprite_sets){
 				if(cursor->sprite != nullptr){
 					if(cursor->sprite[sprite_set.second]->rect != nullptr){
-						free(cursor->sprite[sprite_set.second]->rect);
+						delete cursor->sprite[sprite_set.second]->rect;
 					}
 
 					if(cursor->sprite[sprite_set.second]->texture != nullptr){
@@ -68,12 +68,14 @@ Animation::~Animation(){
 				delete cursor->sprite[sprite_set.second];
 			}
 
-			delete cursor->sprite;
+			if(cursor->sprite != nullptr){
+				delete cursor->sprite;
+			}
 
 			AnimationSeq* tmp;
 			tmp = cursor;
 			cursor = cursor->next;
-			free(tmp);
+			delete tmp;
 		} while(cursor != sequence_start && cursor != nullptr);
 	}
 

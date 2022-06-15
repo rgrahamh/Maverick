@@ -16,9 +16,7 @@ SoundBoard::SoundBoard(){
     music_level = 1.0;
     sound_level = 1.0;
 
-    for(int i = 0; i < MAX_MUSIC_CHANNELS; i++){
-        this->music[i] = nullptr;
-    }
+    memset(this->music, 0, sizeof(Music*) * MAX_MUSIC_CHANNELS);
 }
 
 SoundBoard::~SoundBoard(){
@@ -34,21 +32,23 @@ int SoundBoard::playMusic(const char* music, unsigned int fade){
         return -1;
     }
 
+    //If music[0] hasn't been initialized
     if(this->music[0] == nullptr){
         this->music[0] = new_music;
         this->music[0]->start(0, -1);
     }
-
     //If channel 1 is playing anything
-    if(this->music[0]->isPlaying()){
+    else if(this->music[0]->isPlaying()){
         this->music[0]->stop(fade);
+        this->music[1] = new_music;
         this->music[1]->start(1, 1.0, fade);
     }
     //If channel 1 isn't playing anything (will hit both when nothing is playing & when just channel 2 is playing)
     else{
-        if(this->music[1]->isPlaying()){
+        if(this->music[1] != nullptr && this->music[1]->isPlaying()){
             this->music[1]->stop(fade);
         }
+        this->music[0] = new_music;
         this->music[0]->start(1, 1.0, fade);
     }
 
