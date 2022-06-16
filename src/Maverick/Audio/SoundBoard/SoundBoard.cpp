@@ -137,7 +137,8 @@ int SoundBoard::playSound(Sound* sound, int loops, float left_pan, float right_p
     int channel_id = Mix_PlayChannel(-1, sound->sample, loops);
     if(channel_id != -1){
         Mix_Volume(channel_id, sound_level * MIX_MAX_VOLUME);
-        Mix_SetPanning(channel_id, left_pan, right_pan);
+        Mix_SetPanning(channel_id, left_pan * MIX_MAX_VOLUME, right_pan * MIX_MAX_VOLUME);
+        printf("Playing sound: %s\n", sound->name);
     }
 
     return channel_id;
