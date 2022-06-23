@@ -314,6 +314,7 @@ static inline File* ReadDirectory(const char* dir_name){
 //If Windows
 #if _WIN32
 	//Figure this out when I compile on a Windows machine ig lol
+	return nullptr;
 //else if __linux__ or __APPLE__ (assume some POSIX standard machine)
 #else
 	File* files = nullptr;

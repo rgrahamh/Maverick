@@ -1,22 +1,24 @@
 #!/bin/bash
 set -e
 
+Make(){
+	if [[ `uname | grep MINGW` != "" ]]; then
+		cmake -G "MinGW Makefiles"
+		mingw32-make.exe
+	else
+		cmake .
+		make
+	fi
+}
+
 cd ../src/Maverick
-cmake .
-make
-cp libmaverick* ../../bin
-cd ../../bin
+Make
+cd -
 
 cd ../src/led
-cmake .
-make
-chmod +x led
-cp led ../../bin
-cd ../../bin
+Make
+cd -
 
 cd ../src/red
-cmake .
-make
-chmod +x red
-cp red ../../bin
-cd ../../bin
+Make
+cd -

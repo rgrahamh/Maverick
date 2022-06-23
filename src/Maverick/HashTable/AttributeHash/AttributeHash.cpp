@@ -44,7 +44,7 @@ unsigned int AttributeHash::hash(const char* key){
  */
 void AttributeHash::set(const char* key, void* val, ATTR_DATA_TYPE type){
 	//Make a deep copy if it's a string
-	if(type == ATTR_DATA_TYPE::STRING){
+	if(type == ATTR_DATA_TYPE::DATA_STRING){
 		val = StrDeepCopy((const char*)val);
 	}
 
@@ -75,7 +75,7 @@ void AttributeHash::set(const char* key, void* val, ATTR_DATA_TYPE type){
 		table[hash_val] = new_entry;
 	}
 	else{
-		if(entry->type == ATTR_DATA_TYPE::STRING && entry->val != nullptr){
+		if(entry->type == ATTR_DATA_TYPE::DATA_STRING && entry->val != nullptr){
 			free(entry->val);
 		}
 		entry->val = val;

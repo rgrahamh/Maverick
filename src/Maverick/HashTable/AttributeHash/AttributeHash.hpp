@@ -6,12 +6,13 @@
 
 #include "../../Global/Global.hpp"
 
+//Don't use just the type name in all caps; that's reserved in Windowsese
 enum ATTR_DATA_TYPE{
-    INT = 0,
-    UINT,
-    BOOL,
-    CHAR,
-    STRING
+    DATA_INT = 0,
+    DATA_UINT,
+    DATA_BOOL,
+    DATA_CHAR,
+    DATA_STRING
 };
 
 typedef struct Attribute{

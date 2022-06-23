@@ -110,13 +110,15 @@ HitboxList* Animation::getHitboxes(){
  * @return The draw axis
  */
 float Animation::getDrawAxis(){
-	//If draw_axis is set
-	if(this->draw_axis != -1){
-		return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
-	}
-	//Otherwise, interpolate from the sequence
-	else if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
-		return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
+		//If draw_axis is set
+		if(this->draw_axis != -1){
+			return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
+		//Otherwise, interpolate from the sequence
+		else{
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
 	}
 	//If we can't find the draw axis any other way
 	else{
@@ -535,7 +537,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 			}
 
 			enum HITBOX_SHAPE shape = hitbox->getShape();
-			if(shape == HITBOX_SHAPE::RECT){
+			if(shape == HITBOX_SHAPE::HIT_RECT){
 				HitRect* hit_rect = (HitRect*)hitbox;
 				SDL_Rect rect;
 				rect.h = hit_rect->getHeight();
@@ -559,7 +561,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 				rect.y -= depth;
 				DrawSDL_Rect(renderer, rect);
 			}
-			else if(shape == HITBOX_SHAPE::ELLIPSE){
+			else if(shape == HITBOX_SHAPE::HIT_ELLIPSE){
 				HitEllipse* hit_ellipse = (HitEllipse*)hitbox;
 				unsigned int center_x = hit_ellipse->getX() - camera_x;
 				unsigned int center_y = hit_ellipse->getY() - camera_y + hit_ellipse->getZOffset() - z_coord;
@@ -602,7 +604,7 @@ void Animation::rotate(int direction, float rotate_amnt){
 		HitboxList* hitboxes = animations->hitboxes;
 		while(hitboxes != NULL){
 			Hitbox* hitbox = hitboxes->hitbox;
-			if(hitbox->getShape() == CONE){
+			if(hitbox->getShape() == HIT_CONE){
 				((HitCone*)hitbox)->rotate(direction, rotate_amnt);
 				hitboxes = hitboxes->next;
 			}

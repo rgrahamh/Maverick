@@ -334,8 +334,8 @@ int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     }
 
     Hitbox* hitbox;
-    //We should never hit the CONE in this case.
-    if(shape == RECT){
+    //We should never hit the HIT_CONE in this case.
+    if(shape == HIT_RECT){
         hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
     }
     else{
@@ -512,7 +512,7 @@ void Entity::setVisible(bool visible){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, bool val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::BOOL);
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_BOOL);
 }
 
 /** Sets the attribute key to the specified val (as a char)
@@ -520,7 +520,7 @@ void Entity::setAttr(const char* key, bool val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, char val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::CHAR);
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_CHAR);
 }
 
 /** Sets the attribute key to the specified val (as a signed int)
@@ -528,7 +528,7 @@ void Entity::setAttr(const char* key, char val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, int64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::INT);
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_INT);
 }
 
 /** Sets the attribute key to the specified val (as an unsigned int)
@@ -536,7 +536,7 @@ void Entity::setAttr(const char* key, int64_t val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, uint64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::UINT);
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_UINT);
 }
 
 /** Sets the attribute key to the specified val (as a string)
@@ -544,7 +544,7 @@ void Entity::setAttr(const char* key, uint64_t val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, char* val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::STRING);
+    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_STRING);
 }
 
 /** Gets the entity type
@@ -604,22 +604,22 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
         //Write the val info
         switch(attr_type){
             //Writing chars & bools (1 byte)
-            case ATTR_DATA_TYPE::BOOL:
-            case ATTR_DATA_TYPE::CHAR:{
+            case ATTR_DATA_TYPE::DATA_BOOL:
+            case ATTR_DATA_TYPE::DATA_CHAR:{
                 uint8_t attr_val = (uint8_t)((uint64_t)attr_list->val & 0xFF);
                 WriteVar(attr_val, uint8_t, file);
                 break;
             }
 
             //Writing ints/uints (8 bytes)
-            case ATTR_DATA_TYPE::INT:
-            case ATTR_DATA_TYPE::UINT:{
+            case ATTR_DATA_TYPE::DATA_INT:
+            case ATTR_DATA_TYPE::DATA_UINT:{
                 WriteVar((uint64_t)attr_list->val, uint64_t, file);
                 break;
             }
 
             //Writing strings (? bytes)
-            case ATTR_DATA_TYPE::STRING:{
+            case ATTR_DATA_TYPE::DATA_STRING:{
                 char* attr_str = (char*)attr_list->val;
                 uint16_t attr_val_len = strlen(attr_str);
                 WriteVar(attr_val_len, uint16_t, file);
@@ -683,7 +683,7 @@ int Entity::deserializeData(FILE* file){
     uint32_t num_entries;
     ReadVar(num_entries, file);
 
-    for(uint i = 0; i < num_entries; i++){
+    for(uint32_t i = 0; i < num_entries; i++){
         //Attribute type
         uint16_t attr_type;
         ReadVar(attr_type, file);
@@ -697,13 +697,13 @@ int Entity::deserializeData(FILE* file){
 
         switch(attr_type){
             //Reading chars & bools (1 byte)
-            case ATTR_DATA_TYPE::BOOL:{
+            case ATTR_DATA_TYPE::DATA_BOOL:{
                 bool attr_val;
                 ReadVar(attr_val, file);
                 this->setAttr(attr_key, attr_val);
                 break;
             }
-            case ATTR_DATA_TYPE::CHAR:{
+            case ATTR_DATA_TYPE::DATA_CHAR:{
                 char attr_val;
                 ReadVar(attr_val, file);
                 this->setAttr(attr_key, attr_val);
@@ -711,13 +711,13 @@ int Entity::deserializeData(FILE* file){
             }
 
             //Reading ints/uints (8 bytes)
-            case ATTR_DATA_TYPE::INT:{
+            case ATTR_DATA_TYPE::DATA_INT:{
                 int64_t attr_val;
                 ReadVar(attr_val, file);
                 this->setAttr(attr_key, attr_val);
                 break;
             }
-            case ATTR_DATA_TYPE::UINT:{
+            case ATTR_DATA_TYPE::DATA_UINT:{
                 uint64_t attr_val;
                 ReadVar(attr_val, file);
                 this->setAttr(attr_key, attr_val);
@@ -725,7 +725,7 @@ int Entity::deserializeData(FILE* file){
             }
 
             //Reading strings (? bytes)
-            case ATTR_DATA_TYPE::STRING:{
+            case ATTR_DATA_TYPE::DATA_STRING:{
                 uint16_t attr_str_len;
                 ReadVar(attr_str_len, file);
                 char attr_str[attr_str_len + 1];

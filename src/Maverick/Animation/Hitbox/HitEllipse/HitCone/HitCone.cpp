@@ -15,7 +15,7 @@ HitCone::HitCone(double* x_base, double* y_base, double* z_base, double x_offset
 	:HitEllipse(x_base, y_base, z_base, x_offset, y_offset, z_offset, depth, x_radius, y_radius, type){
 	this->angle = angle;
 	this->slice_prop = slice_prop;
-	this->shape = CONE;
+	this->shape = HIT_CONE;
 }
 
 /** HitCone destructor
@@ -40,17 +40,17 @@ float HitCone::getProp(){
  */
 bool HitCone::checkCollision(Hitbox* other){
 	switch (other->getShape()){
-		case RECT:{
+		case HIT_RECT:{
 			return collisionRectCone((HitRect*)other, this);
 		}
 		break;
 
-		case ELLIPSE:{
+		case HIT_ELLIPSE:{
 			return collisionEllipseCone((HitEllipse*)other, this);
 		}
 		break;
 
-		case CONE:{
+		case HIT_CONE:{
 			return collisionConeCone((HitCone*)other, this);
 		}
 		break;
