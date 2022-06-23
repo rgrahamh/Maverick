@@ -2,7 +2,7 @@
 set -e
 
 Make(){
-	if [ `uname | grep MINGW` != "" ]; then
+	if [[ `uname | grep MINGW` != "" ]]; then
 		cmake -G "MinGW Makefiles"
 		mingw32-make.exe
 	else
