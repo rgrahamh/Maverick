@@ -311,7 +311,7 @@ void Engine::collisionStep(ObjectList* all_objects){
 
             //Set up the bounds
             switch(curr_hitbox->getShape()){
-                case RECT:{
+                case HIT_RECT:{
                         HitRect* rect_hitbox = (HitRect*)curr_hitbox;
 
                         top_bound = rect_hitbox->getY();
@@ -321,7 +321,7 @@ void Engine::collisionStep(ObjectList* all_objects){
                     }
                     break;
 
-                case ELLIPSE:{
+                case HIT_ELLIPSE:{
                         HitEllipse* ellipse_hitbox = (HitEllipse*)curr_hitbox;
 
                         top_bound = ellipse_hitbox->getY() - ellipse_hitbox->getYRadius();
@@ -331,7 +331,7 @@ void Engine::collisionStep(ObjectList* all_objects){
                     }
                     break;
 
-                case CONE:{
+                case HIT_CONE:{
                         HitCone* cone_hitbox = (HitCone*)curr_hitbox;
 
                         top_bound = cone_hitbox->getY() - cone_hitbox->getYRadius();

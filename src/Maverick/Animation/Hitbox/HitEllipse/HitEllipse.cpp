@@ -18,7 +18,7 @@ HitEllipse::HitEllipse(double* x_base, double* y_base, double* z_base, double x_
 	this->y_base_radius = y_radius;
 	this->x_curr_radius = x_radius;
 	this->y_curr_radius = y_radius;
-	this->shape = ELLIPSE;
+	this->shape = HIT_ELLIPSE;
 }
 
 /** HitEllipse destructor
@@ -45,15 +45,15 @@ float HitEllipse::getYRadius(){
  */
 bool HitEllipse::checkCollision(Hitbox* other){
 	switch (other->getShape()){
-		case RECT:
+		case HIT_RECT:
 			return collisionRectEllipse((HitRect*)other, this);
 			break;
 
-		case ELLIPSE:
+		case HIT_ELLIPSE:
 			return collisionEllipseEllipse(this, (HitEllipse*)other);
 			break;
 
-		case CONE:
+		case HIT_CONE:
 			return collisionEllipseCone(this, (HitCone*)other);
 			break;
 	}

@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "../Maverick/Engine/Engine.hpp"
 extern Engine* engine;
 

@@ -18,7 +18,7 @@ HitRect::HitRect(double* x_base, double* y_base, double* z_base, double x_offset
 	this->curr_height = height;
 	this->base_width = width;
 	this->curr_width = width;
-	this->shape = RECT;
+	this->shape = HIT_RECT;
 }
 
 /** The destructor for HitRect
@@ -60,15 +60,15 @@ bool HitRect::isPointInside(double x_coord, double y_coord){
  */
 bool HitRect::checkCollision(Hitbox* other){
 	switch (other->getShape()){
-		case RECT:
+		case HIT_RECT:
 			return collisionRectRect(this, (HitRect*)other);
 			break;
 
-		case ELLIPSE:
+		case HIT_ELLIPSE:
 			return collisionRectEllipse(this, (HitEllipse*)other);
 			break;
 
-		case CONE:
+		case HIT_CONE:
 			return collisionRectCone(this, (HitCone*)other);
 			break;
 	}

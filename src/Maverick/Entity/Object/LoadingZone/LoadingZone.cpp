@@ -11,7 +11,7 @@ LoadingZone::LoadingZone(const char* name, const char* zone_to_load, float start
     if(this->addFrame("loading") == -1){
         printf("Could not frame to LoadingZone animation\n");
     }
-    if(this->addHitbox("loading", HITBOX_SHAPE::RECT, 0, 0, 0, width, height, depth, HITBOX_TYPE::TRIGGER, 0)){
+    if(this->addHitbox("loading", HITBOX_SHAPE::HIT_RECT, 0, 0, 0, width, height, depth, HITBOX_TYPE::TRIGGER, 0)){
         printf("Could not add hitbox to the frame\n");
     }
     this->setAnimation("loading");

@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "./red.hpp"
 #include "../Maverick/FileHandler/Loader/Loader.hpp"
 #include "../Maverick/Engine/Engine.hpp"

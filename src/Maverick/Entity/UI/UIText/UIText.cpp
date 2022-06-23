@@ -293,9 +293,9 @@ void UIText::nextPage(){
     if(this->line_start_x != nullptr){
         free(this->line_start_x);
     }
-    this->line_start_x = (uint*)calloc(sizeof(uint), num_lines);
+    this->line_start_x = (uint32_t*)calloc(sizeof(uint32_t), num_lines);
 
-    uint line_num = 0;
+    uint32_t line_num = 0;
     for(int i = 0; ref_buff[i] != '\0' && line_num < num_lines; i++){
         if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
             unsigned int total_width = 0;
@@ -352,7 +352,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
     //Set starting Y draw position
-    uint y_draw;
+    uint32_t y_draw;
     if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
         y_draw = this->y + ((this->getHeight() / 2) - (this->num_lines * char_height / 2));
     }
@@ -360,8 +360,8 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
         y_draw = this->y;
     }
 
-    uint line_num = 0;
-    uint x_draw;
+    uint32_t line_num = 0;
+    uint32_t x_draw;
     for(int i = 0; print_buff[i] != '\0' && line_num < num_lines; i++){
         //Set the line X draw position
         x_draw = line_start_x[line_num++];
