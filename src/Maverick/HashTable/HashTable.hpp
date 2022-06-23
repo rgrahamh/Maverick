@@ -1,8 +1,9 @@
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
 
-#include <string.h>
 #include <SDL2/SDL.h>
+#include <string.h>
+#include <stdio.h>
 
 typedef struct HashTableEntry{
 	char* key;

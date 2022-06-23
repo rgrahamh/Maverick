@@ -8,9 +8,9 @@
 
 //The shape of the hitbox
 enum HITBOX_SHAPE{
-    RECT = 0,
-    ELLIPSE,
-    CONE
+    HIT_RECT = 0,
+    HIT_ELLIPSE,
+    HIT_CONE
 };
 
 //The type of the hitbox (default flags that may be applied to a hitbox)

@@ -1,6 +1,7 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 #include <SDL2/SDL_mixer.h>
+#include <stdio.h>
 
 //The total number of sound channels (max normal sounds + (MAX_MUSIC_CHANNELS * MAX_MUSIC_TRACKS))
 #define NUM_CHANNELS 64

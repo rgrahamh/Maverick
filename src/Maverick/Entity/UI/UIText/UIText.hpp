@@ -87,8 +87,8 @@ class UIText : public UIElement{
         uint32_t timer;
 
         //Line characteristics
-        uint* line_start_x;
-        uint num_lines;
+        uint32_t* line_start_x;
+        uint32_t num_lines;
 
         //The foreground & background colors
         SDL_Color font_color;
