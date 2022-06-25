@@ -4,7 +4,8 @@ project(maverick VERSION 0.1.0 DESCRIPTION "Maverick Game Engine, Ryan Houck 202
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pthread -Wno-write-strings -Wno-int-to-pointer-cast -fPIC")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "../../bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "../../bin")
 
 set(LIBS_DIR "../../libs")
 
@@ -159,7 +160,8 @@ set(MotorSrc
     ${LedZonesSrc}
 )
 
-add_library(maverick SHARED
+#Dynamic lib compilation
+add_library(maverick STATIC
     ${MotorSrc}
 )
 

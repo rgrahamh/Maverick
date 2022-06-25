@@ -433,7 +433,7 @@ int Entity::addSound(const char* animation_name, const char* sound_id, int seque
     if(animation == nullptr){
         return -1;
     }
-    return animation->addSound(engine->getSound(sound_id), sequence_num);
+    return animation->addSound(sound_id, sequence_num);
 }
 
 /** Sets the X posision

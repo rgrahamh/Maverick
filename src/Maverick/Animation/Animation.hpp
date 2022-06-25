@@ -52,6 +52,7 @@ class Animation{
 		void start();
 
 		Sprite* getSprite();
+		Sound* getSound();
 		HitboxList* getHitboxes();
 		unsigned char getDrawLayer();
 		float getDrawAxis();
@@ -74,7 +75,7 @@ class Animation{
 		int addSpriteSet(const char* sprite_set);
 		int addHitbox(Hitbox* hitbox);
 		int addHitbox(Hitbox* hitbox, int sequence_num);
-		int addSound(Sound* sound, int sequence_num);
+		int addSound(const char* sound_id, int sequence_num);
 
 		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord = 0);
 
