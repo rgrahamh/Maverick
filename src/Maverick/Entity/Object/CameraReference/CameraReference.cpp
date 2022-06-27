@@ -3,7 +3,7 @@
 extern Engine* engine;
 
 CameraReference::CameraReference(const char* name, float start_x, float start_y, double x_speed, double y_speed)
-               : Object(name, start_x, start_y, 1, 0, 0, 4){
+               : Object(name, start_x, start_y, 0, 0, 0, 4){
     this->type = OBJECT_TYPE::CAMERA_REFERENCE;
 
     this->x_speed = x_speed;
@@ -14,18 +14,23 @@ void CameraReference::action(Control* control){
     const uint8_t* keys = control->getKeys();
     if(!(engine->getState() & GAME_STATE::PAUSE)){
         if(keys[SDL_SCANCODE_W] | keys[SDL_SCANCODE_UP]){
-            this->yA -= y_speed / engine->getGlobalYScale();
+            this->y -= y_speed / engine->getGlobalYScale();
         }
         if(keys[SDL_SCANCODE_A] | keys[SDL_SCANCODE_LEFT]){
-            this->xA -= x_speed / engine->getGlobalXScale();
+            this->x -= x_speed / engine->getGlobalXScale();
         }
         if(keys[SDL_SCANCODE_S] | keys[SDL_SCANCODE_DOWN]){
-            this->yA += y_speed / engine->getGlobalYScale();
+            this->y += y_speed / engine->getGlobalYScale();
         }
         if(keys[SDL_SCANCODE_D] | keys[SDL_SCANCODE_RIGHT]){
-            this->xA += x_speed / engine->getGlobalXScale();
+            this->x += x_speed / engine->getGlobalXScale();
         }
 
         engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);
     }
+}
+
+void CameraReference::process(uint64_t delta, unsigned int steps){
+    this->xV = this->x_speed;
+    this->yV = this->y_speed;
 }

@@ -259,7 +259,6 @@ void Object::_process(uint64_t delta, unsigned int steps){
     //Updating environmental bump
     this->env_bump = false;
 
-    //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
     if(this->xV != 0){
         xV -= this->xV * friction;

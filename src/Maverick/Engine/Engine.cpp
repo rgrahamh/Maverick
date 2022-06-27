@@ -71,7 +71,7 @@ Engine::Engine(){
         fflush(stdout);
         exit(-1);
     }
-    this->camera = new Camera(renderer, window, NULL);
+    this->camera = new Camera(renderer, window, nullptr, CAMERA_FOLLOW_MODE::FIXED_FOLLOW, 0.08);
 
     //Set up the screenshot blit surface
     this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);

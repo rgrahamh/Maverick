@@ -11,6 +11,17 @@ if [ $# -lt 1 ]; then
 	exit -1
 fi
 
+if [[ "$1" == "clean" ]]; then
+	if [[ "`ls ../bin | grep -v "Test"`" != "" ]]; then
+		ls ../bin/* 2>/dev/null | grep -v "Test" | xargs rm
+	fi
+	if [[ "`ls ../bin/Test`" != "" ]]; then
+		rm ../bin/Test/*
+	fi
+	echo "Cleaned out bin!"
+	exit 0
+fi
+
 Make(){
 	if [[ `uname | grep MINGW` != "" ]]; then
 		cmake -G "MinGW Makefiles"

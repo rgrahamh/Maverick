@@ -68,17 +68,17 @@ target_link_libraries(TestAnimation
 #target_link_libraries(TestAudio
 #    ${LinkLibs}
 #)
-#
-##Camera test
-#add_executable(TestCamera
-#    ${MotorSrc}
-#    TestCamera.cpp
-#)
-#
-#target_link_libraries(TestCamera
-#    ${LinkLibs}
-#)
-#
+
+#Camera test
+add_executable(TestCamera
+    ${MotorSrc}
+    TestCamera.cpp
+)
+
+target_link_libraries(TestCamera
+    ${LinkLibs}
+)
+
 ##Control test
 #add_executable(TestControl
 #    ${MotorSrc}
