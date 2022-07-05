@@ -496,7 +496,8 @@ ObjectList* Engine::drawSort(ObjectList* curr_obj){
                //Behind case
                (nxt->getLowerDrawAxis() < cur->getUpperDrawAxis() ||
                //Overlap case
-               ((checkDrawOverlap(nxt, cur) && (nxt->getZ() < cur->getZ())))))){
+               ((checkDrawOverlap(nxt, cur) &&
+               (nxt->getZ() < cur->getZ() || (nxt->getZ() == cur->getZ() && nxt->getLowerDrawAxis() < cur->getLowerDrawAxis()))))))){
                 //Swap node positions & send curr_obj up the draw chain
                 curr_obj->next = next_obj->next;
                 next_obj->next = this->drawSort(curr_obj);
