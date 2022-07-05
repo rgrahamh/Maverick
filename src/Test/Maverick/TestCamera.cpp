@@ -5,7 +5,7 @@
 
 extern Engine* engine;
 
-TEST(Camera, TestFixedFollow){
+TEST(CameraBehavior, TestFixedFollow){
     Camera* camera = engine->getCamera();
     int width, height;
     SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);
@@ -43,7 +43,7 @@ TEST(Camera, TestFixedFollow){
     ASSERT_EQ(camera->getY(), camera_y_offset + y_mod);
 }
 
-TEST(Camera, TestGradualFollow){
+TEST(CameraBehavior, TestGradualFollow){
     Camera* camera = engine->getCamera();
     int width, height;
     SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);

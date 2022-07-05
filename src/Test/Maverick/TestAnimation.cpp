@@ -94,6 +94,8 @@ TEST(AnimationBehavior, TestAdvance){
     delete animation;
 }
 
+//Add serialization/deserialzation
+
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
 

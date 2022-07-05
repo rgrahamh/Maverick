@@ -94,9 +94,10 @@ bool collisionRectRect(HitRect* rect1, HitRect* rect2){
 	float rect2_max_height = rect2->getZMax();
 	float rect2_min_height = rect2->getZMin();
 	
-	if(((rect1_left_bound < rect2_left_bound && rect1_right_bound > rect2_left_bound) || (rect2_left_bound < rect1_left_bound && rect2_right_bound > rect1_left_bound))
+	if((((rect1_left_bound < rect2_left_bound && rect1_right_bound > rect2_left_bound) || (rect2_left_bound < rect1_left_bound && rect2_right_bound > rect1_left_bound))
 	&& ((rect1_top_bound < rect2_top_bound && rect1_bot_bound > rect2_top_bound) || (rect2_top_bound < rect1_top_bound && rect2_bot_bound > rect1_top_bound))
-	&& !(rect1_max_height <= rect2_min_height || rect2_max_height <= rect1_min_height)){
+	&& !(rect1_max_height <= rect2_min_height || rect2_max_height <= rect1_min_height))
+	|| (rect1_bot_bound == rect2_bot_bound && rect1_left_bound == rect2_left_bound && rect1_right_bound == rect1_right_bound && rect1_top_bound == rect2_top_bound)){
 		return true;
 	}
 

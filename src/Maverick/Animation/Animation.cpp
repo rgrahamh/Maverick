@@ -28,7 +28,6 @@ Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t 
 	this->num_sprite_sets = num_sprite_sets;
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
-	this->draw_axis = -1.0;
 
 	this->next_animation = nullptr;
 }
@@ -121,14 +120,34 @@ HitboxList* Animation::getHitboxes(){
 	}
 }
 
-/** Gets the draw axis
- * @return The draw axis
+/** Gets the upper draw axis
+ * @return The upper draw axis
  */
-float Animation::getDrawAxis(){
+double Animation::getUpperDrawAxis(){
 	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
 		//If draw_axis is set
-		if(this->draw_axis != -1){
-			return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		if(this->sequence->sprite[curr_sprite_set]->upper_draw_axis != -1){
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->upper_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
+		//Otherwise, interpolate from the sequence
+		else{
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
+	}
+	//If we can't find the draw axis any other way
+	else{
+		return 0.0;
+	}
+}
+
+/** Gets the lower draw axis
+ * @return The lower draw axis
+ */
+double Animation::getLowerDrawAxis(){
+	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
+		//If draw_axis is set
+		if(this->sequence->sprite[curr_sprite_set]->lower_draw_axis != -1){
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->lower_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
@@ -245,6 +264,8 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	Sprite* sprite = new Sprite();
 	sprite->name = StrDeepCopy(sprite_path);
 	sprite->rotation = 0.0;
+	sprite->lower_draw_axis = -1.0;
+	sprite->upper_draw_axis = -1.0;
 
 	//Getting the texture
 	SDL_Surface* surface;
@@ -284,7 +305,7 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 }
 
 /** Adds a new sprite set to an animation
- * @param sprite_set The sprite set you'd like to add
+ * @param sprite_set The name of the sprite set you'd like to add
  * @return 0 if successful, -1 otherwise
  */
 int Animation::addSpriteSet(const char* sprite_set){
@@ -443,11 +464,70 @@ int Animation::setSpriteSet(const char* sprite_set){
 	return -1;
 }
 
-/** The draw axis offset, in pixels (from the top left of the animation).
- * @param offset The draw axis offset, from the top left of the animation. -1 assumes position based off of the img size
+/** The upper draw axis offset, in pixels (from the top of the animation).
+ * @param upper_draw_axis The upper draw axis, offset from the top of the animation. -1 assumes position based off of the img size
+ * @param sprite_num The sprite number; -1 applies to all sprites
  */
-void Animation::setDrawAxis(double draw_axis){
-	this->draw_axis = draw_axis;
+void Animation::setUpperDrawAxis(double upper_draw_axis, int32_t sprite_num){
+	AnimationSeq* cursor = this->sequence_start;
+	if(sprite_num == -1){
+		if(cursor != nullptr){
+			do{
+				for(int i = 0; i < num_sprite_sets; i++){
+					if(cursor->sprite[i] != nullptr){
+						cursor->sprite[i]->upper_draw_axis = upper_draw_axis;
+					}
+				}
+				cursor = cursor->next;
+			} while(cursor != nullptr && cursor != this->sequence_start);
+		}
+	}
+	else{
+		//Get to the sprite_num-th sprite
+		for(int i = 0; i < sprite_num && cursor != nullptr; i++){
+			cursor = cursor->next;
+		}
+
+		//Set the val if it exists
+		if(cursor != nullptr){
+			for(int i = 0; i < num_sprite_sets; i++){
+				cursor->sprite[i]->upper_draw_axis = upper_draw_axis;
+			}
+		}
+	}
+}
+
+/** The lower draw axis offset, in pixels (from the top of the animation).
+ * @param offset The lower draw axis, offset from the top left of the animation. -1 assumes position based off of the img size
+ * @param sprite_num The sprite number; -1 applies to all sprites
+ */
+void Animation::setLowerDrawAxis(double lower_draw_axis, int32_t sprite_num){
+	AnimationSeq* cursor = this->sequence_start;
+	if(sprite_num == -1){
+		if(cursor != nullptr){
+			do{
+				for(int i = 0; i < num_sprite_sets; i++){
+					if(cursor->sprite[i] != nullptr){
+						cursor->sprite[i]->lower_draw_axis = lower_draw_axis;
+					}
+				}
+				cursor = cursor->next;
+			} while(cursor != nullptr && cursor != this->sequence_start);
+		}
+	}
+	else{
+		//Get to the sprite_num-th sprite
+		for(int i = 0; i < sprite_num && cursor != nullptr; i++){
+			cursor = cursor->next;
+		}
+
+		//Set the val if it exists
+		if(cursor != nullptr){
+			for(int i = 0; i < num_sprite_sets; i++){
+				cursor->sprite[i]->lower_draw_axis = lower_draw_axis;
+			}
+		}
+	}
 }
 
 /** Advances the animation by a delta
@@ -575,7 +655,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 				rect.h = hit_rect->getHeight();
 				rect.w = hit_rect->getWidth();
 				rect.x = hit_rect->getX() - camera_x;
-				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() + z_coord;
+				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() - z_coord;
 				unsigned int depth = hit_rect->getDepth();
 				
 				//Draw the base (will be white to differentiate from the rest)

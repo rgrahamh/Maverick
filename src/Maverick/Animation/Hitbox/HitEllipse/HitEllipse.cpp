@@ -11,6 +11,8 @@
  * @param height The height of the hitbox
  * @param depth The depth of the hitbox
  * @param type The HITBOX_TYPE attributes
+ * @param hitbox_group The hitbox group that this hitbox belongs to
+ * @param immunity_timer The amount of time that something colliding with this hitbox should be immune to it
  */
 HitEllipse::HitEllipse(double* x_base, double* y_base, double* z_base, double x_offset, double y_offset, double z_offset, double x_radius, double y_radius, double depth, unsigned int type, int32_t hitbox_group, uint32_t immunity_timer)
 	:Hitbox(x_base, y_base, z_base, x_offset, y_offset, z_offset, depth, type, hitbox_group, immunity_timer){

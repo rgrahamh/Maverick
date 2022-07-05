@@ -119,11 +119,21 @@ int16_t Entity::getDrawLayer(){
 /** Gets the draw axis of the entity
  * @return The draw axis of the entity
  */
-double Entity::getDrawAxis(){
+double Entity::getUpperDrawAxis(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    return this->active_animation->getDrawAxis();
+    return this->active_animation->getUpperDrawAxis();
+}
+
+/** Gets the draw axis of the entity
+ * @return The draw axis of the entity
+ */
+double Entity::getLowerDrawAxis(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    return this->active_animation->getLowerDrawAxis();
 }
 
 /** Gets the hitboxes of the current animation state
@@ -226,7 +236,7 @@ int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned 
     return ret; 
 }
 
-int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset, int y_offset, int width, int height){
+int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset, int y_offset, int width, int height){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
@@ -237,7 +247,7 @@ int Entity::addSprite(const char* animation_name, const char* sprite_set, const 
         animation->addSpriteSet(sprite_set);
     }
 
-    return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
+    return animation->addSprite(sprite_set, sprite_id, x_offset, y_offset, width, height);
 }
 
 /** Sets the sprite set for a given animation in the entity
@@ -286,28 +296,63 @@ int Entity::setSpriteSet(const char* sprite_set){
 /** Sets the draw axis for the specified animation in the entity
  * @param animation_name The name of the animation you'd like to set the draw axis of
  * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the upper draw axis for (-1 is all sprites in the animation)
  */
-int Entity::setDrawAxis(const char* animation_name, double draw_axis){
+int Entity::setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
 
-    animation->setDrawAxis(draw_axis);
+    animation->setUpperDrawAxis(draw_axis, sprite_num);
+    return 0;
+}
+
+/** Sets the draw axis for the specified animation in the entity
+ * @param animation_name The name of the animation you'd like to set the draw axis of
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the lower draw axis for (-1 is all sprites in the animation)
+ */
+int Entity::setLowerDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    animation->setLowerDrawAxis(draw_axis, sprite_num);
     return 0;
 }
 
 /** Sets the draw axis for all animations in the entity
  * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the upper draw axis for (-1 is all sprites in the animation)
  */
-int Entity::setDrawAxis(double draw_axis){
+int Entity::setUpperDrawAxis(double draw_axis, int32_t sprite_num){
     if(animations == nullptr){
         return -1;
     }
 
     AnimationList* cursor = animations;
     while(cursor != nullptr){
-        cursor->animation->setDrawAxis(draw_axis);
+        cursor->animation->setUpperDrawAxis(draw_axis, sprite_num);
+        cursor = cursor->next;
+    }
+
+    return 0;
+}
+
+/** Sets the draw axis for all animations in the entity
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the lower draw axis for (-1 is all sprites in the animation)
+ */
+int Entity::setLowerDrawAxis(double draw_axis, int32_t sprite_num){
+    if(animations == nullptr){
+        return -1;
+    }
+
+    AnimationList* cursor = animations;
+    while(cursor != nullptr){
+        cursor->animation->setLowerDrawAxis(draw_axis, sprite_num);
         cursor = cursor->next;
     }
 

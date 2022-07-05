@@ -103,7 +103,7 @@ Engine::Engine(){
     this->entities.obj = nullptr;
     this->entities.ui = nullptr;
 
-    this->delta = SDL_GetTicks64();
+    this->delta = SDL_GetTicks(); //Upgrade to SDL_GetTicks64 once Fedora upgrades its packages
 
     this->gravity = 0.1;
 
@@ -181,13 +181,13 @@ void Engine::gameLoop(){
     uint64_t last_time = this->delta;
 
     uint64_t physics_step_accumulator = 0;
-    delta = SDL_GetTicks64();
+    delta = SDL_GetTicks();
 	while(!exit_game){
         buildFullEntityList();
 
         //Calculate the time that has passed since last frame
-        delta = SDL_GetTicks64() - last_time;
-        last_time = SDL_GetTicks64();
+        delta = SDL_GetTicks() - last_time;
+        last_time = SDL_GetTicks();
 
         physics_step_accumulator += delta;
         uint64_t physics_step = physics_step_accumulator / PHYSICS_STEP_SIZE;
@@ -466,6 +466,13 @@ void Engine::drawStep(EntityList* all_entities){
     SDL_RenderPresent(renderer);
 }
 
+inline static bool checkDrawOverlap(Object* obj1, Object* obj2){
+    return (obj1->getLowerDrawAxis() >= obj2->getUpperDrawAxis() && obj1->getLowerDrawAxis() <= obj2->getLowerDrawAxis()) ||
+           (obj1->getUpperDrawAxis() >= obj2->getUpperDrawAxis() && obj1->getUpperDrawAxis() <= obj2->getLowerDrawAxis()) ||
+           (obj2->getLowerDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getLowerDrawAxis() <= obj1->getLowerDrawAxis()) ||
+           (obj2->getUpperDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getUpperDrawAxis() <= obj1->getLowerDrawAxis());
+}
+
 /** Recursively sorts the objects in the order of draw
  * @param curr_obj The current object that you're sorting through
  * @return The current draw object
@@ -479,12 +486,22 @@ ObjectList* Engine::drawSort(ObjectList* curr_obj){
         }
         else{
             ObjectList* next_obj = this->drawSort(curr_obj->next);
-            if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() ||
-              (curr_obj->obj->getDrawAxis() > next_obj->obj->getDrawAxis() && curr_obj->obj->getDrawLayer() == next_obj->obj->getDrawLayer())){
+            Object* nxt = next_obj->obj;
+            Object* cur = curr_obj->obj;
+            //Higher draw axis = closer to the bottom of the screen (since Y coordinates trend positively downards)
+            //If next is a lower draw layer, always move it back in the draw ordering
+            if(nxt->getDrawLayer() < cur->getDrawLayer() ||
+               //Make sure we're on the same draw layer for behind/overlap case
+               (nxt->getDrawLayer() == cur->getDrawLayer() &&
+               //Behind case
+               (nxt->getLowerDrawAxis() < cur->getUpperDrawAxis() ||
+               //Overlap case
+               ((checkDrawOverlap(nxt, cur) && (nxt->getZ() < cur->getZ())))))){
                 //Swap node positions & send curr_obj up the draw chain
                 curr_obj->next = next_obj->next;
                 next_obj->next = this->drawSort(curr_obj);
                 return next_obj;
+                //If nodes don't get sunk in the list, does the draw chain break?
             }
             else{
                 curr_obj->next = next_obj;

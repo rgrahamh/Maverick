@@ -79,6 +79,8 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
         player->addHitbox("walk_up", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
     }
 
+    player->setUpperDrawAxis(40, -1);
+
     //Setting the starting animation
     player->setAnimation("neutral_down");
 
@@ -93,19 +95,20 @@ Object* buildPillar(const char* name, float start_x, float start_y){
     pillar->addSprite("default", "day", "./assets/sprites/environment/pillar.bmp");
     pillar->setAnimation("default");
     pillar->addHitbox("default", HIT_ELLIPSE, 16, 120, 0, 18, 8, 120, COLLISION | ENVIRONMENT, 0);
+    pillar->setUpperDrawAxis(120, -1);
 
     return pillar;
 }
 
-Object* buildCrate(const char* name, float start_x, float start_y){
-    Object* crate = new Object(name, start_x, start_y, 0, 1, 500, 0);
+Object* buildCrate(const char* name, float start_x, float start_y, float start_z){
+    Object* crate = new Object(name, start_x, start_y, start_z, 1, 500, 0);
 
     crate->addAnimation("default", 1);
     crate->addFrame("default");
     crate->addSprite("default", "day", "./assets/sprites/environment/CrateTest.bmp");
     crate->setAnimation("default");
     crate->addHitbox("default", HIT_RECT, 0, 16, 0, 48, 48, 16, HITBOX_TYPE::COLLISION | HITBOX_TYPE::ENVIRONMENT, 0);
-    crate->setDrawAxis(17);
+    crate->setUpperDrawAxis(17, -1);
 
     return crate;
 }

@@ -27,7 +27,8 @@ class Entity{
 		virtual float getHeight();
 		HitboxList* getHitboxes();
 		int16_t getDrawLayer();
-		double getDrawAxis();
+		double getUpperDrawAxis();
+		double getLowerDrawAxis();
 		void* getAttr(const char* key);
 		uint32_t getType();
 		bool isActive();
@@ -39,7 +40,7 @@ class Entity{
 
 		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
-		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
+		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
 		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element, double y_element, double depth, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
 		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
@@ -55,8 +56,12 @@ class Entity{
 		void setVisible(bool visible);
 		int setSpriteSet(const char* animation_name, const char* sprite_set);
 		int setSpriteSet(const char* sprite_set);
-		int setDrawAxis(const char* animation_name, double draw_axis);
-		int setDrawAxis(double draw_axis);
+
+		int setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num);
+		int setUpperDrawAxis(double draw_axis, int32_t sprite_num);
+
+		int setLowerDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num);
+		int setLowerDrawAxis(double draw_axis, int32_t sprite_num);
 
 		//Sets an attribute
 		void setAttr(const char* key, bool val);

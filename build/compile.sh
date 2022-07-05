@@ -6,20 +6,11 @@ TARGET_BUILT="false"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
+./clean.sh
+
 if [ $# -lt 1 ]; then
 	echo "Please specify what program you'd like to compile"
 	exit -1
-fi
-
-if [[ "$1" == "clean" ]]; then
-	if [[ "`ls ../bin | grep -v "Test"`" != "" ]]; then
-		ls ../bin/* 2>/dev/null | grep -v "Test" | xargs rm
-	fi
-	if [[ "`ls ../bin/Test`" != "" ]]; then
-		rm ../bin/Test/*
-	fi
-	echo "Cleaned out bin!"
-	exit 0
 fi
 
 Make(){
@@ -28,7 +19,7 @@ Make(){
 		mingw32-make.exe
 	else
 		cmake .
-		make
+		make -j `nproc --all`
 	fi
 	TARGET_BUILT="true"
 }

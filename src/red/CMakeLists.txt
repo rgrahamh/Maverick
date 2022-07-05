@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.19)
 
 project(red VERSION 0.1.0 DESCRIPTION "Asset editor, Ryan Houck 2021-2022")
 

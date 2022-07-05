@@ -40,6 +40,10 @@ class Hitbox{
         double getYOffset();
         double getZOffset();
 
+        void setXOffset(double x_offset);
+        void setYOffset(double y_offset);
+        void setZOffset(double z_offset);
+
         double getDepth();
 
         virtual float getRightBound();
