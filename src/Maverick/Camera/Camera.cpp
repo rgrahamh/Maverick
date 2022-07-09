@@ -53,8 +53,14 @@ void Camera::recenter(){
 void Camera::_draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset, double camera_y_offset){
     recenter();
 
+    int win_width, win_height;
+    SDL_GetRendererOutputSize(this->renderer, &win_width, &win_height);
+
     while(obj_lst != NULL){
-        if(obj_lst->obj->isVisible()){
+        //If visible and on-screen
+        if(obj_lst->obj->isVisible() &&
+           !(obj_lst->obj->getX() > this->current_x + win_width || obj_lst->obj->getX() + obj_lst->obj->getWidth() < this->current_x) &&
+           !(obj_lst->obj->getY() - obj_lst->obj->getZ() > this->current_y + win_height || obj_lst->obj->getY() - obj_lst->obj->getZ() + obj_lst->obj->getHeight() < this->current_y)){
             obj_lst->obj->_draw(renderer, delta, current_x + camera_x_offset, current_y + camera_y_offset);
         }
         obj_lst = obj_lst->next;

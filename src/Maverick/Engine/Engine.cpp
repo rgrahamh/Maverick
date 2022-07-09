@@ -8,7 +8,7 @@
 std::atomic<bool> exit_game;
 
 bool endian;
-bool debug = true;
+bool debug = false;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
@@ -180,6 +180,8 @@ void Engine::start(){
 void Engine::gameLoop(){
     uint64_t last_time = this->delta;
 
+    uint64_t fps = 0;
+    uint64_t fps_counter = 0;
     uint64_t physics_step_accumulator = 0;
     delta = SDL_GetTicks();
 	while(!exit_game){
@@ -195,10 +197,18 @@ void Engine::gameLoop(){
 
         //No need to do anything if a step hasn't occurred
         if(delta > 0){
-            //Action step (where actions occur)
-            this->actionStep(&this->entities);
+            fps_counter += delta;
+            fps++;
+            if(fps_counter >= 1000){
+                printf("FPS: %ld\n", fps);
+                fps_counter = 0;
+                fps = 0;
+            }
 
             if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
+                //Action step (where actions occur)
+                this->actionStep(&this->entities);
+
                 //Physics step (where physics are calculated, obj positions updated, etc.)
                 this->physicsStep(&this->entities, physics_step);
 
@@ -356,19 +366,21 @@ void Engine::collisionStep(ObjectList* all_objects){
 
             int win_width, win_height;
             SDL_GetWindowSize(this->window, &win_width, &win_height);
-            int x_iter = win_width / x_block;
-            int y_iter = win_height / y_block;
-            int x_max = win_width + camera->getX();
-            int y_max = win_height + camera->getY();
+            int x_iter = win_width * 2 / x_block;
+            int y_iter = win_height * 2 / y_block;
+            int x_min = camera->getX() - (win_width / 2); 
+            int y_min = camera->getY() - (win_height / 2); 
+            int x_max = win_width * 1.5 + camera->getX();
+            int y_max = win_height * 1.5 + camera->getY();
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
             if(x_iter > 0 && y_iter > 0){
-                for(int box_y = camera->getY(); box_y < y_max; box_y += y_iter){
+                for(int box_y = y_min; box_y < y_max; box_y += y_iter){
                     //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
                     if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
                         int i = 0;
-                        for(int box_x = camera->getX(); box_x < x_max; box_x += x_iter){
+                        for(int box_x = x_min; box_x < x_max; box_x += x_iter){
                             //If the left bound is greater than box_x or the right bound is less than box_x, go to next
                             if(!(left_bound > box_x + x_iter || right_bound < box_x)){
                                 //Insert the object in the list

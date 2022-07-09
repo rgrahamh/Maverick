@@ -36,15 +36,23 @@ Character::Character(const char* name, float start_x, float start_y, float start
 	this->overdrive=false;
 }
 
+/** The character's default destructor
+ */
 Character::~Character(){
 	free(this->inventory);
 	delete this->equipment;
 }
 
+/** Returns if the character is walking
+ * @return If the character is in a neutral animation
+ */
 bool Character::isStanding(){
     return strncmp("neutral", this->active_animation->getName(), 7) == 0;
 }
 
+/** Returns if the character is walking
+ * @return If the character is in a walking animation
+ */
 bool Character::isWalking(){
     return strncmp("walk", this->active_animation->getName(), 4) == 0;
 }
