@@ -206,6 +206,11 @@ void Engine::gameLoop(){
             }
 
             if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
+                //Cap the physics step at 5 steps (to avoid bound exploitation)
+                if(physics_step > 5){
+                    physics_step = 5;
+                }
+
                 //Action step (where actions occur)
                 this->actionStep(&this->entities);
 
@@ -705,11 +710,15 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
+            //If the mov_box is below the env_box
             if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
+                mov_obj->setZVel(0);
             }
-            else if(env_box->getZMax() >= mov_box->getZMin() && env_box->getZMax() <= mov_obj->getOldZ() - mov_box->getZOffset()){
+            //If the mov_box is above the env_box
+            else if(mov_box->getZMax() >= env_box->getZMin() && mov_box->getZMax() <= env_obj->getOldZ() - env_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
+                mov_obj->setZVel(0);
             }
             
             if(mov_box->checkCollision(env_box) == false){
@@ -901,9 +910,12 @@ void Engine::addThread(std::thread* thread){
     thread_map[thread->get_id()] = thread;
 }
 
+/** Pushes a thread to the thread cleanup queue
+ * @param thread_id The thread ID you'd like to clean up
+ */
 void Engine::cleanupThread(std::thread::id thread_id){
     if(thread_id != base_thread_id){
-        thread_cleanup_queue.load()->push(thread_id);
+        thread_cleanup_queue.load(std::memory_order_relaxed)->push(thread_id);
     }
 }
 
