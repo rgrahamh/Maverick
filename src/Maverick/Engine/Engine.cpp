@@ -9,6 +9,7 @@ std::atomic<bool> exit_game;
 
 bool endian;
 bool debug = false;
+bool graphics_init = false;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
@@ -33,17 +34,17 @@ Engine::Engine(){
     //Don't need to init w/ anything else; we're just using WAVs
     if(Mix_Init(MIX_INIT_MP3) < 0){
         printf("Failed to init Mixer! ERR: %s\n", Mix_GetError());
-        exit(-1);
     }
 
-    //Play around w/ the audio frequency
-    if(Mix_OpenAudio(44100, AUDIO_S32LSB, 2, 512) < 0){
-        printf("Failed to init Mixer Audio! ERR: %s\n", Mix_GetError());
-        exit(-1);
-    }
+    if(SDL_GetNumAudioDevices(0) > 0){
+        //Play around w/ the audio frequency
+        if(Mix_OpenAudio(44100, AUDIO_S32LSB, 2, 512) < 0){
+            printf("Failed to init Mixer Audio! ERR: %s\n", Mix_GetError());
+        }
 
-    for(int i = 0; i < SDL_GetNumAudioDevices(0); i++){
-        printf("Audio device %i: %s\n", i, SDL_GetAudioDeviceName(i, 0));
+        for(int i = 0; i < SDL_GetNumAudioDevices(0); i++){
+            printf("Audio device %i: %s\n", i, SDL_GetAudioDeviceName(i, 0));
+        }
     }
 
     //Initialization of the sound board

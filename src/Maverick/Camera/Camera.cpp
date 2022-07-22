@@ -17,6 +17,9 @@ Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = n
     this->renderer = renderer;
     this->follow_mode = follow_mode;
     this->follow_rate = follow_rate;
+
+    this->x_scale = 1.0;
+    this->y_scale = 1.0;
 }
 
 /** Sets the reference for the center of the camera
