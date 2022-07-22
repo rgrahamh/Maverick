@@ -67,8 +67,8 @@ TEST(CameraBehavior, TestGradualFollow){
     camera_reference.setX(x_mod);
     camera_reference.setY(y_mod);
     camera->_draw((ObjectList*)nullptr, 6);
-    camera_x_pos += ((x_mod - camera_x_pos) * follow_rate);
-    camera_y_pos += ((y_mod - camera_y_pos) * follow_rate);
+    camera_x_pos += (((x_mod - (width / 2)) - camera_x_pos) * follow_rate);
+    camera_y_pos += (((y_mod - (height / 2)) - camera_y_pos) * follow_rate);
     ASSERT_EQ(camera->getX(), camera_x_pos);
     ASSERT_EQ(camera->getY(), camera_y_pos);
 
@@ -77,8 +77,8 @@ TEST(CameraBehavior, TestGradualFollow){
     camera_reference.setX(x_mod);
     camera_reference.setY(y_mod);
     camera->_draw((ObjectList*)nullptr, 6);
-    camera_x_pos += ((x_mod - camera_x_pos) * follow_rate);
-    camera_y_pos += ((y_mod - camera_y_pos) * follow_rate);
+    camera_x_pos += (((x_mod - (width / 2)) - camera_x_pos) * follow_rate);
+    camera_y_pos += (((y_mod - (height / 2)) - camera_y_pos) * follow_rate);
     ASSERT_EQ(camera->getX(), camera_x_pos);
     ASSERT_EQ(camera->getY(), camera_y_pos);
 
