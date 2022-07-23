@@ -20,7 +20,7 @@ class HitRect : public Hitbox{
 
 		bool checkCollision(Hitbox* other) override;
 
-		void serializeData(FILE* file);
+		void serializeData(FILE* file) override;
 
 	private:
 		double curr_width;

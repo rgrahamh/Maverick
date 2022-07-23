@@ -604,12 +604,12 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	//Draw the sprite
 	if(sprite->rotation){
 		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, &draw_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
-			printf(SDL_GetError());
+			printf("%s\n", SDL_GetError());
 		}
 	}
 	else{
 		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
-			printf(SDL_GetError());
+			printf("%s\n", SDL_GetError());
 		}
 	}
 

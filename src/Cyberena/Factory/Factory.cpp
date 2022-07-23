@@ -9,25 +9,25 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
     player->addFrame("neutral_up", 0);
     player->addSprite("neutral_up", "day", "./assets/sprites/old_game_resources/Up_Neutral.bmp", 0, 0, 34, 44);
     player->addHitbox("neutral_up", HIT_ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, 0);
-    player->addHitbox("neutral_up", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
+    //player->addHitbox("neutral_up", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_down", 1);
     player->addFrame("neutral_down", 0);
     player->addSprite("neutral_down", "day", "./assets/sprites/old_game_resources/Down_Neutral.bmp", 0, 0, 34, 44);
     player->addHitbox("neutral_down", HIT_ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, 0);
-    player->addHitbox("neutral_down", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
+    //player->addHitbox("neutral_down", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_left", 1);
     player->addFrame("neutral_left", 0);
     player->addSprite("neutral_left", "day", "./assets/sprites/old_game_resources/Left_Neutral.bmp", 0, 0, 34, 44);
     player->addHitbox("neutral_left", HIT_ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, 0);
-    player->addHitbox("neutral_left", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
+    //player->addHitbox("neutral_left", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
 
     player->addAnimation("neutral_right", 1);
     player->addFrame("neutral_right", 0);
     player->addSprite("neutral_right", "day", "./assets/sprites/old_game_resources/Right_Neutral.bmp", 0, 0, 34, 44);
     player->addHitbox("neutral_right", HIT_ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, 0);
-    player->addHitbox("neutral_right", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
+    //player->addHitbox("neutral_right", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, 0);
 
     //Walking position
     player->addAnimation("walk_up", 1);
@@ -73,10 +73,10 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
         player->addHitbox("walk_up", HIT_ELLIPSE, 17, 40, 0, 12, 4, 44, COLLISION | HURTBOX, i);
 
         //Ground hitboxes
-        player->addHitbox("walk_right", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
-        player->addHitbox("walk_left", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
-        player->addHitbox("walk_down", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
-        player->addHitbox("walk_up", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
+        //player->addHitbox("walk_right", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
+        //player->addHitbox("walk_left", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
+        //player->addHitbox("walk_down", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
+        //player->addHitbox("walk_up", HIT_ELLIPSE, 17, 40, -540, 12, 4, 540, GROUNDING_ZONE, i);
     }
 
     player->setUpperDrawAxis(40, -1);

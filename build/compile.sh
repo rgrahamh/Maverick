@@ -3,6 +3,8 @@ set -e
 
 TARGET_BUILT="false"
 
+COMPILER="/usr/bin/clang++"
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
@@ -18,7 +20,7 @@ Make(){
 		cmake -G "MinGW Makefiles"
 		mingw32-make.exe
 	else
-		cmake .
+		cmake . -DCMAKE_CXX_COMPILER=$COMPILER
 		make -j `nproc --all`
 	fi
 	TARGET_BUILT="true"

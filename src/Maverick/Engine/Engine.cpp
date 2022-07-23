@@ -317,8 +317,8 @@ void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
  */
 void Engine::collisionStep(ObjectList* all_objects){
     //Sister arrays for the list matricies
-    ObjectList* object_matrix[16][9] = {NULL};
-    HitboxList* hitbox_matrix[16][9] = {NULL};
+    ObjectList* object_matrix[16][9] = {{nullptr}};
+    HitboxList* hitbox_matrix[16][9] = {{nullptr}};
 
     //While we're not out of objects
     while(all_objects != NULL){
