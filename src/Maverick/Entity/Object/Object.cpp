@@ -259,7 +259,6 @@ void Object::_process(uint64_t delta, unsigned int steps){
     //Updating environmental bump
     this->env_bump = false;
 
-    //Updating X values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
     this->xV += this->xA;
     if(this->xV != 0){
         xV -= this->xV * friction;
@@ -279,7 +278,7 @@ void Object::_process(uint64_t delta, unsigned int steps){
     }
     this->xA = 0;
 
-    //Updating Y values (CHANGE THESE TO ALTER VEL BY DELTA LATER)
+    //Updating Y values
     this->yV += this->yA;
     if(this->yV != 0){
         this->yV -= this->yV * friction;
@@ -301,7 +300,7 @@ void Object::_process(uint64_t delta, unsigned int steps){
 
     //Updating Z values
     if(this->z != this->ground && this->gravity){
-        this->zA -= engine->getGravity() * steps;
+        this->zA -= engine->getGravity() * (float)steps;
     }
 
     this->zV += this->zA;

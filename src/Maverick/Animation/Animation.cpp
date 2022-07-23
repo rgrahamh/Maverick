@@ -28,7 +28,6 @@ Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t 
 	this->num_sprite_sets = num_sprite_sets;
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
-	this->draw_axis = -1.0;
 
 	this->next_animation = nullptr;
 }
@@ -56,24 +55,29 @@ Animation::~Animation(){
 
 			for(auto& sprite_set:this->sprite_sets){
 				if(cursor->sprite != nullptr){
-					if(cursor->sprite[sprite_set.second]->rect != nullptr){
-						free(cursor->sprite[sprite_set.second]->rect);
-					}
+					if(cursor->sprite[sprite_set.second])
+					{
+						if(cursor->sprite[sprite_set.second]->rect != nullptr){
+							delete cursor->sprite[sprite_set.second]->rect;
+						}
 
-					if(cursor->sprite[sprite_set.second]->texture != nullptr){
-						SDL_DestroyTexture(cursor->sprite[sprite_set.second]->texture);
+						if(cursor->sprite[sprite_set.second]->texture != nullptr){
+							SDL_DestroyTexture(cursor->sprite[sprite_set.second]->texture);
+						}
 					}
 				}
 
 				delete cursor->sprite[sprite_set.second];
 			}
 
-			delete cursor->sprite;
+			if(cursor->sprite != nullptr){
+				delete cursor->sprite;
+			}
 
 			AnimationSeq* tmp;
 			tmp = cursor;
 			cursor = cursor->next;
-			free(tmp);
+			delete tmp;
 		} while(cursor != sequence_start && cursor != nullptr);
 	}
 
@@ -92,6 +96,18 @@ Sprite* Animation::getSprite(){
 	}
 }
 
+/** Gets the current sound
+ * @return The current sound
+ */
+Sound* Animation::getSound(){
+	if(this->sequence != nullptr){
+		return this->sequence->sound;
+	}
+	else{
+		return nullptr;
+	}
+}
+
 /** Gets the current hitboxes
  * @return The current hitboxes
  */
@@ -104,14 +120,34 @@ HitboxList* Animation::getHitboxes(){
 	}
 }
 
-/** Gets the draw axis
- * @return The draw axis
+/** Gets the upper draw axis
+ * @return The upper draw axis
  */
-float Animation::getDrawAxis(){
+double Animation::getUpperDrawAxis(){
 	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
 		//If draw_axis is set
-		if(this->draw_axis != -1){
-			return *this->y_base + this->draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		if(this->sequence->sprite[curr_sprite_set]->upper_draw_axis != -1){
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->upper_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
+		//Otherwise, interpolate from the sequence
+		else{
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+		}
+	}
+	//If we can't find the draw axis any other way
+	else{
+		return 0.0;
+	}
+}
+
+/** Gets the lower draw axis
+ * @return The lower draw axis
+ */
+double Animation::getLowerDrawAxis(){
+	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
+		//If draw_axis is set
+		if(this->sequence->sprite[curr_sprite_set]->lower_draw_axis != -1){
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->lower_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
@@ -128,13 +164,18 @@ float Animation::getDrawAxis(){
  * @return The number of frames left in the animation
  */
 uint32_t Animation::getTimeLeft(){
+	if(this->sequence == nullptr){
+		return 0;
+	}
+
 	AnimationSeq* cursor = this->sequence;
-	int time_left = cursor->keytime - this->time_counter;
-	while(cursor != this->sequence_start){
+	int time_left = cursor->keytime;
+	cursor = cursor->next;
+	while(cursor != this->sequence_start && cursor != nullptr){
 		time_left += cursor->keytime;
 		cursor = cursor->next;
 	}
-	return time_left;
+	return time_left - this->time_counter;
 }
 
 /** Gets if the animation is paused
@@ -152,10 +193,12 @@ void Animation::setPaused(bool paused){
 }
 
 /** If the animation is animated
- * @return If the animation is animated (if it has multiple frames)
+ * @return If the animation is animated (if it has multiple frames, and hasn't hit the end of the animation)
  */
 bool Animation::isAnimated(){
-	return (this->sequence_start == this->sequence_end || this->sequence_start == NULL)? false : true;
+	return !(this->sequence_start == this->sequence_end ||
+			 this->sequence_start == NULL ||
+			 (sequence == sequence_end && next_animation == nullptr));
 }
 
 /** Adds a frame to an animation
@@ -189,19 +232,19 @@ int Animation::addFrame(unsigned int keytime){
 
 /** Adds a sprite to the animation
  * @param sprite_set The sprite set you'd like to add the sprite to
- * @param sprite_path The filepath of the sprite
+ * @param sprite_name The identifier of the sprite
  * @param x_offset The X offset of the new sprite
  * @param y_offset The Y offset of the new sprite
  * @param width The width of the new sprite 
  * @param height The height of the new sprite
  */
 int Animation::addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width, int height){
-	if(this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
+	if(this->sprite_sets.find(std::string(sprite_set)) == this->sprite_sets.end()){
 		if(this->addSpriteSet(sprite_set) != 0){
 			return -1;
 		}
 	}
-	uint16_t sprite_set_idx = this->sprite_sets[sprite_set];
+	uint16_t sprite_set_idx = this->sprite_sets[std::string(sprite_set)];
 
 	AnimationSeq* sequence_cursor = this->sequence_start;
 	if(sequence_cursor != nullptr){
@@ -221,6 +264,8 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	Sprite* sprite = new Sprite();
 	sprite->name = StrDeepCopy(sprite_path);
 	sprite->rotation = 0.0;
+	sprite->lower_draw_axis = -1.0;
+	sprite->upper_draw_axis = -1.0;
 
 	//Getting the texture
 	SDL_Surface* surface;
@@ -260,12 +305,12 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 }
 
 /** Adds a new sprite set to an animation
- * @param sprite_set The sprite set you'd like to add
+ * @param sprite_set The name of the sprite set you'd like to add
  * @return 0 if successful, -1 otherwise
  */
 int Animation::addSpriteSet(const char* sprite_set){
-	if(sprite_set_counter < num_sprite_sets && this->sprite_sets.find(sprite_set) == this->sprite_sets.end()){
-		this->sprite_sets[sprite_set] = sprite_set_counter++;
+	if(sprite_set_counter < num_sprite_sets && this->sprite_sets.find(std::string(sprite_set)) == this->sprite_sets.end()){
+		this->sprite_sets[std::string(sprite_set)] = sprite_set_counter++;
 		return 0;
 	}
 	return -1;
@@ -334,11 +379,20 @@ int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 }
 
 /** Adds a new sound to an animation (given the sprite number)
- * @param sound The sound to add
+ * @param sound_id The sound to add
  * @param sequence_num The sequence number (-1 adds to the last element of the sequence)
  * @return 0 if successful, -1 otherwise
  */
-int Animation::addSound(Sound* sound, int sequence_num){
+int Animation::addSound(const char* sound_id, int sequence_num){
+	if(sound_id == nullptr){
+		return -1;
+	}
+
+	Sound* sound = engine->getSound(sound_id);
+	if(sound == nullptr){
+		return -1;
+	}
+
 	if(this->sequence_start != nullptr){
 		if(sequence_num == -1){
 			if(this->sequence_end != NULL){
@@ -403,18 +457,77 @@ int Animation::setSize(int width, int height){
  * @return 0 if the sprite set was set successfully, -1 otherwise (means it couldn't be found)
  */
 int Animation::setSpriteSet(const char* sprite_set){
-	if(this->sprite_sets.find(sprite_set) != this->sprite_sets.end()){
-		this->curr_sprite_set = sprite_sets[sprite_set];
+	if(this->sprite_sets.find(std::string(sprite_set)) != this->sprite_sets.end()){
+		this->curr_sprite_set = sprite_sets[std::string(sprite_set)];
 		return 0;
 	}
 	return -1;
 }
 
-/** The draw axis offset, in pixels (from the top left of the animation).
- * @param offset The draw axis offset, from the top left of the animation. -1 assumes position based off of the img size
+/** The upper draw axis offset, in pixels (from the top of the animation).
+ * @param upper_draw_axis The upper draw axis, offset from the top of the animation. -1 assumes position based off of the img size
+ * @param sprite_num The sprite number; -1 applies to all sprites
  */
-void Animation::setDrawAxis(double draw_axis){
-	this->draw_axis = draw_axis;
+void Animation::setUpperDrawAxis(double upper_draw_axis, int32_t sprite_num){
+	AnimationSeq* cursor = this->sequence_start;
+	if(sprite_num == -1){
+		if(cursor != nullptr){
+			do{
+				for(int i = 0; i < num_sprite_sets; i++){
+					if(cursor->sprite[i] != nullptr){
+						cursor->sprite[i]->upper_draw_axis = upper_draw_axis;
+					}
+				}
+				cursor = cursor->next;
+			} while(cursor != nullptr && cursor != this->sequence_start);
+		}
+	}
+	else{
+		//Get to the sprite_num-th sprite
+		for(int i = 0; i < sprite_num && cursor != nullptr; i++){
+			cursor = cursor->next;
+		}
+
+		//Set the val if it exists
+		if(cursor != nullptr){
+			for(int i = 0; i < num_sprite_sets; i++){
+				cursor->sprite[i]->upper_draw_axis = upper_draw_axis;
+			}
+		}
+	}
+}
+
+/** The lower draw axis offset, in pixels (from the top of the animation).
+ * @param offset The lower draw axis, offset from the top left of the animation. -1 assumes position based off of the img size
+ * @param sprite_num The sprite number; -1 applies to all sprites
+ */
+void Animation::setLowerDrawAxis(double lower_draw_axis, int32_t sprite_num){
+	AnimationSeq* cursor = this->sequence_start;
+	if(sprite_num == -1){
+		if(cursor != nullptr){
+			do{
+				for(int i = 0; i < num_sprite_sets; i++){
+					if(cursor->sprite[i] != nullptr){
+						cursor->sprite[i]->lower_draw_axis = lower_draw_axis;
+					}
+				}
+				cursor = cursor->next;
+			} while(cursor != nullptr && cursor != this->sequence_start);
+		}
+	}
+	else{
+		//Get to the sprite_num-th sprite
+		for(int i = 0; i < sprite_num && cursor != nullptr; i++){
+			cursor = cursor->next;
+		}
+
+		//Set the val if it exists
+		if(cursor != nullptr){
+			for(int i = 0; i < num_sprite_sets; i++){
+				cursor->sprite[i]->lower_draw_axis = lower_draw_axis;
+			}
+		}
+	}
 }
 
 /** Advances the animation by a delta
@@ -424,26 +537,27 @@ void Animation::advance(uint64_t delta){
 	if(this->isAnimated() && !this->paused){
 		time_counter += delta;
 		//If we've exceeded the keytime for this frame
-		if(sequence->keytime <= time_counter){
-			//If we've hit the end of the sequence & next_animation is not nullptr (for a loop, next_sequence should be start_sequence)
-			bool progressed = false;
-			if(sequence == sequence_end && next_animation != nullptr){
-				sequence = next_animation->getSequenceStart();
-				progressed = true;
-			}
+		while(sequence->keytime <= time_counter){
+			time_counter -= sequence->keytime;
+
 			//If we haven't hit the end of the sequence
-			else if(sequence != sequence_end){
+			if(sequence != sequence_end){
 				sequence = sequence->next;
-				progressed = true;
+			}
+			//If we've hit the end of the sequence & next_animation is not nullptr (for a loop, next_sequence should be start_sequence)
+			else if(sequence == sequence_end && next_animation != nullptr){
+				sequence = next_animation->getSequenceStart();
+			}
+			//If we've hit the end of the sequence & next_animation is nullptr
+			else if(sequence == sequence_end && next_animation == nullptr){
+				time_counter = sequence->keytime;
+				break;	
 			}
 
 			//Play the new sound, if it exists
-			if(sequence->sound != nullptr && progressed){
+			if(sequence->sound != nullptr){
 				engine->getSoundBoard()->playSound(sequence->sound, 0);
 			}
-
-			//If we're on the last frame of the sequence & next_animation is null, maintain the current frame
-			time_counter -= sequence->keytime;
 		}
 	}
 }
@@ -490,12 +604,12 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	//Draw the sprite
 	if(sprite->rotation){
 		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, &draw_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
-			printf(SDL_GetError());
+			printf("%s\n", SDL_GetError());
 		}
 	}
 	else{
 		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
-			printf(SDL_GetError());
+			printf("%s\n", SDL_GetError());
 		}
 	}
 
@@ -541,7 +655,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 				rect.h = hit_rect->getHeight();
 				rect.w = hit_rect->getWidth();
 				rect.x = hit_rect->getX() - camera_x;
-				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() + z_coord;
+				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() - z_coord;
 				unsigned int depth = hit_rect->getDepth();
 				
 				//Draw the base (will be white to differentiate from the rest)
@@ -642,7 +756,7 @@ uint16_t Animation::getSequenceLen(){
  * @return true if the animation has the sprite_set, false otherwise
  */
 bool Animation::hasSpriteSet(const char* sprite_set){
-	return (this->sprite_sets.find(sprite_set) != this->sprite_sets.end());
+	return (this->sprite_sets.find(std::string(sprite_set)) != this->sprite_sets.end());
 }
 
 /** Saves the resources of the entity to a char*'s (which should be freed upon return)

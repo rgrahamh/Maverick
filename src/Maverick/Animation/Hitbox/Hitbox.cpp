@@ -86,6 +86,8 @@ uint64_t Hitbox::getType(){
 }
 
 /** Returns true if the point is inside the hitbox, false otherwise. In the base class, it always returns false (it should always be overridden)
+ * @param x_coord The X coordinate of the point you're checking
+ * @param y_coord The X coordinate of the point you're checking
  * @return If the point is inside the hitbox
  */
 bool Hitbox::isPointInside(double x_coord, double y_coord){
@@ -163,4 +165,25 @@ double Hitbox::getYOffset(){
  */
 double Hitbox::getZOffset(){
 	return this->z_offset;
+}
+
+/** Sets the X offset
+ * @param x_offset The new X offset
+ */
+void Hitbox::setXOffset(double x_offset){
+	this->x_offset = x_offset;
+}
+
+/** Sets the Y offset
+ * @param y_offset The Y new offset
+ */
+void Hitbox::setYOffset(double y_offset){
+	this->y_offset = y_offset;
+}
+
+/** Sets the Z offset
+ * @param z_offset The new Z offset
+ */
+void Hitbox::setZOffset(double z_offset){
+	this->z_offset = z_offset;
 }

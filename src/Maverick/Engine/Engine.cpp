@@ -8,7 +8,8 @@
 std::atomic<bool> exit_game;
 
 bool endian;
-bool debug = true;
+bool debug = false;
+bool graphics_init = false;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
@@ -33,13 +34,17 @@ Engine::Engine(){
     //Don't need to init w/ anything else; we're just using WAVs
     if(Mix_Init(MIX_INIT_MP3) < 0){
         printf("Failed to init Mixer! ERR: %s\n", Mix_GetError());
-        exit(-1);
     }
 
-    //Play around w/ the audio frequency
-    if(Mix_OpenAudio(44100, AUDIO_S32LSB, 2, 512) < 0){
-        printf("Failed to init Mixer Audio! ERR: %s\n", Mix_GetError());
-        exit(-1);
+    if(SDL_GetNumAudioDevices(0) > 0){
+        //Play around w/ the audio frequency
+        if(Mix_OpenAudio(44100, AUDIO_S32LSB, 2, 512) < 0){
+            printf("Failed to init Mixer Audio! ERR: %s\n", Mix_GetError());
+        }
+
+        for(int i = 0; i < SDL_GetNumAudioDevices(0); i++){
+            printf("Audio device %i: %s\n", i, SDL_GetAudioDeviceName(i, 0));
+        }
     }
 
     //Initialization of the sound board
@@ -67,7 +72,7 @@ Engine::Engine(){
         fflush(stdout);
         exit(-1);
     }
-    this->camera = new Camera(renderer, window, NULL);
+    this->camera = new Camera(renderer, window, nullptr, CAMERA_FOLLOW_MODE::FIXED_FOLLOW, 0.08);
 
     //Set up the screenshot blit surface
     this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -99,7 +104,7 @@ Engine::Engine(){
     this->entities.obj = nullptr;
     this->entities.ui = nullptr;
 
-    this->delta = SDL_GetTicks64();
+    this->delta = SDL_GetTicks(); //Upgrade to SDL_GetTicks64 once Fedora upgrades its packages
 
     this->gravity = 0.1;
 
@@ -159,9 +164,14 @@ void Engine::start(){
     //saveZone(this->getZone("global"));
     //saveZone(this->getZone("Test Zone"));
 
-    /*Music* song1 = this->music_hash->get("./assets/audio/music/bass_riff_idea.wav");
-    sound_board->playMusic(song1);
-    sound_board->setMusicVolume(1, 0.0, 10000);*/
+    Music* song1 = new Music("song1");
+    Sound* sound = new Sound;
+    sound->name = "bass";
+    sound->sample = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
+    song1->addTrack(sound);
+    engine->addMusic("song1", song1);
+    sound_board->playMusic("song1");
+    sound_board->setMusicVolume(1, 1.0, 10000);
 
     gameLoop();
 }
@@ -171,14 +181,16 @@ void Engine::start(){
 void Engine::gameLoop(){
     uint64_t last_time = this->delta;
 
+    uint64_t fps = 0;
+    uint64_t fps_counter = 0;
     uint64_t physics_step_accumulator = 0;
+    delta = SDL_GetTicks();
 	while(!exit_game){
         buildFullEntityList();
-        delta = SDL_GetTicks64();
 
         //Calculate the time that has passed since last frame
-        delta = SDL_GetTicks64() - last_time;
-        last_time = SDL_GetTicks64();
+        delta = SDL_GetTicks() - last_time;
+        last_time = SDL_GetTicks();
 
         physics_step_accumulator += delta;
         uint64_t physics_step = physics_step_accumulator / PHYSICS_STEP_SIZE;
@@ -186,10 +198,23 @@ void Engine::gameLoop(){
 
         //No need to do anything if a step hasn't occurred
         if(delta > 0){
-            //Action step (where actions occur)
-            this->actionStep(&this->entities);
+            fps_counter += delta;
+            fps++;
+            if(fps_counter >= 1000){
+                printf("FPS: %ld\n", fps);
+                fps_counter = 0;
+                fps = 0;
+            }
 
             if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
+                //Cap the physics step at 5 steps (to avoid bound exploitation)
+                if(physics_step > 5){
+                    physics_step = 5;
+                }
+
+                //Action step (where actions occur)
+                this->actionStep(&this->entities);
+
                 //Physics step (where physics are calculated, obj positions updated, etc.)
                 this->physicsStep(&this->entities, physics_step);
 
@@ -292,8 +317,8 @@ void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
  */
 void Engine::collisionStep(ObjectList* all_objects){
     //Sister arrays for the list matricies
-    ObjectList* object_matrix[16][9] = {NULL};
-    HitboxList* hitbox_matrix[16][9] = {NULL};
+    ObjectList* object_matrix[16][9] = {{nullptr}};
+    HitboxList* hitbox_matrix[16][9] = {{nullptr}};
 
     //While we're not out of objects
     while(all_objects != NULL){
@@ -347,19 +372,21 @@ void Engine::collisionStep(ObjectList* all_objects){
 
             int win_width, win_height;
             SDL_GetWindowSize(this->window, &win_width, &win_height);
-            int x_iter = win_width / x_block;
-            int y_iter = win_height / y_block;
-            int x_max = win_width + camera->getX();
-            int y_max = win_height + camera->getY();
+            int x_iter = win_width * 2 / x_block;
+            int y_iter = win_height * 2 / y_block;
+            int x_min = camera->getX() - (win_width / 2); 
+            int y_min = camera->getY() - (win_height / 2); 
+            int x_max = win_width * 1.5 + camera->getX();
+            int y_max = win_height * 1.5 + camera->getY();
             int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
             if(x_iter > 0 && y_iter > 0){
-                for(int box_y = camera->getY(); box_y < y_max; box_y += y_iter){
+                for(int box_y = y_min; box_y < y_max; box_y += y_iter){
                     //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
                     if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
                         int i = 0;
-                        for(int box_x = camera->getX(); box_x < x_max; box_x += x_iter){
+                        for(int box_x = x_min; box_x < x_max; box_x += x_iter){
                             //If the left bound is greater than box_x or the right bound is less than box_x, go to next
                             if(!(left_bound > box_x + x_iter || right_bound < box_x)){
                                 //Insert the object in the list
@@ -457,6 +484,13 @@ void Engine::drawStep(EntityList* all_entities){
     SDL_RenderPresent(renderer);
 }
 
+inline static bool checkDrawOverlap(Object* obj1, Object* obj2){
+    return (obj1->getLowerDrawAxis() >= obj2->getUpperDrawAxis() && obj1->getLowerDrawAxis() <= obj2->getLowerDrawAxis()) ||
+           (obj1->getUpperDrawAxis() >= obj2->getUpperDrawAxis() && obj1->getUpperDrawAxis() <= obj2->getLowerDrawAxis()) ||
+           (obj2->getLowerDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getLowerDrawAxis() <= obj1->getLowerDrawAxis()) ||
+           (obj2->getUpperDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getUpperDrawAxis() <= obj1->getLowerDrawAxis());
+}
+
 /** Recursively sorts the objects in the order of draw
  * @param curr_obj The current object that you're sorting through
  * @return The current draw object
@@ -470,12 +504,23 @@ ObjectList* Engine::drawSort(ObjectList* curr_obj){
         }
         else{
             ObjectList* next_obj = this->drawSort(curr_obj->next);
-            if(curr_obj->obj->getDrawLayer() > next_obj->obj->getDrawLayer() ||
-              (curr_obj->obj->getDrawAxis() > next_obj->obj->getDrawAxis() && curr_obj->obj->getDrawLayer() == next_obj->obj->getDrawLayer())){
+            Object* nxt = next_obj->obj;
+            Object* cur = curr_obj->obj;
+            //Higher draw axis = closer to the bottom of the screen (since Y coordinates trend positively downards)
+            //If next is a lower draw layer, always move it back in the draw ordering
+            if(nxt->getDrawLayer() < cur->getDrawLayer() ||
+               //Make sure we're on the same draw layer for behind/overlap case
+               (nxt->getDrawLayer() == cur->getDrawLayer() &&
+               //Behind case
+               (nxt->getLowerDrawAxis() < cur->getUpperDrawAxis() ||
+               //Overlap case
+               ((checkDrawOverlap(nxt, cur) &&
+               (nxt->getZ() < cur->getZ() || (nxt->getZ() == cur->getZ() && nxt->getLowerDrawAxis() < cur->getLowerDrawAxis()))))))){
                 //Swap node positions & send curr_obj up the draw chain
                 curr_obj->next = next_obj->next;
                 next_obj->next = this->drawSort(curr_obj);
                 return next_obj;
+                //If nodes don't get sunk in the list, does the draw chain break?
             }
             else{
                 curr_obj->next = next_obj;
@@ -666,11 +711,15 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
+            //If the mov_box is below the env_box
             if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
+                mov_obj->setZVel(0);
             }
-            else if(env_box->getZMax() >= mov_box->getZMin() && env_box->getZMax() <= mov_obj->getOldZ() - mov_box->getZOffset()){
+            //If the mov_box is above the env_box
+            else if(mov_box->getZMax() >= env_box->getZMin() && mov_box->getZMax() <= env_obj->getOldZ() - env_box->getZOffset()){
                 mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
+                mov_obj->setZVel(0);
             }
             
             if(mov_box->checkCollision(env_box) == false){
@@ -862,9 +911,12 @@ void Engine::addThread(std::thread* thread){
     thread_map[thread->get_id()] = thread;
 }
 
+/** Pushes a thread to the thread cleanup queue
+ * @param thread_id The thread ID you'd like to clean up
+ */
 void Engine::cleanupThread(std::thread::id thread_id){
     if(thread_id != base_thread_id){
-        thread_cleanup_queue.load()->push(thread_id);
+        thread_cleanup_queue.load(std::memory_order_relaxed)->push(thread_id);
     }
 }
 

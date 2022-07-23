@@ -52,7 +52,7 @@ void UIObjectFrame::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, i
     //Draw reference
     if(this->reference != nullptr &&
        SDL_RenderCopy(renderer, this->reference->getSprite()->texture, NULL, &draw_area)){
-        printf(SDL_GetError());
+        printf("%s\n", SDL_GetError());
     }
 
     //Draw borders

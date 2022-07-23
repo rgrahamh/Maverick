@@ -4,6 +4,22 @@
 class Engine;
 extern Engine* engine;
 
+/** Paramaterized constructor for the Character
+ * @param name The character's name
+ * @param start_x The character's starting X position
+ * @param start_y The character's starting Y position
+ * @param start_z The character's starting Z position
+ * @param friction The COF for the character
+ * @param mass The mass of the character
+ * @param race The race of the character
+ * @param stats The character's stats struct
+ * @param mastry The character's mastery struct
+ * @param abilities A pointer to the character's abilities struct
+ * @param control The CONTROL_TYPE of what's controlling the character
+ * @param equipment The equipment that the character has
+ * @param inventory The inventory that the character has
+ * @param draw_layer The draw layer of the character
+ */
 Character::Character(const char* name, float start_x, float start_y, float start_z, float friction, float mass, RACE race, STYLE style, Stats* stats, Mastery* mastery, Abilities* abilities, CONTROL_TYPE control, Equipment* equipment, InvSlot** inventory, int draw_layer)
 	: Object(name, start_x, start_y, start_z, friction, mass, 11, true, draw_layer),
 	Race(race),
@@ -36,15 +52,23 @@ Character::Character(const char* name, float start_x, float start_y, float start
 	this->overdrive=false;
 }
 
+/** The character's default destructor
+ */
 Character::~Character(){
 	free(this->inventory);
 	delete this->equipment;
 }
 
+/** Returns if the character is walking
+ * @return If the character is in a neutral animation
+ */
 bool Character::isStanding(){
     return strncmp("neutral", this->active_animation->getName(), 7) == 0;
 }
 
+/** Returns if the character is walking
+ * @return If the character is in a walking animation
+ */
 bool Character::isWalking(){
     return strncmp("walk", this->active_animation->getName(), 4) == 0;
 }

@@ -26,6 +26,10 @@ struct Sprite{
 	uint32_t curr_x_offset;
 	uint32_t curr_y_offset;
 
+	//Draw axis
+	double upper_draw_axis;
+	double lower_draw_axis;
+
 	//Rotation (clockwise, in degrees)
 	double rotation;
 };
@@ -52,9 +56,11 @@ class Animation{
 		void start();
 
 		Sprite* getSprite();
+		Sound* getSound();
 		HitboxList* getHitboxes();
 		unsigned char getDrawLayer();
-		float getDrawAxis();
+		double getUpperDrawAxis();
+		double getLowerDrawAxis();
 		uint32_t getTimeLeft();
 		bool getPaused();
 		const char* getName();
@@ -67,14 +73,15 @@ class Animation{
 		int setSize(int width, int height);
 		void setNextAnimation(Animation* next_animation);
 		int setSpriteSet(const char* sprite_set);
-		void setDrawAxis(double draw_axis);
+		void setUpperDrawAxis(double draw_axis, int32_t sprite_set);
+		void setLowerDrawAxis(double draw_axis, int32_t sprite_set);
 
 		int addFrame(unsigned int keytime);
 		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
 		int addSpriteSet(const char* sprite_set);
 		int addHitbox(Hitbox* hitbox);
 		int addHitbox(Hitbox* hitbox, int sequence_num);
-		int addSound(Sound* sound, int sequence_num);
+		int addSound(const char* sound_id, int sequence_num);
 
 		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord = 0);
 
@@ -114,9 +121,6 @@ class Animation{
 		//Scale of the height and width
 		double x_scale;
 		double y_scale;
-
-		//Draw axis
-		double draw_axis;
 
 		//The time counter
 		unsigned int time_counter;

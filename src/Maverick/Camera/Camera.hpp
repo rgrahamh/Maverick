@@ -13,7 +13,7 @@ enum CAMERA_FOLLOW_MODE{
 
 class Camera{
 	public:
-		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference);
+		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference, CAMERA_FOLLOW_MODE follow_mode, double follow_rate);
 
 		void setReference(Object* reference);
 		void _draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset = 0, double camera_y_offset = 0);
@@ -22,9 +22,12 @@ class Camera{
 		SDL_Renderer* getRenderer();
 		double getX();
 		double getY();
+		CAMERA_FOLLOW_MODE getFollowMode();
+		double getFollowRate();
 
 		void setScale(double x_scale, double y_scale);
 		void setFollowMode(CAMERA_FOLLOW_MODE follow_mode);
+		void setFollowRate(double follow_rate);
 
 	private:
 		Object* reference;
@@ -32,6 +35,7 @@ class Camera{
 		double current_y;
 		double x_scale;
 		double y_scale;
+		double follow_rate;
 
 		CAMERA_FOLLOW_MODE follow_mode;
 

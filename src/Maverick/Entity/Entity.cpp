@@ -119,11 +119,21 @@ int16_t Entity::getDrawLayer(){
 /** Gets the draw axis of the entity
  * @return The draw axis of the entity
  */
-double Entity::getDrawAxis(){
+double Entity::getUpperDrawAxis(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    return this->active_animation->getDrawAxis();
+    return this->active_animation->getUpperDrawAxis();
+}
+
+/** Gets the draw axis of the entity
+ * @return The draw axis of the entity
+ */
+double Entity::getLowerDrawAxis(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    return this->active_animation->getLowerDrawAxis();
 }
 
 /** Gets the hitboxes of the current animation state
@@ -211,10 +221,7 @@ int Entity::addAnimation(Animation* animation){
  * @param animation_name The animation name
  * @param sprite_path The filepath to the sprite you're adding
  * @param keytime The number of frames until the animation progresses
- * @param x_offset The X offset of the sprite
- * @param y_offset The Y offset of the sprite
- * @param width The width of the sprite (default if -1)
- * @param height The height of the sprite (default if -1)
+ * @param iter The number of frames you'd like to add
  * @return 0 on success, -1 if the animation doesn't exist
  */ 
 int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
@@ -229,7 +236,7 @@ int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned 
     return ret; 
 }
 
-int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, int x_offset, int y_offset, int width, int height){
+int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset, int y_offset, int width, int height){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
@@ -240,7 +247,7 @@ int Entity::addSprite(const char* animation_name, const char* sprite_set, const 
         animation->addSpriteSet(sprite_set);
     }
 
-    return animation->addSprite(sprite_set, sprite_path, x_offset, y_offset, width, height);
+    return animation->addSprite(sprite_set, sprite_id, x_offset, y_offset, width, height);
 }
 
 /** Sets the sprite set for a given animation in the entity
@@ -289,28 +296,63 @@ int Entity::setSpriteSet(const char* sprite_set){
 /** Sets the draw axis for the specified animation in the entity
  * @param animation_name The name of the animation you'd like to set the draw axis of
  * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the upper draw axis for (-1 is all sprites in the animation)
  */
-int Entity::setDrawAxis(const char* animation_name, double draw_axis){
+int Entity::setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
 
-    animation->setDrawAxis(draw_axis);
+    animation->setUpperDrawAxis(draw_axis, sprite_num);
+    return 0;
+}
+
+/** Sets the draw axis for the specified animation in the entity
+ * @param animation_name The name of the animation you'd like to set the draw axis of
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the lower draw axis for (-1 is all sprites in the animation)
+ */
+int Entity::setLowerDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    animation->setLowerDrawAxis(draw_axis, sprite_num);
     return 0;
 }
 
 /** Sets the draw axis for all animations in the entity
  * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the upper draw axis for (-1 is all sprites in the animation)
  */
-int Entity::setDrawAxis(double draw_axis){
+int Entity::setUpperDrawAxis(double draw_axis, int32_t sprite_num){
     if(animations == nullptr){
         return -1;
     }
 
     AnimationList* cursor = animations;
     while(cursor != nullptr){
-        cursor->animation->setDrawAxis(draw_axis);
+        cursor->animation->setUpperDrawAxis(draw_axis, sprite_num);
+        cursor = cursor->next;
+    }
+
+    return 0;
+}
+
+/** Sets the draw axis for all animations in the entity
+ * @param draw_axis The draw axis (offset from the the top of the sprite)
+ * @param sprite_num The sprite number you'd like to set the lower draw axis for (-1 is all sprites in the animation)
+ */
+int Entity::setLowerDrawAxis(double draw_axis, int32_t sprite_num){
+    if(animations == nullptr){
+        return -1;
+    }
+
+    AnimationList* cursor = animations;
+    while(cursor != nullptr){
+        cursor->animation->setLowerDrawAxis(draw_axis, sprite_num);
         cursor = cursor->next;
     }
 
@@ -427,20 +469,16 @@ void Entity::cleanupHitboxImmunity(uint64_t delta){
 
 /** Adds a sound to a given animation
  * @param animation_name The animation name
- * @param sprite_path The filepath to the sprite you're adding
- * @param keytime The number of frames until the animation progresses
- * @param x_offset The X offset of the sprite
- * @param y_offset The Y offset of the sprite
- * @param width The width of the sprite (default if -1)
- * @param height The height of the sprite (default if -1)
+ * @param sound_id The identifier of the sound you're adding
+ * @param sequence_num The sequence number you'd like to add the sound to
  * @return 0 on success, -1 if the animation doesn't exist
  */
-int Entity::addSound(const char* animation_name, const char* sound_path, int sequence_num){
+int Entity::addSound(const char* animation_name, const char* sound_id, int sequence_num){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
         return -1;
     }
-    return animation->addSound(engine->getSound(sound_path), sequence_num);
+    return animation->addSound(sound_id, sequence_num);
 }
 
 /** Sets the X posision

@@ -1,13 +1,11 @@
 #include "./Camera.hpp"
 #include "./../Engine/Engine.hpp"
 
-const float follow_rate = 0.08;
-
 /** The parameterized constructor for the camera
  * @param window The window that the camera should be drawing to
  * @param reference The object that the camera is centered on
  */
-Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = NULL){
+Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = nullptr, CAMERA_FOLLOW_MODE follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW, double follow_rate = 0.08){
     this->reference = reference;
     this->current_x = 0;
     this->current_y = 0;
@@ -17,7 +15,11 @@ Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = N
     }
     this->window = window;
     this->renderer = renderer;
-    this->follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW;
+    this->follow_mode = follow_mode;
+    this->follow_rate = follow_rate;
+
+    this->x_scale = 1.0;
+    this->y_scale = 1.0;
 }
 
 /** Sets the reference for the center of the camera
@@ -54,8 +56,14 @@ void Camera::recenter(){
 void Camera::_draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset, double camera_y_offset){
     recenter();
 
+    int win_width, win_height;
+    SDL_GetRendererOutputSize(this->renderer, &win_width, &win_height);
+
     while(obj_lst != NULL){
-        if(obj_lst->obj->isVisible()){
+        //If visible and on-screen
+        if(obj_lst->obj->isVisible() &&
+           !(obj_lst->obj->getX() > this->current_x + win_width || obj_lst->obj->getX() + obj_lst->obj->getWidth() < this->current_x) &&
+           !(obj_lst->obj->getY() - obj_lst->obj->getZ() > this->current_y + win_height || obj_lst->obj->getY() - obj_lst->obj->getZ() + obj_lst->obj->getHeight() < this->current_y)){
             obj_lst->obj->_draw(renderer, delta, current_x + camera_x_offset, current_y + camera_y_offset);
         }
         obj_lst = obj_lst->next;
@@ -95,6 +103,20 @@ double Camera::getY(){
     return this->current_y;
 }
 
+/** Gets the follow mode of the camera
+ * @return The follow mode of the camera
+ */
+CAMERA_FOLLOW_MODE Camera::getFollowMode(){
+    return this->follow_mode;
+}
+
+/** Gets the follow rate of the camera
+ * @return The follow rate of the camera
+ */
+double Camera::getFollowRate(){
+    return this->follow_rate;
+}
+
 /** Sets the X & Y scale of the camera
  * @param x_scale The X scale of the camera
  * @param y_scale The Y scale of the camera
@@ -106,9 +128,15 @@ void Camera::setScale(double x_scale, double y_scale){
 }
 
 /** Sets the camera follow mode
- * @param x_scale The X scale of the camera
- * @param x_scale The Y scale of the camera
+ * @param follow_mode The new follow mode of the camera
  */
 void Camera::setFollowMode(CAMERA_FOLLOW_MODE follow_mode){
     this->follow_mode = follow_mode;
+}
+
+/** Sets the camera follow rate
+ * @param follow_rate The new follow rate of the camera
+ */
+void Camera::setFollowRate(double follow_rate){
+    this->follow_rate = follow_rate;
 }
