@@ -67,17 +67,53 @@ TEST(Collision, TestRectRect){
 }
 
 TEST(Collision, TestRectEllipse){
-	
+	double x_base = 0;
+	double y_base = 0;
+	double z_base = 0;
+
+	HitRect rect(&x_base, &y_base, &z_base, 0, 0, 0, 20, 40, 80, COLLISION);
+	HitEllipse ellipse(&x_base, &y_base, &z_base, 0, 0, 0, 20, 40, 80, COLLISION);
+
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setXOffset(25);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setXOffset(-45);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setXOffset(0);
+	rect.setYOffset(45);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setYOffset(-85);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setYOffset(0);
+	rect.setZOffset(85);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setZOffset(-85);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), false);
+
+	rect.setZOffset(75);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setYOffset(35);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setXOffset(15);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setZOffset(-75);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setYOffset(-35);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
+
+	rect.setXOffset(-15);
+	ASSERT_EQ(collisionRectEllipse(&rect, &ellipse), true);
 }
 
 TEST(Collision, TestEllipseEllipse){
-	
-}
-
-int main(int argc, char** argv){
-    testing::InitGoogleTest(&argc, argv);
-
-    engine = new Engine();
-
-    return RUN_ALL_TESTS();
 }
