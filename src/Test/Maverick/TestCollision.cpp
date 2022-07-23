@@ -116,4 +116,71 @@ TEST(Collision, TestRectEllipse){
 }
 
 TEST(Collision, TestEllipseEllipse){
+	double x_base = 0;
+	double y_base = 0;
+	double z_base = 0;
+
+	HitEllipse ellipse1(&x_base, &y_base, &z_base, 0, 0, 0, 20, 40, 80, COLLISION);
+	HitEllipse ellipse2(&x_base, &y_base, &z_base, 0, 0, 0, 20, 40, 80, COLLISION);
+
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setXOffset(40);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setXOffset(-40);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setXOffset(0);
+	ellipse2.setYOffset(80);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setYOffset(-80);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setYOffset(0);
+	ellipse2.setZOffset(85);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setZOffset(-85);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), false);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), false);
+
+	ellipse2.setZOffset(75);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setYOffset(35);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setXOffset(15);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setZOffset(-75);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setYOffset(-35);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+
+	ellipse2.setXOffset(-15);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse1, &ellipse2), true);
+	ASSERT_EQ(collisionEllipseEllipse(&ellipse2, &ellipse1), true);
+}
+
+int main(int argc, char** argv){
+    testing::InitGoogleTest(&argc, argv);
+
+    engine = new Engine();
+
+    return RUN_ALL_TESTS();
 }

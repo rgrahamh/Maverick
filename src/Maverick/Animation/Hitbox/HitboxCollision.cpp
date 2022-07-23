@@ -114,7 +114,9 @@ bool collisionRectCone(HitRect* rect, HitCone* cone){
  * @return If the two ellipses are colliding
  */
 bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
-	double angle = atan2(ellipse2->getY() - ellipse1->getY(), ellipse2->getX() - ellipse1->getX());
+	double y_diff = ellipse2->getY() - ellipse1->getY();
+	double x_diff = ellipse2->getX() - ellipse1->getX();
+	double angle = atan2(y_diff, x_diff);
 	double sin_angle = sin(angle);
 	double cos_angle = cos(angle);
 
@@ -124,7 +126,8 @@ bool collisionEllipseEllipse(HitEllipse* ellipse1, HitEllipse* ellipse2){
 	float ellipse2_min_height = ellipse2->getZMin();
 
 	return (ellipse2->isPointInside(ellipse1->getX() + (ellipse1->getXRadius() * cos_angle), ellipse1->getY() + (ellipse1->getYRadius() * sin_angle)) ||
-	       ellipse1->isPointInside(ellipse2->getX() + (ellipse2->getXRadius() * (cos_angle * -1)), ellipse2->getY() + (ellipse2->getYRadius() * (sin_angle * -1)))) &&
+	       ellipse1->isPointInside(ellipse2->getX() + (ellipse2->getXRadius() * (cos_angle * -1)), ellipse2->getY() + (ellipse2->getYRadius() * (sin_angle * -1))) ||
+		   (x_diff == 0 && y_diff == 0)) &&
 		   !(ellipse1_max_height <= ellipse2_min_height || ellipse2_max_height <= ellipse1_min_height);
 }
 
