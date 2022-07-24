@@ -72,7 +72,7 @@ static inline uint64_t EndianSwap(uint64_t input){
 		return input;
 	}
 	else{
-		uint64_t output;
+		uint64_t output = 0;
 		for(int i = 0; i < 8; i++){
 			((uint8_t*)&output)[i] = ((uint8_t*)&input)[8 - i - 1];
 		}
@@ -85,7 +85,7 @@ static inline int64_t EndianSwap(int64_t input){
 		return input;
 	}
 	else{
-		int64_t output;
+		int64_t output = 0;
 		for(int i = 0; i < 8; i++){
 			((uint8_t*)&output)[i] = ((uint8_t*)&input)[8 - i - 1];
 		}
@@ -98,7 +98,7 @@ static inline uint32_t EndianSwap(uint32_t input){
 		return input;
 	}
 	else{
-		uint32_t output;
+		uint32_t output = 0;
 		for(int i = 0; i < 4; i++){
 			((uint8_t*)&output)[i] = ((uint8_t*)&input)[4 - i - 1];
 		}
@@ -111,7 +111,7 @@ static inline int32_t EndianSwap(int32_t input){
 		return input;
 	}
 	else{
-		int32_t output;
+		int32_t output = 0;
 		for(int i = 0; i < 4; i++){
 			((uint8_t*)&output)[i] = ((uint8_t*)&input)[4 - i - 1];
 		}
@@ -124,7 +124,7 @@ static inline uint16_t EndianSwap(uint16_t input){
 		return input;
 	}
 	else{
-		uint16_t output;
+		uint16_t output = 0;
 		((uint8_t*)&output)[0] = ((uint8_t*)&input)[1];
 		((uint8_t*)&output)[1] = ((uint8_t*)&input)[0];
 		return output;
@@ -136,7 +136,7 @@ static inline int16_t EndianSwap(int16_t input){
 		return input;
 	}
 	else{
-		int16_t output;
+		int16_t output = 0;
 		((uint8_t*)&output)[0] = ((uint8_t*)&input)[1];
 		((uint8_t*)&output)[1] = ((uint8_t*)&input)[0];
 		return output;

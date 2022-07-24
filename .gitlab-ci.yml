@@ -42,12 +42,9 @@ unit-test-job:   # This job runs in the test stage.
 
 code-analysis-job:   # This job also runs in the test stage.
   stage: test    # It can run at the same time as unit-test-job (in parallel).
-  dependencies:
-    - unit-test-job
   script:
     - echo "Doing static code analysis..."
-    - sleep 10
-    - echo "No issues found."
+    - cppcheck src --force -iCMakeFiles --enable=warning,style,performance,portability,information
 
 docker-job:      # This job runs in the deploy stage.
   stage: containerization  # It only runs when *both* jobs in the test stage complete successfully.

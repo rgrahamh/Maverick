@@ -260,13 +260,6 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 		return -1;
 	}
 
-	//Create the sprite
-	Sprite* sprite = new Sprite();
-	sprite->name = StrDeepCopy(sprite_path);
-	sprite->rotation = 0.0;
-	sprite->lower_draw_axis = -1.0;
-	sprite->upper_draw_axis = -1.0;
-
 	//Getting the texture
 	SDL_Surface* surface;
 	if((surface = engine->getSurface(sprite_path)) == NULL){
@@ -275,6 +268,13 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 			return -1;
 		}
 	}
+
+	//Create the sprite
+	Sprite* sprite = new Sprite();
+	sprite->name = StrDeepCopy(sprite_path);
+	sprite->rotation = 0.0;
+	sprite->lower_draw_axis = -1.0;
+	sprite->upper_draw_axis = -1.0;
 
 	//Create the rect
 	SDL_Rect* rect = new SDL_Rect();
@@ -350,13 +350,11 @@ int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 			HitboxList* new_hitbox = new HitboxList;
 			new_hitbox->hitbox = hitbox;
 			new_hitbox->next = NULL;
-			if(this->sequence_end != NULL){
-				if(this->sequence_end->hitboxes == NULL){
-					this->sequence_end->hitboxes = new_hitbox;
-				}
-				else{
-					this->sequence_end->hitboxes->next = new_hitbox;
-				}
+			if(this->sequence_end->hitboxes == NULL){
+				this->sequence_end->hitboxes = new_hitbox;
+			}
+			else{
+				this->sequence_end->hitboxes->next = new_hitbox;
 			}
 		}
 		else{
