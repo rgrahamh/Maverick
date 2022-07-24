@@ -711,20 +711,25 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
                 mov_obj = obj1;
             }
 
-            //If the mov_box is below the env_box
-            if(env_box->getZMin() >= mov_box->getZMax() && env_box->getZMin() < mov_obj->getOldZ() + mov_box->getDepth() - mov_box->getZOffset()){
-                mov_obj->setZ(env_box->getZMin() - mov_box->getDepth() - mov_box->getZOffset());
-                mov_obj->setZVel(0);
-            }
-            //If the mov_box is above the env_box
-            else if(mov_box->getZMax() >= env_box->getZMin() && mov_box->getZMax() <= env_obj->getOldZ() - env_box->getZOffset()){
+            double old_env_z_min = env_obj->getOldZ() + env_box->getZOffset();
+            double old_env_z_max = env_obj->getOldZ() + env_box->getZOffset() + env_box->getDepth();
+
+            double old_mov_z_min = mov_obj->getOldZ() + mov_box->getZOffset();
+            double old_mov_z_max = mov_obj->getOldZ() + mov_box->getZOffset() + mov_box->getDepth();
+
+            //If the bottom of the mov_box hit the top of the env_box
+            if(mov_box->getZMin() <= env_box->getZMax() && old_mov_z_min >= old_env_z_max){
                 mov_obj->setZ(env_box->getZMax() + mov_box->getZOffset());
                 mov_obj->setZVel(0);
-            }
-            
-            if(mov_box->checkCollision(env_box) == false){
                 return;
             }
+            //If the top of the mov_box hit the bottom of the env_box
+            else if(mov_box->getZMax() >= env_box->getZMin() && old_mov_z_max <= old_env_z_min){
+                mov_obj->setZ(env_box->getZMin() - mov_box->getDepth());
+                mov_obj->setZVel(0);
+                return;
+            }
+            
 
             double old_x = mov_obj->getOldX();
             double old_y = mov_obj->getOldY();
