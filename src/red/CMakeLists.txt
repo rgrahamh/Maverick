@@ -36,39 +36,6 @@ else()
     )
 endif()
 
-#TODO: Once we're independent of the current level editor loading scheme, get rid of this lol
-#Game source
-set(CyberenaObjectSrc
-    ../Cyberena/Entity/Object/Character/Character.cpp
-    ../Cyberena/Entity/Object/Character/Race/Race.cpp
-    ../Cyberena/Entity/Object/Character/Style/Style.cpp
-    ../Cyberena/Entity/Object/GlassBall/GlassBall.cpp
-)
-
-set(CyberenaEntitySrc
-    ${CyberenaObjectSrc}
-    ${CyberenaUISrc}
-)
-
-set(CyberenaZonesSrc
-    ../Cyberena/Zones/TestZone/TestZone.cpp
-    ../Cyberena/Zones/global/global.cpp
-)
-
-#Editor source
-set(LedZonesSrc
-    ../led/Zones/led/led.cpp
-)
-
-set(LedUISrc
-    ../led/Entity/UI/UILevelPort/UILevelPort.cpp
-)
-
-set(LedSrc
-    ${LedZonesSrc}
-    ${LedUISrc}
-)
-
 #Actual source
 set(redSrc
     ./red.cpp

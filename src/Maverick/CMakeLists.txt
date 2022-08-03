@@ -38,28 +38,6 @@ else()
     )
 endif()
 
-#Level source
-# TEMPORARY; GET RID OF THIS AS SOON AS LEVEL LOADING IS WORKING PROPERLY
-set(CyberenaObjectSrc
-    ../Cyberena/Entity/Object/Character/Character.cpp
-    ../Cyberena/Entity/Object/Character/Race/Race.cpp
-    ../Cyberena/Entity/Object/Character/Style/Style.cpp
-    ../Cyberena/Entity/Object/GlassBall/GlassBall.cpp
-)
-
-set(CyberenaZonesSrc
-    ../Cyberena/Zones/TestZone/TestZone.cpp
-    ../Cyberena/Zones/global/global.cpp
-)
-
-set(LedObjectSrc
-    ../led/Entity/UI/UILevelPort/UILevelPort.cpp
-)
-
-set(LedZonesSrc
-    ../led/Zones/led/led.cpp
-)
-
 #Engine source
 set(AnimationSrc
     Animation/Animation.cpp
@@ -112,7 +90,6 @@ set(UISrc
 set(ObjectSrc
     Entity/Object/Object.cpp
     Entity/Object/CameraReference/CameraReference.cpp
-    Entity/Object/LoadingZone/LoadingZone.cpp
 )
 
 set(EntitySrc
@@ -123,10 +100,6 @@ set(EntitySrc
 
 set(ZoneSrc
     Zone/Zone.cpp
-)
-
-set(ZoneFactorySrc
-    Zone/ZoneFactory/ZoneFactory.cpp
 )
 
 set(FactorySrc

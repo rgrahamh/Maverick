@@ -43,6 +43,7 @@ set(CyberenaObjectSrc
     Cyberena/Entity/Object/Character/Race/Race.cpp
     Cyberena/Entity/Object/Character/Style/Style.cpp
     Cyberena/Entity/Object/GlassBall/GlassBall.cpp
+    Cyberena/Entity/Object/LoadingZone/LoadingZone.cpp
 )
 
 set(CyberenaUISrc
@@ -54,6 +55,7 @@ set(CyberenaEntitySrc
 )
 
 set(CyberenaZonesSrc
+    Cyberena/Zones/ZoneFactory/ZoneFactory.cpp
     Cyberena/Zones/TestZone/TestZone.cpp
     Cyberena/Zones/global/global.cpp
 )
