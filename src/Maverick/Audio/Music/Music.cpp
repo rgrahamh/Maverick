@@ -97,10 +97,10 @@ void Music::setVolume(float volume, unsigned int fade){
     int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
     for(int i = 0; i < this->num_tracks; i++){
         if(fade == 0){
-            Mix_Volume(i + channel_offset, volume);
+            Mix_Volume(i + channel_offset, volume * MIX_MAX_VOLUME);
         }
         else{
-            std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade);
+            std::thread(&Music::fadeVolume, this, i + channel_offset, volume * MIX_MAX_VOLUME, fade);
         }
     }
 }

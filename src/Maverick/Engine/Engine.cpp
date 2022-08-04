@@ -1,7 +1,6 @@
 #include "./Engine.hpp"
 
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
-#include "../Zone/ZoneFactory/ZoneFactory.hpp"
 #include "../FileHandler/Saver/Saver.hpp"
 #include "../FileHandler/Loader/Loader.hpp"
 
@@ -146,33 +145,6 @@ Engine::~Engine(){
 /** The function that is called to start the game engine's operation
  */
 void Engine::start(){
-    //loadZoneFromFile("global");
-    //loadZoneFromFile("Test Zone");
-
-    //Loading the test zone as the first area
-    //this->addThread(new std::thread(loadZone, "global"));
-    loadZone("global");
-    //loadZone("led");
-
-    //Loading the test zone as the first area
-    //this->addThread(new std::thread(loadZone, "Test Zone"));
-    loadZone("Test Zone");
-
-    //Loading the level editor
-    //engine->addThread(new std::thread(loadZone, "led"));
-
-    //saveZone(this->getZone("global"));
-    //saveZone(this->getZone("Test Zone"));
-
-    Music* song1 = new Music("song1");
-    Sound* sound = new Sound;
-    sound->name = "bass";
-    sound->sample = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
-    song1->addTrack(sound);
-    engine->addMusic("song1", song1);
-    sound_board->playMusic("song1");
-    sound_board->setMusicVolume(1, 1.0, 10000);
-
     gameLoop();
 }
 
