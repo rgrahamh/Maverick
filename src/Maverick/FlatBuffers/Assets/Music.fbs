@@ -1,0 +1,15 @@
+include "Sound.fbs";
+
+namespace Crisp;
+
+table Track{
+    name:string;
+    sound:Sound;
+}
+
+table Music{
+    tracks:[Track];
+}
+
+file_identifier "MUSI";
+file_extension ".mus";

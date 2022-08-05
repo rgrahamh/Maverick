@@ -1,0 +1,16 @@
+namespace Crisp;
+
+struct SurfaceMetadata{
+    width:uint;
+    height:uint;
+    depth:ubyte;
+    rmask:uint;
+    gmask:uint;
+    bmask:uint;
+    amask:uint;
+}
+
+table Surface{
+    metadata:SurfaceMetadata (required);
+    data:[ubyte] (required);
+}

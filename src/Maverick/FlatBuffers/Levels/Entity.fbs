@@ -1,0 +1,7 @@
+namespace Crisp;
+
+table Entity{
+    x:double; //The level X coordinate of the Entity
+    y:double; //The level Y coordinate of the Entity
+    z:double = 0.0; //The level Y coordinate of the Entity
+}
