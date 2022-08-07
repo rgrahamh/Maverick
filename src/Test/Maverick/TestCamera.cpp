@@ -3,9 +3,8 @@
 #include "../../Maverick/Engine/Engine.hpp"
 #include "../../Maverick/Entity/Object/CameraReference/CameraReference.hpp"
 
-extern Engine* engine;
-
 TEST(CameraBehavior, TestFixedFollow){
+    Engine* engine = Engine::getInstance();
     Camera* camera = engine->getCamera();
     int width, height;
     SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);
@@ -44,6 +43,7 @@ TEST(CameraBehavior, TestFixedFollow){
 }
 
 TEST(CameraBehavior, TestGradualFollow){
+    Engine* engine = Engine::getInstance();
     Camera* camera = engine->getCamera();
     int width, height;
     SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);
@@ -90,7 +90,7 @@ TEST(CameraBehavior, TestGradualFollow){
 
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
-    engine = new Engine();
+    Engine* engine = Engine::getInstance();
 
     return RUN_ALL_TESTS();
 }

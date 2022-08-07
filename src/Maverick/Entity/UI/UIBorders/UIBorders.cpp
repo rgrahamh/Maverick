@@ -1,8 +1,6 @@
 #include "./UIBorders.hpp"
 #include "../../../Engine/Engine.hpp"
 
-extern Engine* engine;
-
 /** UIBorders constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement
@@ -73,6 +71,7 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
                 sprite_path[combined_len - 1] = '\0';
 
                 //Get the surface of the border (necessary to check if the texture can be loaded & get texture height/width)
+                Engine* engine = Engine::getInstance();
                 SDL_Surface* border_surface = engine->getSurface(sprite_path);
 
                 if(border_surface != nullptr){

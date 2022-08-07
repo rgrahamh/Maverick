@@ -2,8 +2,6 @@
 #include "../../Maverick/Animation/Hitbox/HitboxCollision.hpp"
 #include "../../Maverick/Engine/Engine.hpp"
 
-extern Engine* engine;
-
 TEST(Collision, TestRectRect){
 	double x_base = 0;
 	double y_base = 0;
@@ -180,7 +178,7 @@ TEST(Collision, TestEllipseEllipse){
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
 
-    engine = new Engine();
+    Engine* engine = Engine::getInstance();
 
     return RUN_ALL_TESTS();
 }

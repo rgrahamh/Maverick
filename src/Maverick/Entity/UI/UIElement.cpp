@@ -1,8 +1,6 @@
 #include "UIElement.hpp"
 #include "../../Engine/Engine.hpp"
 
-extern Engine* engine;
-
 /** UIElement constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
  * @param view_x_offset The viewport X offset of the UIElement
@@ -24,7 +22,7 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->type = UI_ELEMENT_TYPE::GENERIC_ELEMENT;
 
     int win_width, win_height;
-    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+    SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
 
     this->x = view_x_offset * win_width;
     this->y = view_y_offset * win_height;
@@ -139,7 +137,7 @@ void UIElement::setViewSize(double view_width, double view_height){
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
         int win_width, win_height;
-        SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+        SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
         animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
     }
 
@@ -195,7 +193,7 @@ int UIElement::addSprite(const char* animation_name, const char* sprite_set, con
     }
 
     int win_width, win_height;
-    SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
+    SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
 
     if(width != -1){
         width *= (float)win_width;
@@ -258,7 +256,7 @@ UIElementList* UIElement::getSubelements(){
  */
 float UIElement::getWidth(){
     int height, width;
-    SDL_GetWindowSize(engine->getWindow(), &width, &height);
+    SDL_GetWindowSize(Engine::getInstance()->getWindow(), &width, &height);
     return width * this->view_width;
 }
 
@@ -267,7 +265,7 @@ float UIElement::getWidth(){
  */
 float UIElement::getHeight(){
     int height, width;
-    SDL_GetWindowSize(engine->getWindow(), &width, &height);
+    SDL_GetWindowSize(Engine::getInstance()->getWindow(), &width, &height);
     return height * this->view_height;
 }
 
@@ -303,7 +301,11 @@ bool UIElement::isMouseInside(Control* control){
  * @param base_zone The zone this object belongs to (used for zone-based offsets)
  * @return 0 on success
  */
-int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
+int UIElement::serializeData(FILE* file, Zone* base_zone){
+    if(Entity::serializeData(file, base_zone) == -1){
+        return -1;
+    }
+
     //Write X/Y offsets
     WriteVar((uint64_t)view_x_offset, uint64_t, file);
     WriteVar((uint64_t)view_y_offset, uint64_t, file);
@@ -324,16 +326,18 @@ int UIElement::serializeExtendedData(FILE* file, Zone* base_zone){
 /** Serializing UI Element assets (to be overridden by children, as necessary)
  * @param file An open file to write to
  * @param serialize_set The serialization set (logs saved assets)
+ * @return -1 if serialization failed, 0 otherwise
  */
-int UIElement::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
+int UIElement::serializeAssets(FILE* file, SerializeSet& serialize_set){
+    if(Entity::serializeAssets(file, serialize_set) == -1){
+        return -1;
+    }
+
     UIElementList* subelement_cursor = subelements;
     while(subelement_cursor != nullptr){
         subelement_cursor->element->serializeAssets(file, serialize_set);
         subelement_cursor = subelement_cursor->next;
     }
-    return 0;
-}
 
-int UIElement::deserializeExtendedData(FILE* file){
     return 0;
 }

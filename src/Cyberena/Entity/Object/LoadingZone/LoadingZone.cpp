@@ -1,7 +1,6 @@
 #include "./LoadingZone.hpp"
 #include "../../../../Maverick/Engine/Engine.hpp"
 #include "../../../Zones/ZoneFactory/ZoneFactory.hpp"
-extern Engine* engine;
 
 LoadingZone::LoadingZone(const char* name, const char* zone_to_load, float start_x, float start_y, float start_z, double width, double height, double depth, uint32_t matching_type, int layer)
            : Object(name, start_x, start_y, start_z, 0, 0, 0){
@@ -21,7 +20,7 @@ LoadingZone::LoadingZone(const char* name, const char* zone_to_load, float start
 }
 
 void LoadingZone::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
-    if(other->getType() == this->matching_type && engine->getZone(this->zone_to_load) == nullptr){
+    if(other->getType() == this->matching_type && Engine::getInstance()->getZone(this->zone_to_load) == nullptr){
         printf("Loading zone: %s\n", this->zone_to_load);
         loadZone(this->zone_to_load);
     }

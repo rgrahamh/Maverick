@@ -1,7 +1,6 @@
 #include "./Object.hpp"
 #include "../../Zone/Zone.hpp"
 #include "../../Engine/Engine.hpp"
-extern Engine* engine;
 
 /** Object parameterized constructor
  * @param name The name of the object
@@ -300,7 +299,7 @@ void Object::_process(uint64_t delta, unsigned int steps){
 
     //Updating Z values
     if(this->z != this->ground && this->gravity){
-        this->zA -= engine->getGravity() * (float)steps;
+        this->zA -= Engine::getInstance()->getGravity() * (float)steps;
     }
 
     this->zV += this->zA;
@@ -356,9 +355,13 @@ void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox)
 /** Serializing object data (WIP)
  * @param file An open file to write to
  * @param base_zone The zone this object belongs to (used for zone-based offsets)
- * @return 0 on success
+ * @return -1 on failure, 0 on success
  */
-int Object::serializeExtendedData(FILE* file, Zone* base_zone){
+int Object::serializeData(FILE* file, Zone* base_zone){
+    if(Entity::serializeData(file, base_zone) == -1){
+        return 0;
+    }
+
     //Write X/Y offsets from the zone origin
     double write_x = this->x - base_zone->getGlobalX();
     double write_y = this->y - base_zone->getGlobalY();
@@ -372,11 +375,8 @@ int Object::serializeExtendedData(FILE* file, Zone* base_zone){
 /** Serializing object assets (to be overridden by children, as necessary)
  * @param file An open file to write to
  * @param serialize_set The serialization set (logs saved assets)
+ * @return -1 on failure, 0 on success
  */
-int Object::serializeExtendedAssets(FILE* file, SerializeSet& serialize_set){
-    return 0;
-}
-
-int Object::deserializeExtendedData(FILE* file){
-    return 0;
+int Object::serializeAssets(FILE* file, SerializeSet& serialize_set){
+    return Entity::serializeAssets(file, serialize_set);
 }

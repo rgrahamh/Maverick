@@ -1,6 +1,5 @@
 #include "./CameraReference.hpp"
 #include "../../../Engine/Engine.hpp"
-extern Engine* engine;
 
 CameraReference::CameraReference(const char* name, float start_x, float start_y, double x_speed, double y_speed)
                : Object(name, start_x, start_y, 0, 0, 0, 4){
@@ -11,6 +10,7 @@ CameraReference::CameraReference(const char* name, float start_x, float start_y,
 }
 
 void CameraReference::action(Control* control){
+    Engine* engine = Engine::getInstance();
     const uint8_t* keys = control->getKeys();
     if(!(engine->getState() & GAME_STATE::PAUSE)){
         if(keys[SDL_SCANCODE_W] | keys[SDL_SCANCODE_UP]){

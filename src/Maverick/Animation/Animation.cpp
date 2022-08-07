@@ -3,7 +3,6 @@
 #include "../Engine/Engine.hpp"
 #include "../Global/Global.hpp"
 
-extern Engine* engine;
 extern bool debug;
 
 //FINISH MULTIPLE SPRITES
@@ -262,7 +261,7 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 
 	//Getting the texture
 	SDL_Surface* surface;
-	if((surface = engine->getSurface(sprite_path)) == NULL){
+	if((surface = Engine::getInstance()->getSurface(sprite_path)) == NULL){
 		if(surface == nullptr){
 			printf("Cannot find image %s!\n", sprite_path);
 			return -1;
@@ -386,7 +385,7 @@ int Animation::addSound(const char* sound_id, int sequence_num){
 		return -1;
 	}
 
-	Sound* sound = engine->getSound(sound_id);
+	Sound* sound = Engine::getInstance()->getSound(sound_id);
 	if(sound == nullptr){
 		return -1;
 	}
@@ -554,7 +553,7 @@ void Animation::advance(uint64_t delta){
 
 			//Play the new sound, if it exists
 			if(sequence->sound != nullptr){
-				engine->getSoundBoard()->playSound(sequence->sound, 0);
+				Engine::getInstance()->getSoundBoard()->playSound(sequence->sound, 0);
 			}
 		}
 	}
@@ -577,7 +576,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 	}
 
 	//Advance the animation if not paused
-	if(!engine->checkState(GAME_STATE::PAUSE)){
+	if(!Engine::getInstance()->checkState(GAME_STATE::PAUSE)){
 		this->advance(delta);
 	}
 
@@ -773,7 +772,7 @@ int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
 					//If this asset's not been saved in this file yet
 					if(sprite != nullptr && serialize_set.sprite_set.find(sprite->name) == serialize_set.sprite_set.end()){
 						//Use the surface from the engine; the animation's actual surface may have transparency set, masking, etc.
-						SDL_Surface* surface = engine->getSurface(sprite->name);
+						SDL_Surface* surface = Engine::getInstance()->getSurface(sprite->name);
 
 						if(surface != nullptr){
 							uint8_t resource_type = RESOURCE_TYPE::BMP;

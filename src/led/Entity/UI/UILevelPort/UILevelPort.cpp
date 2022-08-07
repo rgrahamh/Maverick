@@ -1,6 +1,5 @@
 #include "UILevelPort.hpp"
 #include "../../../../Maverick/Engine/Engine.hpp"
-extern Engine* engine;
 
 /** UIElement constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
@@ -21,6 +20,7 @@ UILevelPort::UILevelPort(const char* name, double view_x_offset, double view_y_o
  */
 void UILevelPort::action(Control* control){
     if(isMouseInside(control)){
+        Engine* engine = Engine::getInstance();
         const MouseState* mouse = control->getMouse();
         float zoom_amount = mouse->scroll_wheel * 0.01;
         engine->setGlobalXScale(engine->getGlobalXScale() + zoom_amount);

@@ -3,8 +3,6 @@
 #include "../Maverick/FileHandler/Loader/Loader.hpp"
 #include "../Maverick/Engine/Engine.hpp"
 
-extern Engine* engine;
-
 /** Prints out help for the program
  * @param help_section The section of the app you'd like help for
  */
@@ -129,6 +127,7 @@ void* loadAsset(FILE* file, uint8_t* resource_type_ptr, char* key_buff, unsigned
  * @return The asset if it exists in the engine, otherwise a nullptr
  */
 void* getAsset(char* key, uint8_t resource_type){
+	Engine* engine = Engine::getInstance();
 	if(resource_type == RESOURCE_TYPE::BMP){
 		return engine->getSurface(key);
 	}
@@ -454,7 +453,7 @@ void addAsset(char* name, uint8_t resource_type){
 }
 
 int main(int argc, char** argv){
-	engine = new Engine();
+	Engine* engine = Engine::getInstance();
 	SDL_DestroyWindow(engine->getWindow());
 
 	printf("Welcome to red, your Resource EDitor!\n");

@@ -2,9 +2,8 @@
 #include "../../Maverick/Animation/Animation.hpp"
 #include "../../Maverick/Engine/Engine.hpp"
 
-extern Engine* engine;
-
 TEST(AnimationProperties, TestSpriteSet){
+    Engine* engine = Engine::getInstance();
     double x_base, y_base;
     Animation* animation = new Animation("Test Animation", &x_base, &y_base, 2);
 
@@ -28,6 +27,7 @@ TEST(AnimationProperties, TestSpriteSet){
 }
 
 TEST(AnimationBehavior, TestAdvance){
+    Engine* engine = Engine::getInstance();
     double x_base, y_base, z_base;
     Animation* animation = new Animation("Test Animation", &x_base, &y_base, 1);
     animation->addFrame(60);
@@ -99,7 +99,7 @@ TEST(AnimationBehavior, TestAdvance){
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
 
-    engine = new Engine();
+    Engine* engine = Engine::getInstance();
 
     //Adding sounds that we'll use
     Sound slice;

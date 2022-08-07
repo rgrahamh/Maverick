@@ -4,10 +4,9 @@
 #include "../Cyberena/Zones/TestZone/TestZone.hpp"
 #include "../Maverick/Audio/SoundBoard/SoundBoard.hpp"
 #include "Zones/led/led.hpp"
-extern Engine* engine;
 
 int main(int argc, char** argv){
-	engine = new Engine();
+	Engine* engine = Engine::getInstance();
 
     buildGlobal();
 	buildTestZone();
@@ -24,6 +23,5 @@ int main(int argc, char** argv){
     sound_board->setMusicVolume(1, 1.0, 10000);
 
 	engine->start();
-	delete engine;
 	return 0;
 }

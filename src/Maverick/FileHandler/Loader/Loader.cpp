@@ -1,8 +1,6 @@
 #include "Loader.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
 
-extern Engine* engine;
-
 inline SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;
 	uint32_t width, height, rmask, gmask, bmask, amask;
@@ -51,6 +49,7 @@ inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
 		strncpy(key_buff, identifier, max_len);
 	}
 
+	Engine* engine = Engine::getInstance();
 	SDL_Surface* new_surface = engine->getSurface(identifier);
 	if(new_surface != nullptr){
 		return new_surface;
@@ -79,6 +78,7 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 		strncpy(key_buff, identifier, max_len);
 	}
 
+	Engine* engine = Engine::getInstance();
 	Sound* new_sound = engine->getSound(identifier);
 	if(new_sound != nullptr){
 		return new_sound;
@@ -113,6 +113,7 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 		strncpy(key_buff, identifier, max_len);
 	}
 
+	Engine* engine = Engine::getInstance();
 	Music* new_music = engine->getMusic(identifier);
 	if(new_music != nullptr){
 		return new_music;
@@ -154,6 +155,7 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 		strncpy(key_buff, identifier, max_len);
 	}
 
+	Engine* engine = Engine::getInstance();
 	Font* new_font = engine->getFont(identifier);
 	if(new_font != nullptr){
 		return new_font;
