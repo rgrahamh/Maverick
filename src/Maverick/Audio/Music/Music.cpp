@@ -1,6 +1,5 @@
 #include "Music.hpp"
 #include "../../Engine/Engine.hpp"
-extern Engine* engine;
 
 Music::Music(const char* name){
     this->playing = false;
@@ -124,7 +123,7 @@ void Music::fadeVolume(int channel_id, float volume, unsigned int fade){
         Mix_Volume(channel_id, current_volume);
     }
 
-	engine->cleanupThread(std::this_thread::get_id());
+	Engine::getInstance()->cleanupThread(std::this_thread::get_id());
 }
 
 int Music::addTrack(Sound* track){

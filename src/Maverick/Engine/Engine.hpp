@@ -46,8 +46,13 @@ struct EntityList{
 
 class Engine{
 	public:
-		Engine();
-		~Engine();
+		static Engine* getInstance(){
+			if(unlikely(engine == nullptr)){
+				engine = new Engine();
+			}
+			return engine;
+		}
+
 
 		//Game engine run
 		void start();
@@ -109,6 +114,9 @@ class Engine{
 		Font* getFont(const char* key);
 
 	private:
+		Engine();
+		~Engine();
+
 		void gameLoop();
 
 		//Engine steps
@@ -138,6 +146,8 @@ class Engine{
 
 		//UI initialization
 		void InitUI();
+
+		static Engine* engine;
 
 		//UI Objects
 		UIElementList* ui_elements;

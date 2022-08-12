@@ -81,16 +81,12 @@ class Entity{
 		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
-		//Call
-		int serializeAssets(FILE* file, SerializeSet& serialize_set);
-		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) = 0;
-
-		int serializeData(FILE* file, Zone* base_zone);
-		virtual int serializeExtendedData(FILE* file, Zone* base_zone) = 0;
+		//Object serialization
+		virtual int serializeAssets(FILE* file, SerializeSet& serialize_set);
+		virtual int serializeData(FILE* file, Zone* base_zone);
 
 		int deserializeData(FILE* file);
-		virtual int deserializeExtendedData(FILE* file);
-		
+
 	protected:
 		//Name
 		char* name;

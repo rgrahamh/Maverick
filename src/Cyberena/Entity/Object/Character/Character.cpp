@@ -1,9 +1,6 @@
 #include "./Character.hpp"
 #include "../../../../Maverick/Engine/Engine.hpp"
 
-class Engine;
-extern Engine* engine;
-
 /** Paramaterized constructor for the Character
  * @param name The character's name
  * @param start_x The character's starting X position
@@ -93,7 +90,7 @@ void Character::action(Control* control){
 
 	const char* active_animation_name = this->active_animation->getName();
 
-    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE) && !this->sliding){
+    if(!Engine::getInstance()->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE) && !this->sliding){
 		//If the character is in an actionable state
 		if(this->control == CONTROL_TYPE::KEYBOARD){
 			const uint8_t* keys = control->getKeys();
@@ -252,7 +249,7 @@ void Character::action(Control* control){
 }
 
 void Character::process(uint64_t delta, unsigned int steps){
-    if(!engine->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
+    if(!Engine::getInstance()->checkState(GAME_STATE::PAUSE | GAME_STATE::DISCUSSION | GAME_STATE::TITLE)){
         //Checking to see if we're still sliding
         if(this->sliding == true){
             if(this->xV + this->yV < 0.5){

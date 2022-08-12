@@ -38,10 +38,8 @@ class UIElement : public Entity{
         virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
         virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
 
-		virtual int serializeExtendedAssets(FILE* file, SerializeSet& serialize_set) override;
-		virtual int serializeExtendedData(FILE* file, Zone* base_zone) override;
-
-		virtual int deserializeExtendedData(FILE* file) override;
+        virtual int serializeData(FILE* file, Zone* base_zone) override;
+        virtual int serializeAssets(FILE* file, SerializeSet& serialize_set) override;
 
         virtual void setViewSize(double view_width, double view_height);
 		virtual void setActive(bool active);

@@ -12,7 +12,7 @@ bool graphics_init = false;
 
 std::thread::id base_thread_id = std::this_thread::get_id();
 
-Engine* engine;
+Engine* Engine::engine = nullptr;
 
 /** Engine's parameterized constructor
  * @param zones The zones that the game engine is initialized with

@@ -1,0 +1,9 @@
+namespace Crisp;
+
+table Sound{
+    name:string (required);
+    data:[ubyte] (required);
+}
+
+file_identifier "SOUN";
+file_extension ".snd";

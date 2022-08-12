@@ -1,7 +1,5 @@
 #include "./UITextBox.hpp"
-
 #include "../../../Engine/Engine.hpp"
-extern Engine* engine;
 
 /** UITextBox constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
@@ -28,6 +26,7 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
     this->type = UI_ELEMENT_TYPE::TEXT_BOX;
 
     int win_width, win_height;
+    Engine* engine = Engine::getInstance();
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
     unsigned int height_buff = 0, width_buff = 0;

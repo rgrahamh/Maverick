@@ -1,6 +1,5 @@
 #include "./ZoneFactory.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
-extern Engine* engine;
 
 //This function will eventually open a file w/ the passed in <zone_name>.pld
 void loadZone(const char* zone_name){
@@ -11,5 +10,5 @@ void loadZone(const char* zone_name){
 		buildGlobal();
 	}
 
-	engine->cleanupThread(std::this_thread::get_id());
+	Engine::getInstance()->cleanupThread(std::this_thread::get_id());
 }

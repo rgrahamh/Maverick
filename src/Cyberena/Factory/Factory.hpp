@@ -10,4 +10,7 @@ Object* buildCrate(const char* name, float start_x, float start_y, float start_z
 Object* buildBackground(const char* name, float start_x, float start_y);
 GlassBall* buildGlassBloodBall(const char* name, float start_x, float start_y);
 
+template<class Class>
+Class* create(FILE* file);
+
 #endif

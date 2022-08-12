@@ -1,7 +1,5 @@
 #include "UIText.hpp"
-
 #include "../../../Engine/Engine.hpp"
-extern Engine* engine;
 
 /** UIText constructor (for viewport calcs, 1.0 is one screen width/height)
  * @param name The name of the UIElement
@@ -100,7 +98,7 @@ void UIText::setText(const char* text){
  */
 void UIText::setFont(const char* font_name){
     if(font_name != nullptr){
-        this->font = engine->getFont(font_name);
+        this->font = Engine::getInstance()->getFont(font_name);
         if(font == nullptr){
             fprintf(stderr, "Could not find font: %s\n", font_name);
         }
@@ -186,7 +184,7 @@ float UIText::getCharHeight(){
     for(int i = 0; i < 256; i++){
         SDL_Surface* character = font->getCharacterSurface(i, this->style);
         if(character != nullptr){
-            return character->h * this->size * engine->getGlobalYScale();
+            return character->h * this->size * Engine::getInstance()->getGlobalYScale();
         }
     }
 
@@ -233,6 +231,7 @@ void UIText::nextPage(){
             continue;
         }
 
+        Engine* engine = Engine::getInstance();
         unsigned int letter_width = character->w * this->size * engine->getGlobalXScale() + font->getSpacing() * engine->getGlobalXScale();
         line_len += letter_width;
 
@@ -295,6 +294,7 @@ void UIText::nextPage(){
     }
     this->line_start_x = (uint32_t*)calloc(sizeof(uint32_t), num_lines);
 
+    Engine* engine = Engine::getInstance();
     uint32_t line_num = 0;
     for(int i = 0; ref_buff[i] != '\0' && line_num < num_lines; i++){
         if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
@@ -302,7 +302,7 @@ void UIText::nextPage(){
             for(; ref_buff[i] != '\0' && ref_buff[i] != '\n'; i++){
                 SDL_Surface* letter = font->getCharacterSurface(ref_buff[i], this->style);
                 if(letter != nullptr){
-                    total_width += letter->w  * engine->getGlobalXScale() + this->font->getSpacing() * engine->getGlobalXScale();
+                    total_width += letter->w * engine->getGlobalXScale() + this->font->getSpacing() * engine->getGlobalXScale();
                 }
             }
 
@@ -349,6 +349,7 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     }
 
     int win_width, win_height;
+    Engine* engine = Engine::getInstance();
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
     //Set starting Y draw position

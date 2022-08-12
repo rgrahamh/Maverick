@@ -1,0 +1,11 @@
+include "Surface.fbs";
+
+namespace Crisp;
+
+table Sprite{
+    name:string (required);
+    surface:Surface (required);
+}
+
+file_identifier "SPRT";
+file_extension ".spr";

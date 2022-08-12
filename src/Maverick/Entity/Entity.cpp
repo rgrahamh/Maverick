@@ -1,7 +1,6 @@
 #include "./Entity.hpp"
 #include "../Zone/Zone.hpp"
 #include "../Engine/Engine.hpp"
-extern Engine* engine;
 
 /** Entity parameterized constructor
  * @param name The name of the entity
@@ -36,9 +35,6 @@ Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
  */
 Entity::Entity(FILE* file){
     if(this->deserializeData(file)){
-        printf("Object deserialization failed\n");
-    }
-    if(this->deserializeExtendedData(file)){
         if(this->name != nullptr){
             printf("Extended object deserialization of %s failed\n", this->name);
         }
@@ -236,6 +232,16 @@ int Entity::addFrame(const char* animation_name, unsigned int keytime, unsigned 
     return ret; 
 }
 
+/** Adds a sprite for a given animation in the entity
+ * @param animation_name The animation set you'd like to add the sprite to
+ * @param sprite_set The sprite set you'd like to add the sprite to
+ * @param sprite_id The sprite ID
+ * @param x_offset The X offset of the sprite
+ * @param y_offset The Y offset of the sprite
+ * @param width The width of the sprite (or -1 if it should be calculated via image size)
+ * @param height The height of the sprite (or -1 if it should be calculated via the image size)
+ * @return -1 if adding the sprite failed, 0 otherwise
+ */
 int Entity::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset, int y_offset, int width, int height){
     Animation* animation = findAnimation(animation_name);
     if(animation == nullptr){
@@ -440,6 +446,7 @@ bool Entity::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
 }
 
 /** Cleans up the hitbox immunity list; should be run in the _process step
+ * @param delta The amount of time (in ms) that have passed since the last frame
  */
 void Entity::cleanupHitboxImmunity(uint64_t delta){
     HitboxImmunityList* cursor = this->hitbox_immunity;
@@ -599,6 +606,10 @@ uint32_t Entity::getType(){
     return this->type;
 }
 
+/** Finds an animation within the entity
+ * @param animation_name The name of the animation
+ * @return The animation pointer, or nullptr if it's not found
+ */
 Animation* Entity::findAnimation(const char* animation_name){
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
@@ -614,6 +625,11 @@ Animation* Entity::findAnimation(const char* animation_name){
     return animation_cursor->animation;
 }
 
+/** Serializes data
+ * @param file The file to write serialization data to
+ * @param base_zone The base zone that the entity belongs to (needed for using the local object offset)
+ * @return -1 if serialization failed, 0 otherwise
+ */
 int Entity::serializeData(FILE* file, Zone* base_zone){
     if(file == nullptr){
         return -1;
@@ -703,7 +719,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
         }
     }
 
-    return this->serializeExtendedData(file, base_zone);
+    return 0;
 }
 
 int Entity::deserializeData(FILE* file){
@@ -800,10 +816,6 @@ int Entity::deserializeData(FILE* file){
         this->setAnimation(starting_str);
     }
 
-    return this->deserializeExtendedData(file);
-}
-
-int Entity::deserializeExtendedData(FILE* file){
     return 0;
 }
 
@@ -825,5 +837,5 @@ int Entity::serializeAssets(FILE* file, SerializeSet& serialize_set){
         animation_cursor = animation_cursor->next;
     }
 
-    return this->serializeExtendedAssets(file, serialize_set);
+    return 0;
 }

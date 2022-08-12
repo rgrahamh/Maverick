@@ -3,10 +3,10 @@
 #include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
 #include "../../../Cyberena/Entity/Object/Character/Character.hpp"
 #include "../../../Maverick/FileHandler/Loader/Loader.hpp"
-extern Engine* engine;
 
 void buildGlobal(){
     Zone* global = new Zone("global", 0, 0);
+    Engine* engine = Engine::getInstance();
     engine->addZone(global);
 
     FILE* file = fopen("./assets/fonts/mavwhite.fnt", "rb");

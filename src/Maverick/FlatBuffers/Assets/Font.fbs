@@ -1,0 +1,22 @@
+include "Surface.fbs";
+
+namespace Crisp;
+
+table Letter{
+    value:ubyte;
+    surface:Surface (required);
+}
+
+table FontStyle{
+    name:string (required);
+    characters:[Letter] (required);
+}
+
+table Font{
+    name:string (required);
+    spacing:uint = 0;
+    styles:[FontStyle] (required);
+}
+
+file_identifier "FONT";
+file_extension ".fnt";

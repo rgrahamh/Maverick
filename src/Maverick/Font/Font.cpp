@@ -1,7 +1,5 @@
 #include "./Font.hpp"
-
 #include "../Engine/Engine.hpp"
-extern Engine* engine;
 
 Font::Font(const char* name, uint16_t spacing){
     this->name = StrDeepCopy(name);
@@ -17,7 +15,7 @@ SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style){
         return type_textures[style][value];
     }
 
-    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(engine->getCamera()->getRenderer(), typesetter[style][value]);
+    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(Engine::getInstance()->getCamera()->getRenderer(), typesetter[style][value]);
     
     //Store & return the new texture
     type_textures[style][value] = new_texture;

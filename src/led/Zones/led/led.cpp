@@ -1,9 +1,10 @@
 #include "led.hpp"
 #include "../../../Maverick/Zone/Zone.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
-extern Engine* engine;
 
 void buildEditor(){
+    Engine* engine = Engine::getInstance();
+
     Zone* led = new Zone("led", 0, 0);
     engine->addZone(led);
 

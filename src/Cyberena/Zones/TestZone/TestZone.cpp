@@ -1,8 +1,8 @@
 #include "./TestZone.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
-extern Engine* engine;
 
 void buildTestZone(){
+    Engine* engine = Engine::getInstance();
     Zone* zone = new Zone("Test Zone", 0, 0);
     engine->addZone(zone);
 

@@ -1,7 +1,6 @@
 #include "SoundBoard.hpp"
 #include "../../Engine/Engine.hpp"
 #include "../Music/Music.hpp"
-extern Engine* engine;
 
 SoundBoard::SoundBoard(){
     Mix_AllocateChannels(NUM_CHANNELS);
@@ -27,7 +26,7 @@ SoundBoard::~SoundBoard(){
  * @param fade Any fade you'd like to do (will blend the old & new music tracks automagically)
  */
 int SoundBoard::playMusic(const char* music, unsigned int fade){
-    Music* new_music = engine->getMusic(music);
+    Music* new_music = Engine::getInstance()->getMusic(music);
     if(new_music == nullptr){
         return -1;
     }
@@ -76,6 +75,7 @@ void SoundBoard::setSoundVolume(int channel_id, float volume, unsigned int fade)
     }
     else{
         //Fade to volume for selected channel
+        Engine* engine = Engine::getInstance();
         if(channel_id != -1){
             engine->addThread(new std::thread(&SoundBoard::fadeVolume, this, channel_id, volume, fade));
         }
@@ -169,5 +169,5 @@ void SoundBoard::fadeVolume(unsigned int channel_id, float volume, unsigned int 
         Mix_Volume(channel_id, current_volume);
     }
 
-	engine->cleanupThread(std::this_thread::get_id());
+	Engine::getInstance()->cleanupThread(std::this_thread::get_id());
 }

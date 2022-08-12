@@ -1,0 +1,18 @@
+include "Font.fbs";
+include "Sprite.fbs";
+include "Music.fbs";
+
+namespace Crisp;
+
+union Asset{
+    font:Font,
+    sprite:Sprite,
+    music:Music
+}
+
+table Assets{
+    asset:[Asset];
+}
+
+file_identifier "ASET";
+file_extension ".pad";
