@@ -20,8 +20,8 @@
  * @param border_buff How much additional buffer the text should be given (how far inset you should start the text box past the borders)
  */
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     int draw_layer, char* font_path, char* text, float scroll_speed, int point, ALIGNMENT text_x_alignment,
-                     ALIGNMENT text_y_alignment, char* border_pattern, uint8_t border_types, int border_buff)
+                     int draw_layer, const char* font_path, char* text, float scroll_speed, int size, ALIGNMENT text_x_alignment,
+                     ALIGNMENT text_y_alignment, const char* border_pattern, uint8_t border_types, uint16_t border_buff)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT_BOX;
 
@@ -49,9 +49,7 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
     double text_view_height = ((view_height * win_height) - (height_buff * 2)) / win_height;
 
     this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height, draw_layer,
-                            font_path, text, scroll_speed, point, text_x_alignment, text_y_alignment);
-
-    this->subelements = nullptr;
+                            font_path, text, scroll_speed, size, text_x_alignment, text_y_alignment);
 }
 
 /** Default destructor

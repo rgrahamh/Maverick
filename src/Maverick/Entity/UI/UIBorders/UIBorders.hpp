@@ -4,6 +4,7 @@
 #include "../UIText/UIText.hpp"
 
 enum BORDER_TYPE{
+    NO_BORDER = 0,
     TOP_BORDER = 1,
     BOTTOM_BORDER = 2,
     LEFT_BORDER = 4,
@@ -14,13 +15,13 @@ enum BORDER_TYPE{
 class UIBorders: public UIElement{
     public:
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                  int draw_layer, char* border_pattern = "", uint8_t border_types = TOP_BORDER | BOTTOM_BORDER | LEFT_BORDER | RIGHT_BORDER);
+                  int draw_layer, const char* border_pattern = "", uint8_t border_types = ALL_BORDERS);
         ~UIBorders();
 
         unsigned int getHeightBuff();
         unsigned int getWidthBuff();
 
-        void addBorders(char* border_pattern, uint8_t border_types);
+        void addBorders(const char* border_pattern, uint8_t border_types);
 
         virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
 

@@ -84,6 +84,7 @@ set(UISrc
     Entity/UI/UIText/UIText.cpp
     Entity/UI/UITextBox/UITextBox.cpp
     Entity/UI/UIObjectFrame/UIObjectFrame.cpp
+    Entity/UI/UITabbedWindow/UITabbedWindow.cpp
     ${FontSrc}
 )
 

@@ -13,13 +13,11 @@
  * @param border_types The border locations
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     int draw_layer, char* border_pattern, uint8_t border_types)
+                     int draw_layer, const char* border_pattern, uint8_t border_types)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
     this->height_buff = 0;
     this->width_buff = 0;
-
-    this->subelements = nullptr;
 
     memset(this->borders, '\0', sizeof(UIElement*) * 4);
 
@@ -54,7 +52,7 @@ unsigned int UIBorders::getWidthBuff(){
  * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
-void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
+void UIBorders::addBorders(const char* border_pattern, uint8_t border_types){
     this->height_buff = 0;
     this->width_buff = 0;
     if(border_pattern != nullptr && strlen(border_pattern) != 0){

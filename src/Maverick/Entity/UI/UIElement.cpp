@@ -31,20 +31,13 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->draw_area.y = this->y;
     this->draw_area.w = view_width * win_width;
     this->draw_area.h = view_height * win_height;
-
-    this->subelements = nullptr;
 }
 
 /** Default UIElement destructor
  */
 UIElement::~UIElement(){
-    UIElementList* cursor = subelements;
-    while(cursor != nullptr){
-        UIElementList* tmp = cursor;
-        delete cursor->element;
-
-        cursor = cursor->next;
-        delete tmp;
+    for(UIElement* subelement : subelements){
+        delete subelement;
     }
 }
 
@@ -63,19 +56,17 @@ void UIElement::process(uint64_t delta, unsigned int steps){
 void UIElement::_process(uint64_t delta, unsigned int steps){
     this->process(delta, steps);
 
-    UIElementList* cursor = subelements;
-    while(cursor != nullptr){
-        if(cursor->element->isActive()){
-            cursor->element->_process(delta, steps);
+    for(UIElement* subelement : subelements){
+        if(subelement->isActive()){
+            subelement->_process(delta, steps);
         }
-        cursor = cursor->next;
     }
 
     cleanupHitboxImmunity(delta);
 }
 
 /** Handles actions for this UIElement
- * @param event The event that has occurred
+ * @param control The control struct
  */
 void UIElement::action(Control* control){
     return;
@@ -88,12 +79,10 @@ void UIElement::_action(Control* control){
     this->action(control);
 
     //Perform all actions for child elements (generic element has no default actions)
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
-        if(cursor->element->isActive()){
-            cursor->element->_action(control);
+    for(UIElement* subelement : subelements){
+        if(subelement->isActive()){
+            subelement->_action(control);
         }
-        cursor = cursor->next;
     }
 }
 
@@ -108,10 +97,8 @@ void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int 
     this->draw(renderer, delta, camera_x, camera_y);
 
     //Draw all children elements (AFTER the parent element)
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr && cursor->element != nullptr){
-        cursor->element->_draw(renderer, delta, camera_x, camera_y);
-        cursor = cursor->next;
+    for(UIElement* subelement : subelements){
+        subelement->_draw(renderer, delta, camera_x, camera_y);
     }
 }
 
@@ -142,10 +129,49 @@ void UIElement::setViewSize(double view_width, double view_height){
     }
 
     //Set scale for all children elements
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
-        cursor->element->setViewSize(view_width, view_height);
-        cursor = cursor->next;
+    for(UIElement* subelement : subelements){
+        subelement->setViewSize(view_width, view_height);
+    }
+}
+
+/** Sets the UI offset of the UIElement
+ * @param view_x_offset The new X viewport offset
+ * @param view_y_offset The new Y viewport offset
+ */
+void UIElement::setViewOffset(double view_x_offset, double view_y_offset){
+    int win_width, win_height;
+    SDL_Renderer* renderer = Engine::getInstance()->getCamera()->getRenderer();
+    SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
+    this->view_x_offset = view_x_offset;
+    this->view_y_offset = view_y_offset;
+
+    double view_x_diff = view_x_offset * win_width;
+    double view_y_diff = view_y_offset * win_height;
+    this->x += view_x_diff;
+    this->y = view_y_diff;
+
+    //Add the moved distance for all children elements
+    for(UIElement* subelement : subelements){
+        subelement->addViewOffset(view_x_diff, view_y_diff);
+    }
+}
+
+/** Adds a UI offset of the UIElement
+ * @param view_x_offset The new X viewport offset
+ * @param view_y_offset The new Y viewport offset
+ */
+void UIElement::addViewOffset(double view_x_diff, double view_y_diff){
+    int win_width, win_height;
+    SDL_Renderer* renderer = Engine::getInstance()->getCamera()->getRenderer();
+    SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
+    this->view_x_offset += view_x_diff;
+    this->view_y_offset += view_y_diff;
+    this->x += view_x_diff * win_width;
+    this->y += view_y_diff * win_height;
+
+    //Add the moved distance for all children elements
+    for(UIElement* subelement : subelements){
+        subelement->addViewOffset(view_width, view_height);
     }
 }
 
@@ -155,11 +181,9 @@ void UIElement::setViewSize(double view_width, double view_height){
 void UIElement::setActive(bool active){
     this->active = active;
 
-    //Set visible for all child elements
-    UIElementList* cursor = subelements;
-    while(cursor != nullptr){
-        cursor->element->setActive(active);
-        cursor = cursor->next;
+    //Set active for all child elements
+    for(UIElement* subelement : subelements){
+        subelement->setActive(active);
     }
 }
 
@@ -169,11 +193,9 @@ void UIElement::setActive(bool active){
 void UIElement::setVisible(bool visible){
     this->visible = visible;
 
-    //Set active for all child elements
-    UIElementList* cursor = subelements;
-    while(cursor != nullptr){
-        cursor->element->setVisible(visible);
-        cursor = cursor->next;
+    //Set visible for all child elements
+    for(UIElement* subelement : subelements){
+        subelement->setVisible(visible);
     }
 }
 
@@ -214,11 +236,9 @@ int UIElement::addSprite(const char* animation_name, const char* sprite_set, con
  * @param element The element to add
  */
 void UIElement::addElement(UIElement* element){
-    UIElementList* new_element = new UIElementList;
-    new_element->element = element;
-    new_element->next = subelements;
-    subelements = new_element;
-    num_subelements++;
+    if(element != nullptr){
+        subelements.push_back(element);
+    }
 }
 
 /** Tries to get an element of the given name
@@ -232,13 +252,11 @@ UIElement* UIElement::getElement(const char* name){
     }
 
     //Check children
-    UIElementList* cursor = this->subelements;
-    while(cursor != nullptr){
-        UIElement* element = cursor->element->getElement(name);
+    for(UIElement* subelement : subelements){
+        UIElement* element = subelement->getElement(name);
         if(element != nullptr){
             return element;
         }
-        cursor = cursor->next;
     }
 
     return nullptr;
@@ -247,7 +265,7 @@ UIElement* UIElement::getElement(const char* name){
 /** Gets the subelements
  * @return The subelement list
  */
-UIElementList* UIElement::getSubelements(){
+std::vector<UIElement*>& UIElement::getSubelements(){
     return this->subelements;
 }
 
@@ -314,10 +332,8 @@ int UIElement::serializeData(FILE* file, Zone* base_zone){
     WriteVar((uint64_t)view_width, uint64_t, file);
     WriteVar((uint64_t)view_height, uint64_t, file);
 
-    UIElementList* subelement_cursor = subelements;
-    while(subelement_cursor != nullptr){
-        subelement_cursor->element->serializeData(file, base_zone);
-        subelement_cursor = subelement_cursor->next;
+    for(UIElement* subelement : subelements){
+        subelement->serializeData(file, base_zone);
     }
 
     return 0;
@@ -333,10 +349,8 @@ int UIElement::serializeAssets(FILE* file, SerializeSet& serialize_set){
         return -1;
     }
 
-    UIElementList* subelement_cursor = subelements;
-    while(subelement_cursor != nullptr){
-        subelement_cursor->element->serializeAssets(file, serialize_set);
-        subelement_cursor = subelement_cursor->next;
+    for(UIElement* subelement : subelements){
+        subelement->serializeAssets(file, serialize_set);
     }
 
     return 0;

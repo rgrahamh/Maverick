@@ -1,6 +1,17 @@
 #include "led.hpp"
+
+//Maverick includes
 #include "../../../Maverick/Zone/Zone.hpp"
 #include "../../../Maverick/Engine/Engine.hpp"
+#include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
+#include "../../../Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.hpp"
+#include "../../../Maverick/Entity/UI/UITabbedWindow/UITabbedWindow.hpp"
+#include "../../../Maverick/Entity/Object/CameraReference/CameraReference.hpp"
+
+//led includes
+#include "../../Entity/UI/UILevelPort/UILevelPort.hpp"
+
+#include "stdio.h"
 
 void buildEditor(){
     Engine* engine = Engine::getInstance();
@@ -8,26 +19,27 @@ void buildEditor(){
     Zone* led = new Zone("led", 0, 0);
     engine->addZone(led);
 
+    UIElement* level_group = new UIElement("level_group", 0.0, 0.0, 1.0, 1.0, 0);
+
     UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, "mavwhite", "Zone Placeholder", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     zone_name->addAnimation("background", 1);
     zone_name->addFrame("background", 0);
     zone_name->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     zone_name->setAnimation("background");
-    led->addUIElement(zone_name);
 
     UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, "mavwhite", "Objects in zone:", 0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     object_list->addAnimation("background", 1);
     object_list->addFrame("background", 0);
     object_list->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     object_list->setAnimation("background");
-    led->addUIElement(object_list);
+    level_group->addElement(object_list);
 
     UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "mavwhite", "All draw layers", 5.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     layer_display->addAnimation("background", 1);
     layer_display->addFrame("background", 0);
     layer_display->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     layer_display->setAnimation("background");
-    led->addUIElement(layer_display);
+    level_group->addElement(layer_display);
 
     for(int i = 0; i < 10; i++){
         char hotbar_name[8];
@@ -39,7 +51,7 @@ void buildEditor(){
         hotbar->addFrame("background", 0);
         hotbar->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
         hotbar->setAnimation("background");
-        led->addUIElement(hotbar);
+        level_group->addElement(hotbar);
     }
 
     UITextBox* status_bar = new UITextBox("status_bar", 0.1, 0.97, 0.7, 0.03, 1, "mavwhite", "Ready", 0.0, 1);
@@ -47,24 +59,34 @@ void buildEditor(){
     status_bar->addFrame("background", 0);
     status_bar->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     status_bar->setAnimation("background");
-    led->addUIElement(status_bar);
+    level_group->addElement(status_bar);
 
     UITextBox* tool_selection = new UITextBox("tool_select", 0.8, 0.97, 0.2, 0.03, 1, "mavwhite", "Select", 0.0, 1);
     tool_selection->addAnimation("background", 1);
     tool_selection->addFrame("background", 0);
     tool_selection->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     tool_selection->setAnimation("background");
-    led->addUIElement(tool_selection);
+    level_group->addElement(tool_selection);
 
     UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, "mavwhite", "Selected object attributes", 0.0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     object_attr->addAnimation("background", 1);
     object_attr->addFrame("background", 0);
     object_attr->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     object_attr->setAnimation("background");
-    led->addUIElement(object_attr);
+    level_group->addElement(object_attr);
 
     UILevelPort* ui_level_port = new UILevelPort("level_port", 0.1, 0, 0.7, 0.925);
-    led->addUIElement(ui_level_port);
+    level_group->addElement(ui_level_port);
+
+    led->addUIElement(level_group);
+    level_group->setActive(false);
+    level_group->setVisible(false);
+
+    //Object Ediror
+    UITabbedWindow* tabbed_window = new UITabbedWindow("selector_pane", 0.0, 0.0, 0.25, 0.9, 1, 0.05, "mavwhite", 1, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 0);
+    tabbed_window->addElement(new UITextBox("first", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "first", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN));
+    tabbed_window->addElement(new UITextBox("second", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "second"));
+    led->addUIElement(tabbed_window);
 
     //CameraReference* cam_ref = new CameraReference("cam_ref", 0.0, 0.0);
     //led->addObject(cam_ref);
