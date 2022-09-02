@@ -3,20 +3,21 @@
 
 UITabbedWindow::UITabbedWindow(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                                int draw_layer, double tab_height, const char* font_path, unsigned int font_size, const char* border_pattern,
-                               uint8_t border_type, uint32_t border_buff)
+                               BORDER_TYPE border_type, uint32_t border_buff)
                :UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer),
                draw_text("tab_text", 0.0, 0.0, 0.0, 0.0, 0, font_path, "", 0.0, font_size, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN,
-                         border_pattern, border_type, border_buff){
+                         border_pattern, border_type, border_buff, false){
     this->tab_height = tab_height;
+    this->current_tab = -1;
 }
 
 /** Adds an element to the child element list
  * @param element The element to add
  */
-void UITabbedWindow::addElement(UIElement* element){
+void UITabbedWindow::addSubelement(UIElement* element){
     if(element != nullptr){
         if(subelements.empty()){
-            selected_element = element;
+            this->current_tab = 0;
         }
         subelements.push_back(element);
     }
@@ -29,8 +30,8 @@ void UITabbedWindow::addElement(UIElement* element){
 void UITabbedWindow::_process(uint64_t delta, unsigned int steps){
     this->process(delta, steps);
 
-    if(selected_element != nullptr){
-        selected_element->_process(delta, steps);
+    if(this->current_tab != -1){
+        subelements[current_tab]->_process(delta, steps);
     }
 
     cleanupHitboxImmunity(delta);
@@ -43,18 +44,20 @@ void UITabbedWindow::_process(uint64_t delta, unsigned int steps){
  * @param camera_y The Y location of the camera
  */
 void UITabbedWindow::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
+    updateDrawArea();
+    this->draw(renderer, delta, camera_x, camera_y);
+
     int win_width, win_height;
     SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
     float tab_width = this->view_width / this->subelements.size();
     draw_text.setViewSize(tab_width, tab_height);
 
     for(int i = 0; i < subelements.size(); i++){
-        draw_text.setViewOffset(this->view_x_offset + (tab_width * i), this->view_y_offset);
         draw_text.setText(subelements[i]->getName());
-        draw_text.draw(renderer, delta, camera_x, camera_y);
+        draw_text._draw(renderer, delta, (-1 * camera_x) + (tab_width * i), -1 * camera_y);
     }
 
-    selected_element->_draw(renderer, delta, camera_x, camera_y);
+    subelements[current_tab]->_draw(renderer, delta, -1 * camera_x, -1 * camera_y);
 }
 
 /** Handles actions for this UIElement
@@ -68,12 +71,12 @@ void UITabbedWindow::_action(Control* control){
     if(isMouseInside(control) && mouse->button_state & SDL_BUTTON_LMASK){
         int tab_num = getTabNumber(control);
         if(tab_num != -1){
-            selected_element = subelements[tab_num];
+            current_tab = tab_num;
         }
     }
 
-    if(selected_element != nullptr){
-        selected_element->_action(control);
+    if(current_tab != -1){
+        subelements[current_tab]->_action(control);
     }
 }
 
@@ -83,11 +86,11 @@ void UITabbedWindow::_action(Control* control){
 int UITabbedWindow::getTabNumber(Control* control){
     int win_width, win_height;
     SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
-    float tab_width = this->view_width / this->subelements.size();
+    double tab_width = this->view_width / this->subelements.size();
     const MouseState* mouse = control->getMouse();
 
     for(int i = 0; i < subelements.size(); i++){
-        if(mouse->x > this->draw_area.x && mouse->x < (this->draw_area.x + (i * tab_width)) &&
+        if(mouse->x > this->draw_area.x && mouse->x < (this->draw_area.x + ((i + 1) * (tab_width * win_width))) &&
            mouse->y > this->draw_area.y && mouse->y < (this->draw_area.y + (this->tab_height * win_height))){
             return i;
         }

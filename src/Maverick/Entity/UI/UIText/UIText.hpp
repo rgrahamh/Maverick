@@ -11,7 +11,7 @@ enum ALIGNMENT{
 
 class UIText : public UIElement{
     public:
-        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int size = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN);
+        UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int size = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN, bool wrap = false);
         virtual ~UIText();
 
         void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
@@ -56,7 +56,7 @@ class UIText : public UIElement{
         char* getNextBreak(char* str);
 
         //Gets the letter height
-        float getCharHeight();
+        uint32_t getCharHeight();
 
         //Flushes current print & ref buffers
         void flushBuffers();
@@ -73,11 +73,17 @@ class UIText : public UIElement{
         //The printing buffer
         char* print_buff;
 
+        //If we have text wrapping
+        bool wrapping;
+
         //The font object & filepath
         Font* font;
         
         //Text size (scaling factor)
         uint8_t size;
+
+        //Character height (calculated on-init)
+        uint32_t char_height;
 
         //Text style (italics, bold, etc.)
         enum FONT_STYLE style;

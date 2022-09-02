@@ -97,9 +97,23 @@ void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int 
     this->draw(renderer, delta, camera_x, camera_y);
 
     //Draw all children elements (AFTER the parent element)
+    int win_width, win_height;
+    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
     for(UIElement* subelement : subelements){
         subelement->_draw(renderer, delta, camera_x, camera_y);
     }
+}
+
+/** Updates the draw area to be current
+ */
+inline void UIElement::updateDrawArea(){
+    int win_width, win_height;
+    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
+    this->draw_area.x = this->x + this->view_x_offset * win_width;
+    this->draw_area.y = this->y + this->view_y_offset * win_height;
+
+    this->draw_area.w = this->view_width * win_width;
+    this->draw_area.h = this->view_height * win_height;
 }
 
 /** Draws this UIElement
@@ -111,7 +125,7 @@ void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int 
 void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     //Draw this element
     if(active_animation != nullptr){
-        this->active_animation->draw(renderer, delta, camera_x, camera_y);
+        this->active_animation->draw(renderer, delta, camera_x * -1, camera_y * -1);
     }
 }
 
@@ -120,18 +134,30 @@ void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int c
  * @param view_height The viewport height (0.0 is none of the screen, 1.0 is the whole thing)
  */
 void UIElement::setViewSize(double view_width, double view_height){
+    int win_width, win_height;
+    SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
+    double old_view_width = this->view_width;
+    double old_view_height = this->view_height;
+    this->view_width = view_width;
+    this->view_height = view_height;
+
+    double view_width_diff = view_width - old_view_width;
+    double view_height_diff = view_height - old_view_height;
+
     //Set scale for this element
     AnimationList* animation_cursor = animations;
     while(animation_cursor != nullptr){
-        int win_width, win_height;
-        SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
-        animation_cursor->animation->setSize(view_width * win_width, view_height * win_height);
+        animation_cursor->animation->setSize(animation_cursor->animation->getSprite()->rect->w * (1.0 + view_width_diff), 
+                                             animation_cursor->animation->getSprite()->rect->h * (1.0 + view_height_diff));
+        animation_cursor = animation_cursor->next;
     }
 
     //Set scale for all children elements
     for(UIElement* subelement : subelements){
-        subelement->setViewSize(view_width, view_height);
+        subelement->setViewSize(subelement->getViewWidth() + view_width_diff, subelement->getViewHeight() + view_height_diff);
     }
+
+    updateDrawArea();
 }
 
 /** Sets the UI offset of the UIElement
@@ -142,37 +168,15 @@ void UIElement::setViewOffset(double view_x_offset, double view_y_offset){
     int win_width, win_height;
     SDL_Renderer* renderer = Engine::getInstance()->getCamera()->getRenderer();
     SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
+    double view_x_diff = (view_x_offset - this->view_x_offset);
+    double view_y_diff = (view_y_offset - this->view_y_offset);
+
     this->view_x_offset = view_x_offset;
     this->view_y_offset = view_y_offset;
 
-    double view_x_diff = view_x_offset * win_width;
-    double view_y_diff = view_y_offset * win_height;
-    this->x += view_x_diff;
-    this->y = view_y_diff;
-
-    //Add the moved distance for all children elements
-    for(UIElement* subelement : subelements){
-        subelement->addViewOffset(view_x_diff, view_y_diff);
-    }
-}
-
-/** Adds a UI offset of the UIElement
- * @param view_x_offset The new X viewport offset
- * @param view_y_offset The new Y viewport offset
- */
-void UIElement::addViewOffset(double view_x_diff, double view_y_diff){
-    int win_width, win_height;
-    SDL_Renderer* renderer = Engine::getInstance()->getCamera()->getRenderer();
-    SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
-    this->view_x_offset += view_x_diff;
-    this->view_y_offset += view_y_diff;
     this->x += view_x_diff * win_width;
     this->y += view_y_diff * win_height;
-
-    //Add the moved distance for all children elements
-    for(UIElement* subelement : subelements){
-        subelement->addViewOffset(view_width, view_height);
-    }
+    updateDrawArea();
 }
 
 /** Sets the visibility of the current animation state
@@ -235,7 +239,7 @@ int UIElement::addSprite(const char* animation_name, const char* sprite_set, con
 /** Adds an element to the child element list
  * @param element The element to add
  */
-void UIElement::addElement(UIElement* element){
+void UIElement::addSubelement(UIElement* element){
     if(element != nullptr){
         subelements.push_back(element);
     }
@@ -245,7 +249,7 @@ void UIElement::addElement(UIElement* element){
  * @param name The name of the element
  * @return A pointer to the element with a matching name, or NULL if not found
  */
-UIElement* UIElement::getElement(const char* name){
+UIElement* UIElement::getSubelement(const char* name){
     //Check self
     if(strcmp(this->name, name) == 0){
         return this;
@@ -253,13 +257,24 @@ UIElement* UIElement::getElement(const char* name){
 
     //Check children
     for(UIElement* subelement : subelements){
-        UIElement* element = subelement->getElement(name);
+        UIElement* element = subelement->getSubelement(name);
         if(element != nullptr){
             return element;
         }
     }
 
     return nullptr;
+}
+
+void UIElement::deleteSubelement(const char* name){
+    for(int i = 0; i < subelements.size(); i++)
+    {
+        if(strcmp(subelements[i]->getName(), name) == 0){
+            delete subelements[i];
+            subelements.erase(subelements.begin() + i);
+            break;
+        }
+    }
 }
 
 /** Gets the subelements

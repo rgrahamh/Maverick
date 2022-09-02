@@ -13,7 +13,7 @@
  * @param layer The default layer of the object
  */
 Object::Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity, int layer)
-      : Entity(name, start_x, start_y, layer){
+      : Entity(name, layer){
     this->type = OBJECT_TYPE::GENERIC_OBJECT;
 
     //Initializing position, velocity, and acceleration
@@ -37,6 +37,8 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
     this->gravity = gravity;
 
     this->collision_layer = layer;
+
+    this->hitbox_immunity = nullptr;
 
     this->ground = 0;
     this->next_ground = this->ground;
@@ -80,6 +82,20 @@ double Object::getYVel(){
  */
 double Object::getZVel(){
     return this->zV;
+}
+
+/** Gets the X value of the entity
+ * @return The X value of the entity
+ */
+double Object::getX(){
+    return this->x;
+}
+
+/** Gets the Y value of the entity
+ * @return The Y value of the entity
+ */
+double Object::getY(){
+    return this->y;
 }
 
 /** Gets the Z value of the object
@@ -168,6 +184,20 @@ void Object::setYVel(double yV){
  */
 void Object::setZVel(double zV){
     this->zV = zV;
+}
+
+/** Sets the X posision
+ * @param x The X coordinate
+ */
+void Object::setX(double x){
+    this->x = x;
+}
+
+/** Sets the Y posision
+ * @param y The Y coordinate
+ */
+void Object::setY(double y){
+    this->y = y;
 }
 
 /** Sets the Z position
@@ -342,6 +372,125 @@ void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     if(this->active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y, this->z);
     }
+}
+
+/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
+ * @param animation_name The animation name
+ * @param shape The hitbox shape
+ * @param x_offset The X offset of the hitbox
+ * @param y_offset The Y offset of the hitbox
+ * @param x_element The X width/radius of the hitbox
+ * @param y_element The Y width/radius of the hitbox
+ * @param type The type flags of the hitbox
+ * @param sprite_num The sprite number that is being used
+ * @param immunity_timer The hitbox immunity timer
+ * @return 0 on success, -1 if the animation doesn't exist
+ */
+int Object::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element,
+                       double y_element, double depth, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    Hitbox* hitbox;
+    //We should never hit the HIT_CONE in this case.
+    if(shape == HIT_RECT){
+        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
+    }
+    else{
+        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
+    }
+
+    animation->addHitbox(hitbox, sprite_num);
+    return 0;
+}
+
+/** Adds an immunity to the hitbox of another entity
+ * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
+ * @param hitbox The hitbox to add immunity for
+ */
+void Object::addHitboxImmunity(Entity* other, Hitbox* hitbox){
+    //If the disable timer is 0, there will be no immunity added
+    uint32_t ignore_timer = hitbox->getImmunityTimer();
+    if(ignore_timer == 0){
+        return;
+    }
+
+    HitboxImmunityList* new_immunity = new HitboxImmunityList;
+    new_immunity->entity = other;
+    new_immunity->hitbox = hitbox;
+    new_immunity->hitbox_group = hitbox->getHitboxGroup();
+    new_immunity->ignore_timer = ignore_timer;
+
+    if(this->hitbox_immunity != nullptr){
+        new_immunity->next = this->hitbox_immunity;
+    }
+    else{
+        new_immunity->next = nullptr;
+    }
+    this->hitbox_immunity = new_immunity;
+}
+
+/** Checks immunity against the hitbox of another entity
+ * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
+ * @param hitbox The hitbox to check immunity for
+ */
+bool Object::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
+    if(this->hitbox_immunity == nullptr){
+        return false;
+    }
+
+    HitboxImmunityList* cursor = this->hitbox_immunity;
+    uint32_t hitbox_group = cursor->hitbox_group;
+    while(cursor != nullptr){
+        if(cursor->hitbox == hitbox || (other == cursor->entity && cursor->hitbox_group == hitbox_group)){
+            return true;
+        }
+
+        cursor = cursor->next;
+    }
+
+    return false;
+}
+
+/** Cleans up the hitbox immunity list; should be run in the _process step
+ * @param delta The amount of time (in ms) that have passed since the last frame
+ */
+void Object::cleanupHitboxImmunity(uint64_t delta){
+    HitboxImmunityList* cursor = this->hitbox_immunity;
+    HitboxImmunityList* last_cursor = this->hitbox_immunity;
+    while(cursor != nullptr){
+        if(cursor->ignore_timer <= delta){
+            HitboxImmunityList* tmp = cursor;
+
+            cursor = cursor->next;
+            if(tmp == this->hitbox_immunity){
+                this->hitbox_immunity = cursor;
+                last_cursor = cursor;
+            }
+            else{
+                last_cursor->next = cursor;
+            }
+
+            delete tmp;
+        }
+        else{
+            cursor->ignore_timer -= delta;
+            last_cursor = cursor;
+            cursor = cursor->next;
+        }
+    }
+}
+
+/** Gets the hitboxes of the current animation state
+ * @return The HitboxList containing the entity's current hitboxes
+ */
+HitboxList* Object::getHitboxes(){
+    if(this->active_animation == nullptr){
+        return nullptr;
+    }
+    return this->active_animation->getHitboxes();
 }
 
 /** Called on object collision; should be overridden by children if you want collision logic.

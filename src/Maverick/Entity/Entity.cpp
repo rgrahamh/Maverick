@@ -4,27 +4,17 @@
 
 /** Entity parameterized constructor
  * @param name The name of the entity
- * @param start_x The starting X location of the entity
- * @param start_y The starting Y location of the entity
  * @param draw_layer The draw layer of the entity
  */
-Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
+Entity::Entity(const char* name, int draw_layer){
     this->name = StrDeepCopy(name);
-    
-    //Initializing position, velocity, and acceleration
-    this->x = start_x;
-    this->y = start_y;
 
     this->draw_layer = draw_layer;
-
-    this->num_animations = 0;
 
     //Initializing animation/visibility attributes
     this->active = true;
     this->visible = true;
     this->active_animation = nullptr;
-    this->animations = nullptr;
-    this->hitbox_immunity = nullptr;
 
     //Initializing attributes
     this->attr = new AttributeHash(64);
@@ -47,12 +37,10 @@ Entity::Entity(FILE* file){
 /** Destructor for entities
  */
 Entity::~Entity(){
-    while(animations != nullptr){
-        delete animations->animation;
-        AnimationList* tmp = animations;
-        animations = animations->next;
-        delete tmp;
+    for(auto& animation : animations){
+        delete animation.second;
     }
+    animations.clear();
     free(name);
 }
 
@@ -61,20 +49,6 @@ Entity::~Entity(){
  */
 char* Entity::getName(){
     return this->name;
-}
-
-/** Gets the X value of the entity
- * @return The X value of the entity
- */
-double Entity::getX(){
-    return this->x;
-}
-
-/** Gets the Y value of the entity
- * @return The Y value of the entity
- */
-double Entity::getY(){
-    return this->y;
 }
 
 /** Gets the width of the entity
@@ -132,16 +106,6 @@ double Entity::getLowerDrawAxis(){
     return this->active_animation->getLowerDrawAxis();
 }
 
-/** Gets the hitboxes of the current animation state
- * @return The HitboxList containing the entity's current hitboxes
- */
-HitboxList* Entity::getHitboxes(){
-    if(this->active_animation == nullptr){
-        return nullptr;
-    }
-    return this->active_animation->getHitboxes();
-}
-
 /** Sets if the current entity is active (can be interacted with)
  * @return If the entity is active
  */
@@ -164,6 +128,8 @@ void* Entity::getAttr(const char* key){
     return this->attr->get(key);
 }
 
+//Should this be a pure virtual?
+//Should AnimationList be an unordered map?
 /** Creates a new animation (you MUST do this before adding hitboxes/sprites)
  * @param animation_name The name of the new animation
  * @param num_sprite_sets The number of sprite sets
@@ -175,18 +141,7 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
     }
 
     Animation* new_animation = new Animation(animation_name, &x, &y, num_sprite_sets);
-    AnimationList* new_animation_list = new AnimationList;
-    new_animation_list->animation = new_animation;
-    new_animation_list->next = nullptr;
-
-    if(animations == nullptr){
-        animations = new_animation_list;
-    }
-    else{
-        new_animation_list->next = animations;
-        animations = new_animation_list;
-    }
-    this->num_animations++;
+    animations[std::string(animation_name)] = new_animation;
     return 0;
 }
 
@@ -194,22 +149,12 @@ int Entity::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
  * @param animation A pointer to the new animation
  */
 int Entity::addAnimation(Animation* animation){
-    if(findAnimation(animation->getName()) != nullptr){
+    std::string animation_name(animation->getName());
+    if(animations.find(animation_name) != animations.end()){
         return -1;
     }
 
-    AnimationList* new_animation_list = new AnimationList;
-    new_animation_list->animation = animation;
-    new_animation_list->next = nullptr;
-
-    if(animations == nullptr){
-        animations = new_animation_list;
-    }
-    else{
-        new_animation_list->next = animations;
-        animations = new_animation_list;
-    }
-    this->num_animations++;
+    animations[animation_name] = animation;
     return 0;
 }
 
@@ -290,10 +235,8 @@ int Entity::setSpriteSet(const char* animation_name, const char* sprite_set){
  */
 int Entity::setSpriteSet(const char* sprite_set){
     int ret = 0;
-    AnimationList* cursor = animations;
-    while(cursor != nullptr){
-        ret |= cursor->animation->setSpriteSet(sprite_set);
-        cursor = cursor->next;
+    for(auto& animation : animations){
+        ret |= animation.second->setSpriteSet(sprite_set);
     }
 
     return ret;
@@ -334,14 +277,12 @@ int Entity::setLowerDrawAxis(const char* animation_name, double draw_axis, int32
  * @param sprite_num The sprite number you'd like to set the upper draw axis for (-1 is all sprites in the animation)
  */
 int Entity::setUpperDrawAxis(double draw_axis, int32_t sprite_num){
-    if(animations == nullptr){
+    if(animations.empty()){
         return -1;
     }
 
-    AnimationList* cursor = animations;
-    while(cursor != nullptr){
-        cursor->animation->setUpperDrawAxis(draw_axis, sprite_num);
-        cursor = cursor->next;
+    for(auto& animation : animations){
+        animation.second->setUpperDrawAxis(draw_axis, sprite_num);
     }
 
     return 0;
@@ -352,126 +293,15 @@ int Entity::setUpperDrawAxis(double draw_axis, int32_t sprite_num){
  * @param sprite_num The sprite number you'd like to set the lower draw axis for (-1 is all sprites in the animation)
  */
 int Entity::setLowerDrawAxis(double draw_axis, int32_t sprite_num){
-    if(animations == nullptr){
+    if(animations.empty()){
         return -1;
     }
 
-    AnimationList* cursor = animations;
-    while(cursor != nullptr){
-        cursor->animation->setLowerDrawAxis(draw_axis, sprite_num);
-        cursor = cursor->next;
+    for(auto& animation : animations){
+        animation.second->setLowerDrawAxis(draw_axis, sprite_num);
     }
 
     return 0;
-}
-
-/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
- * @param animation_name The animation name
- * @param shape The hitbox shape
- * @param x_offset The X offset of the hitbox
- * @param y_offset The Y offset of the hitbox
- * @param x_element The X width/radius of the hitbox
- * @param y_element The Y width/radius of the hitbox
- * @param type The type flags of the hitbox
- * @param sprite_num The sprite number that is being used
- * @param immunity_timer The hitbox immunity timer
- * @return 0 on success, -1 if the animation doesn't exist
- */
-int Entity::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element,
-                       double y_element, double depth, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
-    Animation* animation = findAnimation(animation_name);
-    if(animation == nullptr){
-        return -1;
-    }
-
-    Hitbox* hitbox;
-    //We should never hit the HIT_CONE in this case.
-    if(shape == HIT_RECT){
-        hitbox = (Hitbox*)new HitRect(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
-    }
-    else{
-        hitbox = (Hitbox*)new HitEllipse(&(this->x), &(this->y), &(this->z), x_offset, y_offset, z_offset, x_element, y_element, depth, type, hitbox_group, immunity_timer);
-    }
-
-    animation->addHitbox(hitbox, sprite_num);
-    return 0;
-}
-
-/** Adds an immunity to the hitbox of another entity
- * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
- * @param hitbox The hitbox to add immunity for
- */
-void Entity::addHitboxImmunity(Entity* other, Hitbox* hitbox){
-    //If the disable timer is 0, there will be no immunity added
-    uint32_t ignore_timer = hitbox->getImmunityTimer();
-    if(ignore_timer == 0){
-        return;
-    }
-
-    HitboxImmunityList* new_immunity = new HitboxImmunityList;
-    new_immunity->entity = other;
-    new_immunity->hitbox = hitbox;
-    new_immunity->hitbox_group = hitbox->getHitboxGroup();
-    new_immunity->ignore_timer = ignore_timer;
-
-    if(this->hitbox_immunity != nullptr){
-        new_immunity->next = this->hitbox_immunity;
-    }
-    else{
-        new_immunity->next = nullptr;
-    }
-    this->hitbox_immunity = new_immunity;
-}
-
-/** Checks immunity against the hitbox of another entity
- * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
- * @param hitbox The hitbox to check immunity for
- */
-bool Entity::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
-    if(this->hitbox_immunity == nullptr){
-        return false;
-    }
-
-    HitboxImmunityList* cursor = this->hitbox_immunity;
-    uint32_t hitbox_group = cursor->hitbox_group;
-    while(cursor != nullptr){
-        if(cursor->hitbox == hitbox || (other == cursor->entity && cursor->hitbox_group == hitbox_group)){
-            return true;
-        }
-
-        cursor = cursor->next;
-    }
-
-    return false;
-}
-
-/** Cleans up the hitbox immunity list; should be run in the _process step
- * @param delta The amount of time (in ms) that have passed since the last frame
- */
-void Entity::cleanupHitboxImmunity(uint64_t delta){
-    HitboxImmunityList* cursor = this->hitbox_immunity;
-    HitboxImmunityList* last_cursor = this->hitbox_immunity;
-    while(cursor != nullptr){
-        if(cursor->ignore_timer <= delta){
-            HitboxImmunityList* tmp = cursor;
-
-            cursor = cursor->next;
-            if(tmp == this->hitbox_immunity){
-                this->hitbox_immunity = cursor;
-                last_cursor = cursor;
-            }
-            else{
-                last_cursor->next = cursor;
-            }
-
-            delete tmp;
-        }
-        else{
-            cursor->ignore_timer -= delta;
-            last_cursor = cursor;
-            cursor = cursor->next;
-        }
-    }
 }
 
 /** Adds a sound to a given animation
@@ -486,20 +316,6 @@ int Entity::addSound(const char* animation_name, const char* sound_id, int seque
         return -1;
     }
     return animation->addSound(sound_id, sequence_num);
-}
-
-/** Sets the X posision
- * @param x The X coordinate
- */
-void Entity::setX(double x){
-    this->x = x;
-}
-
-/** Sets the Y posision
- * @param y The Y coordinate
- */
-void Entity::setY(double y){
-    this->y = y;
 }
 
 /** Sets the animation number
@@ -538,10 +354,8 @@ int Entity::setSize(const char* animation_name, float width, float height){
  * @param height The y scale factor
  */
 void Entity::setSize(float width, float height){
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->setSize(width, height);
-        animation_cursor = animation_cursor->next;
+    for(auto& animation : animations){
+        animation.second->setSize(width, height);
     }
 }
 
@@ -611,18 +425,11 @@ uint32_t Entity::getType(){
  * @return The animation pointer, or nullptr if it's not found
  */
 Animation* Entity::findAnimation(const char* animation_name){
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        if(strcmp(animation_cursor->animation->getName(), animation_name) == 0){
-            break;
-        }
-        animation_cursor = animation_cursor->next;
-    }
-
-    if(animation_cursor == nullptr){
+    std::string animation_str(animation_name);
+    if(animations.find(animation_str) == animations.end()){
         return nullptr;
     }
-    return animation_cursor->animation;
+    return animations[animation_str];
 }
 
 /** Serializes data
@@ -691,12 +498,10 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     }
 
     //ANIMATION SECTION
-    WriteVar(this->num_animations, uint16_t, file);
+    WriteVar(animations.size(), uint16_t, file);
 
-    AnimationList* animation_cursor = this->animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->serializeData(file);
-        animation_cursor = animation_cursor->next;
+    for(auto& animation : animations){
+        animation.second->serializeData(file);
     }
 
     if(this->active_animation != nullptr){
@@ -706,7 +511,7 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
         fwrite(starting_animation, 1, starting_animation_len, file);
     }
     else{
-        Animation* default_animation = this->animations->animation;
+        Animation* default_animation = this->animations.begin()->second;
         if(default_animation != nullptr){
             const char* starting_animation = default_animation->getName();
             uint16_t starting_animation_len = strlen(starting_animation);
@@ -831,10 +636,8 @@ int Entity::serializeAssets(FILE* file, SerializeSet& serialize_set){
         return -1;
     }
 
-    AnimationList* animation_cursor = animations;
-    while(animation_cursor != nullptr){
-        animation_cursor->animation->serializeAssets(file, serialize_set);
-        animation_cursor = animation_cursor->next;
+    for(auto& animation : animations){
+        animation.second->serializeAssets(file, serialize_set);
     }
 
     return 0;

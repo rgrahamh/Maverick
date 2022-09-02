@@ -14,7 +14,7 @@
  * @param border_buff How much buffer the text should be given (how far inset you should start the text box)
  */
 UIObjectFrame::UIObjectFrame(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                             int draw_layer, Object* reference, char* border_pattern, uint8_t border_types, uint16_t border_buff)
+                             int draw_layer, Object* reference, char* border_pattern, BORDER_TYPE border_type, uint16_t border_buff)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::OBJECT_FRAME;
 
@@ -22,7 +22,7 @@ UIObjectFrame::UIObjectFrame(const char* name, double view_x_offset, double view
     this->border_buff = border_buff;
 
     if(border_pattern != nullptr){
-        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer, border_pattern, border_types);
+        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer, border_pattern, border_type);
     }
     else{
         this->borders = nullptr;

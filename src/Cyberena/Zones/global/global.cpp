@@ -39,7 +39,7 @@ void buildGlobal(){
     //Create the pause text
     UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "mavwhite", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     pause_text->setColor(255, 255, 255);
-    pause_menu->addElement(pause_text);
+    pause_menu->addSubelement(pause_text);
 
     pause_menu->setVisible(false);
     pause_menu->setActive(false);

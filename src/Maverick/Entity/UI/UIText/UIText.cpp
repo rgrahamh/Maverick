@@ -15,10 +15,11 @@
  * @param point The point (size) of the text
  * @param x_alignment The horizontal alignment of the text
  * @param y_alignment The vertical alignment of the text
+ * @param wrap If you'd like text wrapping
  */
 UIText::UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                int draw_layer, const char* font_name, const char* text, float scroll_speed, unsigned int size,
-               ALIGNMENT x_alignment, ALIGNMENT y_alignment)
+               ALIGNMENT x_alignment, ALIGNMENT y_alignment, bool wrap)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT;
 
@@ -177,18 +178,21 @@ inline char* UIText::getNextBreak(char* str){
     return nullptr;
 }
 
-/** Gets the height of a letter in current config (assumes all letters are the same height)
+/** Gets the height of a character in current config (assumes all letters are the same height)
  * @return The letter height, or 0 if no letters were found
  */
-float UIText::getCharHeight(){
-    for(int i = 0; i < 256; i++){
-        SDL_Surface* character = font->getCharacterSurface(i, this->style);
-        if(character != nullptr){
-            return character->h * this->size * Engine::getInstance()->getGlobalYScale();
+uint32_t UIText::getCharHeight(){
+    if(unlikely(this->char_height == 0)){
+        for(int i = 0; i < 256; i++){
+            SDL_Surface* character = font->getCharacterSurface(i, this->style);
+            if(character != nullptr){
+                this->char_height = character->h * this->size * Engine::getInstance()->getGlobalYScale();
+                break;
+            }
         }
     }
 
-    return 0;
+    return this->char_height;
 }
 
 /** Loads the next section of text into the ref buff
@@ -353,19 +357,19 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
     //Set starting Y draw position
-    uint32_t y_draw;
+    uint32_t y_draw = camera_y;
     if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
-        y_draw = this->y + ((this->getHeight() / 2) - (this->num_lines * char_height / 2));
+        y_draw += this->y + ((this->getHeight() / 2) - (this->num_lines * char_height / 2));
     }
     else{
-        y_draw = this->y;
+        y_draw += this->y;
     }
 
     uint32_t line_num = 0;
     uint32_t x_draw;
     for(int i = 0; print_buff[i] != '\0' && line_num < num_lines; i++){
         //Set the line X draw position
-        x_draw = line_start_x[line_num++];
+        x_draw = line_start_x[line_num++] + camera_x + this->view_x_offset * win_width;
         for(; print_buff[i] != '\0' && print_buff[i] != '\n'; i++){
             SDL_Texture* letter = font->getCharacterTexture(print_buff[i], this->style);
             if(letter != nullptr){

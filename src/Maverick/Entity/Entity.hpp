@@ -17,15 +17,12 @@ class Zone;
 
 class Entity{
 	public:
-		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
+		Entity(const char* name, int draw_layer = 1);
 		Entity(FILE* file);
 		virtual ~Entity();
 		char* getName();
-		double getX();
-		double getY();
 		virtual float getWidth();
 		virtual float getHeight();
-		HitboxList* getHitboxes();
 		int16_t getDrawLayer();
 		double getUpperDrawAxis();
 		double getLowerDrawAxis();
@@ -33,7 +30,6 @@ class Entity{
 		uint32_t getType();
 		bool isActive();
 		bool isVisible();
-		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		int addAnimation(Animation* animation);
 		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
@@ -42,13 +38,8 @@ class Entity{
 		int addSpriteSet(const char* animation_name, const char* sprite_set);
 		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
 
-		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element, double y_element, double depth, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
-		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
-
 		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
 
-		void setX(double x);
-		void setY(double y);
 		int setAnimation(const char* animation_name);
 		int setSize(const char* animation_name, float width, float height);
 		void setSize(float width, float height);
@@ -94,11 +85,6 @@ class Entity{
 		//The entity type (exact values are specified by child classes)
 		uint32_t type;
 
-        //Position
-        double x;
-        double y;
-		double z;
-
 		//Attributes
 		AttributeHash* attr;
 
@@ -106,19 +92,10 @@ class Entity{
 		bool active;
 		bool visible;
 
-		//Animation
-		Animation* active_animation;
-		AnimationList* animations;
-		uint16_t num_animations;
-
-		//Hitbox group ignoring (key=other object; first tuple=hitbox group; second tuple=timer)
-		HitboxImmunityList* hitbox_immunity;
-
 		//Draw layer tracking
 		int16_t draw_layer;
 
 		Animation* findAnimation(const char* animation_name);
-		void cleanupHitboxImmunity(uint64_t delta);
 };
 
 #endif

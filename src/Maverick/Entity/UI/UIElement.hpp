@@ -44,16 +44,16 @@ class UIElement : public Entity{
         virtual int serializeAssets(FILE* file, SerializeSet& serialize_set) override;
 
         virtual void setViewSize(double view_width, double view_height);
-        void setViewOffset(double x_offset, double y_offset);
-        void addViewOffset(double x_offset, double y_offset);
+        virtual void setViewOffset(double x_offset, double y_offset);
 		virtual void setActive(bool active);
 		virtual void setVisible(bool visible);
 
         //Virtual so that the UIElement can do something custom with the "add a new subelement" logic
-        virtual void addElement(UIElement* element);
+        virtual void addSubelement(UIElement* element);
         int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_path, double x_offset = 0.0, double y_offset = 0.0, float width = -1.0, float height = -1.0);
 
-        UIElement* getElement(const char* name);
+        UIElement* getSubelement(const char* name);
+        void deleteSubelement(const char* name);
         std::vector<UIElement*>& getSubelements();
 
         float getWidth() override;
@@ -66,16 +66,14 @@ class UIElement : public Entity{
         std::vector<UIElement*> subelements;
 
         //The UI offsets/sizing
-        double view_x_offset;
-        double view_y_offset;
+        double view_x;
+        double view_y;
         double view_width;
         double view_height;
 
-        //The UI draw area
-        SDL_Rect draw_area;
-
         //Checks if the mouse is inside of the draw area
         virtual bool isMouseInside(Control* control);
+        void updateDrawArea();
 };
 
 

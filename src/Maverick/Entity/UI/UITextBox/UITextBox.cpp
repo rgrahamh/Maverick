@@ -21,7 +21,7 @@
  */
 UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                      int draw_layer, const char* font_path, char* text, float scroll_speed, int size, ALIGNMENT text_x_alignment,
-                     ALIGNMENT text_y_alignment, const char* border_pattern, uint8_t border_types, uint16_t border_buff)
+                     ALIGNMENT text_y_alignment, const char* border_pattern, BORDER_TYPE border_types, uint16_t border_buff, bool wrapped)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::TEXT_BOX;
 
@@ -31,15 +31,14 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
 
     unsigned int height_buff = 0, width_buff = 0;
     if(border_pattern != nullptr){
-        this->borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height,
+        UIBorders* borders = new UIBorders(name, view_x_offset, view_y_offset, view_width, view_height,
                                       draw_layer, border_pattern, border_types);
-        if(this->borders != nullptr){
+        if(borders != nullptr){
             height_buff = borders->getHeightBuff() + (border_buff * engine->getGlobalXScale());
             width_buff = borders->getWidthBuff() + (border_buff * engine->getGlobalYScale());
         }
-    }
-    else{
-        this->borders = nullptr;
+
+        this->addSubelement(borders);
     }
 
     double text_view_x_offset = ((view_x_offset * win_width) + width_buff) / win_width;
@@ -49,19 +48,9 @@ UITextBox::UITextBox(const char* name, double view_x_offset, double view_y_offse
     double text_view_height = ((view_height * win_height) - (height_buff * 2)) / win_height;
 
     this->text = new UIText(name, text_view_x_offset, text_view_y_offset, text_view_width, text_view_height, draw_layer,
-                            font_path, text, scroll_speed, size, text_x_alignment, text_y_alignment);
-}
-
-/** Default destructor
- */
-UITextBox::~UITextBox(){
-    if(this->borders != nullptr){
-        delete this->borders;
-    }
-
-    if(this->text != nullptr){
-        delete this->text;
-    }
+                            font_path, text, scroll_speed, size, text_x_alignment, text_y_alignment, wrapped);
+    
+    this->addSubelement(this->text);
 }
 
 /** Sets the text in the textbox
@@ -114,35 +103,4 @@ void UITextBox::setXAlignment(ALIGNMENT x_alignment){
  */
 void UITextBox::setYAlignment(ALIGNMENT y_alignment){
     this->text->setYAlignment(y_alignment);
-}
-
-/** Draws this UITextBox
- * @param renderer The SDL_Renderer we're drawing to
- * @param delta The time passed since last draw (in ms)
- * @param camera_x The X location of the camera
- * @param camera_y The Y location of the camera
- */
-void UITextBox::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    //Draw the textbox background
-    if(active_animation != nullptr){
-        active_animation->draw(renderer, delta, camera_x, camera_y);
-    }
-
-    //Draw the text
-    if(this->text != nullptr){
-        this->text->_draw(renderer, delta, camera_x, camera_y);
-    }
-
-    //Draw the borders
-    if(this->borders != nullptr){
-        this->borders->_draw(renderer, delta, camera_x, camera_y);
-    }
-}
-
-/** Called every frame for processing; can be overridden by children
- * @param delta The amount of time that has passed (in ms)
- * @param step_size The step size used for physics calcluation (probably not needed here)
- */
-void UITextBox::process(uint64_t delta, unsigned int steps){
-    this->text->_process(delta, steps);
 }

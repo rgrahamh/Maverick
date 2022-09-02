@@ -13,25 +13,16 @@
  * @param border_types The border locations
  */
 UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                     int draw_layer, const char* border_pattern, uint8_t border_types)
+                     int draw_layer, const char* border_pattern, BORDER_TYPE border_type)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
     this->height_buff = 0;
     this->width_buff = 0;
 
-    memset(this->borders, '\0', sizeof(UIElement*) * 4);
+    this->border_pattern = StrDeepCopy(border_pattern);
+    this->border_type = border_type;
 
-    addBorders(border_pattern, border_types);
-}
-
-/** Default destructor
- */
-UIBorders::~UIBorders(){
-    for(int i = 0; i < 4; i++){
-        if(this->borders[i] != nullptr){
-            delete this->borders[i];
-        }
-    }
+    addBorders();
 }
 
 /** Returns the height buffer for this set of borders
@@ -52,15 +43,16 @@ unsigned int UIBorders::getWidthBuff(){
  * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
  * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
  */
-void UIBorders::addBorders(const char* border_pattern, uint8_t border_types){
+void UIBorders::addBorders(){
     this->height_buff = 0;
     this->width_buff = 0;
+    
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
         char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
         char* border_names[4] = {"top_border", "bottom_border", "left_border", "right_border"};
         for(int i = 0; i < 4; i++){
-            if(border_types & (1 << i)){
+            if(border_type & (1 << i)){
                 //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.bmp")
                 int combined_len = strlen(file_patterns[i]) + strlen(border_pattern) + 1;
                 char sprite_path[combined_len];
@@ -124,39 +116,56 @@ void UIBorders::addBorders(const char* border_pattern, uint8_t border_types){
                     int win_width, win_height;
                     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
-                    //Draw layer doesn't matter here because we're drawing them manually w/ the text box
-                    if(borders[i] != nullptr){
-                        delete borders[i];
-                    }
-                    this->borders[i] = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
-                                                     border_width / (double)win_width, border_height / (double)win_height, 1);
-                    this->borders[i]->addAnimation("border", 1);
-                    this->borders[i]->addFrame("border", 0);
-                    this->borders[i]->addSprite("border", "default", sprite_path);
-                    this->borders[i]->setAnimation("border");
+                    this->deleteSubelement(border_names[i]);
+
+                    UIElement* border = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
+                                                      border_width / (double)win_width, border_height / (double)win_height, 1);
+                    borders[i] = border;
+                    border->addAnimation("border", 1);
+                    border->addFrame("border", 0);
+                    border->addSprite("border", "default", sprite_path);
+                    border->setAnimation("border");
+                    subelements.push_back(border);
                 }
             }
         }
     }
 }
 
-/** Draws these UIBorders
- * @param renderer The SDL_Renderer we're drawing to
- * @param delta The time passed since last draw (in ms)
- * @param camera_x The X location of the camera
- * @param camera_y The Y location of the camera
- */
-void UIBorders::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    //Draw the textbox background
-    if(active_animation != nullptr){
-        this->active_animation->draw(renderer, delta, camera_x, camera_y);
-    }
+void UIBorders::setViewSize(double view_width, double view_height){
+    UIElement::setViewSize(view_width, view_height);
+    addBorders();
+}
 
-    //Draw the borders
+/** Sets the border pattern
+ * @param border_pattern The border pattern to use
+ */
+void UIBorders::setBorderPattern(const char* border_pattern){
+    if(border_pattern != nullptr){
+        delete border_pattern;
+    }
+    this->border_pattern = StrDeepCopy(border_pattern);
+
     for(int i = 0; i < 4; i++){
-        if(this->borders[i] != nullptr){
-            this->borders[i]->draw(renderer, delta, camera_x, camera_y);
+        if(borders[i] != nullptr){
+            delete borders[i];
+            borders[i] = nullptr;
         }
     }
+    addBorders();
+}
 
+/** Sets the border type
+ * @param border_type The type of border to use
+ */
+void UIBorders::setBorderType(BORDER_TYPE border_type){
+    this->border_type = border_type;
+    
+    for(int i = 0; i < 4; i++){
+        if(!(border_type & (1 << i)) && borders[i] != nullptr){
+            delete borders[i];
+            borders[i] = nullptr;
+        }
+    }
+    addBorders();
 }

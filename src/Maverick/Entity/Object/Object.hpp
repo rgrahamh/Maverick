@@ -31,9 +31,12 @@ class Object : public Entity{
 		double getXVel();
 		double getYVel();
 		double getZVel();
+		double getX();
+		double getY();
 		double getZ();
 		float getMass();
 		bool getEnvBump();
+		HitboxList* getHitboxes();
 		Sprite* getSprite();
 		int getCollisionLayer();
 		float getTerminalVelocity();
@@ -46,6 +49,8 @@ class Object : public Entity{
 		void setXVel(double xV);
 		void setYVel(double yV);
 		void setZVel(double zV);
+		void setX(double x);
+		void setY(double y);
 		void setZ(double z);
 		void setGravity(bool gravity);
 		void setEnvBump();
@@ -53,6 +58,10 @@ class Object : public Entity{
 		void setCollisionLayer(int collision_layer);
 		void setGround(double next_ground);
 		void setNextGround(double next_ground);
+
+		bool checkHitboxImmunity(Entity* other, Hitbox* hitbox);
+		int addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element, double y_element, double depth, unsigned int type, int sprite_num, int32_t hitbox_group = -1, uint32_t immunity_timer = 0);
+		void addHitboxImmunity(Entity* other, Hitbox* hitbox);
 
 		void applyForce(double xA, double yA, double zA = 0);
 
@@ -70,6 +79,11 @@ class Object : public Entity{
 		virtual void onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox);
 
 	protected:
+        //Position
+        double x;
+        double y;
+		double z;
+
 		//Previous position (used for rollback)
 		double old_x;
 		double old_y;
@@ -106,6 +120,15 @@ class Object : public Entity{
 
 		//The collision layer
 		int collision_layer;
+
+		//Animation
+		Animation* active_animation;
+		std::unordered_map<std::string, Animation*> animations;
+
+		//Hitbox group ignoring (key=other object; first tuple=hitbox group; second tuple=timer)
+		HitboxImmunityList* hitbox_immunity;
+
+		void cleanupHitboxImmunity(uint64_t delta);
 };
 
 struct ObjectList{

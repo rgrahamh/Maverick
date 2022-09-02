@@ -65,7 +65,7 @@ Engine::Engine(){
     SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
@@ -218,7 +218,7 @@ void Engine::actionStep(EntityList* all_entities){
             continue;
         }
 
-        obj_cursor->obj->action(control);
+        obj_cursor->obj->_action(control);
         obj_cursor = obj_cursor->next;
     }
 
@@ -230,7 +230,7 @@ void Engine::actionStep(EntityList* all_entities){
             continue;
         }
 
-        ui_cursor->element->action(control);
+        ui_cursor->element->_action(control);
         ui_cursor = ui_cursor->next;
     }
     this->globalAction();

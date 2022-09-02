@@ -15,20 +15,26 @@ enum BORDER_TYPE{
 class UIBorders: public UIElement{
     public:
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
-                  int draw_layer, const char* border_pattern = "", uint8_t border_types = ALL_BORDERS);
-        ~UIBorders();
+                  int draw_layer, const char* border_pattern = "", BORDER_TYPE border_types = BORDER_TYPE::ALL_BORDERS);
 
         unsigned int getHeightBuff();
         unsigned int getWidthBuff();
 
-        void addBorders(const char* border_pattern, uint8_t border_types);
+        void setBorderPattern(const char* border_pattern);
+        void setBorderType(BORDER_TYPE border_type);
 
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+        void addBorders();
+
+        virtual void setViewSize(double view_width, double view_height) override;
 
     private:
-        UIElement* borders[4];
         unsigned int height_buff;
         unsigned int width_buff;
+
+        UIElement* borders[4];
+
+        char* border_pattern;
+        BORDER_TYPE border_type;
 };
 
 #endif

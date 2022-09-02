@@ -19,8 +19,8 @@ int main(int argc, char** argv){
     song1->addTrack(sound);
     engine->addMusic("song1", song1);
 	SoundBoard* sound_board = engine->getSoundBoard();
-    sound_board->playMusic("song1");
-    sound_board->setMusicVolume(1, 1.0, 10000);
+    //sound_board->playMusic("song1");
+    //sound_board->setMusicVolume(1, 1.0, 10000);
 
 	engine->start();
 	return 0;

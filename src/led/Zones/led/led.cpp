@@ -32,14 +32,14 @@ void buildEditor(){
     object_list->addFrame("background", 0);
     object_list->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     object_list->setAnimation("background");
-    level_group->addElement(object_list);
+    level_group->addSubelement(object_list);
 
     UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "mavwhite", "All draw layers", 5.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     layer_display->addAnimation("background", 1);
     layer_display->addFrame("background", 0);
     layer_display->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     layer_display->setAnimation("background");
-    level_group->addElement(layer_display);
+    level_group->addSubelement(layer_display);
 
     for(int i = 0; i < 10; i++){
         char hotbar_name[8];
@@ -51,7 +51,7 @@ void buildEditor(){
         hotbar->addFrame("background", 0);
         hotbar->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
         hotbar->setAnimation("background");
-        level_group->addElement(hotbar);
+        level_group->addSubelement(hotbar);
     }
 
     UITextBox* status_bar = new UITextBox("status_bar", 0.1, 0.97, 0.7, 0.03, 1, "mavwhite", "Ready", 0.0, 1);
@@ -59,24 +59,24 @@ void buildEditor(){
     status_bar->addFrame("background", 0);
     status_bar->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     status_bar->setAnimation("background");
-    level_group->addElement(status_bar);
+    level_group->addSubelement(status_bar);
 
     UITextBox* tool_selection = new UITextBox("tool_select", 0.8, 0.97, 0.2, 0.03, 1, "mavwhite", "Select", 0.0, 1);
     tool_selection->addAnimation("background", 1);
     tool_selection->addFrame("background", 0);
     tool_selection->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
     tool_selection->setAnimation("background");
-    level_group->addElement(tool_selection);
+    level_group->addSubelement(tool_selection);
 
     UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, "mavwhite", "Selected object attributes", 0.0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
     object_attr->addAnimation("background", 1);
     object_attr->addFrame("background", 0);
     object_attr->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
     object_attr->setAnimation("background");
-    level_group->addElement(object_attr);
+    level_group->addSubelement(object_attr);
 
     UILevelPort* ui_level_port = new UILevelPort("level_port", 0.1, 0, 0.7, 0.925);
-    level_group->addElement(ui_level_port);
+    level_group->addSubelement(ui_level_port);
 
     led->addUIElement(level_group);
     level_group->setActive(false);
@@ -84,8 +84,25 @@ void buildEditor(){
 
     //Object Ediror
     UITabbedWindow* tabbed_window = new UITabbedWindow("selector_pane", 0.0, 0.0, 0.25, 0.9, 1, 0.05, "mavwhite", 1, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 0);
-    tabbed_window->addElement(new UITextBox("first", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "first", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN));
-    tabbed_window->addElement(new UITextBox("second", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "second"));
+    tabbed_window->addAnimation("background", 1);
+    tabbed_window->addFrame("background", 0);
+    tabbed_window->addSprite("background", "default", "./assets/sprites/ui/black.bmp");
+    tabbed_window->setAnimation("background");
+
+    UITextBox* first_tab = new UITextBox("first", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "first", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    first_tab->addAnimation("background", 1);
+    first_tab->addFrame("background", 0);
+    first_tab->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
+    first_tab->setAnimation("background");
+    tabbed_window->addSubelement(first_tab);
+
+    UITextBox* second_tab = new UITextBox("second", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "second", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::STANDARD_ALIGN, "./assets/sprites/ui/basic_border", BORDER_TYPE::ALL_BORDERS, 2);
+    second_tab->addAnimation("background", 1);
+    second_tab->addFrame("background", 0);
+    second_tab->addSprite("background", "default", "./assets/sprites/ui/blue_box_small.bmp");
+    second_tab->setAnimation("background");
+    tabbed_window->addSubelement(second_tab);
+
     led->addUIElement(tabbed_window);
 
     //CameraReference* cam_ref = new CameraReference("cam_ref", 0.0, 0.0);

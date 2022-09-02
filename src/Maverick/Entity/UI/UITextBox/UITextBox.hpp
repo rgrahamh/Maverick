@@ -9,8 +9,7 @@ class UITextBox : public UIElement{
         UITextBox(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                   int draw_layer, const char* font_path, char* text = "", float scroll_speed = 0.0, int size = 1,
                   ALIGNMENT text_x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT text_y_alignment = ALIGNMENT::CENTER_ALIGN,
-                  const char* border_pattern = "", uint8_t border_types = BORDER_TYPE::NO_BORDER, uint16_t border_buff = 0);
-        ~UITextBox();
+                  const char* border_pattern = "", BORDER_TYPE border_types = BORDER_TYPE::NO_BORDER, uint16_t border_buff = 0, bool wrapped = false);
 
         void setText(const char* text);
         void setFont(const char* font_path);
@@ -20,12 +19,8 @@ class UITextBox : public UIElement{
         void setXAlignment(ALIGNMENT x_alignment);
         void setYAlignment(ALIGNMENT y_alignment);
 
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
-		virtual void process(uint64_t delta, unsigned int steps) override;
-
     private:
         UIText* text;
-        UIBorders* borders;
 
 };
 
