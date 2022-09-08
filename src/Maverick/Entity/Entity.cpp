@@ -116,7 +116,7 @@ int16_t Entity::getDrawLayer(){
  * @return The draw axis of the entity
  */
 double Entity::getUpperDrawAxis(){
-    if(this->active_animation == nullptr){
+    if(unlikely(this->active_animation == nullptr)){
         return 0;
     }
     return this->active_animation->getUpperDrawAxis();
@@ -126,7 +126,7 @@ double Entity::getUpperDrawAxis(){
  * @return The draw axis of the entity
  */
 double Entity::getLowerDrawAxis(){
-    if(this->active_animation == nullptr){
+    if(unlikely(this->active_animation == nullptr)){
         return 0;
     }
     return this->active_animation->getLowerDrawAxis();

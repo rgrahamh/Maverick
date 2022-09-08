@@ -61,10 +61,6 @@ class Engine{
 		int addObject(const char* zone, Object* object);
 		int addUIElement(const char* zone, UIElement* ui);
 
-		//Thread creation
-		void addThread(std::thread* thread);
-		void cleanupThread(std::thread::id thread_id);
-
 		//Getters
 		Object* getObject(const char* name);
 		Object* getObject(const char* name, const char* zone);
@@ -159,10 +155,6 @@ class Engine{
 		//Zones
 		ZoneList* zones;
 		ZoneList* active_zones;
-
-		//The thread map
-		std::unordered_map<std::thread::id, std::thread*> thread_map;
-		std::atomic<std::queue<std::thread::id>*> thread_cleanup_queue;
 
 		//Render
 		Camera* camera;
