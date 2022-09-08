@@ -10,8 +10,6 @@ bool endian;
 bool debug = false;
 bool graphics_init = false;
 
-std::thread::id base_thread_id = std::this_thread::get_id();
-
 Engine* Engine::engine = nullptr;
 
 /** Engine's parameterized constructor
@@ -108,8 +106,6 @@ Engine::Engine(){
     this->gravity = 0.1;
 
     endian = getEndian();
-
-    this->thread_cleanup_queue = new std::queue<std::thread::id>();
 }
 
 /** Engine's destructor
@@ -197,9 +193,6 @@ void Engine::gameLoop(){
             //Different because we need to adjust the object list for draw order
             this->drawStep(&this->entities);
         }
-
-        //Thread cleanup
-        this->threadGC();
 	}
 }
 
@@ -467,7 +460,7 @@ inline static bool checkDrawOverlap(Object* obj1, Object* obj2){
  * @param curr_obj The current object that you're sorting through
  * @return The current draw object
  */
-ObjectList* Engine::drawSort(ObjectList* curr_obj){
+inline ObjectList* Engine::drawSort(ObjectList* curr_obj){
     //Checking if we have any objects
     if(curr_obj != NULL){
         //Case where it's the last iteration (everything is sorted)
@@ -636,22 +629,6 @@ float Engine::getGlobalXScale(){
  */
 float Engine::getGlobalYScale(){
     return this->target_y_scale;
-}
-
-/** Goes through all active threads and cleans them up
- */
-inline void Engine::threadGC(){
-    while(thread_cleanup_queue.load()->empty() == false){
-        std::thread::id thread_id = thread_cleanup_queue.load()->front();
-        thread_cleanup_queue.load()->pop();
-        if(thread_map.find(thread_id) != thread_map.end()){
-            std::thread* thread_ptr = thread_map[thread_id];
-            if(thread_ptr != nullptr && thread_ptr->joinable()){
-                thread_ptr->join();
-                thread_map.erase(thread_id);
-            }
-        }
-    }
 }
 
 /** Handles the default collision between two objects
@@ -878,22 +855,6 @@ void Engine::freeFullEntityList(){
         free_ui = all_ui->next;
         delete all_ui;
         all_ui = free_ui;
-    }
-}
-
-/** Adds a new thread to the engine (to get cleaned up once the thread's execution halts)
- * @param thread The thread to add
- */
-void Engine::addThread(std::thread* thread){
-    thread_map[thread->get_id()] = thread;
-}
-
-/** Pushes a thread to the thread cleanup queue
- * @param thread_id The thread ID you'd like to clean up
- */
-void Engine::cleanupThread(std::thread::id thread_id){
-    if(thread_id != base_thread_id){
-        thread_cleanup_queue.load(std::memory_order_relaxed)->push(thread_id);
     }
 }
 

@@ -9,6 +9,4 @@ void loadZone(const char* zone_name){
 	else if(strcmp(zone_name, "global") == 0){
 		buildGlobal();
 	}
-
-	Engine::getInstance()->cleanupThread(std::this_thread::get_id());
 }
