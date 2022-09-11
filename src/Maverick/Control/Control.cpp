@@ -1,8 +1,6 @@
 #include "./Control.hpp"
 extern std::atomic<bool> exit_game;
 
-/** Default constructor for the Control object
- */
 Control::Control(){
     memset(keys, '\0', 512);
     memset(keys, '\0', 512);
@@ -24,8 +22,6 @@ Control::Control(){
     mouse.scroll_wheel = 0;
 }
 
-/** Default destructor for the Control object
- */
 Control::~Control(){
     for(int i = 0; i < MAX_GAMEPADS; i++){
         if(controller_objs[i] != nullptr){
@@ -34,8 +30,6 @@ Control::~Control(){
     }
 }
 
-/** Update the controller input (happens once per game loop)
- */
 void Control::updateInput(){
     //Update controllers
     num_controllers = updateControllers();
@@ -50,9 +44,6 @@ void Control::updateInput(){
     pollEvents();
 }
 
-/** Update controller states
- * @return number of controllers
- */
 int Control::updateControllers(){
     SDL_GameControllerUpdate();
 
@@ -108,8 +99,6 @@ int Control::updateControllers(){
     return n_controllers;
 }
 
-/** Update keyboard state
- */
 void Control::updateKeyboard(){
     SDL_PumpEvents();
 
@@ -132,8 +121,6 @@ void Control::updateKeyboard(){
     }
 }
 
-/** Update mouse state
- */
 void Control::updateMouse(){
     old_mouse = mouse;
     mouse.button_state = SDL_GetMouseState(&mouse.x, &mouse.y);
@@ -142,59 +129,34 @@ void Control::updateMouse(){
     mouse.scroll_wheel = 0;
 }
 
-/** Gets the controller state last frame
- * @param controller The controller number
- * @return The controller state last frame
- */
-const ControllerState* Control::getOldController(uint8_t controller) const{
+inline const ControllerState* Control::getOldController(uint8_t controller) const{
     return &old_controllers[controller];
 }
 
-/** Gets the current controller state
- * @param controller The controller number
- * @return The current controller state
- */
-const ControllerState* Control::getController(uint8_t controller) const{
+inline const ControllerState* Control::getController(uint8_t controller) const{
     return &controllers[controller];
 }
 
-/** Gets the digital presses (keys pressed this frame that weren't last frame)
- * @return The digital presses since last frame
- */
-const uint8_t* Control::getDigitalPress() const{
+inline const uint8_t* Control::getDigitalPress() const{
     return digital_press;
 }
 
-/** Gets the keyboard state last frame
- * @return The keyboard state last frame
- */
-const uint8_t* Control::getOldKeys() const{
+inline const uint8_t* Control::getOldKeys() const{
     return old_keys;
 }
 
-/** Gets the current keyboard state
- * @return The current keyboard state
- */
-const uint8_t* Control::getKeys() const{
+inline const uint8_t* Control::getKeys() const{
     return keys;
 }
 
-/** Gets the mouse state last frmae
- * @return The mouse state last frame
- */
-const MouseState* Control::getOldMouse() const{
+inline const MouseState* Control::getOldMouse() const{
     return &old_mouse;
 }
 
-/** Gets the mouse state last frmae
- * @return The mouse state last frame
- */
-const MouseState* Control::getMouse() const{
+inline const MouseState* Control::getMouse() const{
     return &mouse;
 }
 
-/** Polls events (for updating input that isn't captured in other SDL operations)
- */
 void Control::pollEvents(){
     SDL_Event event;
     while(SDL_PollEvent(&event)){

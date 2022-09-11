@@ -14,15 +14,44 @@ enum BORDER_TYPE{
 
 class UIBorders: public UIElement{
     public:
+        /** UIBorders constructor (for viewport calcs, 1.0 is one screen width/height)
+         * @param name The name of the UIElement
+         * @param view_x_offset The viewport X offset of the UIElement
+         * @param view_y_offset The viewport X offset of the UIElement
+         * @param view_width The viewport width of the UIElement
+         * @param view_height The viewport height of the UIElement
+         * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
+         * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
+         * @param border_pattern The pattern for the border texture files you wish to use
+         * @param border_types The border locations
+         */
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                   int draw_layer, const char* border_pattern = "", BORDER_TYPE border_types = BORDER_TYPE::ALL_BORDERS);
 
+        /** Returns the height buffer for this set of borders
+         * @return The height buffer for this set of borders
+         */
         unsigned int getHeightBuff();
+
+        /** Returns the width buffer for this set of borders
+         * @return The width buffer for this set of borders
+         */
         unsigned int getWidthBuff();
 
+        /** Sets the border pattern
+         * @param border_pattern The border pattern to use
+         */
         void setBorderPattern(const char* border_pattern);
+
+        /** Sets the border type
+         * @param border_type The type of border to use
+         */
         void setBorderType(BORDER_TYPE border_type);
 
+        /** Creates & adds borders based upon the border_pattern & border_types
+         * @param border_pattern The file pattern to match border files to (ex. "<border_pattern>[_top | _bottom | _left | _right].bmp")
+         * @param border_types The types of borders you want (bitwise or of zero to all BORDER_TYPE fields, depending upon which sides you want the borders)
+         */
         void addBorders();
 
         virtual void setViewSize(double view_width, double view_height) override;

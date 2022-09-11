@@ -11,9 +11,6 @@ UITabbedWindow::UITabbedWindow(const char* name, double view_x_offset, double vi
     this->current_tab = -1;
 }
 
-/** Adds an element to the child element list
- * @param element The element to add
- */
 void UITabbedWindow::addSubelement(UIElement* element){
     if(element != nullptr){
         if(subelements.empty()){
@@ -23,26 +20,14 @@ void UITabbedWindow::addSubelement(UIElement* element){
     }
 }
 
-/** Called every frame for processing
- * @param delta The amount of time that has passed (in ms)
- * @param step_size The step size used for physics calcluation (probably not needed here)
- */
 void UITabbedWindow::_process(uint64_t delta, unsigned int steps){
     this->process(delta, steps);
 
     if(this->current_tab != -1){
         subelements[current_tab]->_process(delta, steps);
     }
-
-    cleanupHitboxImmunity(delta);
 }
 
-/** Draws this UIElement
- * @param renderer The SDL_Renderer we're drawing to
- * @param delta The time passed since last draw (in ms)
- * @param camera_x The X location of the camera
- * @param camera_y The Y location of the camera
- */
 void UITabbedWindow::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     updateDrawArea();
     this->draw(renderer, delta, camera_x, camera_y);
@@ -60,9 +45,6 @@ void UITabbedWindow::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x,
     subelements[current_tab]->_draw(renderer, delta, -1 * camera_x, -1 * camera_y);
 }
 
-/** Handles actions for this UIElement
- * @param control The control struct
- */
 void UITabbedWindow::_action(Control* control){
     int win_width, win_height;
     SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
@@ -80,9 +62,6 @@ void UITabbedWindow::_action(Control* control){
     }
 }
 
-/** Returns the tab number which the mouse is hovering over, or -1 if it's not over any tab
- * @param control The control struct
- */
 int UITabbedWindow::getTabNumber(Control* control){
     int win_width, win_height;
     SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
@@ -90,8 +69,8 @@ int UITabbedWindow::getTabNumber(Control* control){
     const MouseState* mouse = control->getMouse();
 
     for(int i = 0; i < subelements.size(); i++){
-        if(mouse->x > this->draw_area.x && mouse->x < (this->draw_area.x + ((i + 1) * (tab_width * win_width))) &&
-           mouse->y > this->draw_area.y && mouse->y < (this->draw_area.y + (this->tab_height * win_height))){
+        if(mouse->x > this->x && mouse->x < (this->x + ((i + 1) * (tab_width * win_width))) &&
+           mouse->y > this->y && mouse->y < (this->y + (this->tab_height * win_height))){
             return i;
         }
     }

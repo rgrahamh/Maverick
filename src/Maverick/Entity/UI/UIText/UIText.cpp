@@ -1,22 +1,6 @@
 #include "UIText.hpp"
 #include "../../../Engine/Engine.hpp"
 
-/** UIText constructor (for viewport calcs, 1.0 is one screen width/height)
- * @param name The name of the UIElement
- * @param view_x_offset The viewport X offset of the UIElement
- * @param view_y_offset The viewport Y offset of the UIElement
- * @param view_width The viewport width of the UIElement
- * @param view_height The viewport height of the UIElement
- * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
- * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
- * @param text The text to display
- * @param font_path The filepath to the .ttf file you wish to use
- * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
- * @param point The point (size) of the text
- * @param x_alignment The horizontal alignment of the text
- * @param y_alignment The vertical alignment of the text
- * @param wrap If you'd like text wrapping
- */
 UIText::UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                int draw_layer, const char* font_name, const char* text, float scroll_speed, unsigned int size,
                ALIGNMENT x_alignment, ALIGNMENT y_alignment, bool wrap)
@@ -51,8 +35,6 @@ UIText::UIText(const char* name, double view_x_offset, double view_y_offset, dou
     this->setText(text);
 }
 
-/** UIText Destructor
- */
 UIText::~UIText(){
     if(this->text != nullptr){
         free(this->text);
@@ -62,9 +44,6 @@ UIText::~UIText(){
     }
 }
 
-/** Sets the text's contents 
- * @param text The text you wish to use (will make a local copy of the text)
- */
 void UIText::setText(const char* text){
     //Reset the text timer (since we have new text)
     this->timer = 0.0;
@@ -94,9 +73,6 @@ void UIText::setText(const char* text){
     this->nextPage();
 }
 
-/** Sets the text's font (call upon change of font or size)
- * @param font_name The path to a .ttf you wish to use
- */
 void UIText::setFont(const char* font_name){
     if(font_name != nullptr){
         this->font = Engine::getInstance()->getFont(font_name);
@@ -106,56 +82,31 @@ void UIText::setFont(const char* font_name){
     }
 }
 
-/** Sets the size of the font
- * @param size The point (size) of the font
- */
 void UIText::setSize(unsigned int size){
     this->size = size;
 }
 
-/** Sets the style of the font
- * @param style Any number of TTF_STYLE_* attrs OR'd together
- */
 void UIText::setStyle(enum FONT_STYLE style){
     this->style = style;
 }
 
-/** Sets the color of font
- * @param r The red value of the font
- * @param g The green value of the font
- * @param b The blue value of the font
- * @param a The alpha value of the font
- */
 void UIText::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
     this->font_color = SDL_Color{r, g, b, a};
 }
 
-/** Sets the text scroll speed
- * @param scroll_speed The speed of text scroll speed (in chars/sec)
- */
 void UIText::setScrollSpeed(float scroll_speed){
     this->scroll_speed = scroll_speed;
 }
 
 
-/** Sets the X alignment
- * @param x_alignment The X alignment
- */
 void UIText::setXAlignment(ALIGNMENT x_alignment){
     this->x_alignment = x_alignment;
 }
 
-/** Sets the Y alignment
- * @param y_alignment The Y alignment
- */
 void UIText::setYAlignment(ALIGNMENT y_alignment){
     this->y_alignment = y_alignment;
 }
 
-/** Gets the next break point (a tab or space character)
- * @param str The string we're checking the next break for
- * @return A char* pointing to the first instance of a break
- */
 inline char* UIText::getNextBreak(char* str){
     char* space_break = strchr(str, ' ');
     char* tab_break   = strchr(str, '\t');
@@ -178,9 +129,6 @@ inline char* UIText::getNextBreak(char* str){
     return nullptr;
 }
 
-/** Gets the height of a character in current config (assumes all letters are the same height)
- * @return The letter height, or 0 if no letters were found
- */
 uint32_t UIText::getCharHeight(){
     if(unlikely(this->char_height == 0)){
         for(int i = 0; i < 256; i++){
@@ -195,8 +143,6 @@ uint32_t UIText::getCharHeight(){
     return this->char_height;
 }
 
-/** Loads the next section of text into the ref buff
- */
 void UIText::nextPage(){
     if(this->text == nullptr || this->text_buff_cursor == nullptr || this->font == nullptr){
         return;
@@ -318,9 +264,6 @@ void UIText::nextPage(){
     }
 }
 
-/** If we've hit the end of text
- * @return If we've hit the end of text
- */
 bool UIText::hitTextEnd(){
     if(text_buff_cursor != nullptr){
         return *text_buff_cursor == '\0';
@@ -329,9 +272,6 @@ bool UIText::hitTextEnd(){
     return false;
 }
 
-/** If we've hit the end of the draw area
- * @return If we've hit the end of the draw area
- */
 bool UIText::hitDrawEnd(){
     return strlen(print_buff) == strlen(ref_buff);
 }

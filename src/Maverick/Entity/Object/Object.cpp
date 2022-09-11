@@ -2,16 +2,6 @@
 #include "../../Zone/Zone.hpp"
 #include "../../Engine/Engine.hpp"
 
-/** Object parameterized constructor
- * @param name The name of the object
- * @param start_x The starting X location of the object
- * @param start_y The starting Y location of the object
- * @param friction The object's coefficient of friction
- * @param mass The object's mass
- * @param terminal_velocity The object's terminal velocity
- * @param gravity If the object should have gravity applied to it
- * @param layer The default layer of the object
- */
 Object::Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity, int layer)
       : Entity(name, layer){
     this->type = OBJECT_TYPE::GENERIC_OBJECT;
@@ -44,90 +34,75 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
     this->next_ground = this->ground;
 }
 
-/** Destructor for objects
- */
 Object::~Object(){
 }
 
-/** Gets the old X value of the object
- * @return The old X value of the object
- */
 double Object::getOldX(){
     return this->old_x;
 }
 
-/** Gets the old Y value of the object
- * @return The old Y value of the object
- */
 double Object::getOldY(){
     return this->old_y;
 }
 
-/** Gets the X velocity of the object
- * @return The X velocity of the object
- */
-double Object::getXVel(){
-    return this->xV;
-}
-
-/** Gets the Y velocity of the object
- * @return The Y velocity of the object
- */
-double Object::getYVel(){
-    return this->yV;
-}
-
-/** Gets the Z velocity of the object
- * @return The Z velocity of the object
- */
-double Object::getZVel(){
-    return this->zV;
-}
-
-/** Gets the X value of the entity
- * @return The X value of the entity
- */
-double Object::getX(){
-    return this->x;
-}
-
-/** Gets the Y value of the entity
- * @return The Y value of the entity
- */
-double Object::getY(){
-    return this->y;
-}
-
-/** Gets the Z value of the object
- * @return The Z value of the object
- */
-double Object::getZ(){
-    return this->z;
-}
-
-/** Gets the old Z value of the object
- * @return The old Z value of the object
- */
 double Object::getOldZ(){
     return this->old_z;
 }
 
-/** Gets the mass of the object (in lbs)
- */
+double Object::getXVel(){
+    return this->xV;
+}
+
+double Object::getYVel(){
+    return this->yV;
+}
+
+double Object::getZVel(){
+    return this->zV;
+}
+
+double Object::getX(){
+    return this->x;
+}
+
+double Object::getY(){
+    return this->y;
+}
+
+double Object::getZ(){
+    return this->z;
+}
+
+double Object::getWidth(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    Sprite* sprite = this->active_animation->getSprite();
+    if(sprite == nullptr){
+        return 0;
+    }
+    return sprite->rect->w;
+}
+
+double Object::getHeight(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    Sprite* sprite = this->active_animation->getSprite();
+    if(sprite == nullptr){
+        return 0;
+    }
+    return sprite->rect->h;
+}
+
 float Object::getMass(){
     return this->mass;
 }
 
-/** Gets if the object has bumped against the environment (or an entity which has bumped against the environment)
- * @return If the object has bumped against the environemnt
- */
 bool Object::getEnvBump(){
     return this->env_bump;
 }
 
-/** Gets the current object's current sprite
- * @return The object's current sprite
- */
 Sprite* Object::getSprite(){
     if(this->active_animation != nullptr){
         return this->active_animation->getSprite();
@@ -137,138 +112,80 @@ Sprite* Object::getSprite(){
     }
 }
 
-/** Gets the collision layer
- * @return collision_layer The object's collision layer
- */
 int Object::getCollisionLayer(){
     return this->collision_layer;
 }
 
-/** Gets the terminal velocity
- * @return The terminal velocity
- */
 float Object::getTerminalVelocity(){
     return this->terminal_velocity;
 }
 
-/** Gets the ground Z position
- * @return The ground Z position
- */
 double Object::getGround(){
     return this->ground;
 }
 
-/** Gets the next ground Z position
- * @return The next ground Z position
- */
 double Object::getNextGround(){
     return this->next_ground;
 }
 
-/** Sets the X velocity
- * @param xV The X velocity
- */
 void Object::setXVel(double xV){
     this->xV = xV;
 }
 
-/** Sets the Y velocity
- * @param yV The Y velocity
- */
 void Object::setYVel(double yV){
     this->yV = yV;
 }
 
-/** Sets the Z velocity
- * @param zV The Z velocity
- */
 void Object::setZVel(double zV){
     this->zV = zV;
 }
 
-/** Sets the X posision
- * @param x The X coordinate
- */
 void Object::setX(double x){
     this->x = x;
 }
 
-/** Sets the Y posision
- * @param y The Y coordinate
- */
 void Object::setY(double y){
     this->y = y;
 }
 
-/** Sets the Z position
- * @param zV The Z position
- */
 void Object::setZ(double z){
     this->z = z;
 }
 
-/** Sets the friction
- * @param friction The object's friction
- */
 void Object::setFriction(float friction){
     this->friction = friction;
 }
 
-/** Sets the environmental bump to true
- */
 void Object::setEnvBump(){
     this->env_bump = true;
 }
 
-/** Sets the collision layer
- * @param collision_layer The object's new collision layer
- */
 void Object::setCollisionLayer(int collision_layer){
     this->collision_layer = collision_layer;
 }
 
-/** Sets the ground Z position
- * @param ground The ground Z position
- */
 void Object::setGround(double ground){
     this->ground = ground;
 }
 
-/** Sets the next ground Z position
- * @param next_ground The next ground Z position
- */
 void Object::setNextGround(double next_ground){
     this->next_ground = next_ground;
 }
 
-/** Applies force to an object
- * @param xA The X newtons of the force
- * @param yA The Y newtons of the force
- */
 void Object::applyForce(double xA, double yA, double zA){
     this->xA += xA / this->mass;
     this->yA += yA / this->mass;
     this->zA += zA / this->mass;
 }
 
-/** Called during input step; calls action function
- * @param event The event being interpreted
- */
 void Object::_action(Control* control){
     this->action(control);
 }
 
-/** Calculates any actions taken; should be overridden by children if used
- * @param control Contains the engine's Control entity
- */
 void Object::action(Control* control){
     return;
 }
 
-/** Called during the process step; performs object processing calculations
- * @param delta The time that has passed since the last process() call (in ms)
- * @param step_size The step size that should be applied
- */
 void Object::_process(uint64_t delta, unsigned int steps){
     //Updating old X & Y values
     if(abs(this->old_x - this->x) > 0.1){
@@ -345,47 +262,19 @@ void Object::_process(uint64_t delta, unsigned int steps){
     cleanupHitboxImmunity(delta);
 }
 
-/** Called during the process step by _process; space for users to override with custom processing logics
- * @param delta The time that has passed since the last process() call (in ms)
- * @param step_size The step size that should be applied
- */
 void Object::process(uint64_t delta, unsigned int steps){
 }
 
-/** Called during the draw step
- * @param renderer The object renderer
- * @param delta The delta in ms since the last draw() operation
- * @param camera_x The left-hand side of the screen's X coordinate
- * @param camera_x The top side of hte screen's Y coordinate
- */
 void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     this->draw(renderer, delta, camera_x, camera_y);
 }
 
-/** Called during the draw step
- * @param renderer The object renderer
- * @param delta The delta in ms since the last draw() operation
- * @param camera_x The left-hand side of the screen's X coordinate
- * @param camera_x The top side of hte screen's Y coordinate
- */
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     if(this->active_animation != nullptr){
         this->active_animation->draw(renderer, delta, camera_x, camera_y, this->z);
     }
 }
 
-/** Adds a hitbox to a given animation on either the spepcified sprite of an animation or the last-added sprite of the animation (if -1)
- * @param animation_name The animation name
- * @param shape The hitbox shape
- * @param x_offset The X offset of the hitbox
- * @param y_offset The Y offset of the hitbox
- * @param x_element The X width/radius of the hitbox
- * @param y_element The Y width/radius of the hitbox
- * @param type The type flags of the hitbox
- * @param sprite_num The sprite number that is being used
- * @param immunity_timer The hitbox immunity timer
- * @return 0 on success, -1 if the animation doesn't exist
- */
 int Object::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element,
                        double y_element, double depth, unsigned int type, int sprite_num, int hitbox_group, uint32_t immunity_timer){
     Animation* animation = findAnimation(animation_name);
@@ -406,10 +295,6 @@ int Object::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_o
     return 0;
 }
 
-/** Adds an immunity to the hitbox of another entity
- * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
- * @param hitbox The hitbox to add immunity for
- */
 void Object::addHitboxImmunity(Entity* other, Hitbox* hitbox){
     //If the disable timer is 0, there will be no immunity added
     uint32_t ignore_timer = hitbox->getImmunityTimer();
@@ -432,10 +317,6 @@ void Object::addHitboxImmunity(Entity* other, Hitbox* hitbox){
     this->hitbox_immunity = new_immunity;
 }
 
-/** Checks immunity against the hitbox of another entity
- * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
- * @param hitbox The hitbox to check immunity for
- */
 bool Object::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
     if(this->hitbox_immunity == nullptr){
         return false;
@@ -454,9 +335,6 @@ bool Object::checkHitboxImmunity(Entity* other, Hitbox* hitbox){
     return false;
 }
 
-/** Cleans up the hitbox immunity list; should be run in the _process step
- * @param delta The amount of time (in ms) that have passed since the last frame
- */
 void Object::cleanupHitboxImmunity(uint64_t delta){
     HitboxImmunityList* cursor = this->hitbox_immunity;
     HitboxImmunityList* last_cursor = this->hitbox_immunity;
@@ -483,9 +361,6 @@ void Object::cleanupHitboxImmunity(uint64_t delta){
     }
 }
 
-/** Gets the hitboxes of the current animation state
- * @return The HitboxList containing the entity's current hitboxes
- */
 HitboxList* Object::getHitboxes(){
     if(this->active_animation == nullptr){
         return nullptr;
@@ -493,19 +368,185 @@ HitboxList* Object::getHitboxes(){
     return this->active_animation->getHitboxes();
 }
 
-/** Called on object collision; should be overridden by children if you want collision logic.
- * @param other The other object
- * @param this_hitbox The hitbox that collided from this object
- * @param other_hitbox The hitbox that collided from the other object
- */
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
 }
 
-/** Serializing object data (WIP)
- * @param file An open file to write to
- * @param base_zone The zone this object belongs to (used for zone-based offsets)
- * @return -1 on failure, 0 on success
- */
+Animation* Object::findAnimation(const char* animation_name){
+    std::string animation_str(animation_name);
+    if(animations.find(animation_str) == animations.end()){
+        return nullptr;
+    }
+    return animations[animation_str];
+}
+
+int Object::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
+    //If the animation already exists, just return
+    if(findAnimation(animation_name) != nullptr){
+        return -1;
+    }
+
+    Animation* new_animation = new Animation(animation_name, &x, &y, num_sprite_sets);
+    animations[std::string(animation_name)] = new_animation;
+    return 0;
+}
+
+int Object::addAnimation(Animation* animation){
+    std::string animation_name(animation->getName());
+    if(animations.find(animation_name) != animations.end()){
+        return -1;
+    }
+
+    animations[animation_name] = animation;
+    return 0;
+}
+
+int Object::addFrame(const char* animation_name, unsigned int keytime, unsigned int iter){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+    unsigned int ret = 0;
+    for(unsigned int i = 0; i < iter; i++){
+        ret |= animation->addFrame(keytime);
+    }
+    return ret; 
+}
+
+int Object::addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset, int y_offset, int width, int height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    //If the animation doesn't have the sprite set, add it
+    if(!animation->hasSpriteSet(sprite_set)){
+        animation->addSpriteSet(sprite_set);
+    }
+
+    return animation->addSprite(sprite_set, sprite_id, x_offset, y_offset, width, height);
+}
+
+int Object::addSpriteSet(const char* animation_name, const char* sprite_set){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    return animation->addSpriteSet(sprite_set);
+}
+
+int Object::setSpriteSet(const char* animation_name, const char* sprite_set){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    return animation->setSpriteSet(sprite_set);
+}
+
+int Object::setSpriteSet(const char* sprite_set){
+    int ret = 0;
+    for(auto& animation : animations){
+        ret |= animation.second->setSpriteSet(sprite_set);
+    }
+
+    return ret;
+}
+
+double Object::getUpperDrawAxis(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    return this->active_animation->getUpperDrawAxis();
+}
+
+double Object::getLowerDrawAxis(){
+    if(this->active_animation == nullptr){
+        return 0;
+    }
+    return this->active_animation->getLowerDrawAxis();
+}
+
+int Object::setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    animation->setUpperDrawAxis(draw_axis, sprite_num);
+    return 0;
+}
+
+int Object::setLowerDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+
+    animation->setLowerDrawAxis(draw_axis, sprite_num);
+    return 0;
+}
+
+int Object::setUpperDrawAxis(double draw_axis, int32_t sprite_num){
+    if(animations.empty()){
+        return -1;
+    }
+
+    for(auto& animation : animations){
+        animation.second->setUpperDrawAxis(draw_axis, sprite_num);
+    }
+
+    return 0;
+}
+
+int Object::setLowerDrawAxis(double draw_axis, int32_t sprite_num){
+    if(animations.empty()){
+        return -1;
+    }
+
+    for(auto& animation : animations){
+        animation.second->setLowerDrawAxis(draw_axis, sprite_num);
+    }
+
+    return 0;
+}
+
+int Object::addSound(const char* animation_name, const char* sound_id, int sequence_num){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+    return animation->addSound(sound_id, sequence_num);
+}
+
+int Object::setAnimation(const char* animation_name){
+    Animation* animation = findAnimation(animation_name);
+    if(animation != nullptr && animation != this->active_animation){
+        this->active_animation = animation;
+        this->active_animation->start();
+        return 0;
+    }
+    else{
+        return -1;
+    }
+}
+
+int Object::setSize(const char* animation_name, float width, float height){
+    Animation* animation = findAnimation(animation_name);
+    if(animation == nullptr){
+        return -1;
+    }
+    animation->setSize(width, height);
+    return 0;
+}
+
+void Object::setSize(float width, float height){
+    for(auto& animation : animations){
+        animation.second->setSize(width, height);
+    }
+}
+
+
 int Object::serializeData(FILE* file, Zone* base_zone){
     if(Entity::serializeData(file, base_zone) == -1){
         return 0;
@@ -518,14 +559,68 @@ int Object::serializeData(FILE* file, Zone* base_zone){
     WriteVar((uint64_t)write_x, uint64_t, file);
     WriteVar((uint64_t)write_y, uint64_t, file);
 
+    //ANIMATION SECTION
+    WriteVar(animations.size(), uint16_t, file);
+
+    for(auto& animation : animations){
+        animation.second->serializeData(file);
+    }
+
+    if(this->active_animation != nullptr){
+        const char* starting_animation = this->active_animation->getName();
+        uint16_t starting_animation_len = strlen(starting_animation);
+        WriteVar(starting_animation_len, uint16_t, file);
+        fwrite(starting_animation, 1, starting_animation_len, file);
+    }
+    else{
+        Animation* default_animation = this->animations.begin()->second;
+        if(default_animation != nullptr){
+            const char* starting_animation = default_animation->getName();
+            uint16_t starting_animation_len = strlen(starting_animation);
+            WriteVar(starting_animation_len, uint16_t, file);
+            fwrite(starting_animation, 1, starting_animation_len, file);
+        }
+        else{
+            const uint16_t zero = 0;
+            fwrite(&zero, sizeof(zero), 1, file);
+        }
+    }
+
     return 0;
 }
 
-/** Serializing object assets (to be overridden by children, as necessary)
- * @param file An open file to write to
- * @param serialize_set The serialization set (logs saved assets)
- * @return -1 on failure, 0 on success
- */
+
+int Object::deserializeData(FILE* file){
+    if(Entity::deserializeData(file) != 0){
+        return -1;
+    }
+
+    //ANIMATION SECTION
+    uint16_t num_animations;
+    ReadVar(num_animations, file);
+    for(int i = 0; i < num_animations; i++){
+        Animation* new_animation = new Animation(file);
+        this->addAnimation(new_animation);
+    }
+
+    //Set staring animation
+    uint16_t starting_str_len;
+    ReadVar(starting_str_len, file);
+    if(starting_str_len > 0){
+        char starting_str[starting_str_len + 1];
+        fread(starting_str, starting_str_len, 1, file);
+        starting_str[starting_str_len] = '\0';
+        this->setAnimation(starting_str);
+    }
+}
+
 int Object::serializeAssets(FILE* file, SerializeSet& serialize_set){
-    return Entity::serializeAssets(file, serialize_set);
+    int ret = 0;
+    ret |= Entity::serializeAssets(file, serialize_set);
+    
+    for(auto& animation : animations){
+        ret |= animation.second->serializeAssets(file, serialize_set);
+    }
+
+    return ret;
 }

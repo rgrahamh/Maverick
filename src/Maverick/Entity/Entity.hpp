@@ -17,48 +17,102 @@ class Zone;
 
 class Entity{
 	public:
+		/** Entity parameterized constructor
+		 * @param name The name of the entity
+		 * @param draw_layer The draw layer of the entity
+		 */
 		Entity(const char* name, int draw_layer = 1);
+
+		/** Construct the entity from file
+		 * @param file The file you wish to construct the entity with, pointing to the object type indicator
+		 */
 		Entity(FILE* file);
+
+		/** Destructor for entities
+		 */
 		virtual ~Entity();
+
+		/** Gets the name of the entity
+		 * @return The name of the entity
+		 */
 		char* getName();
-		virtual float getWidth();
-		virtual float getHeight();
+
+		/** Gets the width of the entity
+		 * @return The width of the entity
+		 */
+		virtual double getWidth() = 0;
+
+		/** Gets the height of the entity
+		 * @return The height of the entity
+		 */
+		virtual double getHeight() = 0;
+
+		/** Gets the draw layer of the entity
+		 * @return The draw layer of the entity
+		 */
 		int16_t getDrawLayer();
-		double getUpperDrawAxis();
-		double getLowerDrawAxis();
+
+		/** Gets a pointer to an attribute
+		 * @param key The attribute you're looking for
+		 * @return A pointer to the var if found, NULL otherwise
+		 */
 		void* getAttr(const char* key);
+
+		/** Gets the entity type
+		 * @return A uint32_t representation of the entity type set in the constructor
+		 */
 		uint32_t getType();
+
+		/** Sets if the current entity is active (can be interacted with)
+		 * @return If the entity is active
+		 */
 		bool isActive();
+
+		/** Sets if the current entity is visible (will/won't be drawn)
+		 * @return If the entity is active
+		 */
 		bool isVisible();
 
-		int addAnimation(Animation* animation);
-		int addAnimation(const char* animation_name, uint32_t num_sprite_sets);
+		/** Sets the activation of the current animation state
+		 * @return If the entity is active
+		 */
+		virtual void setActive(bool active);
 
-		int addFrame(const char* animation_name, unsigned int keytime = 0, unsigned int iter = 1);
-		int addSpriteSet(const char* animation_name, const char* sprite_set);
-		int addSprite(const char* animation_name, const char* sprite_set, const char* sprite_id, int x_offset = 0, int y_offset = 0, int width = -1, int height = -1);
-
-		int addSound(const char* animation_name, const char* sound_path, int sequence_num);
-
-		int setAnimation(const char* animation_name);
-		int setSize(const char* animation_name, float width, float height);
-		void setSize(float width, float height);
-		void setActive(bool active);
-		void setVisible(bool visible);
-		int setSpriteSet(const char* animation_name, const char* sprite_set);
-		int setSpriteSet(const char* sprite_set);
-
-		int setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num);
-		int setUpperDrawAxis(double draw_axis, int32_t sprite_num);
-
-		int setLowerDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num);
-		int setLowerDrawAxis(double draw_axis, int32_t sprite_num);
+		/** Sets the visibility of the current animation state
+		 * @return If the entity is active
+		 */
+		virtual void setVisible(bool visible);
 
 		//Sets an attribute
+		//TODO: Look into if we can make this templated; it'd be a lot simpler!
+		/** Sets the attribute key to the specified (as a bool)
+		 * @param key The key you wish to set
+		 * @param val The val you wish to set
+		 */
 		void setAttr(const char* key, bool val);
+
+		/** Sets the attribute key to the specified val (as a char)
+		 * @param key The key you wish to set
+		 * @param val The val you wish to set
+		 */
 		void setAttr(const char* key, char val);
+
+		/** Sets the attribute key to the specified val (as a signed int)
+		 * @param key The key you wish to set
+		 * @param val The val you wish to set
+		 */
 		void setAttr(const char* key, int64_t val);
+
+		/** Sets the attribute key to the specified val (as an unsigned int)
+		 * @param key The key you wish to set
+		 * @param val The val you wish to set
+		 */
 		void setAttr(const char* key, uint64_t val);
+
+		/** Sets the attribute key to the specified val (as a string)
+		 * @param key The key you wish to set
+		 * @param val The val you wish to set
+		 */
 		void setAttr(const char* key, char* val);
 
 		//Processing functions
@@ -72,11 +126,27 @@ class Entity{
 		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) = 0;
 
-		//Object serialization
+		/** Saves the resources of the entity to a char*'s (which should be freed upon return)
+		 * @param file The pointer to the open file to write to
+		 * @param written_sprites The set of sprites that have already been written to file
+		 * @param written_audio The set of audio assets that have already been written to file
+		 * @param written_music The set of music assets that have already been written to file (used just by entities that handle music)
+		 * @return The number of bytes that *buff_ptr is
+		 */
 		virtual int serializeAssets(FILE* file, SerializeSet& serialize_set);
+
+		/** Serializes data
+		 * @param file The file to write serialization data to
+		 * @param base_zone The base zone that the entity belongs to (needed for using the local object offset)
+		 * @return -1 if serialization failed, 0 otherwise
+		 */
 		virtual int serializeData(FILE* file, Zone* base_zone);
 
-		int deserializeData(FILE* file);
+		/** Deserialized data from a file
+		 * @param file The file to read info from
+		 * @return -1 if serialization failed, 0 otherwise
+		 */
+		virtual int deserializeData(FILE* file);
 
 	protected:
 		//Name
@@ -95,7 +165,8 @@ class Entity{
 		//Draw layer tracking
 		int16_t draw_layer;
 
-		Animation* findAnimation(const char* animation_name);
+		//X & Y coords; setters aren't needed because you shouldn't be able to directly set this value for all entities
+		double x, y;
 };
 
 #endif

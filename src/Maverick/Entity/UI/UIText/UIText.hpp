@@ -11,55 +11,99 @@ enum ALIGNMENT{
 
 class UIText : public UIElement{
     public:
+        /** UIText constructor (for viewport calcs, 1.0 is one screen width/height)
+         * @param name The name of the UIElement
+         * @param view_x_offset The viewport X offset of the UIElement
+         * @param view_y_offset The viewport Y offset of the UIElement
+         * @param view_width The viewport width of the UIElement
+         * @param view_height The viewport height of the UIElement
+         * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
+         * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
+         * @param text The text to display
+         * @param font_path The filepath to the .ttf file you wish to use
+         * @param scroll_speed The speed at which text scrolls (in units of chars/sec)
+         * @param point The point (size) of the text
+         * @param x_alignment The horizontal alignment of the text
+         * @param y_alignment The vertical alignment of the text
+         * @param wrap If you'd like text wrapping
+         */
         UIText(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer, const char* font_path, const char* text = "", float scroll_speed = 0.0, unsigned int size = 12, ALIGNMENT x_alignment = ALIGNMENT::STANDARD_ALIGN, ALIGNMENT y_alignment = ALIGNMENT::STANDARD_ALIGN, bool wrap = false);
-        virtual ~UIText();
+
+        /** UIText Default Destructor
+         */
+        ~UIText();
 
         void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
         void process(uint64_t delta, unsigned int steps) override;
 
-        //Set the displayed text
+        /** Sets the text's contents 
+         * @param text The text you wish to use (will make a local copy of the text)
+         */
         void setText(const char* text);
 
-        //Sets the font
+        /** Sets the text's font (call upon change of font or size)
+         * @param font_name The path to a .ttf you wish to use
+         */
         void setFont(const char* font_name);
 
-        //Sets the style (strikethrough, bold, etc.)
+        /** Sets the style of the font
+         * @param style Any number of TTF_STYLE_* attrs OR'd together
+         */
         void setStyle(enum FONT_STYLE style);
 
-        //Sets the size
+        /** Sets the size of the font
+         * @param size The point (size) of the font
+         */
         void setSize(unsigned int size);
 
-        //Sets the text color
+        /** Sets the color of font
+         * @param r The red value of the font
+         * @param g The green value of the font
+         * @param b The blue value of the font
+         * @param a The alpha value of the font
+         */
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
 
-        //Sets the X alignment
+        /** Sets the X alignment
+         * @param x_alignment The X alignment
+         */
         void setXAlignment(ALIGNMENT x_alignment);
 
-        //Sets the Y alignment
+        /** Sets the Y alignment
+         * @param y_alignment The Y alignment
+         */
         void setYAlignment(ALIGNMENT y_alignment);
 
-        //Sets the speed at which text scrolls
-        //(0.0 means it's instant, otherwise it's in units of chars/sec)
+        /** Sets the text scroll speed
+         * @param scroll_speed The speed of text scroll speed (0.0 means it's instant, otherwise it's in units of chars/sec)
+         */
         void setScrollSpeed(float scroll_speed);
 
-        //Updates to the next page's contents (for continued text on the next "page")
+        /** Loads the next section of text into the ref buff
+         */
         void nextPage();
 
-        //If we hit the end of the text
+        /** If we've hit the end of text
+         * @return If we've hit the end of text
+         */
         bool hitTextEnd();
 
-        //If we hit the character limit
+        /** If we've hit the end of the draw area
+         * @return If we've hit the end of the draw area
+         */
         bool hitDrawEnd();
 
     private:
-        //Gets the next line break
+        /** Gets the next break point (a tab or space character)
+         * @param str The string we're checking the next break for
+         * @return A char* pointing to the first instance of a break
+         */
         char* getNextBreak(char* str);
 
-        //Gets the letter height
+        /** Gets the height of a character in current config (assumes all letters are the same height)
+         * @return The letter height, or 0 if no letters were found
+         */
         uint32_t getCharHeight();
-
-        //Flushes current print & ref buffers
-        void flushBuffers();
 
         //The text
         char* text;

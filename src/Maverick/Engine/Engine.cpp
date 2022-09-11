@@ -14,9 +14,6 @@ std::thread::id base_thread_id = std::this_thread::get_id();
 
 Engine* Engine::engine = nullptr;
 
-/** Engine's parameterized constructor
- * @param zones The zones that the game engine is initialized with
- */
 Engine::Engine(){
     exit_game = false;
 
@@ -73,10 +70,6 @@ Engine::Engine(){
     }
     this->camera = new Camera(renderer, window, nullptr, CAMERA_FOLLOW_MODE::FIXED_FOLLOW, 0.08);
 
-    //Set up the screenshot blit surface
-    this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-    this->screen_blit_texture = nullptr;
-
     //Setting up the hash tables
     this->sprite_hash = new SpriteHash(2048);
     this->sound_hash = new SoundHash(2048);
@@ -108,12 +101,8 @@ Engine::Engine(){
     this->gravity = 0.1;
 
     endian = getEndian();
-
-    this->thread_cleanup_queue = new std::queue<std::thread::id>();
 }
 
-/** Engine's destructor
- */
 Engine::~Engine(){
     ZoneList* zone_cursor = zones;
     while(zones != NULL){
@@ -142,14 +131,10 @@ Engine::~Engine(){
     freeFullEntityList();
 }
 
-/** The function that is called to start the game engine's operation
- */
 void Engine::start(){
     gameLoop();
 }
 
-/** The primary game loop
- */
 void Engine::gameLoop(){
     uint64_t last_time = this->delta;
 
@@ -197,15 +182,9 @@ void Engine::gameLoop(){
             //Different because we need to adjust the object list for draw order
             this->drawStep(&this->entities);
         }
-
-        //Thread cleanup
-        this->threadGC();
 	}
 }
 
-/** The action step of the game engine
- * @param all_objects All of the objects that should be listening for input
- */
 void Engine::actionStep(EntityList* all_entities){
     //Update controller/keyboard input
     control->updateInput();
@@ -236,8 +215,6 @@ void Engine::actionStep(EntityList* all_entities){
     this->globalAction();
 }
 
-/** Handles object-nonspecific actions (like menuing for example)
- */
 void Engine::globalAction(){
     const uint8_t* keys = control->getKeys();
     const uint8_t* old_keys = control->getOldKeys();
@@ -256,9 +233,6 @@ void Engine::globalAction(){
     }
 }
 
-/** The physics step of the game engine
- * @param all_objects All of the objects that physics should be simluated for
- */
 void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
     ObjectList* all_objects = all_entities->obj;
     if(!this->checkState(GAME_STATE::PAUSE)){
@@ -284,9 +258,6 @@ void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
     this->current_y_scale += (this->target_y_scale - this->current_y_scale) * ZOOM_RATE;
 }
 
-/** The collision step of the game engine
- * @param all_objects All of the objects that collisions should be checked for
- */
 void Engine::collisionStep(ObjectList* all_objects){
     //Sister arrays for the list matricies
     ObjectList* object_matrix[16][9] = {{nullptr}};
@@ -433,9 +404,6 @@ void Engine::collisionStep(ObjectList* all_objects){
     }
 }
 
-/** The draw step of the game engine
- * @param all_entities An entity list of all entities to draw
- */
 void Engine::drawStep(EntityList* all_entities){
     SDL_Renderer* renderer = this->camera->getRenderer();
 
@@ -463,11 +431,7 @@ inline static bool checkDrawOverlap(Object* obj1, Object* obj2){
            (obj2->getUpperDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getUpperDrawAxis() <= obj1->getLowerDrawAxis());
 }
 
-/** Recursively sorts the objects in the order of draw
- * @param curr_obj The current object that you're sorting through
- * @return The current draw object
- */
-ObjectList* Engine::drawSort(ObjectList* curr_obj){
+inline ObjectList* Engine::drawSort(ObjectList* curr_obj){
     //Checking if we have any objects
     if(curr_obj != NULL){
         //Case where it's the last iteration (everything is sorted)
@@ -505,10 +469,6 @@ ObjectList* Engine::drawSort(ObjectList* curr_obj){
     }
 }
 
-/** Gets the first object by name in any zone (slower than specifying zone)
- * @param element_name The name of the object element
- * @return A pointer to the object, or NULL if it can't be found
- */
 UIElement* Engine::getUIElement(const char* element_name){
     ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
@@ -525,10 +485,6 @@ UIElement* Engine::getUIElement(const char* element_name){
     return NULL;
 }
 
-/** Gets the first object by name in any zone (slower than specifying zone)
- * @param obj_name The name of the object
- * @return A pointer to the object, or NULL if it can't be found
- */
 Object* Engine::getObject(const char* obj_name){
     ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
@@ -545,11 +501,6 @@ Object* Engine::getObject(const char* obj_name){
     return NULL;
 }
 
-/** Gets the first object found by name from a specific zone
- * @param obj_name The name of the object
- * @param zone_name The name of the zone
- * @return A pointer to the object
- */
 Object* Engine::getObject(const char* obj_name, const char* zone_name){
     ZoneList* zone_cursor = this->active_zones;
     while(zone_cursor != NULL){
@@ -567,99 +518,42 @@ Object* Engine::getObject(const char* obj_name, const char* zone_name){
     return NULL;
 }
 
-/** Gets the state of the engine
- * @return The state of the engine
- */
 uint64_t Engine::getState(){
     return this->state;
 }
 
-/** Gets the camera engine's camera
- * @return The engine's camera
- */
 Camera* Engine::getCamera(){
     return this->camera;
 }
 
-/** Gets the window the engine is using
- * @return The window the engine is using
- */
 SDL_Window* Engine::getWindow(){
     return this->window;
 }
 
-/** Gets the texture representing all object (to be blit elsewhere on the screen)
- * @return The texture being blit (or nullptr if the blit failed)
- */
-SDL_Texture* Engine::getScreenBlitTexture(){
-    return this->screen_blit_texture;
-}
-
-/** Checks the state of the engine against the passed-in state(s)
- * @param chk_state The state(s) you wish to check
- * @return If the engine is in chk_state
- */
 bool Engine::checkState(uint64_t chk_state){
     return (this->state & chk_state) != 0;
 }
 
-/** Sets the state of the engine
- * @param state The new of the engine
- */
 void Engine::setState(uint64_t state){
     this->state = state;
 }
 
-/** Sets the global X scale of the engine
- * @param x_scale The global X scale of the engine
- */
 void Engine::setGlobalXScale(double x_scale){
     this->target_x_scale = x_scale;
 }
 
-/** Sets the global Y scale of the engine
- * @param y_scale The global Y scale of the engine
- */
 void Engine::setGlobalYScale(double y_scale){
     this->target_y_scale = y_scale;
 }
 
-/** Returns the global X scale of the engine
- * @return The global X scale of the engine
- */
 float Engine::getGlobalXScale(){
     return this->target_x_scale;
 }
 
-/** Returns the global Y scale of the engine
- * @return The global Y scale of the engine
- */
 float Engine::getGlobalYScale(){
     return this->target_y_scale;
 }
 
-/** Goes through all active threads and cleans them up
- */
-inline void Engine::threadGC(){
-    while(thread_cleanup_queue.load()->empty() == false){
-        std::thread::id thread_id = thread_cleanup_queue.load()->front();
-        thread_cleanup_queue.load()->pop();
-        if(thread_map.find(thread_id) != thread_map.end()){
-            std::thread* thread_ptr = thread_map[thread_id];
-            if(thread_ptr != nullptr && thread_ptr->joinable()){
-                thread_ptr->join();
-                thread_map.erase(thread_id);
-            }
-        }
-    }
-}
-
-/** Handles the default collision between two objects
- * @param obj1 The first object in the collision
- * @param box1 The first hitbox in the collision
- * @param obj2 The second object in the collision
- * @param box2 The second hitbox in the collision
- */
 void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2){
     unsigned int box1_prop = box1->getType();
     unsigned int box2_prop = box2->getType();
@@ -771,9 +665,6 @@ void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hi
     }
 }
 
-/** Make a combined deep copy of the object list (so that things of different zones can interact if they're adjacent)
- * @return A full list of all active objects in the engine
- */
 void Engine::buildFullEntityList(){
     if(unlikely(this->entities.obj == nullptr)){
         this->entities.obj = new ObjectList;
@@ -860,9 +751,6 @@ void Engine::buildFullEntityList(){
     }
 }
 
-/** Frees the full list of objects generated for each step
- * @param all_objects The full list of objects
- */
 void Engine::freeFullEntityList(){
     ObjectList* free_objects;
     ObjectList* all_objects = this->entities.obj;
@@ -881,26 +769,7 @@ void Engine::freeFullEntityList(){
     }
 }
 
-/** Adds a new thread to the engine (to get cleaned up once the thread's execution halts)
- * @param thread The thread to add
- */
-void Engine::addThread(std::thread* thread){
-    thread_map[thread->get_id()] = thread;
-}
-
-/** Pushes a thread to the thread cleanup queue
- * @param thread_id The thread ID you'd like to clean up
- */
-void Engine::cleanupThread(std::thread::id thread_id){
-    if(thread_id != base_thread_id){
-        thread_cleanup_queue.load(std::memory_order_relaxed)->push(thread_id);
-    }
-}
-
-/** Adds a new zone to the game
- * @param zone The zone to add
- */
-void Engine::addZone(Zone* zone){
+inline void Engine::addZone(Zone* zone){
     if(getZone(zone->getName()) == nullptr){
         ZoneList* new_zone = new ZoneList;
         new_zone->zone = zone;
@@ -912,12 +781,7 @@ void Engine::addZone(Zone* zone){
     }
 }
 
-/** Adds an object to the zone
- * @param zone The zone we're adding an object to
- * @param object The object we're adding to the zone
- * @return -1 if the zone isn't found, 0 otherwise
- */
-int Engine::addObject(const char* zone, Object* object){
+inline int Engine::addObject(const char* zone, Object* object){
     Zone* zone_ptr = getZone(zone);
     if(zone == nullptr){
         return -1;
@@ -928,12 +792,7 @@ int Engine::addObject(const char* zone, Object* object){
     return 0;
 }
 
-/** Adds an UI Element to the zone
- * @param zone The zone we're adding a UI element to
- * @param element The UI element we're adding to the zone
- * @return -1 if the zone isn't found, 0 otherwise
- */
-int Engine::addUIElement(const char* zone, UIElement* element){
+inline int Engine::addUIElement(const char* zone, UIElement* element){
     Zone* zone_ptr = getZone(zone);
     if(zone == nullptr){
         return -1;
@@ -944,41 +803,22 @@ int Engine::addUIElement(const char* zone, UIElement* element){
     return 0;
 }
 
-/**Adds a surface to the sprite hash
- * @param key The key representing the surface
- * @param surface The surface being added to the hash
- */
-void Engine::addSurface(const char* key, SDL_Surface* surface){
+inline void Engine::addSurface(const char* key, SDL_Surface* surface){
     this->sprite_hash->add(key, surface);
 }
 
-/**Adds a sound to the sprite hash
- * @param key The key representing the sound
- * @param sound The sound being added to the hash
- */
-void Engine::addSound(const char* key, Sound* sound){
+inline void Engine::addSound(const char* key, Sound* sound){
     this->sound_hash->add(key, sound);
 }
 
-/**Adds a music to the sprite hash
- * @param key The key representing the music
- * @param music The music being added to the hash
- */
-void Engine::addMusic(const char* key, Music* music){
+inline void Engine::addMusic(const char* key, Music* music){
     this->music_hash->add(key, music);
 }
 
-/**Adds a font to the sprite hash
- * @param key The key representing the font
- * @param font The font being added to the hash
- */
-void Engine::addFont(const char* key, Font* font){
+inline void Engine::addFont(const char* key, Font* font){
     this->font_hash->add(key, font);
 }
 
-/** Moves a Zone to the active_zones ZoneList
- * @param zone_name The name of the zone you wish to move
- */
 void Engine::activateZone(const char* zone_name){
     //If it's the first zone
     if(this->zones != nullptr && strcmp(this->zones->zone->getName(), zone_name) == 0){
@@ -1001,9 +841,6 @@ void Engine::activateZone(const char* zone_name){
     }
 }
 
-/** Moves a zone from active_zone to zones
- * @param zone_name The name of the zone you wish to deactivate
- */
 void Engine::deactivateZone(const char* zone_name){
     //If it's the first zone
     if(zone_name != NULL){
@@ -1028,9 +865,6 @@ void Engine::deactivateZone(const char* zone_name){
     }
 }
 
-/** Unloads a zone from memory
- * @param zone_name The name of the zone you wish to unload
- */
 void Engine::unloadZone(const char* zone_name){
     //If it's the first zone
     if(this->zones != nullptr && strcmp(this->zones->zone->getName(), zone_name) == 0){
@@ -1053,17 +887,10 @@ void Engine::unloadZone(const char* zone_name){
     }
 }
 
-/** Gets all zones
- * @return A ZoneList* of all zones
- */
-ZoneList* Engine::getZones(){
+inline ZoneList* Engine::getZones(){
     return this->zones;
 }
 
-/** Gets a zone by name
- * @param zone_name The name of the zone you want
- * @return The requested zone
- */
 Zone* Engine::getZone(const char* zone_name){
     ZoneList* zone_cursor = this->zones;
     while(zone_cursor != nullptr){
@@ -1084,62 +911,34 @@ Zone* Engine::getZone(const char* zone_name){
     return nullptr;
 }
 
-/** Gets all active zones
- * @return A ZoneList* of all active zones
- */
-ZoneList* Engine::getActiveZones(){
+inline ZoneList* Engine::getActiveZones(){
     return this->active_zones;
 }
 
-/** Gets the engine's sound board
- * @return The engine's sound board
- */
-SoundBoard* Engine::getSoundBoard(){
+inline SoundBoard* Engine::getSoundBoard(){
     return this->sound_board;
 }
 
-/** Gets the global gravity val of the engine
- * @return The global gravity val
- */
-float Engine::getGravity(){
+inline float Engine::getGravity(){
     return this->gravity;
 }
 
-/** Sets the global gravity val of the engine
- * @param gravity The global gravity val
- */
-void Engine::setGravity(float gravity){
+inline void Engine::setGravity(float gravity){
     this->gravity = gravity;
 }
 
-/** Gets a texture from the engine
- * @param key The texture's identifier in the hash table
- * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
- */
-SDL_Surface* Engine::getSurface(const char* key){
+inline SDL_Surface* Engine::getSurface(const char* key){
     return this->sprite_hash->get(key);
 }
 
-/** Gets a sound from the engine
- * @param key The sound's identifier in the hash table
- * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
- */
-Sound* Engine::getSound(const char* key){
+inline Sound* Engine::getSound(const char* key){
     return this->sound_hash->get(key);
 }
 
-/** Gets a music from the engine
- * @param key The music's identifier in the hash table
- * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
- */
-Music* Engine::getMusic(const char* key){
+inline Music* Engine::getMusic(const char* key){
     return this->music_hash->get(key);
 }
 
-/** Gets a font from the engine
- * @param key The font's identifier in the hash table
- * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
- */
-Font* Engine::getFont(const char* key){
+inline Font* Engine::getFont(const char* key){
     return this->font_hash->get(key);
 }
