@@ -122,8 +122,6 @@ void Music::fadeVolume(int channel_id, float volume, unsigned int fade){
         current_volume += volume_dir;
         Mix_Volume(channel_id, current_volume);
     }
-
-	Engine::getInstance()->cleanupThread(std::this_thread::get_id());
 }
 
 int Music::addTrack(Sound* track){

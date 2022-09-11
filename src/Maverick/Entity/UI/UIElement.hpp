@@ -32,8 +32,8 @@ class UIElement : public Entity{
     public:
         /** UIElement constructor (for viewport calcs, 1.0 is one screen width/height)
          * @param name The name of the UIElement
-         * @param view_x The viewport X offset of the UIElement
-         * @param view_y The viewport X offset of the UIElement
+         * @param view_x_offset The viewport X offset of the UIElement
+         * @param view_y_offset The viewport X offset of the UIElement
          * @param view_width The viewport width of the UIElement
          * @param view_height The viewport height of the UIElement
          * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
@@ -114,8 +114,8 @@ class UIElement : public Entity{
         void setViewSize(double view_width, double view_height);
 
         /** Sets the UI offset of the UIElement
-         * @param view_x The new X viewport offset
-         * @param view_y The new Y viewport offset
+         * @param view_x_offset The new X viewport offset
+         * @param view_y_offset The new Y viewport offset
          */
         void setViewOffset(double x_offset, double y_offset);
 
@@ -171,8 +171,8 @@ class UIElement : public Entity{
         std::vector<UIElement*> subelements;
 
         //The UI offsets/sizing
-        double view_x;
-        double view_y;
+        double view_x_offset;
+        double view_y_offset;
         double view_width;
         double view_height;
 

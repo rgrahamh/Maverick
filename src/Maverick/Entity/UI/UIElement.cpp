@@ -1,11 +1,11 @@
 #include "UIElement.hpp"
 #include "../../Engine/Engine.hpp"
 
-UIElement::UIElement(const char* name, double view_x, double view_y, double view_width, double view_height, int draw_layer)
+UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer)
          : Entity(name, draw_layer){
     //Setting viewport position/scaling stats
-    this->view_x = view_x;
-    this->view_y = view_y;
+    this->view_x_offset = view_x_offset;
+    this->view_y_offset = view_y_offset;
     this->view_width = view_width;
     this->view_height = view_height;
 
@@ -14,8 +14,8 @@ UIElement::UIElement(const char* name, double view_x, double view_y, double view
     int win_width, win_height;
     SDL_GetWindowSize(Engine::getInstance()->getWindow(), &win_width, &win_height);
 
-    this->x = view_x * win_width;
-    this->y = view_y * win_height;
+    this->x = view_x_offset * win_width;
+    this->y = view_y_offset * win_height;
 
     this->width = view_width * win_width;
     this->height = view_height * win_height;
@@ -85,8 +85,8 @@ void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int c
 inline void UIElement::updateDrawArea(){
     int win_width, win_height;
     SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
-    this->x = this->view_x * win_width;
-    this->y = this->view_y * win_height;
+    this->x = this->view_x_offset * win_width;
+    this->y = this->view_y_offset * win_height;
     this->width = this->view_width * win_width;
     this->height = this->view_height * win_height;
 }
@@ -100,15 +100,15 @@ void UIElement::setViewSize(double view_width, double view_height){
     this->view_height = view_height;
 }
 
-void UIElement::setViewOffset(double view_x, double view_y){
+void UIElement::setViewOffset(double view_x_offset, double view_y_offset){
     int win_width, win_height;
     SDL_Renderer* renderer = Engine::getInstance()->getCamera()->getRenderer();
     SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
-    double view_x_diff = (view_x - this->view_x);
-    double view_y_diff = (view_y - this->view_y);
+    double view_x_diff = (view_x_offset - this->view_x_offset);
+    double view_y_diff = (view_y_offset - this->view_y_offset);
 
-    this->view_x = view_x;
-    this->view_y = view_y;
+    this->view_x_offset = view_x_offset;
+    this->view_y_offset = view_y_offset;
 
     this->x += view_x_diff * win_width;
     this->y += view_y_diff * win_height;
@@ -206,8 +206,8 @@ int UIElement::serializeData(FILE* file, Zone* base_zone){
     }
 
     //Write X/Y offsets
-    WriteVar((uint64_t)view_x, uint64_t, file);
-    WriteVar((uint64_t)view_y, uint64_t, file);
+    WriteVar((uint64_t)view_x_offset, uint64_t, file);
+    WriteVar((uint64_t)view_y_offset, uint64_t, file);
 
     //Write width/height
     WriteVar((uint64_t)view_width, uint64_t, file);

@@ -1,10 +1,6 @@
 #include "./Camera.hpp"
 #include "./../Engine/Engine.hpp"
 
-/** The parameterized constructor for the camera
- * @param window The window that the camera should be drawing to
- * @param reference The object that the camera is centered on
- */
 Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = nullptr, CAMERA_FOLLOW_MODE follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW, double follow_rate = 0.08){
     this->reference = reference;
     this->current_x = 0;
@@ -22,15 +18,10 @@ Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = n
     this->y_scale = 1.0;
 }
 
-/** Sets the reference for the center of the camera
- * @param reference The reference object you wish to center on
- */
 void Camera::setReference(Object* reference){
     this->reference = reference;
 }
 
-/** Recenters the camera on the reference object
- */
 void Camera::recenter(){
     if(this->reference == NULL){
         return;
@@ -50,9 +41,6 @@ void Camera::recenter(){
     }
 }
 
-/** Draws all objects in the given object list
- * @param obj_lst The object list that you wish to draw
- */
 void Camera::_draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset, double camera_y_offset){
     recenter();
 
@@ -70,9 +58,6 @@ void Camera::_draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset, 
     }
 }
 
-/** Draws all UI elements in the given UI element list
- * @param obj_lst The UI element list that you wish to draw
- */
 void Camera::_draw(UIElementList* element_lst, uint64_t delta){
     while(element_lst != NULL){
         if(element_lst->element->isVisible()){
@@ -82,61 +67,36 @@ void Camera::_draw(UIElementList* element_lst, uint64_t delta){
     }
 }
 
-/** Gets the renderer the camera's using
- * @return The renderer the camera's using
- */
 SDL_Renderer* Camera::getRenderer(){
     return renderer;
 }
 
-/** Gets the X coord of the top-left corner of the camera
- * @return The X coord of the top-left corner of the camera
- */
 double Camera::getX(){
     return this->current_x;
 }
 
-/** Gets the Y coord of the top-left corner of the camera
- * @return The Y coord of the top-left corner of the camera
- */
 double Camera::getY(){
     return this->current_y;
 }
 
-/** Gets the follow mode of the camera
- * @return The follow mode of the camera
- */
 CAMERA_FOLLOW_MODE Camera::getFollowMode(){
     return this->follow_mode;
 }
 
-/** Gets the follow rate of the camera
- * @return The follow rate of the camera
- */
 double Camera::getFollowRate(){
     return this->follow_rate;
 }
 
-/** Sets the X & Y scale of the camera
- * @param x_scale The X scale of the camera
- * @param y_scale The Y scale of the camera
- */
 void Camera::setScale(double x_scale, double y_scale){
     this->x_scale = x_scale;
     this->y_scale = y_scale;
     SDL_RenderSetScale(this->renderer, x_scale, y_scale);
 }
 
-/** Sets the camera follow mode
- * @param follow_mode The new follow mode of the camera
- */
 void Camera::setFollowMode(CAMERA_FOLLOW_MODE follow_mode){
     this->follow_mode = follow_mode;
 }
 
-/** Sets the camera follow rate
- * @param follow_rate The new follow rate of the camera
- */
 void Camera::setFollowRate(double follow_rate){
     this->follow_rate = follow_rate;
 }

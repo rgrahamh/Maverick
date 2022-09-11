@@ -53,7 +53,6 @@ class Engine{
 			return engine;
 		}
 
-
 		//Game engine run
 		/** The function that is called to start the game engine's operation
 		 */
@@ -309,9 +308,6 @@ class Engine{
 		void handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2);
 
 		static Engine* engine;
-
-		//UI Objects
-		UIElementList* ui_elements;
 
 		//Zones
 		ZoneList* zones;
