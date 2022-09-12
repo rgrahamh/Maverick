@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "../Global/Global.hpp"
+#include "Maverick/Global/Global.hpp"
 
 #include <unordered_set>
 #include <unordered_map>

@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "./red.hpp"
-#include "../Maverick/FileHandler/Loader/Loader.hpp"
-#include "../Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/Loader/Loader.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 /** Prints out help for the program
  * @param help_section The section of the app you'd like help for

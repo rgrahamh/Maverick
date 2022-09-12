@@ -39,11 +39,11 @@ endif()
 
 #Game source
 set(CyberenaObjectSrc
-    ../Cyberena/Entity/Object/Character/Character.cpp
-    ../Cyberena/Entity/Object/Character/Race/Race.cpp
-    ../Cyberena/Entity/Object/Character/Style/Style.cpp
-    ../Cyberena/Entity/Object/GlassBall/GlassBall.cpp
-    ../Cyberena/Entity/Object/LoadingZone/LoadingZone.cpp
+    ../Cyberena/Object/Character/Character.cpp
+    ../Cyberena/Object/Character/Race/Race.cpp
+    ../Cyberena/Object/Character/Style/Style.cpp
+    ../Cyberena/Object/GlassBall/GlassBall.cpp
+    ../Cyberena/Object/LoadingZone/LoadingZone.cpp
 )
 
 set(CyberenaUISrc
@@ -71,7 +71,7 @@ set(LedZonesSrc
 )
 
 set(LedUISrc
-    Entity/UI/UILevelPort/UILevelPort.cpp
+    UIElement/UILevelPort/UILevelPort.cpp
 )
 
 set(LedSrc
@@ -83,6 +83,11 @@ set(LedSrc
 add_executable(led
     ${CyberenaSrc}
     ${LedSrc}
+)
+
+target_include_directories(led PUBLIC
+    ../../bin
+    ../../src
 )
 
 target_link_libraries(led

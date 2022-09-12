@@ -1,5 +1,5 @@
 #include "Music.hpp"
-#include "../../Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 Music::Music(const char* name){
     this->playing = false;

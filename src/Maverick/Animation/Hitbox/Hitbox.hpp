@@ -86,9 +86,9 @@ struct HitboxList{
     struct HitboxList* next;
 };
 
-class Entity;
+class Object;
 struct HitboxImmunityList{
-    Entity* entity;
+    Object* obj;
     Hitbox* hitbox;
     uint32_t hitbox_group;
     uint32_t ignore_timer;

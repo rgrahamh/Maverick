@@ -1,8 +1,8 @@
 #ifndef ZONE_H
 #define ZONE_H
 
-#include "../Entity/Object/Object.hpp"
-#include "../Entity/UI/UIElement.hpp"
+#include "../Object/Object.hpp"
+#include "../UIElement/UIElement.hpp"
 
 class Zone{
     public:

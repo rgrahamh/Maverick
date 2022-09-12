@@ -1,5 +1,5 @@
 #include "Loader.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 inline SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;

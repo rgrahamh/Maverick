@@ -4,7 +4,7 @@
 #include <atomic>
 
 #include "../HashTable.hpp"
-#include "../../Font/Font.hpp"
+#include "Maverick/Font/Font.hpp"
 
 typedef struct FontHashEntry{
 	char* key;

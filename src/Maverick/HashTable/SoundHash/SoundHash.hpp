@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <atomic>
 
-#include "../../Audio/Audio.hpp"
+#include "Maverick/Audio/Audio.hpp"
 #include "../HashTable.hpp"
 
 typedef struct SoundHashEntry{

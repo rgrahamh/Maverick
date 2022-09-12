@@ -2,10 +2,10 @@
 
 #ifndef LOADER_H
 #define LOADER_H
-#include "../../Zone/Zone.hpp"
-#include "../../Font/Font.hpp"
-#include "../../Audio/Music/Music.hpp"
-#include "../../../Maverick/Global/Global.hpp"
+#include "Maverick/Zone/Zone.hpp"
+#include "Maverick/Font/Font.hpp"
+#include "Maverick/Audio/Music/Music.hpp"
+#include "Maverick/Global/Global.hpp"
 
 Zone* loadZoneFromFile(const char* zone_name);
 

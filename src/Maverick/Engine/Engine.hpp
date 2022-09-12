@@ -5,21 +5,21 @@
 #include <atomic>
 #include <queue>
 
-#include "../HashTable/SpriteHash/SpriteHash.hpp"
-#include "../HashTable/MusicHash/MusicHash.hpp"
-#include "../HashTable/SoundHash/SoundHash.hpp"
-#include "../HashTable/FontHash/FontHash.hpp"
+#include "Maverick/HashTable/SpriteHash/SpriteHash.hpp"
+#include "Maverick/HashTable/MusicHash/MusicHash.hpp"
+#include "Maverick/HashTable/SoundHash/SoundHash.hpp"
+#include "Maverick/HashTable/FontHash/FontHash.hpp"
 
-#include "../Zone/Zone.hpp"
-#include "../Camera/Camera.hpp"
-#include "../Control/Control.hpp"
+#include "Maverick/Zone/Zone.hpp"
+#include "Maverick/Camera/Camera.hpp"
+#include "Maverick/Control/Control.hpp"
 
-#include "../Entity/UI/UIElement.hpp"
-#include "../Entity/Object/Object.hpp"
+#include "Maverick/UIElement/UIElement.hpp"
+#include "Maverick/Object/Object.hpp"
 
-#include "../Audio/SoundBoard/SoundBoard.hpp"
+#include "Maverick/Audio/SoundBoard/SoundBoard.hpp"
 
-#include "../Global/Global.hpp"
+#include "Maverick/Global/Global.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

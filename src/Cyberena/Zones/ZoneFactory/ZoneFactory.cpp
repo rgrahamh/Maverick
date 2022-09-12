@@ -1,5 +1,5 @@
 #include "./ZoneFactory.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 //This function will eventually open a file w/ the passed in <zone_name>.pld
 void loadZone(const char* zone_name){

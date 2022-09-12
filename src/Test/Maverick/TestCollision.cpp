@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../../Maverick/Animation/Hitbox/HitboxCollision.hpp"
-#include "../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Animation/Hitbox/HitboxCollision.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 TEST(Collision, TestRectRect){
 	double x_base = 0;

@@ -79,24 +79,18 @@ set(ControlSrc
 )
 
 set(UISrc
-    Entity/UI/UIElement.cpp
-    Entity/UI/UIBorders/UIBorders.cpp
-    Entity/UI/UIText/UIText.cpp
-    Entity/UI/UITextBox/UITextBox.cpp
-    Entity/UI/UIObjectFrame/UIObjectFrame.cpp
-    Entity/UI/UITabbedWindow/UITabbedWindow.cpp
+    UIElement/UIElement.cpp
+    UIElement/UIBorders/UIBorders.cpp
+    UIElement/UIText/UIText.cpp
+    UIElement/UITextBox/UITextBox.cpp
+    UIElement/UIObjectFrame/UIObjectFrame.cpp
+    UIElement/UITabbedWindow/UITabbedWindow.cpp
     ${FontSrc}
 )
 
 set(ObjectSrc
-    Entity/Object/Object.cpp
-    Entity/Object/CameraReference/CameraReference.cpp
-)
-
-set(EntitySrc
-    Entity/Entity.cpp
-    ${ObjectSrc}
-    ${UISrc}
+    Object/Object.cpp
+    Object/CameraReference/CameraReference.cpp
 )
 
 set(ZoneSrc
@@ -123,7 +117,8 @@ set(MotorSrc
     ${HitboxSrc}
     ${CameraSrc}
     ${ControlSrc}
-    ${EntitySrc}
+    ${ObjectSrc}
+    ${UISrc}
     ${ZoneSrc}
     ${ZoneFactorySrc}
     ${FactorySrc}
@@ -144,6 +139,10 @@ target_link_libraries(maverick
     SDL2
     SDL2_image
     SDL2_mixer
+)
+
+target_include_directories(maverick PUBLIC
+    ../../src
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")

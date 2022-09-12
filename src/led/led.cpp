@@ -1,8 +1,8 @@
 #define SDL_MAIN_HANDLED
-#include "../Maverick/Engine/Engine.hpp"
-#include "../Cyberena/Zones/global/global.hpp"
-#include "../Cyberena/Zones/TestZone/TestZone.hpp"
-#include "../Maverick/Audio/SoundBoard/SoundBoard.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Cyberena/Zones/global/global.hpp"
+#include "Cyberena/Zones/TestZone/TestZone.hpp"
+#include "Maverick/Audio/SoundBoard/SoundBoard.hpp"
 #include "Zones/led/led.hpp"
 
 int main(int argc, char** argv){

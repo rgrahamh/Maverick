@@ -48,7 +48,7 @@ typedef struct AnimationSequence{
 
 class Animation{
 	public:
-		Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets);
+		Animation(const char* name, int* x_base, int* y_base, uint16_t num_sprite_sets);
 		Animation(FILE* file);
 		~Animation();
 
@@ -115,8 +115,8 @@ class Animation{
 		uint16_t sequence_len;
 
 		//Pointers to the X and Y base coords
-		double* x_base;
-		double* y_base;
+		int* x_base;
+		int* y_base;
 
 		//Scale of the height and width
 		double x_scale;

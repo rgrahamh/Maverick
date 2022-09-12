@@ -1,8 +1,8 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include "../Entity/Object/Object.hpp"
-#include "../Entity/UI/UIElement.hpp"
+#include "../Object/Object.hpp"
+#include "../UIElement/UIElement.hpp"
 
 #include <SDL2/SDL.h>
 

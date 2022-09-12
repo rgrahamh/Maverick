@@ -1,6 +1,6 @@
 #include "SoundBoard.hpp"
-#include "../../Engine/Engine.hpp"
-#include "../Music/Music.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/Audio/Music/Music.hpp"
 
 SoundBoard::SoundBoard(){
     Mix_AllocateChannels(NUM_CHANNELS);

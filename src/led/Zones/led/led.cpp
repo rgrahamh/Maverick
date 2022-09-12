@@ -1,15 +1,15 @@
 #include "led.hpp"
 
 //Maverick includes
-#include "../../../Maverick/Zone/Zone.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
-#include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
-#include "../../../Maverick/Entity/UI/UIObjectFrame/UIObjectFrame.hpp"
-#include "../../../Maverick/Entity/UI/UITabbedWindow/UITabbedWindow.hpp"
-#include "../../../Maverick/Entity/Object/CameraReference/CameraReference.hpp"
+#include "Maverick/Zone/Zone.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/UIElement/UITextBox/UITextBox.hpp"
+#include "Maverick/UIElement/UIObjectFrame/UIObjectFrame.hpp"
+#include "Maverick/UIElement/UITabbedWindow/UITabbedWindow.hpp"
+#include "Maverick/Object/CameraReference/CameraReference.hpp"
 
 //led includes
-#include "../../Entity/UI/UILevelPort/UILevelPort.hpp"
+#include "led/UIElement/UILevelPort/UILevelPort.hpp"
 
 #include "stdio.h"
 

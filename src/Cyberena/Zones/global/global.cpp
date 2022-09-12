@@ -1,8 +1,8 @@
 #include "global.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
-#include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
-#include "../../../Cyberena/Entity/Object/Character/Character.hpp"
-#include "../../../Maverick/FileHandler/Loader/Loader.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/UIElement/UITextBox/UITextBox.hpp"
+#include "Cyberena/Object/Character/Character.hpp"
+#include "Maverick/FileHandler/Loader/Loader.hpp"
 
 void buildGlobal(){
     Zone* global = new Zone("global", 0, 0);

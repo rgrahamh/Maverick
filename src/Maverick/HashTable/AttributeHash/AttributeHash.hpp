@@ -4,7 +4,7 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 
-#include "../../Global/Global.hpp"
+#include "Maverick/Global/Global.hpp"
 
 //Don't use just the type name in all caps; that's reserved in Windowsese
 enum ATTR_DATA_TYPE{

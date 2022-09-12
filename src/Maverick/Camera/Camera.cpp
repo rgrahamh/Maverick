@@ -1,5 +1,5 @@
 #include "./Camera.hpp"
-#include "./../Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 Camera::Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference = nullptr, CAMERA_FOLLOW_MODE follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW, double follow_rate = 0.08){
     this->reference = reference;

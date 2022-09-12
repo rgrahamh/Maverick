@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../../Maverick/Animation/Animation.hpp"
-#include "../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Animation/Animation.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 TEST(AnimationProperties, TestSpriteSet){
     Engine* engine = Engine::getInstance();

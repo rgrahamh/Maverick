@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include "../../Maverick/Camera/Camera.hpp"
-#include "../../Maverick/Engine/Engine.hpp"
-#include "../../Maverick/Entity/Object/CameraReference/CameraReference.hpp"
+#include "Maverick/Camera/Camera.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/Object/CameraReference/CameraReference.hpp"
 
 TEST(CameraBehavior, TestFixedFollow){
     Engine* engine = Engine::getInstance();

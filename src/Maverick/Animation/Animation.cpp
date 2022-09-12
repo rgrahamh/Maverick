@@ -1,7 +1,7 @@
 #include "./Animation.hpp"
 
-#include "../Engine/Engine.hpp"
-#include "../Global/Global.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/Global/Global.hpp"
 
 extern bool debug;
 
@@ -13,7 +13,7 @@ extern bool debug;
  * @param y_base A pointer to the int of the base object's Y location
  * @param num_sprite_sets The max number of sprite sets that should be allocated for this animation
  */
-Animation::Animation(const char* name, double* x_base, double* y_base, uint16_t num_sprite_sets){
+Animation::Animation(const char* name, int* x_base, int* y_base, uint16_t num_sprite_sets){
     this->name = StrDeepCopy(name);
 	this->sequence = NULL;
 	this->sequence_start = NULL;
@@ -756,7 +756,7 @@ bool Animation::hasSpriteSet(const char* sprite_set){
 	return (this->sprite_sets.find(std::string(sprite_set)) != this->sprite_sets.end());
 }
 
-/** Saves the resources of the entity to a char*'s (which should be freed upon return)
+/** Saves the resources of the animation to a file
  * @param file The pointer to the open file to write to
  * @param written_sprites The set of sprites that have already been written to file
  * @param written_audio The set of audio assets that have already been written to file
