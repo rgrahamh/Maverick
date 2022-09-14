@@ -495,6 +495,9 @@ class Object{
 		double yA;
 		double zA;
 
+		//Draw area (width/height are always -1 for auto-fill)
+		SDL_Rect draw_area;
+
 		//Coefficient of friction
 		float friction;
 
