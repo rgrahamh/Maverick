@@ -9,19 +9,13 @@ extern bool debug;
 
 /** The parameterized constructor of the Animation
  * @param name The name of the animation
- * @param x_base A pointer to the int of the base object's X location
- * @param y_base A pointer to the int of the base object's Y location
  * @param num_sprite_sets The max number of sprite sets that should be allocated for this animation
  */
-Animation::Animation(const char* name, int* x_base, int* y_base, uint16_t num_sprite_sets){
+Animation::Animation(const char* name, uint16_t num_sprite_sets){
     this->name = StrDeepCopy(name);
 	this->sequence = NULL;
 	this->sequence_start = NULL;
 	this->sequence_end = NULL;
-	this->x_base = x_base;
-	this->y_base = y_base;
-	this->x_scale = 1.0;
-	this->y_scale = 1.0;
 	this->time_counter = 0;
 	this->paused = false;
 	this->num_sprite_sets = num_sprite_sets;
@@ -271,7 +265,6 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	//Create the sprite
 	Sprite* sprite = new Sprite();
 	sprite->name = StrDeepCopy(sprite_path);
-	sprite->rotation = 0.0;
 	sprite->lower_draw_axis = -1.0;
 	sprite->upper_draw_axis = -1.0;
 
@@ -423,8 +416,8 @@ void Animation::setNextAnimation(Animation* next_animation){
 }
 
 /** Sets the size of the animation
- * @param x_scale The X size
- * @param y_scale the Y size
+ * @param width The width of the animation
+ * @param height The height of the animation
  * @return 0 if successful, -1 otherwise
  */
 int Animation::setSize(int width, int height){
@@ -569,7 +562,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord){
+void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_off, int width, int height){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -587,27 +580,16 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
-	curr_rect->x = *this->x_base;
-	curr_rect->y = *this->y_base;
+	curr_rect->x = x_off;
+	curr_rect->y = y_off;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 
-	SDL_Rect draw_rect = *curr_rect;
-	draw_rect.x -= camera_x;
-	draw_rect.y -= camera_y + z_coord;
-
 	//Draw the sprite
-	if(sprite->rotation){
-		if(SDL_RenderCopyEx(renderer, sprite->texture, NULL, &draw_rect, sprite->rotation, NULL, SDL_RendererFlip::SDL_FLIP_NONE)){
-			printf("%s\n", SDL_GetError());
-		}
-	}
-	else{
-		if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
-			printf("%s\n", SDL_GetError());
-		}
+	if(SDL_RenderCopy(renderer, sprite->texture, NULL, curr_rect)){
+		printf("%s\n", SDL_GetError());
 	}
 
 	if(debug == true){
@@ -651,8 +633,8 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 				SDL_Rect rect;
 				rect.h = hit_rect->getHeight();
 				rect.w = hit_rect->getWidth();
-				rect.x = hit_rect->getX() - camera_x;
-				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset() - z_coord;
+				rect.x = hit_rect->getX() - x_off;
+				rect.y = hit_rect->getY() - y_off;
 				unsigned int depth = hit_rect->getDepth();
 				
 				//Draw the base (will be white to differentiate from the rest)
@@ -672,8 +654,8 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 			}
 			else if(shape == HITBOX_SHAPE::HIT_ELLIPSE){
 				HitEllipse* hit_ellipse = (HitEllipse*)hitbox;
-				unsigned int center_x = hit_ellipse->getX() - camera_x;
-				unsigned int center_y = hit_ellipse->getY() - camera_y + hit_ellipse->getZOffset() - z_coord;
+				unsigned int center_x = hit_ellipse->getX() - x_off;
+				unsigned int center_y = hit_ellipse->getY() - y_off + hit_ellipse->getZOffset();
 				float x_radius = hit_ellipse->getXRadius();
 				float y_radius = hit_ellipse->getYRadius();
 				unsigned int depth = hit_ellipse->getDepth();
@@ -695,28 +677,6 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, flo
 			}
 
 			hitboxes = hitboxes->next;
-		}
-	}
-}
-
-/** Rotates the hitbox slightly to the right (if direction is 0) or left (if direction is 1)
- * @param direction The direction that things are being rotated to
- * @param rotate_dist The distance you should rotate
- */
-void Animation::rotate(int direction, float rotate_amnt){
-	AnimationSeq* animations = sequence_start;
-	while(animations != NULL){
-		for(auto& sprite_set:this->sprite_sets){
-			animations->sprite[sprite_set.second]->rotation += rotate_amnt * ((direction)? -1 : 1);
-		}
-
-		HitboxList* hitboxes = animations->hitboxes;
-		while(hitboxes != NULL){
-			Hitbox* hitbox = hitboxes->hitbox;
-			if(hitbox->getShape() == HIT_CONE){
-				((HitCone*)hitbox)->rotate(direction, rotate_amnt);
-				hitboxes = hitboxes->next;
-			}
 		}
 	}
 }
@@ -846,7 +806,6 @@ int Animation::serializeData(FILE* file){
 					WriteVar(sequence_cursor->sprite[sprite_set.second]->base_y_offset, uint16_t, file);
 					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->w, uint16_t, file);
 					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->h, uint16_t, file);
-					WriteVar((uint64_t)sequence_cursor->sprite[sprite_set.second]->rotation, uint64_t, file);
 				}
 			}
 

@@ -29,9 +29,6 @@ struct Sprite{
 	//Draw axis
 	double upper_draw_axis;
 	double lower_draw_axis;
-
-	//Rotation (clockwise, in degrees)
-	double rotation;
 };
 
 typedef struct AnimationSequence{
@@ -48,7 +45,7 @@ typedef struct AnimationSequence{
 
 class Animation{
 	public:
-		Animation(const char* name, int* x_base, int* y_base, uint16_t num_sprite_sets);
+		Animation(const char* name, uint16_t num_sprite_sets);
 		Animation(FILE* file);
 		~Animation();
 
@@ -58,7 +55,6 @@ class Animation{
 		Sprite* getSprite();
 		Sound* getSound();
 		HitboxList* getHitboxes();
-		unsigned char getDrawLayer();
 		double getUpperDrawAxis();
 		double getLowerDrawAxis();
 		uint32_t getTimeLeft();
@@ -83,9 +79,7 @@ class Animation{
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(const char* sound_id, int sequence_num);
 
-		void draw(SDL_Renderer* renderer, uint64_t delta, float camera_x, float camera_y, double z_coord = 0);
-
-		void rotate(int direction, float rotation_amnt);
+		void draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_off, int width, int height);
 
 		int serializeAssets(FILE* file, SerializeSet& serialize_set);
 		int serializeData(FILE* file);
@@ -115,12 +109,8 @@ class Animation{
 		uint16_t sequence_len;
 
 		//Pointers to the X and Y base coords
-		int* x_base;
-		int* y_base;
-
-		//Scale of the height and width
-		double x_scale;
-		double y_scale;
+		double* x_base;
+		double* y_base;
 
 		//The time counter
 		unsigned int time_counter;

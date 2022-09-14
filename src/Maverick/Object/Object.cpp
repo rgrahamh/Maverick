@@ -286,7 +286,7 @@ void Object::process(uint64_t delta, unsigned int steps){
 }
 
 void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    this->draw(renderer, delta, camera_x, camera_y);
+    this->draw(renderer, delta, camera_x + this->x, camera_y + this->y);
 }
 
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
@@ -405,7 +405,7 @@ int Object::addAnimation(const char* animation_name, uint32_t num_sprite_sets){
         return -1;
     }
 
-    Animation* new_animation = new Animation(animation_name, &x, &y, num_sprite_sets);
+    Animation* new_animation = new Animation(animation_name, num_sprite_sets);
     animations[std::string(animation_name)] = new_animation;
     return 0;
 }
