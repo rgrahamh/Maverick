@@ -59,15 +59,15 @@ void UIBorders::addBorders(char* border_pattern, uint8_t border_types){
     this->width_buff = 0;
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
-        char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
+        char* extension_patterns[4] = {"_top", "_bottom", "_left", "_right"};
         char* border_names[4] = {"top_border", "bottom_border", "left_border", "right_border"};
         for(int i = 0; i < 4; i++){
             if(border_types & (1 << i)){
                 //Make a new combined string, formatted <border_pattern><file_pattern> (as an example, "basic_border_top.bmp")
-                int combined_len = strlen(file_patterns[i]) + strlen(border_pattern) + 1;
+                int combined_len = strlen(extension_patterns[i]) + strlen(border_pattern) + 1;
                 char sprite_path[combined_len];
                 strcpy(sprite_path, border_pattern);
-                strcat(sprite_path, file_patterns[i]);
+                strcat(sprite_path, extension_patterns[i]);
                 sprite_path[combined_len - 1] = '\0';
 
                 //Get the surface of the border (necessary to check if the texture can be loaded & get texture height/width)

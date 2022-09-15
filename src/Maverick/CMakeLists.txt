@@ -53,15 +53,6 @@ set(FontSrc
     Font/Font.cpp
 )
 
-set(HashSrc
-    HashTable/HashTable.cpp
-    HashTable/AttributeHash/AttributeHash.cpp
-    HashTable/SpriteHash/SpriteHash.cpp
-    HashTable/MusicHash/MusicHash.cpp
-    HashTable/SoundHash/SoundHash.cpp
-    HashTable/FontHash/FontHash.cpp
-)
-
 set(HitboxSrc
     Animation/Hitbox/Hitbox.cpp
     Animation/Hitbox/HitEllipse/HitEllipse.cpp

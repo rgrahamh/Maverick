@@ -3,6 +3,9 @@
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../FileHandler/Saver/Saver.hpp"
 #include "../FileHandler/Loader/Loader.hpp"
+#include "../Font/Font.hpp"
+#include "../Audio/Music/Music.hpp"
+#include "../Audio/Audio.hpp"
 
 std::atomic<bool> exit_game;
 
@@ -74,12 +77,6 @@ Engine::Engine(){
     //Set up the screenshot blit surface
     this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
-
-    //Setting up the hash tables
-    this->sprite_hash = new SpriteHash(2048);
-    this->sound_hash = new SoundHash(2048);
-    this->music_hash = new MusicHash(2048);
-    this->font_hash = new FontHash(2048);
 
     //Set scales
     //We want to scale both X & Y by the Y element, so stuff doesn't get squashed
@@ -910,7 +907,9 @@ int Engine::addUIElement(const char* zone, UIElement* element){
  * @param surface The surface being added to the hash
  */
 void Engine::addSurface(const char* key, SDL_Surface* surface){
-    this->sprite_hash->add(key, surface);
+    if(this->sprite_hash.find(key) == this->sprite_hash.end()){
+        this->sprite_hash[key] = surface;
+    }
 }
 
 /**Adds a sound to the sprite hash
@@ -918,7 +917,9 @@ void Engine::addSurface(const char* key, SDL_Surface* surface){
  * @param sound The sound being added to the hash
  */
 void Engine::addSound(const char* key, Sound* sound){
-    this->sound_hash->add(key, sound);
+    if(this->sound_hash.find(key) == this->sound_hash.end()){
+        this->sound_hash[key] = sound;
+    }
 }
 
 /**Adds a music to the sprite hash
@@ -926,7 +927,9 @@ void Engine::addSound(const char* key, Sound* sound){
  * @param music The music being added to the hash
  */
 void Engine::addMusic(const char* key, Music* music){
-    this->music_hash->add(key, music);
+    if(this->music_hash.find(key) == this->music_hash.end()){
+        this->music_hash[key] = music;
+    }
 }
 
 /**Adds a font to the sprite hash
@@ -934,7 +937,9 @@ void Engine::addMusic(const char* key, Music* music){
  * @param font The font being added to the hash
  */
 void Engine::addFont(const char* key, Font* font){
-    this->font_hash->add(key, font);
+    if(this->font_hash.find(key) == this->font_hash.end()){
+        this->font_hash[key] = font;
+    }
 }
 
 /** Moves a Zone to the active_zones ZoneList
@@ -1078,7 +1083,7 @@ void Engine::setGravity(float gravity){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
  */
 SDL_Surface* Engine::getSurface(const char* key){
-    return this->sprite_hash->get(key);
+    return this->sprite_hash[key];
 }
 
 /** Gets a sound from the engine
@@ -1086,7 +1091,7 @@ SDL_Surface* Engine::getSurface(const char* key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
  */
 Sound* Engine::getSound(const char* key){
-    return this->sound_hash->get(key);
+    return this->sound_hash[key];
 }
 
 /** Gets a music from the engine
@@ -1094,7 +1099,7 @@ Sound* Engine::getSound(const char* key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
  */
 Music* Engine::getMusic(const char* key){
-    return this->music_hash->get(key);
+    return this->music_hash[key];
 }
 
 /** Gets a font from the engine
@@ -1102,5 +1107,5 @@ Music* Engine::getMusic(const char* key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
  */
 Font* Engine::getFont(const char* key){
-    return this->font_hash->get(key);
+    return this->font_hash[key];
 }

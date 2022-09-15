@@ -5,11 +5,6 @@
 #include <atomic>
 #include <queue>
 
-#include "../HashTable/SpriteHash/SpriteHash.hpp"
-#include "../HashTable/MusicHash/MusicHash.hpp"
-#include "../HashTable/SoundHash/SoundHash.hpp"
-#include "../HashTable/FontHash/FontHash.hpp"
-
 #include "../Zone/Zone.hpp"
 #include "../Camera/Camera.hpp"
 #include "../Control/Control.hpp"
@@ -44,6 +39,7 @@ struct EntityList{
 	UIElementList* ui;
 };
 
+class Font;
 class Engine{
 	public:
 		static Engine* getInstance(){
@@ -102,10 +98,13 @@ class Engine{
 		//Resource hashes
 		void addSurface(const char* key, SDL_Surface* surface);
 		SDL_Surface* getSurface(const char* key);
+
 		void addSound(const char* key, Sound* sound);
 		Sound* getSound(const char* key);
+
 		void addMusic(const char* key, Music* music);
 		Music* getMusic(const char* key);
+
 		void addFont(const char* key, Font* font);
 		Font* getFont(const char* key);
 
@@ -188,10 +187,10 @@ class Engine{
 		float gravity;
 
 		//Resource Hashes
-		SpriteHash* sprite_hash;
-		SoundHash* sound_hash;
-		MusicHash* music_hash;
-		FontHash* font_hash;
+		std::unordered_map<const char*, SDL_Surface*, CharHash> sprite_hash;
+		std::unordered_map<const char*, Sound*, CharHash> sound_hash;
+		std::unordered_map<const char*, Music*, CharHash> music_hash;
+		std::unordered_map<const char*, Font*, CharHash> font_hash;
 
 		uint64_t delta;
 };

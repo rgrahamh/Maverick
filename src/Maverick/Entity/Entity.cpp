@@ -25,9 +25,6 @@ Entity::Entity(const char* name, float start_x, float start_y, int draw_layer){
     this->active_animation = nullptr;
     this->animations = nullptr;
     this->hitbox_immunity = nullptr;
-
-    //Initializing attributes
-    this->attr = new AttributeHash(64);
 }
 
 /** Construct the entity from file
@@ -156,12 +153,111 @@ bool Entity::isVisible(){
     return this->visible;
 }
 
-/** Gets a pointer to an attribute
+/** Gets the attribute type
  * @param key The attribute you're looking for
- * @return A pointer to the var if found, NULL otherwise
+ * @return -1 if the attribute isn't found, otherwise the attribute type is returned
  */
-void* Entity::getAttr(const char* key){
-    return this->attr->get(key);
+int Entity::getAttrType(const char* key){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+
+    return this->attr[key].type;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a bool is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Entity::getAttr(const char* key, bool& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_BOOL){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a char is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Entity::getAttr(const char* key, char& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_CHAR){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a signed int is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Entity::getAttr(const char* key, int64_t& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_INT){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; an unsigned int is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Entity::getAttr(const char* key, uint64_t& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_UINT){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a char* is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Entity::getAttr(const char* key, char*& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_STRING){
+        return -2;
+    }
+
+    val = (char*)this->attr[key].val;
+    return 0;
 }
 
 /** Creates a new animation (you MUST do this before adding hitboxes/sprites)
@@ -564,7 +660,9 @@ void Entity::setVisible(bool visible){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, bool val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_BOOL);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_BOOL;
 }
 
 /** Sets the attribute key to the specified val (as a char)
@@ -572,7 +670,9 @@ void Entity::setAttr(const char* key, bool val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, char val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_CHAR);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_CHAR;
 }
 
 /** Sets the attribute key to the specified val (as a signed int)
@@ -580,7 +680,9 @@ void Entity::setAttr(const char* key, char val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, int64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_INT);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_INT;
 }
 
 /** Sets the attribute key to the specified val (as an unsigned int)
@@ -588,7 +690,9 @@ void Entity::setAttr(const char* key, int64_t val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, uint64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_UINT);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_UINT;
 }
 
 /** Sets the attribute key to the specified val (as a string)
@@ -596,7 +700,9 @@ void Entity::setAttr(const char* key, uint64_t val){
  * @param val The val you wish to set
  */
 void Entity::setAttr(const char* key, char* val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_STRING);
+    Attribute& attribute = this->attr[key];
+    attribute.val = (uint64_t)val;
+    attribute.type = ATTR_DATA_TYPE::DATA_STRING;
 }
 
 /** Gets the entity type
@@ -648,26 +754,20 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
     WriteVar(draw_layer, int16_t, file);
 
     //ATTRIBUTE SECTION
-    Attribute* attr_list;
-    uint32_t num_entries = attr->dump(&attr_list);
+    uint32_t num_entries = attr.size();
     WriteVar(num_entries, uint32_t, file);
 
-    while(attr_list != nullptr){
-        //Attribute type
-        uint16_t attr_type = attr_list->type;
+    for(auto& attribute_iter : attr){
+        Attribute& attribute = attribute_iter.second;
+        uint16_t attr_type = attribute.type;
         WriteVar(attr_type, uint16_t, file);
-
-        //Write the key info
-        uint16_t attr_key_len = strlen(attr_list->key);
-        WriteVar(attr_key_len, uint16_t, file);
-        fwrite(attr_list->key, attr_key_len, 1, file);
 
         //Write the val info
         switch(attr_type){
             //Writing chars & bools (1 byte)
             case ATTR_DATA_TYPE::DATA_BOOL:
             case ATTR_DATA_TYPE::DATA_CHAR:{
-                uint8_t attr_val = (uint8_t)((uint64_t)attr_list->val & 0xFF);
+                uint8_t attr_val = (uint8_t)((uint64_t)attribute.val & 0xFF);
                 WriteVar(attr_val, uint8_t, file);
                 break;
             }
@@ -675,13 +775,13 @@ int Entity::serializeData(FILE* file, Zone* base_zone){
             //Writing ints/uints (8 bytes)
             case ATTR_DATA_TYPE::DATA_INT:
             case ATTR_DATA_TYPE::DATA_UINT:{
-                WriteVar((uint64_t)attr_list->val, uint64_t, file);
+                WriteVar((uint64_t)attribute.val, uint64_t, file);
                 break;
             }
 
             //Writing strings (? bytes)
             case ATTR_DATA_TYPE::DATA_STRING:{
-                char* attr_str = (char*)attr_list->val;
+                char* attr_str = (char*)attribute.val;
                 uint16_t attr_val_len = strlen(attr_str);
                 WriteVar(attr_val_len, uint16_t, file);
                 fwrite(attr_str, 1, attr_val_len, file);
