@@ -54,17 +54,6 @@ struct SerializeSet{
 	std::unordered_set<std::string> font_set;
 };
 
-//The char* hashing definition for std::unordered_maps
-struct CharHash{
-	unsigned int operator()(const char* key) const{
-		unsigned int hash = 0;
-		for(int i = 0; key[i] != '\0'; i++){
-			hash += key[i];
-		}
-		return hash;
-	}
-};
-
 /** Determines endian of the machine running the engine
  * @return 1 if big endian, 0 if little endian
  */

@@ -906,7 +906,7 @@ int Engine::addUIElement(const char* zone, UIElement* element){
  * @param key The key representing the surface
  * @param surface The surface being added to the hash
  */
-void Engine::addSurface(const char* key, SDL_Surface* surface){
+void Engine::addSurface(const std::string key, SDL_Surface* surface){
     if(this->sprite_hash.find(key) == this->sprite_hash.end()){
         this->sprite_hash[key] = surface;
     }
@@ -916,7 +916,7 @@ void Engine::addSurface(const char* key, SDL_Surface* surface){
  * @param key The key representing the sound
  * @param sound The sound being added to the hash
  */
-void Engine::addSound(const char* key, Sound* sound){
+void Engine::addSound(const std::string key, Sound* sound){
     if(this->sound_hash.find(key) == this->sound_hash.end()){
         this->sound_hash[key] = sound;
     }
@@ -926,7 +926,7 @@ void Engine::addSound(const char* key, Sound* sound){
  * @param key The key representing the music
  * @param music The music being added to the hash
  */
-void Engine::addMusic(const char* key, Music* music){
+void Engine::addMusic(const std::string key, Music* music){
     if(this->music_hash.find(key) == this->music_hash.end()){
         this->music_hash[key] = music;
     }
@@ -936,7 +936,7 @@ void Engine::addMusic(const char* key, Music* music){
  * @param key The key representing the font
  * @param font The font being added to the hash
  */
-void Engine::addFont(const char* key, Font* font){
+void Engine::addFont(const std::string key, Font* font){
     if(this->font_hash.find(key) == this->font_hash.end()){
         this->font_hash[key] = font;
     }
@@ -1082,7 +1082,7 @@ void Engine::setGravity(float gravity){
  * @param key The texture's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
  */
-SDL_Surface* Engine::getSurface(const char* key){
+SDL_Surface* Engine::getSurface(const std::string key){
     return this->sprite_hash[key];
 }
 
@@ -1090,7 +1090,7 @@ SDL_Surface* Engine::getSurface(const char* key){
  * @param key The sound's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
  */
-Sound* Engine::getSound(const char* key){
+Sound* Engine::getSound(const std::string key){
     return this->sound_hash[key];
 }
 
@@ -1098,7 +1098,7 @@ Sound* Engine::getSound(const char* key){
  * @param key The music's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
  */
-Music* Engine::getMusic(const char* key){
+Music* Engine::getMusic(const std::string key){
     return this->music_hash[key];
 }
 
@@ -1106,6 +1106,6 @@ Music* Engine::getMusic(const char* key){
  * @param key The font's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
  */
-Font* Engine::getFont(const char* key){
+Font* Engine::getFont(const std::string key){
     return this->font_hash[key];
 }

@@ -96,17 +96,17 @@ class Engine{
 		SoundBoard* getSoundBoard();
 
 		//Resource hashes
-		void addSurface(const char* key, SDL_Surface* surface);
-		SDL_Surface* getSurface(const char* key);
+		void addSurface(const std::string key, SDL_Surface* surface);
+		SDL_Surface* getSurface(const std::string key);
 
-		void addSound(const char* key, Sound* sound);
-		Sound* getSound(const char* key);
+		void addSound(const std::string key, Sound* sound);
+		Sound* getSound(const std::string key);
 
-		void addMusic(const char* key, Music* music);
-		Music* getMusic(const char* key);
+		void addMusic(const std::string key, Music* music);
+		Music* getMusic(const std::string key);
 
-		void addFont(const char* key, Font* font);
-		Font* getFont(const char* key);
+		void addFont(const std::string key, Font* font);
+		Font* getFont(const std::string key);
 
 	private:
 		Engine();
@@ -187,10 +187,10 @@ class Engine{
 		float gravity;
 
 		//Resource Hashes
-		std::unordered_map<const char*, SDL_Surface*, CharHash> sprite_hash;
-		std::unordered_map<const char*, Sound*, CharHash> sound_hash;
-		std::unordered_map<const char*, Music*, CharHash> music_hash;
-		std::unordered_map<const char*, Font*, CharHash> font_hash;
+		std::unordered_map<std::string, SDL_Surface*> sprite_hash;
+		std::unordered_map<std::string, Sound*> sound_hash;
+		std::unordered_map<std::string, Music*> music_hash;
+		std::unordered_map<std::string, Font*> font_hash;
 
 		uint64_t delta;
 };

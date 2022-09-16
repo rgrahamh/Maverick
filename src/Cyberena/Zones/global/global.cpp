@@ -24,6 +24,7 @@ void buildGlobal(){
 	engine->addSound("step", new_sound);
 
     engine->addSurface("black_box", SDL_LoadBMP("./assets/sprites/ui/black.bmp"));
+    engine->addSurface("shade", SDL_LoadBMP("./assets/sprites/ui/shade.bmp"));
 
     //Create the player
     Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
@@ -35,7 +36,7 @@ void buildGlobal(){
     pause_menu->setActive(false);
     pause_menu->addAnimation("default", 1);
     pause_menu->addFrame("default", 0);
-    pause_menu->addSprite("default", "default", "./assets/sprites/ui/shade.bmp");
+    pause_menu->addSprite("default", "default", "shade");
     pause_menu->setAnimation("default");
 
     //Create the pause text

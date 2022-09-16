@@ -121,7 +121,7 @@ class Entity{
 		double z;
 
 		//Attributes
-		std::unordered_map<const char*, Attribute, CharHash> attr;
+		std::unordered_map<std::string, Attribute> attr;
 
 		//If the object is active/visible
 		bool active;

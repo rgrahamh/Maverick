@@ -6,7 +6,9 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
     Character* player = new Character(name, start_x, start_y, start_z, friction, mass, race, style, stats, mastery, abilities, control, equipment, inventory, 1);
 
     Engine* engine = Engine::getInstance();
-    engine->addSurface("player_up_neutral", SDL_LoadBMP("./assets/sprites/old_game_resources/Up_Neutral.bmp"));
+    char* plun = (char*)calloc(strlen("player_up_neutral") + 1, 1);
+    strcpy(plun, "player_up_neutral");
+    engine->addSurface(plun, SDL_LoadBMP("./assets/sprites/old_game_resources/Up_Neutral.bmp"));
     engine->addSurface("player_up_left_foot", SDL_LoadBMP("./assets/sprites/old_game_resources/Up_Left_Foot.bmp"));
     engine->addSurface("player_up_right_foot", SDL_LoadBMP("./assets/sprites/old_game_resources/Up_Right_Foot.bmp"));
 
