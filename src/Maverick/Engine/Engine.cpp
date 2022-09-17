@@ -907,7 +907,7 @@ int Engine::addUIElement(const char* zone, UIElement* element){
  * @param surface The surface being added to the hash
  */
 void Engine::addSurface(const std::string key, SDL_Surface* surface){
-    if(this->sprite_hash.find(key) == this->sprite_hash.end()){
+    if(surface != nullptr && this->sprite_hash.find(key) == this->sprite_hash.end()){
         this->sprite_hash[key] = surface;
     }
 }
@@ -917,7 +917,7 @@ void Engine::addSurface(const std::string key, SDL_Surface* surface){
  * @param sound The sound being added to the hash
  */
 void Engine::addSound(const std::string key, Sound* sound){
-    if(this->sound_hash.find(key) == this->sound_hash.end()){
+    if(sound != nullptr && this->sound_hash.find(key) == this->sound_hash.end()){
         this->sound_hash[key] = sound;
     }
 }
@@ -927,7 +927,7 @@ void Engine::addSound(const std::string key, Sound* sound){
  * @param music The music being added to the hash
  */
 void Engine::addMusic(const std::string key, Music* music){
-    if(this->music_hash.find(key) == this->music_hash.end()){
+    if(music != nullptr && this->music_hash.find(key) == this->music_hash.end()){
         this->music_hash[key] = music;
     }
 }
@@ -937,7 +937,7 @@ void Engine::addMusic(const std::string key, Music* music){
  * @param font The font being added to the hash
  */
 void Engine::addFont(const std::string key, Font* font){
-    if(this->font_hash.find(key) == this->font_hash.end()){
+    if(font != nullptr && this->font_hash.find(key) == this->font_hash.end()){
         this->font_hash[key] = font;
     }
 }
@@ -1083,6 +1083,9 @@ void Engine::setGravity(float gravity){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
  */
 SDL_Surface* Engine::getSurface(const std::string key){
+    if(this->sprite_hash.find(key) == this->sprite_hash.end()){
+        return nullptr;
+    }
     return this->sprite_hash[key];
 }
 
@@ -1091,6 +1094,9 @@ SDL_Surface* Engine::getSurface(const std::string key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
  */
 Sound* Engine::getSound(const std::string key){
+    if(this->sound_hash.find(key) == this->sound_hash.end()){
+        return nullptr;
+    }
     return this->sound_hash[key];
 }
 
@@ -1099,6 +1105,9 @@ Sound* Engine::getSound(const std::string key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
  */
 Music* Engine::getMusic(const std::string key){
+    if(this->music_hash.find(key) == this->music_hash.end()){
+        return nullptr;
+    }
     return this->music_hash[key];
 }
 
@@ -1107,5 +1116,8 @@ Music* Engine::getMusic(const std::string key){
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
  */
 Font* Engine::getFont(const std::string key){
+    if(this->font_hash.find(key) == this->font_hash.end()){
+        return nullptr;
+    }
     return this->font_hash[key];
 }
