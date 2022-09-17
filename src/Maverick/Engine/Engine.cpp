@@ -3,6 +3,9 @@
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "../FileHandler/Saver/Saver.hpp"
 #include "../FileHandler/Loader/Loader.hpp"
+#include "../Font/Font.hpp"
+#include "../Audio/Music/Music.hpp"
+#include "../Audio/Audio.hpp"
 
 std::atomic<bool> exit_game;
 
@@ -74,12 +77,6 @@ Engine::Engine(){
     //Set up the screenshot blit surface
     this->screen_blit_surface = SDL_CreateRGBSurface(0, win_width, win_height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     this->screen_blit_texture = nullptr;
-
-    //Setting up the hash tables
-    this->sprite_hash = new SpriteHash(2048);
-    this->sound_hash = new SoundHash(2048);
-    this->music_hash = new MusicHash(2048);
-    this->font_hash = new FontHash(2048);
 
     //Set scales
     //We want to scale both X & Y by the Y element, so stuff doesn't get squashed
@@ -909,32 +906,40 @@ int Engine::addUIElement(const char* zone, UIElement* element){
  * @param key The key representing the surface
  * @param surface The surface being added to the hash
  */
-void Engine::addSurface(const char* key, SDL_Surface* surface){
-    this->sprite_hash->add(key, surface);
+void Engine::addSurface(const std::string key, SDL_Surface* surface){
+    if(surface != nullptr && this->sprite_hash.find(key) == this->sprite_hash.end()){
+        this->sprite_hash[key] = surface;
+    }
 }
 
 /**Adds a sound to the sprite hash
  * @param key The key representing the sound
  * @param sound The sound being added to the hash
  */
-void Engine::addSound(const char* key, Sound* sound){
-    this->sound_hash->add(key, sound);
+void Engine::addSound(const std::string key, Sound* sound){
+    if(sound != nullptr && this->sound_hash.find(key) == this->sound_hash.end()){
+        this->sound_hash[key] = sound;
+    }
 }
 
 /**Adds a music to the sprite hash
  * @param key The key representing the music
  * @param music The music being added to the hash
  */
-void Engine::addMusic(const char* key, Music* music){
-    this->music_hash->add(key, music);
+void Engine::addMusic(const std::string key, Music* music){
+    if(music != nullptr && this->music_hash.find(key) == this->music_hash.end()){
+        this->music_hash[key] = music;
+    }
 }
 
 /**Adds a font to the sprite hash
  * @param key The key representing the font
  * @param font The font being added to the hash
  */
-void Engine::addFont(const char* key, Font* font){
-    this->font_hash->add(key, font);
+void Engine::addFont(const std::string key, Font* font){
+    if(font != nullptr && this->font_hash.find(key) == this->font_hash.end()){
+        this->font_hash[key] = font;
+    }
 }
 
 /** Moves a Zone to the active_zones ZoneList
@@ -1077,30 +1082,42 @@ void Engine::setGravity(float gravity){
  * @param key The texture's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
  */
-SDL_Surface* Engine::getSurface(const char* key){
-    return this->sprite_hash->get(key);
+SDL_Surface* Engine::getSurface(const std::string key){
+    if(this->sprite_hash.find(key) == this->sprite_hash.end()){
+        return nullptr;
+    }
+    return this->sprite_hash[key];
 }
 
 /** Gets a sound from the engine
  * @param key The sound's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
  */
-Sound* Engine::getSound(const char* key){
-    return this->sound_hash->get(key);
+Sound* Engine::getSound(const std::string key){
+    if(this->sound_hash.find(key) == this->sound_hash.end()){
+        return nullptr;
+    }
+    return this->sound_hash[key];
 }
 
 /** Gets a music from the engine
  * @param key The music's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
  */
-Music* Engine::getMusic(const char* key){
-    return this->music_hash->get(key);
+Music* Engine::getMusic(const std::string key){
+    if(this->music_hash.find(key) == this->music_hash.end()){
+        return nullptr;
+    }
+    return this->music_hash[key];
 }
 
 /** Gets a font from the engine
  * @param key The font's identifier in the hash table
  * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
  */
-Font* Engine::getFont(const char* key){
-    return this->font_hash->get(key);
+Font* Engine::getFont(const std::string key){
+    if(this->font_hash.find(key) == this->font_hash.end()){
+        return nullptr;
+    }
+    return this->font_hash[key];
 }

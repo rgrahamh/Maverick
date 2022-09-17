@@ -1,7 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "../HashTable/AttributeHash/AttributeHash.hpp"
 #include "../Animation/Animation.hpp"
 #include "../Animation/Hitbox/Hitbox.hpp"
 #include "../Animation/Hitbox/HitRect/HitRect.hpp"
@@ -9,12 +8,26 @@
 #include "../Animation/Hitbox/HitEllipse/HitCone/HitCone.hpp"
 #include "../Animation/Hitbox/HitboxCollision.hpp"
 #include "../Control/Control.hpp"
+#include "../Global/Global.hpp"
 
 #include <SDL2/SDL.h>
 #include <unordered_map>
 
-class Zone;
+enum ATTR_DATA_TYPE{
+    DATA_INT = 0,
+    DATA_UINT,
+    DATA_BOOL,
+    DATA_CHAR,
+    DATA_STRING
+};
 
+typedef struct Attribute{
+    ATTR_DATA_TYPE type;
+	uint64_t val;
+} Attribute;
+
+struct CharHash;
+class Zone;
 class Entity{
 	public:
 		Entity(const char* name, float start_x, float start_y, int draw_layer = 1);
@@ -29,7 +42,15 @@ class Entity{
 		int16_t getDrawLayer();
 		double getUpperDrawAxis();
 		double getLowerDrawAxis();
-		void* getAttr(const char* key);
+
+		int getAttrType(const char* key);
+
+		int getAttr(const char* key, bool& val);
+		int getAttr(const char* key, char& val);
+		int getAttr(const char* key, int64_t& val);
+		int getAttr(const char* key, uint64_t& val);
+		int getAttr(const char* key, char*& val);
+
 		uint32_t getType();
 		bool isActive();
 		bool isVisible();
@@ -100,7 +121,7 @@ class Entity{
 		double z;
 
 		//Attributes
-		AttributeHash* attr;
+		std::unordered_map<std::string, Attribute> attr;
 
 		//If the object is active/visible
 		bool active;
