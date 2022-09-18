@@ -19,12 +19,8 @@ struct Sprite{
 	SDL_Rect* rect;
 
 	//X & Y offsets from the object, discluding scale
-	uint32_t base_x_offset;
-	uint32_t base_y_offset;
-
-	//X & Y offsets from the object, including scale
-	uint32_t curr_x_offset;
-	uint32_t curr_y_offset;
+	uint32_t x_offset;
+	uint32_t y_offset;
 
 	//Draw axis
 	double upper_draw_axis;
@@ -79,7 +75,8 @@ class Animation{
 		int addHitbox(Hitbox* hitbox, int sequence_num);
 		int addSound(const char* sound_id, int sequence_num);
 
-		void draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_off, int width, int height);
+		void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		void draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area);
 
 		int serializeAssets(FILE* file, SerializeSet& serialize_set);
 		int serializeData(FILE* file);

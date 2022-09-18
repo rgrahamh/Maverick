@@ -120,11 +120,11 @@ double Animation::getUpperDrawAxis(){
 	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
 		//If draw_axis is set
 		if(this->sequence->sprite[curr_sprite_set]->upper_draw_axis != -1){
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->upper_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->upper_draw_axis + this->sequence->sprite[curr_sprite_set]->y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->y_offset;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -140,11 +140,11 @@ double Animation::getLowerDrawAxis(){
 	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
 		//If draw_axis is set
 		if(this->sequence->sprite[curr_sprite_set]->lower_draw_axis != -1){
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->lower_draw_axis + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->lower_draw_axis + this->sequence->sprite[curr_sprite_set]->y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->curr_y_offset;
+			return *this->y_base + this->sequence->sprite[curr_sprite_set]->rect->h + this->sequence->sprite[curr_sprite_set]->y_offset;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -284,10 +284,8 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	}
 
 	sprite->rect = rect;
-	sprite->base_x_offset = x_offset;
-	sprite->base_y_offset = y_offset;
-	sprite->curr_x_offset = x_offset;
-	sprite->curr_y_offset = y_offset;
+	sprite->x_offset = x_offset;
+	sprite->y_offset = y_offset;
 	sprite->surface = surface;
 	sprite->texture = nullptr;
 
@@ -562,7 +560,7 @@ void Animation::start(){
 /** Called for the animation's draw step
  * @param window The current window that is being drawn to
  */
-void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_off, int width, int height){
+void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -580,15 +578,19 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 
 	//Update the sprite position
 	SDL_Rect* curr_rect = sprite->rect;
-	curr_rect->x = x_off;
-	curr_rect->y = y_off;
+	curr_rect->x = *this->x_base;
+	curr_rect->y = *this->y_base;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 
+	SDL_Rect draw_rect = *curr_rect;
+	draw_rect.x -= camera_x;
+	draw_rect.y -= camera_y;
+
 	//Draw the sprite
-	if(SDL_RenderCopy(renderer, sprite->texture, NULL, curr_rect)){
+	if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
 		printf("%s\n", SDL_GetError());
 	}
 
@@ -633,8 +635,8 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 				SDL_Rect rect;
 				rect.h = hit_rect->getHeight();
 				rect.w = hit_rect->getWidth();
-				rect.x = hit_rect->getX() - x_off;
-				rect.y = hit_rect->getY() - y_off;
+				rect.x = hit_rect->getX() - camera_x;
+				rect.y = hit_rect->getY() - camera_y - hit_rect->getZOffset();
 				unsigned int depth = hit_rect->getDepth();
 				
 				//Draw the base (will be white to differentiate from the rest)
@@ -654,8 +656,8 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 			}
 			else if(shape == HITBOX_SHAPE::HIT_ELLIPSE){
 				HitEllipse* hit_ellipse = (HitEllipse*)hitbox;
-				unsigned int center_x = hit_ellipse->getX() - x_off;
-				unsigned int center_y = hit_ellipse->getY() - y_off + hit_ellipse->getZOffset();
+				unsigned int center_x = hit_ellipse->getX() - camera_x;
+				unsigned int center_y = hit_ellipse->getY() - camera_y + hit_ellipse->getZOffset();
 				float x_radius = hit_ellipse->getXRadius();
 				float y_radius = hit_ellipse->getYRadius();
 				unsigned int depth = hit_ellipse->getDepth();
@@ -678,6 +680,55 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 
 			hitboxes = hitboxes->next;
 		}
+	}
+}
+
+void Animation::draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area){
+	// Check to see if we've been initialized
+	if(this->sequence == NULL){
+		return;
+	}
+
+	//Advance the animation if not paused
+	if(!Engine::getInstance()->checkState(GAME_STATE::PAUSE)){
+		this->advance(delta);
+	}
+
+	Sprite* sprite = this->sequence->sprite[curr_sprite_set];
+	if(sprite == nullptr){
+		return;
+	}
+
+	//Update the sprite position
+	SDL_Rect* curr_rect = sprite->rect;
+	curr_rect->x = *this->x_base;
+	curr_rect->y = *this->y_base;
+
+	if(sprite->texture == NULL && sprite->surface != NULL){
+		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
+	}
+
+	SDL_Rect draw_rect = *curr_rect;
+	draw_rect.x = draw_area.x + sprite->x_offset;
+	draw_rect.y = draw_area.y + sprite->y_offset;
+
+	if(draw_area.w == -1){
+		draw_rect.w = sprite->surface->w;
+	}
+	else{
+		draw_rect.w = draw_area.w;
+	}
+
+	if(draw_area.h == -1){
+		draw_rect.h = sprite->surface->h;
+	}
+	else{
+		draw_rect.h = draw_area.h;
+	}
+
+	//Draw the sprite
+	if(SDL_RenderCopy(renderer, sprite->texture, NULL, &draw_rect)){
+		printf("%s\n", SDL_GetError());
 	}
 }
 
@@ -802,8 +853,8 @@ int Animation::serializeData(FILE* file){
 					WriteVar(sprite_set_name_len, uint16_t, file);
 					fwrite(&sprite_set_name, 1, sprite_set_name_len, file);
 
-					WriteVar(sequence_cursor->sprite[sprite_set.second]->base_x_offset, uint16_t, file);
-					WriteVar(sequence_cursor->sprite[sprite_set.second]->base_y_offset, uint16_t, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->x_offset, uint16_t, file);
+					WriteVar(sequence_cursor->sprite[sprite_set.second]->y_offset, uint16_t, file);
 					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->w, uint16_t, file);
 					WriteVar(sequence_cursor->sprite[sprite_set.second]->rect->h, uint16_t, file);
 				}

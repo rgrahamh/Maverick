@@ -291,7 +291,7 @@ void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int cam
 
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
     if(this->active_animation != nullptr){
-        this->active_animation->draw(renderer, delta, camera_x, camera_y, this->z);
+        this->active_animation->draw(renderer, delta, camera_x, camera_y);
     }
 }
 

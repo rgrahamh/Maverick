@@ -100,7 +100,7 @@ void UIBorders::addBorders(){
                     UIElement* border = new UIElement(border_names[i], border_x / (double)win_width, border_y / (double)win_height,
                                                       border_width / (double)win_width, border_height / (double)win_height, 1);
                     borders[i] = border;
-                    Animation* border_background = new Animation(border_names[i], &this->draw_area.x, &this->draw_area.y, 1);
+                    Animation* border_background = new Animation(border_names[i], 1);
                     border->setBackground(border_background);
                     subelements.push_back(border);
                 }
