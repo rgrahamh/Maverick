@@ -148,6 +148,109 @@ double Object::getNextGround(){
     return this->next_ground;
 }
 
+int Object::getAttrType(const char* key){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+
+    return this->attr[key].type;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a bool is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Object::getAttr(const char* key, bool& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_BOOL){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a char is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Object::getAttr(const char* key, char& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_CHAR){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a signed int is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Object::getAttr(const char* key, int64_t& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_INT){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; an unsigned int is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Object::getAttr(const char* key, uint64_t& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_UINT){
+        return -2;
+    }
+
+    val = this->attr[key].val;
+    return 0;
+}
+
+/** Gets an attribute
+ * @param key The attribute you're looking for
+ * @param out The value to be populated; a char* is requested here
+ * @return -1 if the attribute isn't found, -2 if the attribute is the wrong type, 0 otherwise
+ */
+int Object::getAttr(const char* key, char*& val){
+    if(this->attr.find(key) == this->attr.end()){
+        return -1;
+    }
+    
+    Attribute& attribute = this->attr[key];
+    if(attribute.type != ATTR_DATA_TYPE::DATA_STRING){
+        return -2;
+    }
+
+    val = (char*)this->attr[key].val;
+    return 0;
+}
+
 void Object::setXVel(double xV){
     this->xV = xV;
 }
@@ -567,23 +670,33 @@ void Object::setSize(float width, float height){
 }
 
 void Object::setAttr(const char* key, bool val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_BOOL);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_BOOL;
 }
 
 void Object::setAttr(const char* key, char val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_CHAR);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_CHAR;
 }
 
 void Object::setAttr(const char* key, int64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_INT);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_INT;
 }
 
 void Object::setAttr(const char* key, uint64_t val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_UINT);
+    Attribute& attribute = this->attr[key];
+    attribute.val = val;
+    attribute.type = ATTR_DATA_TYPE::DATA_UINT;
 }
 
 void Object::setAttr(const char* key, char* val){
-    this->attr->set(key, (void*)val, ATTR_DATA_TYPE::DATA_STRING);
+    Attribute& attribute = this->attr[key];
+    attribute.val = (uint64_t)val;
+    attribute.type = ATTR_DATA_TYPE::DATA_STRING;
 }
 
 int Object::serializeData(FILE* file, Zone* base_zone){

@@ -5,11 +5,6 @@
 #include <atomic>
 #include <queue>
 
-#include "Maverick/HashTable/SpriteHash/SpriteHash.hpp"
-#include "Maverick/HashTable/MusicHash/MusicHash.hpp"
-#include "Maverick/HashTable/SoundHash/SoundHash.hpp"
-#include "Maverick/HashTable/FontHash/FontHash.hpp"
-
 #include "Maverick/Zone/Zone.hpp"
 #include "Maverick/Camera/Camera.hpp"
 #include "Maverick/Control/Control.hpp"
@@ -44,6 +39,7 @@ struct EntityList{
 	UIElementList* ui;
 };
 
+class Font;
 class Engine{
 	public:
 		static Engine* getInstance(){
@@ -199,49 +195,49 @@ class Engine{
 		 * @param key The key representing the surface
 		 * @param surface The surface being added to the hash
 		 */
-		void addSurface(const char* key, SDL_Surface* surface);
+		void addSurface(const std::string key, SDL_Surface* surface);
 
-		/** Gets a texture from the engine
+		/** Gets a surface from the engine
 		 * @param key The texture's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
 		 */
-		SDL_Surface* getSurface(const char* key);
+		SDL_Surface* getSurface(const std::string key);
 
 		/**Adds a sound to the sprite hash
 		 * @param key The key representing the sound
 		 * @param sound The sound being added to the hash
 		 */
-		void addSound(const char* key, Sound* sound);
+		void addSound(const std::string key, Sound* sound);
 
 		/** Gets a sound from the engine
 		 * @param key The sound's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
 		 */
-		Sound* getSound(const char* key);
+		Sound* getSound(const std::string key);
 
 		/**Adds a music to the sprite hash
 		 * @param key The key representing the music
 		 * @param music The music being added to the hash
 		 */
-		void addMusic(const char* key, Music* music);
+		void addMusic(const std::string key, Music* music);
 
 		/** Gets a music from the engine
 		 * @param key The music's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
 		 */
-		Music* getMusic(const char* key);
+		Music* getMusic(const std::string key);
 
 		/**Adds a font to the sprite hash
 		 * @param key The key representing the font
 		 * @param font The font being added to the hash
 		 */
-		void addFont(const char* key, Font* font);
+		void addFont(const std::string key, Font* font);
 
 		/** Gets a font from the engine
 		 * @param key The font's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
 		 */
-		Font* getFont(const char* key);
+		Font* getFont(const std::string key);
 
 	private:
 		/** Engine's parameterized constructor
@@ -345,10 +341,10 @@ class Engine{
 		float gravity;
 
 		//Resource Hashes
-		SpriteHash* sprite_hash;
-		SoundHash* sound_hash;
-		MusicHash* music_hash;
-		FontHash* font_hash;
+		std::unordered_map<std::string, SDL_Surface*> sprite_hash;
+		std::unordered_map<std::string, Sound*> sound_hash;
+		std::unordered_map<std::string, Music*> music_hash;
+		std::unordered_map<std::string, Font*> font_hash;
 
 		uint64_t delta;
 };

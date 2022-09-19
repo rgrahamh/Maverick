@@ -280,17 +280,8 @@ int UIElement::deserializeData(FILE* file){
     return 0;
 }
 
-int UIElement::addBackgroundSprite(const char* sprite_set, const char* sprite_id, int x_offset, int y_offset){
-    //If the animation doesn't have the sprite set, add it
-    if(!this->background->hasSpriteSet(sprite_set)){
-        this->background->addSpriteSet(sprite_set);
-    }
-
-    return animation->addSprite(sprite_set, sprite_id, x_offset, y_offset, width, height);
-}
-
-int UIElement::addSpriteSet(const char* sprite_set){
-    return animation->addSpriteSet(sprite_set);
+void UIElement::setBackground(Animation* animation){
+    this->background = animation;
 }
 
 void UIElement::deleteBackground(){

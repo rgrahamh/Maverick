@@ -26,7 +26,7 @@ int Music::start(int music_channel_index, float volume, unsigned int fade){
             for(int i = 0; i < this->num_tracks; i++){
                 Mix_Volume(i + channel_offset, 0);
                 Mix_PlayChannel(i + channel_offset, tracks[i]->sample, -1);
-                std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade);
+                std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade).detach();
             }
         }
     }
@@ -84,7 +84,7 @@ int Music::setInstrumentVolume(const char* instrument_name, float volume, unsign
     int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
     for(int i = 0; i < this->num_tracks; i++){
         if(strcmp(tracks[i]->name, instrument_name) == 0){
-            std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade);
+            std::thread(&Music::fadeVolume, this, i + channel_offset, volume, fade).detach();
             return 0;
         }
     }
@@ -99,7 +99,7 @@ void Music::setVolume(float volume, unsigned int fade){
             Mix_Volume(i + channel_offset, volume * MIX_MAX_VOLUME);
         }
         else{
-            std::thread(&Music::fadeVolume, this, i + channel_offset, volume * MIX_MAX_VOLUME, fade);
+            std::thread(&Music::fadeVolume, this, i + channel_offset, volume * MIX_MAX_VOLUME, fade).detach();
         }
     }
 }

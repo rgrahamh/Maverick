@@ -95,14 +95,15 @@ HitboxList* Animation::getHitboxes(){
 }
 
 double Animation::getUpperDrawAxis(){
-	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
+	if(likely(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL)){
 		//If draw_axis is set
-		if(this->sequence->sprite[curr_sprite_set]->upper_draw_axis != -1){
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->upper_draw_axis + this->sequence->sprite[curr_sprite_set]->y_offset;
+		Sprite* sprite = this->sequence->sprite[curr_sprite_set];
+		if(sprite->upper_draw_axis != -1){
+			return *this->y_base + sprite->upper_draw_axis + sprite->y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->y_offset;
+			return *this->y_base + sprite->y_offset;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -112,14 +113,15 @@ double Animation::getUpperDrawAxis(){
 }
 
 double Animation::getLowerDrawAxis(){
-	if(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL){
+	if(likely(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL)){
 		//If draw_axis is set
-		if(this->sequence->sprite[curr_sprite_set]->lower_draw_axis != -1){
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->lower_draw_axis + this->sequence->sprite[curr_sprite_set]->y_offset;
+		Sprite* sprite = this->sequence->sprite[curr_sprite_set];
+		if(sprite->lower_draw_axis != -1){
+			return *this->y_base + sprite->lower_draw_axis + sprite->y_offset;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + this->sequence->sprite[curr_sprite_set]->surface->h + this->sequence->sprite[curr_sprite_set]->y_offset;
+			return *this->y_base + sprite->surface->h + sprite->y_offset;
 		}
 	}
 	//If we can't find the draw axis any other way

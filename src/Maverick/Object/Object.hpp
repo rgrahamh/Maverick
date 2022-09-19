@@ -1,7 +1,6 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "Maverick/HashTable/AttributeHash/AttributeHash.hpp"
 #include "Maverick/Animation/Animation.hpp"
 #include "Maverick/Animation/Hitbox/Hitbox.hpp"
 #include "Maverick/Animation/Hitbox/HitRect/HitRect.hpp"
@@ -20,6 +19,19 @@ enum OBJECT_TYPE{
 	EXTENDED_OBJECT_TYPE_START = 0x10000800,
 	OBJECT_END   = 0x2FFFFFFF
 };
+
+enum ATTR_DATA_TYPE{
+    DATA_INT = 0,
+    DATA_UINT,
+    DATA_BOOL,
+    DATA_CHAR,
+    DATA_STRING
+};
+
+typedef struct Attribute{
+    ATTR_DATA_TYPE type;
+	uint64_t val;
+} Attribute;
 
 class Zone;
 class Object{
@@ -45,11 +57,46 @@ class Object{
 		 */
 		const char* getName();
 
-		/** Gets a pointer to an attribute
+		/** Populates `val` with the bool attribute, if it exists
 		 * @param key The attribute you're looking for
-		 * @return A pointer to the var if found, NULL otherwise
+		 * @param val The val you'd like to populate with the bool attribute
+		 * @return -2 on key not found, -1 on wrong type, 0 on success
 		 */
-		void* getAttr(const char* key);
+		int getAttr(const char* key, bool& val);
+
+		/** Populates `val` with the char attribute, if it exists
+		 * @param key The attribute you're looking for
+		 * @param val The val you'd like to populate with the char attribute
+		 * @return -2 on key not found, -1 on wrong type, 0 on success
+		 */
+		int getAttr(const char* key, char& val);
+
+		/** Populates `val` with the int attribute, if it exists
+		 * @param key The attribute you're looking for
+		 * @param val The val you'd like to populate with the int attribute
+		 * @return -2 on key not found, -1 on wrong type, 0 on success
+		 */
+		int getAttr(const char* key, int64_t& val);
+
+		/** Populates `val` with the uint attribute, if it exists
+		 * @param key The attribute you're looking for
+		 * @param val The val you'd like to populate with the uint attribute
+		 * @return -2 on key not found, -1 on wrong type, 0 on success
+		 */
+		int getAttr(const char* key, uint64_t& val);
+
+		/** Populates `val` with the char* attribute, if it exists
+		 * @param key The attribute you're looking for
+		 * @param val The val you'd like to populate with the char* attribute
+		 * @return -2 on key not found, -1 on wrong type, 0 on success
+		 */
+		int getAttr(const char* key, char*& val);
+
+		/** Gets the attribute type
+		 * @param key The attribute you're looking for
+		 * @return -1 if the attribute isn't found, otherwise the attribute type is returned
+		 */
+		int getAttrType(const char* key);
 
 		/** Gets the entity type
 		 * @return A uint32_t representation of the entity type set in the constructor
@@ -527,7 +574,7 @@ class Object{
 		std::unordered_map<std::string, Animation*> animations;
 
 		//Attributes
-		AttributeHash* attr;
+		std::unordered_map<std::string, Attribute> attr;
 
 		//The object type (exact values are specified by child classes)
 		uint32_t type;

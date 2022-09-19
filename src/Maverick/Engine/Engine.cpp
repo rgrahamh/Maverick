@@ -1,4 +1,4 @@
-#include "./Engine.hpp"
+#include "Engine.hpp"
 
 // EVENTUALLY, we'll want to take out this include and replace the "loadZone()" with a proper zone loading function
 #include "Maverick/FileHandler/Saver/Saver.hpp"
@@ -9,8 +9,6 @@ std::atomic<bool> exit_game;
 bool endian;
 bool debug = false;
 bool graphics_init = false;
-
-std::thread::id base_thread_id = std::this_thread::get_id();
 
 Engine* Engine::engine = nullptr;
 
@@ -69,12 +67,6 @@ Engine::Engine(){
         exit(-1);
     }
     this->camera = new Camera(renderer, window, nullptr, CAMERA_FOLLOW_MODE::FIXED_FOLLOW, 0.08);
-
-    //Setting up the hash tables
-    this->sprite_hash = new SpriteHash(2048);
-    this->sound_hash = new SoundHash(2048);
-    this->music_hash = new MusicHash(2048);
-    this->font_hash = new FontHash(2048);
 
     //Set scales
     //We want to scale both X & Y by the Y element, so stuff doesn't get squashed
@@ -803,20 +795,28 @@ inline int Engine::addUIElement(const char* zone, UIElement* element){
     return 0;
 }
 
-inline void Engine::addSurface(const char* key, SDL_Surface* surface){
-    this->sprite_hash->add(key, surface);
+void Engine::addSurface(const std::string key, SDL_Surface* surface){
+    if(surface != nullptr && this->sprite_hash.find(key) == this->sprite_hash.end()){
+        this->sprite_hash[key] = surface;
+    }
 }
 
-inline void Engine::addSound(const char* key, Sound* sound){
-    this->sound_hash->add(key, sound);
+void Engine::addSound(const std::string key, Sound* sound){
+    if(sound != nullptr && this->sound_hash.find(key) == this->sound_hash.end()){
+        this->sound_hash[key] = sound;
+    }
 }
 
-inline void Engine::addMusic(const char* key, Music* music){
-    this->music_hash->add(key, music);
+void Engine::addMusic(const std::string key, Music* music){
+    if(music != nullptr && this->music_hash.find(key) == this->music_hash.end()){
+        this->music_hash[key] = music;
+    }
 }
 
-inline void Engine::addFont(const char* key, Font* font){
-    this->font_hash->add(key, font);
+void Engine::addFont(const std::string key, Font* font){
+    if(font != nullptr && this->font_hash.find(key) == this->font_hash.end()){
+        this->font_hash[key] = font;
+    }
 }
 
 void Engine::activateZone(const char* zone_name){
@@ -927,18 +927,30 @@ inline void Engine::setGravity(float gravity){
     this->gravity = gravity;
 }
 
-inline SDL_Surface* Engine::getSurface(const char* key){
-    return this->sprite_hash->get(key);
+SDL_Surface* Engine::getSurface(const std::string key){
+    if(this->sprite_hash.find(key) == this->sprite_hash.end()){
+        return nullptr;
+    }
+    return this->sprite_hash[key];
 }
 
-inline Sound* Engine::getSound(const char* key){
-    return this->sound_hash->get(key);
+Sound* Engine::getSound(const std::string key){
+    if(this->sound_hash.find(key) == this->sound_hash.end()){
+        return nullptr;
+    }
+    return this->sound_hash[key];
 }
 
-inline Music* Engine::getMusic(const char* key){
-    return this->music_hash->get(key);
+Music* Engine::getMusic(const std::string key){
+    if(this->music_hash.find(key) == this->music_hash.end()){
+        return nullptr;
+    }
+    return this->music_hash[key];
 }
 
-inline Font* Engine::getFont(const char* key){
-    return this->font_hash->get(key);
+Font* Engine::getFont(const std::string key){
+    if(this->font_hash.find(key) == this->font_hash.end()){
+        return nullptr;
+    }
+    return this->font_hash[key];
 }

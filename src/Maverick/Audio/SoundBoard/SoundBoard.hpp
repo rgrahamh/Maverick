@@ -4,8 +4,6 @@
 #include <atomic>
 
 #include "../Audio.hpp"
-#include "../../HashTable/MusicHash/MusicHash.hpp"
-#include "../../HashTable/SoundHash/SoundHash.hpp"
 #include "../Music/Music.hpp"
 
 class SoundBoard{

@@ -1,7 +1,6 @@
 #ifndef UIELEMENT_H
 #define UIELEMENT_H
 
-#include "Maverick/HashTable/AttributeHash/AttributeHash.hpp"
 #include "Maverick/Animation/Animation.hpp"
 #include "Maverick/Animation/Hitbox/Hitbox.hpp"
 #include "Maverick/Animation/Hitbox/HitRect/HitRect.hpp"
@@ -141,6 +140,10 @@ class UIElement{
          * @param animation A pointer to the new background animation
          */
         void setBackground(Animation* background_ptr);
+
+        /** Deletes the background animation of the UIElement
+         */
+        void deleteBackground();
 
         /** Sets the visibility of the current animation state
          * @return If the object is active
