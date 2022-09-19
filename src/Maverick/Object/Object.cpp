@@ -101,7 +101,7 @@ double Object::getWidth(){
     if(sprite == nullptr){
         return 0;
     }
-    return sprite->rect->w;
+    return sprite->surface->w;
 }
 
 double Object::getHeight(){
@@ -112,7 +112,7 @@ double Object::getHeight(){
     if(sprite == nullptr){
         return 0;
     }
-    return sprite->rect->h;
+    return sprite->surface->h;
 }
 
 float Object::getMass(){
