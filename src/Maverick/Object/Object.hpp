@@ -299,18 +299,6 @@ class Object{
 		 * @return 0 on success, -1 if the animation doesn't exist
 		 */
 		int setAnimation(const char* animation_name);
-		/** Sets the scale for a single animation
-		 * @param animation_name The animation name
-		 * @param x_scale The x scale factor
-		 * @param y_scale The y scale factor
-		 * @return 0 on success, -1 if the animation doesn't exist
-		 */
-		int setSize(const char* animation_name, float width, float height);
-		/** Sets the scale for all animations
-		 * @param width The x scale factor
-		 * @param height The y scale factor
-		 */
-		void setSize(float width, float height);
 
 		/** Sets the sprite set for a given animation in the entity
 		 * @param animation_name The animation set you'd like to swap the sprite set for

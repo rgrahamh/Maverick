@@ -1,6 +1,6 @@
 #include "./LoadingZone.hpp"
 #include "Maverick/Engine/Engine.hpp"
-#include "Maverick/Zones/ZoneFactory/ZoneFactory.hpp"
+#include "Cyberena/Zones/ZoneFactory/ZoneFactory.hpp"
 
 LoadingZone::LoadingZone(const char* name, const char* zone_to_load, float start_x, float start_y, float start_z, double width, double height, double depth, uint32_t matching_type, int layer)
            : Object(name, start_x, start_y, start_z, 0, 0, 0){

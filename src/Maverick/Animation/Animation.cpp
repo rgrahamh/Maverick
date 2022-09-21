@@ -14,7 +14,6 @@ Animation::Animation(const char* name, uint16_t num_sprite_sets){
 	this->sequence_end = NULL;
 	this->time_counter = 0;
 	this->paused = false;
-	this->num_sprite_sets = num_sprite_sets;
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
 
@@ -27,7 +26,7 @@ Animation::Animation(FILE* file){
 
 Animation::~Animation(){
 	if(sequence_start != nullptr){
-		AnimationSeq* cursor = sequence_start;
+		Frame* cursor = sequence_start;
 		do {
 			HitboxList* hitboxes = cursor->hitboxes;
 			while(hitboxes != NULL){
@@ -57,7 +56,7 @@ Animation::~Animation(){
 				delete cursor->sprite;
 			}
 
-			AnimationSeq* tmp;
+			Frame* tmp;
 			tmp = cursor;
 			cursor = cursor->next;
 			delete tmp;
@@ -94,16 +93,16 @@ HitboxList* Animation::getHitboxes(){
 	}
 }
 
-double Animation::getUpperDrawAxis(){
+double Animation::getUpperDrawAxis(double y_base){
 	if(likely(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL)){
 		//If draw_axis is set
 		Sprite* sprite = this->sequence->sprite[curr_sprite_set];
-		if(sprite->upper_draw_axis != -1){
-			return *this->y_base + sprite->upper_draw_axis + sprite->y_offset;
+		if(likely(sprite->upper_draw_axis != -1)){
+			return y_base + sprite->upper_draw_axis;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + sprite->y_offset;
+			return y_base;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -112,16 +111,16 @@ double Animation::getUpperDrawAxis(){
 	}
 }
 
-double Animation::getLowerDrawAxis(){
+double Animation::getLowerDrawAxis(double y_base){
 	if(likely(this->sequence != NULL && this->sequence->sprite[curr_sprite_set] != NULL)){
 		//If draw_axis is set
 		Sprite* sprite = this->sequence->sprite[curr_sprite_set];
-		if(sprite->lower_draw_axis != -1){
-			return *this->y_base + sprite->lower_draw_axis + sprite->y_offset;
+		if(likely(sprite->lower_draw_axis != -1)){
+			return y_base + sprite->lower_draw_axis;
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return *this->y_base + sprite->surface->h + sprite->y_offset;
+			return y_base + sprite->surface->h;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -135,7 +134,7 @@ uint32_t Animation::getTimeLeft(){
 		return 0;
 	}
 
-	AnimationSeq* cursor = this->sequence;
+	Frame* cursor = this->sequence;
 	int time_left = cursor->keytime;
 	cursor = cursor->next;
 	while(cursor != this->sequence_start && cursor != nullptr){
@@ -165,13 +164,13 @@ bool Animation::isAnimated(){
 int Animation::addFrame(unsigned int keytime){
 	//If it's the first animation frame
 	if(this->sequence_end == NULL){
-		this->sequence_end = new AnimationSeq;
+		this->sequence_end = new Frame;
 		this->sequence_start = this->sequence_end;
 		this->sequence = this->sequence_end;
 	}
 	//Any additional frames
 	else{
-		this->sequence_end->next = new AnimationSeq;
+		this->sequence_end->next = new Frame;
 		this->sequence_end = this->sequence_end->next;
 		this->sequence_end->next = this->sequence_start;
 	}
@@ -196,7 +195,7 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	}
 	uint16_t sprite_set_idx = this->sprite_sets[std::string(sprite_set)];
 
-	AnimationSeq* sequence_cursor = this->sequence_start;
+	Frame* sequence_cursor = this->sequence_start;
 	if(sequence_cursor != nullptr){
 		do{
 			if(sequence_cursor->sprite[sprite_set_idx] == nullptr){
@@ -244,7 +243,7 @@ int Animation::addSpriteSet(const char* sprite_set){
 }
 
 int Animation::addHitbox(Hitbox* hitbox){
-	AnimationSeq* cursor = this->sequence_start;
+	Frame* cursor = this->sequence_start;
 	if(cursor != NULL){
 		do{
 			HitboxList* new_hitbox = new HitboxList;
@@ -276,7 +275,7 @@ int Animation::addHitbox(Hitbox* hitbox, int sequence_num){
 			}
 		}
 		else{
-			AnimationSeq* cursor = this->sequence_start;
+			Frame* cursor = this->sequence_start;
 			for(int i = 0; i < sequence_num && cursor != NULL; i++){
 				cursor = cursor->next;
 			}
@@ -314,7 +313,7 @@ int Animation::addSound(const char* sound_id, int sequence_num){
 			}
 		}
 		else{
-			AnimationSeq* cursor = this->sequence_start;
+			Frame* cursor = this->sequence_start;
 			for(int i = 0; i < sequence_num && cursor != NULL; i++){
 				cursor = cursor->next;
 			}
@@ -342,7 +341,7 @@ int Animation::setSpriteSet(const char* sprite_set){
 }
 
 void Animation::setUpperDrawAxis(double upper_draw_axis, int32_t sprite_num){
-	AnimationSeq* cursor = this->sequence_start;
+	Frame* cursor = this->sequence_start;
 	if(sprite_num == -1){
 		if(cursor != nullptr){
 			do{
@@ -371,7 +370,7 @@ void Animation::setUpperDrawAxis(double upper_draw_axis, int32_t sprite_num){
 }
 
 void Animation::setLowerDrawAxis(double lower_draw_axis, int32_t sprite_num){
-	AnimationSeq* cursor = this->sequence_start;
+	Frame* cursor = this->sequence_start;
 	if(sprite_num == -1){
 		if(cursor != nullptr){
 			do{
@@ -599,11 +598,11 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area
 	}
 }
 
-AnimationSeq* Animation::getSequenceStart(){
+Frame* Animation::getSequenceStart(){
 	return this->sequence_start;
 }
 
-AnimationSeq* Animation::getSequenceEnd(){
+Frame* Animation::getSequenceEnd(){
 	return this->sequence_end;
 }
 
@@ -620,7 +619,7 @@ bool Animation::hasSpriteSet(const char* sprite_set){
 }
 
 int Animation::serializeAssets(FILE* file, SerializeSet& serialize_set){
-    AnimationSeq* cursor = sequence_start;
+    Frame* cursor = sequence_start;
     if(cursor != NULL){
         do{
 			for(auto& sprite_set:this->sprite_sets){
@@ -674,7 +673,7 @@ int Animation::serializeData(FILE* file){
 	WriteVar(this->sequence_len, uint16_t, file);
 
 	//Per frame
-	AnimationSeq* sequence_cursor = this->sequence_start;
+	Frame* sequence_cursor = this->sequence_start;
 	if(sequence_cursor != nullptr){
 		do{
 			//Getting the number of sprites in this frame

@@ -34,10 +34,11 @@ void buildGlobal(){
     //Create the pause menu
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 0);
     pause_menu->setActive(false);
-    pause_menu->addAnimation("default", 1);
-    pause_menu->addFrame("default", 0);
-    pause_menu->addSprite("default", "default", "shade");
-    pause_menu->setAnimation("default");
+    Animation* pause_animation = new Animation("pause_animation", 1);
+    pause_animation->addFrame(0);
+    pause_animation->addSpriteSet("default");
+    pause_animation->addSprite("default", "black_box", 0, 0);
+    pause_menu->setBackground(pause_animation);
 
     //Create the pause text
     UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "mavwhite", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);

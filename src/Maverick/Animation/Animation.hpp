@@ -26,7 +26,7 @@ struct Sprite{
 	double lower_draw_axis;
 };
 
-typedef struct AnimationSequence{
+struct Frame{
 	Sprite** sprite = nullptr;
 
 	Sound* sound = nullptr;
@@ -35,8 +35,8 @@ typedef struct AnimationSequence{
 	
 	unsigned int keytime = 0;
 
-	struct AnimationSequence* next = nullptr;
-} AnimationSeq;
+	struct Frame* next = nullptr;
+};
 
 class Animation{
 	public:
@@ -80,14 +80,16 @@ class Animation{
 		HitboxList* getHitboxes();
 
 		/** Gets the upper draw axis
+		 * @param y_base The y base of the object (so draw axis offset can be calcuated)
 		 * @return The upper draw axis
 		 */
-		double getUpperDrawAxis();
+		double getUpperDrawAxis(double y_base);
 
 		/** Gets the lower draw axis
+		 * @param y_base The y base of the object (so draw axis offset can be calcuated)
 		 * @return The lower draw axis
 		 */
-		double getLowerDrawAxis();
+		double getLowerDrawAxis(double y_base);
 
 		/** Gets the number of frames left in the animation from the current state
 		 * @return The number of frames left in the animation
@@ -107,12 +109,12 @@ class Animation{
 		/** Gets the start of the animation sequence
 		 * @return The start of the animation sequence
 		 */
-		AnimationSeq* getSequenceStart();
+		Frame* getSequenceStart();
 
 		/** Gets the end of the animation sequence
 		 * @return The end of the animation sequence
 		 */
-		AnimationSeq* getSequenceEnd();
+		Frame* getSequenceEnd();
 
 		/** Gets the length of a sequence
 		 * @return The sequence len
@@ -128,13 +130,6 @@ class Animation{
 		 * @param paused If the animation is paused
 		 */
 		void setPaused(bool paused);
-
-		/** Sets the size of the animation
-		 * @param width The width of the animation
-		 * @param height The height of the animation
-		 * @return 0 if successful, -1 otherwise
-		 */
-		int setSize(int width, int height);
 
 		/** Sets the next animation
 		 * @param next_animation The next animation
@@ -240,12 +235,12 @@ class Animation{
 		char* name;
 
 		//The image sequence and start of image sequence
-		AnimationSeq* sequence;
-		AnimationSeq* sequence_end;
-		AnimationSeq* sequence_start;
+		Frame* sequence;
+		Frame* sequence_end;
+		Frame* sequence_start;
 
 		//The next animation to be played (if null the animation will stop at the end, if it's a reference to itself it'll loop).
-		//Uses the animation rather than AnimationSeq so that we can enact lazy loading while bringing files in
+		//Uses the animation rather than Frame so that we can enact lazy loading while bringing files in
 		Animation* next_animation;
 
 		//Keeps track of the current sprite set, and the number of sprite sets for this animation
@@ -254,12 +249,8 @@ class Animation{
 		uint16_t num_sprite_sets;
 		uint16_t sprite_set_counter;
 
-		//The number of AnimationSeqs in the Animation
+		//The number of Frames in the Animation
 		uint16_t sequence_len;
-
-		//Pointers to the X and Y base coords
-		double* x_base;
-		double* y_base;
 
 		//The time counter
 		unsigned int time_counter;

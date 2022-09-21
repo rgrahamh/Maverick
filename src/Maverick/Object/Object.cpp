@@ -580,14 +580,14 @@ double Object::getUpperDrawAxis(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    return this->active_animation->getUpperDrawAxis();
+    return this->active_animation->getUpperDrawAxis(this->y);
 }
 
 double Object::getLowerDrawAxis(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    return this->active_animation->getLowerDrawAxis();
+    return this->active_animation->getLowerDrawAxis(this->y);
 }
 
 int Object::setUpperDrawAxis(const char* animation_name, double draw_axis, int32_t sprite_num){
@@ -651,21 +651,6 @@ int Object::setAnimation(const char* animation_name){
     }
     else{
         return -1;
-    }
-}
-
-int Object::setSize(const char* animation_name, float width, float height){
-    Animation* animation = findAnimation(animation_name);
-    if(animation == nullptr){
-        return -1;
-    }
-    animation->setSize(width, height);
-    return 0;
-}
-
-void Object::setSize(float width, float height){
-    for(auto& animation : animations){
-        animation.second->setSize(width, height);
     }
 }
 
