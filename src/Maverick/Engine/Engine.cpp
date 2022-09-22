@@ -150,7 +150,7 @@ void Engine::gameLoop(){
             fps_counter += delta;
             fps++;
             if(fps_counter >= 1000){
-                printf("FPS: %ld\n", fps);
+                printf("FPS: %lu\n", fps);
                 fps_counter = 0;
                 fps = 0;
             }
@@ -313,10 +313,10 @@ void Engine::collisionStep(ObjectList* all_objects){
             int y_min = camera->getY() - (win_height / 2); 
             int x_max = win_width * 1.5 + camera->getX();
             int y_max = win_height * 1.5 + camera->getY();
-            int j = 0;
             //Set up the object & hitbox matricies
             //Go by height as the outer loop since it eliminates the most
             if(x_iter > 0 && y_iter > 0){
+                int j = 0;
                 for(int box_y = y_min; box_y < y_max; box_y += y_iter){
                     //If the top_bound is below box_y + win_height or if the bot_bound is above box_y, go to next
                     if(!(top_bound > box_y + y_iter || bot_bound < box_y)){
@@ -761,7 +761,7 @@ void Engine::freeFullEntityList(){
     }
 }
 
-inline void Engine::addZone(Zone* zone){
+void Engine::addZone(Zone* zone){
     if(getZone(zone->getName()) == nullptr){
         ZoneList* new_zone = new ZoneList;
         new_zone->zone = zone;
@@ -773,7 +773,7 @@ inline void Engine::addZone(Zone* zone){
     }
 }
 
-inline int Engine::addObject(const char* zone, Object* object){
+int Engine::addObject(const char* zone, Object* object){
     Zone* zone_ptr = getZone(zone);
     if(zone == nullptr){
         return -1;
@@ -784,7 +784,7 @@ inline int Engine::addObject(const char* zone, Object* object){
     return 0;
 }
 
-inline int Engine::addUIElement(const char* zone, UIElement* element){
+int Engine::addUIElement(const char* zone, UIElement* element){
     Zone* zone_ptr = getZone(zone);
     if(zone == nullptr){
         return -1;
@@ -795,25 +795,25 @@ inline int Engine::addUIElement(const char* zone, UIElement* element){
     return 0;
 }
 
-void Engine::addSurface(const std::string key, SDL_Surface* surface){
+void Engine::addSurface(const std::string& key, SDL_Surface* surface){
     if(surface != nullptr && this->sprite_hash.find(key) == this->sprite_hash.end()){
         this->sprite_hash[key] = surface;
     }
 }
 
-void Engine::addSound(const std::string key, Sound* sound){
+void Engine::addSound(const std::string& key, Sound* sound){
     if(sound != nullptr && this->sound_hash.find(key) == this->sound_hash.end()){
         this->sound_hash[key] = sound;
     }
 }
 
-void Engine::addMusic(const std::string key, Music* music){
+void Engine::addMusic(const std::string& key, Music* music){
     if(music != nullptr && this->music_hash.find(key) == this->music_hash.end()){
         this->music_hash[key] = music;
     }
 }
 
-void Engine::addFont(const std::string key, Font* font){
+void Engine::addFont(const std::string& key, Font* font){
     if(font != nullptr && this->font_hash.find(key) == this->font_hash.end()){
         this->font_hash[key] = font;
     }
@@ -887,7 +887,7 @@ void Engine::unloadZone(const char* zone_name){
     }
 }
 
-inline ZoneList* Engine::getZones(){
+ZoneList* Engine::getZones(){
     return this->zones;
 }
 
@@ -911,44 +911,44 @@ Zone* Engine::getZone(const char* zone_name){
     return nullptr;
 }
 
-inline ZoneList* Engine::getActiveZones(){
+ZoneList* Engine::getActiveZones(){
     return this->active_zones;
 }
 
-inline SoundBoard* Engine::getSoundBoard(){
+SoundBoard* Engine::getSoundBoard(){
     return this->sound_board;
 }
 
-inline float Engine::getGravity(){
+float Engine::getGravity(){
     return this->gravity;
 }
 
-inline void Engine::setGravity(float gravity){
+void Engine::setGravity(float gravity){
     this->gravity = gravity;
 }
 
-SDL_Surface* Engine::getSurface(const std::string key){
+SDL_Surface* Engine::getSurface(const std::string& key){
     if(this->sprite_hash.find(key) == this->sprite_hash.end()){
         return nullptr;
     }
     return this->sprite_hash[key];
 }
 
-Sound* Engine::getSound(const std::string key){
+Sound* Engine::getSound(const std::string& key){
     if(this->sound_hash.find(key) == this->sound_hash.end()){
         return nullptr;
     }
     return this->sound_hash[key];
 }
 
-Music* Engine::getMusic(const std::string key){
+Music* Engine::getMusic(const std::string& key){
     if(this->music_hash.find(key) == this->music_hash.end()){
         return nullptr;
     }
     return this->music_hash[key];
 }
 
-Font* Engine::getFont(const std::string key){
+Font* Engine::getFont(const std::string& key){
     if(this->font_hash.find(key) == this->font_hash.end()){
         return nullptr;
     }

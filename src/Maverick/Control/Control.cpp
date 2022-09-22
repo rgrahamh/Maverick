@@ -129,31 +129,31 @@ void Control::updateMouse(){
     mouse.scroll_wheel = 0;
 }
 
-inline const ControllerState* Control::getOldController(uint8_t controller) const{
+const ControllerState* Control::getOldController(uint8_t controller) const{
     return &old_controllers[controller];
 }
 
-inline const ControllerState* Control::getController(uint8_t controller) const{
+const ControllerState* Control::getController(uint8_t controller) const{
     return &controllers[controller];
 }
 
-inline const uint8_t* Control::getDigitalPress() const{
+const uint8_t* Control::getDigitalPress() const{
     return digital_press;
 }
 
-inline const uint8_t* Control::getOldKeys() const{
+const uint8_t* Control::getOldKeys() const{
     return old_keys;
 }
 
-inline const uint8_t* Control::getKeys() const{
+const uint8_t* Control::getKeys() const{
     return keys;
 }
 
-inline const MouseState* Control::getOldMouse() const{
+const MouseState* Control::getOldMouse() const{
     return &old_mouse;
 }
 
-inline const MouseState* Control::getMouse() const{
+const MouseState* Control::getMouse() const{
     return &mouse;
 }
 

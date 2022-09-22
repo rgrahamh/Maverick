@@ -1,7 +1,7 @@
 #include "Loader.hpp"
 #include "Maverick/Engine/Engine.hpp"
 
-inline SDL_Surface* readSurface(FILE* file){
+SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;
 	uint32_t width, height, rmask, gmask, bmask, amask;
 
@@ -33,7 +33,7 @@ inline SDL_Surface* readSurface(FILE* file){
 /** Loads a BMP from file & inserts it into the engine
  * @param file The file to load the BMP from
  */
-inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
+SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
 	if(file == nullptr){
 		return nullptr;
 	}
@@ -66,7 +66,7 @@ inline SDL_Surface* loadBMP(FILE* file, char* key_buff, unsigned int max_len){
 /** Loads a sound from file & inserts it into the engine
  * @param file The file to load the sound from
  */
-inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
+Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	ReadVar(identifier_len, file);
 
@@ -101,7 +101,7 @@ inline Sound* loadSound(FILE* file, char* key_buff, unsigned int max_len){
 /** Loads a unit of music from file & inserts it into the engine
  * @param file The file to load the music from
  */
-inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
+Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	ReadVar(identifier_len, file);
 
@@ -140,7 +140,7 @@ inline Music* loadMusic(FILE* file, char* key_buff, unsigned int max_len){
 	return new_music;
 }
 
-inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
+Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	uint16_t identifier_len;
 	ReadVar(identifier_len, file);
 
@@ -185,7 +185,7 @@ inline Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 	return new_font;
 }
 
-inline void loadCutscene(FILE* file){
+void loadCutscene(FILE* file){
 	return;
 }
 

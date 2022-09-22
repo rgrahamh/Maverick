@@ -13,6 +13,7 @@ int Music::start(int music_channel_index, float volume, unsigned int fade){
         return -1;
     }
 
+    this->music_channel_index = music_channel_index;
     int channel_offset = music_channel_index * MAX_MUSIC_TRACKS;
     if(fade == 0){
         for(int i = 0; i < this->num_tracks; i++){
@@ -20,8 +21,6 @@ int Music::start(int music_channel_index, float volume, unsigned int fade){
         }
     }
     else{
-        this->music_channel_index = music_channel_index;
-        int channel_offset = this->music_channel_index * MAX_MUSIC_TRACKS;
         if(!playing){
             for(int i = 0; i < this->num_tracks; i++){
                 Mix_Volume(i + channel_offset, 0);
@@ -30,7 +29,6 @@ int Music::start(int music_channel_index, float volume, unsigned int fade){
             }
         }
     }
-    this->music_channel_index = music_channel_index;
     this->playing = true;
 
     return 0;

@@ -35,6 +35,11 @@ Object::Object(const char* name, float start_x, float start_y, float start_z, fl
 
     this->ground = 0;
     this->next_ground = this->ground;
+
+    this->active_animation = nullptr;
+
+    this->visible = true;
+    this->active = true;
 }
 
 Object::~Object(){
@@ -279,6 +284,14 @@ void Object::setFriction(float friction){
     this->friction = friction;
 }
 
+void Object::setActive(bool active){
+    this->active = active;
+}
+
+void Object::setVisible(bool visible){
+    this->visible = visible;
+}
+
 void Object::setEnvBump(){
     this->env_bump = true;
 }
@@ -389,7 +402,7 @@ void Object::process(uint64_t delta, unsigned int steps){
 }
 
 void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    this->draw(renderer, delta, camera_x + this->x, camera_y + this->y);
+    this->draw(renderer, delta, this->x - camera_x, this->y - camera_y);
 }
 
 void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
@@ -489,6 +502,10 @@ HitboxList* Object::getHitboxes(){
         return nullptr;
     }
     return this->active_animation->getHitboxes();
+}
+
+uint32_t Object::getType(){
+    return this->type;
 }
 
 void Object::onCollide(Object* other, Hitbox* this_hitbox, Hitbox* other_hitbox){
@@ -820,6 +837,8 @@ int Object::deserializeData(FILE* file){
         starting_str[starting_str_len] = '\0';
         this->setAnimation(starting_str);
     }
+
+    return 0;
 }
 
 int Object::serializeAssets(FILE* file, SerializeSet& serialize_set){

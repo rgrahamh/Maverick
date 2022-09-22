@@ -16,6 +16,7 @@ Animation::Animation(const char* name, uint16_t num_sprite_sets){
 	this->paused = false;
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
+	this->num_sprite_sets = num_sprite_sets;
 
 	this->next_animation = nullptr;
 }
@@ -210,12 +211,10 @@ int Animation::addSprite(const char* sprite_set, const char* sprite_path, double
 	}
 
 	//Getting the texture
-	SDL_Surface* surface;
-	if((surface = Engine::getInstance()->getSurface(sprite_path)) == NULL){
-		if(surface == nullptr){
-			printf("Cannot find image %s!\n", sprite_path);
-			return -1;
-		}
+	SDL_Surface* surface = Engine::getInstance()->getSurface(sprite_path);
+	if(surface == nullptr){
+		printf("Cannot find image %s!\n", sprite_path);
+		return -1;
 	}
 
 	//Create the sprite
@@ -410,11 +409,11 @@ void Animation::advance(uint64_t delta){
 				sequence = sequence->next;
 			}
 			//If we've hit the end of the sequence & next_animation is not nullptr (for a loop, next_sequence should be start_sequence)
-			else if(sequence == sequence_end && next_animation != nullptr){
+			else if(next_animation != nullptr){
 				sequence = next_animation->getSequenceStart();
 			}
 			//If we've hit the end of the sequence & next_animation is nullptr
-			else if(sequence == sequence_end && next_animation == nullptr){
+			else if(next_animation == nullptr){
 				time_counter = sequence->keytime;
 				break;	
 			}
@@ -444,7 +443,7 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 	}
 
 	Sprite* sprite = this->sequence->sprite[curr_sprite_set];
-	if(sprite == nullptr){
+	if(sprite == nullptr || sprite->surface == nullptr){
 		return;
 	}
 
@@ -452,11 +451,16 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 	SDL_Rect curr_rect;
 	curr_rect.x = x_off + sprite->x_offset;
 	curr_rect.y = y_off + sprite->y_offset;
+
 	curr_rect.w = sprite->surface->w;
 	curr_rect.h = sprite->surface->h;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
+	}
+
+	if(sprite->texture == nullptr){
+		return;
 	}
 
 	//Draw the sprite

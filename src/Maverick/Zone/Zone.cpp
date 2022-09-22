@@ -27,7 +27,7 @@ Zone::~Zone(){
     }
 
     UIElementList* ui_cursor = ui;
-    while(ui != NULL){
+    while(ui_cursor != nullptr){
         ui_cursor = ui->next;
         if(ui->element != nullptr){
             delete ui->element;

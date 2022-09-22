@@ -24,6 +24,9 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
     this->draw_area.h = view_height * win_height;
 
     this->background = nullptr;
+
+    this->visible = true;
+    this->active = true;
 }
 
 UIElement::~UIElement(){
@@ -114,11 +117,11 @@ inline void UIElement::updateDrawArea(){
     this->draw_area.h = this->view_height * win_height;
 }
 
-inline void UIElement::setViewWidth(double view_width){
+void UIElement::setViewWidth(double view_width){
     this->view_width = view_width;
 }
 
-inline void UIElement::setViewHeight(double view_height){
+void UIElement::setViewHeight(double view_height){
     this->view_height = view_height;
 }
 

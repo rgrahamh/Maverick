@@ -18,7 +18,7 @@ int main(int argc, char** argv){
     sound->sample = Mix_LoadWAV("./assets/audio/music/bass_riff_idea.wav");
     song1->addTrack(sound);
     engine->addMusic("song1", song1);
-	SoundBoard* sound_board = engine->getSoundBoard();
+	//SoundBoard* sound_board = engine->getSoundBoard();
     //sound_board->playMusic("song1");
     //sound_board->setMusicVolume(1, 1.0, 10000);
 

@@ -178,7 +178,5 @@ TEST(Collision, TestEllipseEllipse){
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
 
-    Engine* engine = Engine::getInstance();
-
     return RUN_ALL_TESTS();
 }

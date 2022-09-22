@@ -75,7 +75,6 @@ void SoundBoard::setSoundVolume(int channel_id, float volume, unsigned int fade)
     }
     else{
         //Fade to volume for selected channel
-        Engine* engine = Engine::getInstance();
         if(channel_id != -1){
             std::thread(&SoundBoard::fadeVolume, this, channel_id, volume, fade).detach();
         }

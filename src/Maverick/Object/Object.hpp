@@ -121,12 +121,12 @@ class Object{
 		/** Sets the activation of the current animation state
 		 * @return If the entity is active
 		 */
-		virtual void setActive(bool active);
+		void setActive(bool active);
 
 		/** Sets the visibility of the current animation state
 		 * @return If the entity is active
 		 */
-		virtual void setVisible(bool visible);
+		void setVisible(bool visible);
 
 		/** Gets the old X value of the object
 		 * @return The old X value of the object

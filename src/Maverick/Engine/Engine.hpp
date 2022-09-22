@@ -195,49 +195,49 @@ class Engine{
 		 * @param key The key representing the surface
 		 * @param surface The surface being added to the hash
 		 */
-		void addSurface(const std::string key, SDL_Surface* surface);
+		void addSurface(const std::string& key, SDL_Surface* surface);
 
 		/** Gets a surface from the engine
 		 * @param key The texture's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the SDL_Surface otherwise
 		 */
-		SDL_Surface* getSurface(const std::string key);
+		SDL_Surface* getSurface(const std::string& key);
 
 		/**Adds a sound to the sprite hash
 		 * @param key The key representing the sound
 		 * @param sound The sound being added to the hash
 		 */
-		void addSound(const std::string key, Sound* sound);
+		void addSound(const std::string& key, Sound* sound);
 
 		/** Gets a sound from the engine
 		 * @param key The sound's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Sound otherwise
 		 */
-		Sound* getSound(const std::string key);
+		Sound* getSound(const std::string& key);
 
 		/**Adds a music to the sprite hash
 		 * @param key The key representing the music
 		 * @param music The music being added to the hash
 		 */
-		void addMusic(const std::string key, Music* music);
+		void addMusic(const std::string& key, Music* music);
 
 		/** Gets a music from the engine
 		 * @param key The music's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Music otherwise
 		 */
-		Music* getMusic(const std::string key);
+		Music* getMusic(const std::string& key);
 
 		/**Adds a font to the sprite hash
 		 * @param key The key representing the font
 		 * @param font The font being added to the hash
 		 */
-		void addFont(const std::string key, Font* font);
+		void addFont(const std::string& key, Font* font);
 
 		/** Gets a font from the engine
 		 * @param key The font's identifier in the hash table
 		 * @return A nullptr if not found (& it can't be loaded), a pointer to the Font otherwise
 		 */
-		Font* getFont(const std::string key);
+		Font* getFont(const std::string& key);
 
 	private:
 		/** Engine's parameterized constructor
