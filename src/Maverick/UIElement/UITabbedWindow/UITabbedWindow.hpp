@@ -16,12 +16,10 @@ class UITabbedWindow : public UIElement{
 		virtual void _process(uint64_t delta, unsigned int steps) override;
 
         /** Draws this UIElement
-         * @param renderer The SDL_Renderer we're drawing to
          * @param delta The time passed since last draw (in ms)
-         * @param camera_x The X location of the camera
-         * @param camera_y The Y location of the camera
+         * @param draw_scope The draw scope of the tabbed window
          */
-        virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+        virtual void drawSubelements(uint64_t delta, const SDL_Rect& draw_scope) override;
 
         /** Handles actions for this UIElement
          * @param control The control struct

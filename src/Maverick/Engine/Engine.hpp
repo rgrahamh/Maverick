@@ -20,8 +20,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-#define BASE_SCREEN_WIDTH 640
-#define BASE_SCREEN_HEIGHT 360
+#define DESIGN_SCREEN_WIDTH 640.0
+#define DESIGN_SCREEN_HEIGHT 360.0
 #define PHYSICS_STEP_SIZE 4 //ms
 
 enum GAME_STATE : uint64_t{
@@ -111,34 +111,21 @@ class Engine{
 		 */
 		void setState(uint64_t new_state);
 
-		//Global scale getters
-		/** Returns the global X scale of the engine
-		 * @return The global X scale of the engine
+		/** Returns the native scale (screen height / intended height) of the engine
+		 * @return The native scale of the engine
 		 */
-		float getGlobalXScale();
+		double getNativeScale();
 
-		/** Returns the global Y scale of the engine
-		 * @return The global Y scale of the engine
+		/** Gets the engine's renderer
+		 * @return The engine's renderer
 		 */
-		float getGlobalYScale();
+		SDL_Renderer* getRenderer();
 
 		/** Gets the camera engine's camera
 		 * @return The engine's camera
 		 */
 		Camera* getCamera();
 
-		//Global scale setters
-		/** Sets the global X scale of the engine
-		 * @param x_scale The global X scale of the engine
-		 */
-		void setGlobalXScale(double x_scale);
-
-		/** Sets the global Y scale of the engine
-		 * @param y_scale The global Y scale of the engine
-		 */
-		void setGlobalYScale(double y_scale);
-
-		//Sets/gets the gravity
 		/** Sets the global gravity val of the engine
 		 * @param gravity The global gravity val
 		 */
@@ -312,6 +299,7 @@ class Engine{
 		//Render
 		Camera* camera;
 		SDL_Window* window;
+		SDL_Renderer* renderer;
 
 		//Control
 		Control* control;
@@ -325,17 +313,8 @@ class Engine{
 		//Engine entities
 		EntityList entities;
 
-		//Scale
-		float current_x_scale;
-		float current_y_scale;
-
-		//Target scale
-		float target_x_scale;
-		float target_y_scale;
-
-		//Native scale
-		float native_x_scale;
-		float native_y_scale;
+		//The native scale of the engine
+		double native_scale;
 
 		//Gravity val
 		float gravity;

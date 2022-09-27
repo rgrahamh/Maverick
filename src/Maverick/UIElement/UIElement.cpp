@@ -27,6 +27,9 @@ UIElement::UIElement(const char* name, double view_x_offset, double view_y_offse
 
     this->visible = true;
     this->active = true;
+
+    this->width_buff = 0;
+    this->height_buff = 0;
 }
 
 UIElement::~UIElement(){
@@ -64,27 +67,46 @@ void UIElement::_action(Control* control){
     }
 }
 
-void UIElement::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    //Draw this element
-    updateDrawArea();
-
-    if(this->background != nullptr){
-        this->background->draw(renderer, delta, camera_x, camera_y);
-    }
-
-    this->draw(renderer, delta, camera_x, camera_y);
-
+void UIElement::drawSubelements(uint64_t delta, const SDL_Rect& draw_scope)
+{
     //Draw all children elements (AFTER the parent element)
-    int win_width, win_height;
-    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
     for(UIElement* subelement : subelements){
         if(subelement->isVisible()){
-            subelement->_draw(renderer, delta, camera_x, camera_y);
+            subelement->_draw(delta, draw_scope);
         }
     }
 }
 
-void UIElement::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
+void UIElement::_draw(uint64_t delta, const SDL_Rect& draw_scope){
+    //Update draw area
+    this->draw_area.x = draw_scope.x + (this->view_x_offset * draw_scope.w) + this->width_buff;
+    this->draw_area.y = draw_scope.y + (this->view_y_offset * draw_scope.h) + this->height_buff;
+
+    int width_mod = this->width_buff * 2;
+    int height_mod = this->height_buff * 2;
+    
+    //If the width/height would be 0 or less, skip the draw step
+    if(draw_scope.w <= width_mod || draw_scope.h <= height_mod){
+        this->draw_area.w = 0;
+        this->draw_area.h = 0;
+        return;
+    }
+
+    this->draw_area.w = (draw_scope.w * this->view_width) - width_mod;
+    this->draw_area.h = (draw_scope.h * this->view_height) - height_mod;
+
+    //Draw the background, if present
+    if(this->background != nullptr){
+        this->background->draw(delta, this->draw_area);
+    }
+
+    //Draw any sort of custom logic
+    this->draw(delta, this->draw_area);
+
+    this->drawSubelements(delta, this->draw_area);
+}
+
+void UIElement::draw(uint64_t delta, const SDL_Rect& draw_scope){
     //Draw logic goes here
 }
 
@@ -106,15 +128,6 @@ bool UIElement::isVisible(){
 
 uint32_t UIElement::getType(){
     return this->type;
-}
-
-inline void UIElement::updateDrawArea(){
-    int win_width, win_height;
-    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
-    this->draw_area.x = this->view_x_offset * win_width;
-    this->draw_area.y = this->view_y_offset * win_height;
-    this->draw_area.w = this->view_width * win_width;
-    this->draw_area.h = this->view_height * win_height;
 }
 
 void UIElement::setViewWidth(double view_width){

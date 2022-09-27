@@ -23,12 +23,10 @@ class UIObjectFrame : public UIElement{
         ~UIObjectFrame();
 
         /** Draws this UIObjectFrame
-         * @param renderer The SDL_Renderer we're drawing to
          * @param delta The time passed since last draw (in ms)
-         * @param camera_x The X location of the camera
-         * @param camera_y The Y location of the camera
+         * @param draw_scope The area that you're allowed to draw within
          */
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+        virtual void draw(uint64_t delta, const SDL_Rect& draw_scope) override;
 
         /** Sets the reference object to draw
          * @param reference The reference object being drawn in the frame

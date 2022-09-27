@@ -48,7 +48,7 @@ void UIBorders::addBorders(){
                     switch(1 << i){
                         case(BORDER_TYPE::TOP_BORDER):{
                             border_width = this->draw_area.w;
-                            border_height = border_surface->h * engine->getGlobalYScale();
+                            border_height = border_surface->h * engine->getNativeScale();
                             border_x = this->draw_area.x;
                             border_y = this->draw_area.y;
 
@@ -59,7 +59,7 @@ void UIBorders::addBorders(){
                         }
                         case(BORDER_TYPE::BOTTOM_BORDER):{
                             border_width = this->draw_area.w;
-                            border_height = border_surface->h * engine->getGlobalYScale();
+                            border_height = border_surface->h * engine->getNativeScale();
                             border_x = this->draw_area.x;
                             border_y = this->draw_area.y + this->draw_area.h - border_height;
 
@@ -69,7 +69,7 @@ void UIBorders::addBorders(){
                             break;
                         }
                         case(BORDER_TYPE::LEFT_BORDER):{
-                            border_width = border_surface->w * engine->getGlobalXScale();
+                            border_width = border_surface->w * engine->getNativeScale();
                             border_height = this->draw_area.h;
                             border_x = this->draw_area.x;
                             border_y = this->draw_area.y;
@@ -80,7 +80,7 @@ void UIBorders::addBorders(){
                             break;
                         }
                         case(BORDER_TYPE::RIGHT_BORDER):{
-                            border_width = border_surface->w * engine->getGlobalXScale();
+                            border_width = border_surface->w * engine->getNativeScale();
                             border_height = this->draw_area.h;
                             border_x = this->draw_area.x + this->draw_area.w - border_width;
                             border_y = this->draw_area.y;

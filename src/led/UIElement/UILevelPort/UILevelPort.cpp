@@ -23,7 +23,6 @@ void UILevelPort::action(Control* control){
         Engine* engine = Engine::getInstance();
         const MouseState* mouse = control->getMouse();
         float zoom_amount = mouse->scroll_wheel * 0.01;
-        engine->setGlobalXScale(engine->getGlobalXScale() + zoom_amount);
-        engine->setGlobalYScale(engine->getGlobalYScale() + zoom_amount);
+        engine->getCamera()->setZoom(engine->getCamera()->getZoom() + zoom_amount);
     }
 }

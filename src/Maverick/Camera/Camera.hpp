@@ -17,27 +17,31 @@ class Camera{
 		 * @param window The window that the camera should be drawing to
 		 * @param reference The object that the camera is centered on
 		 */
-		Camera(SDL_Renderer* renderer, SDL_Window* window, Object* reference, CAMERA_FOLLOW_MODE follow_mode, double follow_rate);
+		Camera();
 
 		/** Sets the reference for the center of the camera
 		 * @param reference The reference object you wish to center on
 		 */
 		void setReference(Object* reference);
 
+		/** Sets the camera zoom
+		 * @param zoom The new camera zoom
+		 */
+		void setZoom(double zoom);
+
+		/** Reset the zoom back to native
+		 */
+		void resetZoom();
+
 		/** Draws all objects in the given object list
 		 * @param obj_lst The object list that you wish to draw
 		 */
-		void _draw(ObjectList* obj_lst, uint64_t delta, double camera_x_offset = 0, double camera_y_offset = 0);
+		void _draw(ObjectList* obj_lst, uint64_t delta);
 
 		/** Draws all UI elements in the given UI element list
 		 * @param obj_lst The UI element list that you wish to draw
 		 */
 		void _draw(UIElementList* element_lst, uint64_t delta);
-
-		/** Gets the renderer the camera's using
-		 * @return The renderer the camera's using
-		 */
-		SDL_Renderer* getRenderer();
 
 		/** Gets the X coord of the top-left corner of the camera
 		 * @return The X coord of the top-left corner of the camera
@@ -59,11 +63,10 @@ class Camera{
 		 */
 		double getFollowRate();
 
-		/** Sets the X & Y scale of the camera
-		 * @param x_scale The X scale of the camera
-		 * @param y_scale The Y scale of the camera
+		/** Gets the camera zoom
+		 * @return The current camera zoom
 		 */
-		void setScale(double x_scale, double y_scale);
+		double getZoom();
 
 		/** Sets the camera follow mode
 		 * @param follow_mode The new follow mode of the camera
@@ -79,14 +82,11 @@ class Camera{
 		Object* reference;
 	    double current_x;
 		double current_y;
-		double x_scale;
-		double y_scale;
 		double follow_rate;
 
-		CAMERA_FOLLOW_MODE follow_mode;
+		double zoom;
 
-		SDL_Renderer* renderer;
-		SDL_Window* window;
+		CAMERA_FOLLOW_MODE follow_mode;
 
 		/** Recenters the camera on the reference object
 		 */

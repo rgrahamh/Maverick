@@ -196,19 +196,17 @@ class Animation{
 		int addSound(const char* sound_id, int sequence_num);
 
 		/** Called for the animation's draw step (to be used if a camera is involved)
-		 * @param renderer The renderer that's being drawn to
 		 * @param delta The difference between this and the prior draw call (in ms)
 		 * @param x_offset The X offset for the draw
 		 * @param y_offset The Y offset for the draw
 		 */
-		void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		void draw(uint64_t delta, int camera_x, int camera_y);
 
 		/** Called for the animation's draw step where a draw area needs to be specified
-		 * @param renderer The renderer that's being drawn to
 		 * @param delta The difference between this and the prior draw call (in ms)
 		 * @param draw_area The draw area you'd like to use for the element (if width/height are -1, we will use sprite sizing)
 		 */
-		void draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area);
+		void draw(uint64_t delta, const SDL_Rect& draw_area);
 
 		/** Saves the resources of the animation to a file
 		 * @param file The pointer to the open file to write to
@@ -254,6 +252,9 @@ class Animation{
 
 		//The time counter
 		unsigned int time_counter;
+
+		//The scale of the animation
+		double scale;
 
 		//If the animation is paused
 		bool paused;

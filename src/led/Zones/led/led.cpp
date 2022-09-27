@@ -81,8 +81,8 @@ void buildEditor(){
     level_group->addSubelement(ui_level_port);
 
     led->addUIElement(level_group);
-    level_group->setActive(false);
-    level_group->setVisible(false);
+    level_group->setActive(true);
+    level_group->setVisible(true);
 
     //Object Ediror
     UITabbedWindow* tabbed_window = new UITabbedWindow("selector_pane", 0.0, 0.0, 0.25, 0.9, 1, 0.05, "mavwhite", 1);

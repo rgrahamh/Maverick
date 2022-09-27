@@ -401,14 +401,15 @@ void Object::_process(uint64_t delta, unsigned int steps){
 void Object::process(uint64_t delta, unsigned int steps){
 }
 
-void Object::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    this->draw(renderer, delta, this->x - camera_x, this->y - camera_y);
+void Object::_draw(uint64_t delta, int camera_x, int camera_y){
+    if(this->active_animation != nullptr){
+        this->active_animation->draw(delta, this->x - camera_x, this->y - camera_y - this->z);
+    }
+
+    this->draw(delta, camera_x, camera_y);
 }
 
-void Object::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    if(this->active_animation != nullptr){
-        this->active_animation->draw(renderer, delta, camera_x, camera_y);
-    }
+void Object::draw(uint64_t delta, int camera_x, int camera_y){
 }
 
 int Object::addHitbox(const char* animation_name, HITBOX_SHAPE shape, double x_offset, double y_offset, double z_offset, double x_element,

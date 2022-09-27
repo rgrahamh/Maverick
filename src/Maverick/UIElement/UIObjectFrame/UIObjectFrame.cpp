@@ -1,4 +1,5 @@
 #include "UIObjectFrame.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 UIObjectFrame::UIObjectFrame(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                              int draw_layer, Object* reference)
@@ -11,10 +12,12 @@ UIObjectFrame::UIObjectFrame(const char* name, double view_x_offset, double view
 UIObjectFrame::~UIObjectFrame(){
 }
 
-void UIObjectFrame::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
+void UIObjectFrame::draw(uint64_t delta, const SDL_Rect& draw_scope){
+    SDL_Renderer* renderer = Engine::getInstance()->getRenderer();
+
     //Draw reference
     if(this->reference != nullptr &&
-        SDL_RenderCopy(renderer, this->reference->getSprite()->texture, NULL, &draw_area)){
+        SDL_RenderCopy(renderer, this->reference->getSprite()->texture, NULL, &draw_scope)){
         printf("%s\n", SDL_GetError());
     }
 }

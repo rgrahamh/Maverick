@@ -134,7 +134,7 @@ uint32_t UIText::getCharHeight(){
         for(int i = 0; i < 256; i++){
             SDL_Surface* character = font->getCharacterSurface(i, this->style);
             if(character != nullptr){
-                this->char_height = character->h * this->size * Engine::getInstance()->getGlobalYScale();
+                this->char_height = character->h * this->size * Engine::getInstance()->getNativeScale();
                 break;
             }
         }
@@ -161,6 +161,8 @@ void UIText::nextPage(){
         return;
     }
 
+    Engine* engine = Engine::getInstance();
+
     this->num_lines = 1;
 
     char* ref_cursor = ref_buff;
@@ -181,8 +183,7 @@ void UIText::nextPage(){
             continue;
         }
 
-        Engine* engine = Engine::getInstance();
-        unsigned int letter_width = character->w * this->size * engine->getGlobalXScale() + font->getSpacing() * engine->getGlobalXScale();
+        unsigned int letter_width = character->w * this->size * engine->getNativeScale() + font->getSpacing() * engine->getNativeScale();
         line_len += letter_width;
 
         if(text_cursor[word_len] == ' ' || text_cursor[word_len] == '-' || text_cursor[word_len] == '\t' || text_cursor[word_len] == '\n'){
@@ -244,7 +245,6 @@ void UIText::nextPage(){
     }
     this->line_start_x = (uint32_t*)calloc(sizeof(uint32_t), num_lines);
 
-    Engine* engine = Engine::getInstance();
     uint32_t line_num = 0;
     for(int i = 0; ref_buff[i] != '\0' && line_num < num_lines; i++){
         if(this->x_alignment == ALIGNMENT::CENTER_ALIGN){
@@ -252,7 +252,7 @@ void UIText::nextPage(){
             for(; ref_buff[i] != '\0' && ref_buff[i] != '\n'; i++){
                 SDL_Surface* letter = font->getCharacterSurface(ref_buff[i], this->style);
                 if(letter != nullptr){
-                    total_width += letter->w * engine->getGlobalXScale() + this->font->getSpacing() * engine->getGlobalXScale();
+                    total_width += letter->w * engine->getNativeScale() + this->font->getSpacing() * engine->getNativeScale();
                 }
             }
 
@@ -282,7 +282,7 @@ bool UIText::hitDrawEnd(){
  * @param camera_x The X location of the camera
  * @param camera_y The Y location of the camera
  */
-void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
+void UIText::draw(uint64_t delta, const SDL_Rect& draw_scope){
     if(print_buff == nullptr || font == nullptr){
         return;
     }
@@ -294,10 +294,11 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
 
     int win_width, win_height;
     Engine* engine = Engine::getInstance();
+    SDL_Renderer* renderer = engine->getRenderer();
     SDL_GetWindowSize(engine->getWindow(), &win_width, &win_height);
 
     //Set starting Y draw position
-    uint32_t y_draw = camera_y;
+    uint32_t y_draw = draw_scope.y;
     if(this->y_alignment == ALIGNMENT::CENTER_ALIGN){
         y_draw += this->draw_area.y + ((this->getHeight() / 2) - (this->num_lines * char_height / 2));
     }
@@ -309,20 +310,20 @@ void UIText::draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int came
     uint32_t x_draw;
     for(int i = 0; print_buff[i] != '\0' && line_num < num_lines; i++){
         //Set the line X draw position
-        x_draw = line_start_x[line_num++] + camera_x + this->view_x_offset * win_width;
+        x_draw = line_start_x[line_num++] + draw_scope.x + this->view_x_offset * win_width;
         for(; print_buff[i] != '\0' && print_buff[i] != '\n'; i++){
             SDL_Texture* letter = font->getCharacterTexture(print_buff[i], this->style);
             if(letter != nullptr){
                 SDL_Rect dst_rect;
                 dst_rect.x = x_draw;
                 dst_rect.y = y_draw;
-                dst_rect.w = font->getCharacterSurface(print_buff[i], this->style)->w * this->size * engine->getGlobalXScale();
+                dst_rect.w = font->getCharacterSurface(print_buff[i], this->style)->w * this->size * engine->getNativeScale();
                 dst_rect.h = char_height;
                 if(dst_rect.x + dst_rect.w <= win_width){
                     SDL_RenderCopy(renderer, letter, nullptr, &dst_rect);
                 }
 
-                x_draw += dst_rect.w + font->getSpacing() * engine->getGlobalXScale();
+                x_draw += dst_rect.w + font->getSpacing() * engine->getNativeScale();
             }
         }
         y_draw += char_height;

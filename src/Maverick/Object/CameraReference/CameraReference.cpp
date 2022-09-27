@@ -14,16 +14,16 @@ void CameraReference::action(Control* control){
     const uint8_t* keys = control->getKeys();
     if(!(engine->getState() & GAME_STATE::PAUSE)){
         if(keys[SDL_SCANCODE_W] | keys[SDL_SCANCODE_UP]){
-            this->y -= y_speed / engine->getGlobalYScale();
+            this->y -= y_speed;
         }
         if(keys[SDL_SCANCODE_A] | keys[SDL_SCANCODE_LEFT]){
-            this->x -= x_speed / engine->getGlobalXScale();
+            this->x -= x_speed;
         }
         if(keys[SDL_SCANCODE_S] | keys[SDL_SCANCODE_DOWN]){
-            this->y += y_speed / engine->getGlobalYScale();
+            this->y += y_speed;
         }
         if(keys[SDL_SCANCODE_D] | keys[SDL_SCANCODE_RIGHT]){
-            this->x += x_speed / engine->getGlobalXScale();
+            this->x += x_speed;
         }
 
         engine->getCamera()->setFollowMode(CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW);

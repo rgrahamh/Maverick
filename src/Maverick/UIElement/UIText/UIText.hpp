@@ -32,7 +32,7 @@ class UIText : public UIElement{
          */
         ~UIText();
 
-        void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y) override;
+        void draw(uint64_t delta, const SDL_Rect& draw_scope) override;
         void process(uint64_t delta, unsigned int steps) override;
 
         /** Sets the text's contents 

@@ -7,7 +7,7 @@ TEST(CameraBehavior, TestFixedFollow){
     Engine* engine = Engine::getInstance();
     Camera* camera = engine->getCamera();
     int width, height;
-    SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);
+    SDL_GetRendererOutputSize(engine->getRenderer(), &width, &height);
 
     //Test fixed follow first (the easy case)
     camera->setFollowMode(CAMERA_FOLLOW_MODE::FIXED_FOLLOW);
@@ -46,7 +46,7 @@ TEST(CameraBehavior, TestGradualFollow){
     Engine* engine = Engine::getInstance();
     Camera* camera = engine->getCamera();
     int width, height;
-    SDL_GetRendererOutputSize(engine->getCamera()->getRenderer(), &width, &height);
+    SDL_GetRendererOutputSize(engine->getRenderer(), &width, &height);
 
     double follow_rate = 0.08;
     camera->setFollowRate(follow_rate);

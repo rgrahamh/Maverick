@@ -476,20 +476,18 @@ class Object{
 		virtual void action(Control* control);
 
 		/** Called during the draw step
-		 * @param renderer The object renderer
 		 * @param delta The delta in ms since the last draw() operation
 		 * @param camera_x The left-hand side of the screen's X coordinate
 		 * @param camera_x The top side of hte screen's Y coordinate
 		 */
-		virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void _draw(uint64_t delta, int camera_x, int camera_y);
 
 		/** Called during the draw step
-		 * @param renderer The object renderer
 		 * @param delta The delta in ms since the last draw() operation
 		 * @param camera_x The left-hand side of the screen's X coordinate
 		 * @param camera_x The top side of hte screen's Y coordinate
 		 */
-		virtual void draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y);
+		virtual void draw(uint64_t delta, int camera_x, int camera_y);
 
 		/** Called on object collision; should be overridden by children if you want collision logic.
 		 * @param other The other object

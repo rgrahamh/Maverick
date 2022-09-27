@@ -60,24 +60,13 @@ Engine::Engine(){
     SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer == NULL){
         printf("Renderer is null; exiting");
         fflush(stdout);
         exit(-1);
     }
-    this->camera = new Camera(renderer, window, nullptr, CAMERA_FOLLOW_MODE::FIXED_FOLLOW, 0.08);
-
-    //Set scales
-    //We want to scale both X & Y by the Y element, so stuff doesn't get squashed
-    this->native_x_scale = win_height / BASE_SCREEN_HEIGHT;
-    this->native_y_scale = win_height / BASE_SCREEN_HEIGHT;
-    this->current_x_scale = native_x_scale;
-    this->current_y_scale = native_y_scale;
-    this->target_x_scale = native_x_scale;
-    this->target_y_scale = native_y_scale;
-
-    this->camera->setScale(this->native_x_scale, this->native_y_scale);
+    this->camera = new Camera();
 
     this->zones = NULL;
     this->active_zones = NULL;
@@ -112,7 +101,7 @@ Engine::~Engine(){
         active_zones = zone_cursor;
     }
 
-    SDL_DestroyRenderer(camera->getRenderer());
+    SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     delete camera;
     IMG_Quit();
@@ -124,6 +113,7 @@ Engine::~Engine(){
 }
 
 void Engine::start(){
+    camera->setZoom(1.0);
     gameLoop();
 }
 
@@ -133,13 +123,13 @@ void Engine::gameLoop(){
     uint64_t fps = 0;
     uint64_t fps_counter = 0;
     uint64_t physics_step_accumulator = 0;
-    delta = SDL_GetTicks();
+    delta = SDL_GetTicks64();
 	while(!exit_game){
         buildFullEntityList();
 
         //Calculate the time that has passed since last frame
-        delta = SDL_GetTicks() - last_time;
-        last_time = SDL_GetTicks();
+        delta = SDL_GetTicks64() - last_time;
+        last_time = SDL_GetTicks64();
 
         physics_step_accumulator += delta;
         uint64_t physics_step = physics_step_accumulator / PHYSICS_STEP_SIZE;
@@ -245,9 +235,6 @@ void Engine::physicsStep(EntityList* all_entities, unsigned int steps){
         }
         all_elements = all_elements->next;
     }
-
-    this->current_x_scale += (this->target_x_scale - this->current_x_scale) * ZOOM_RATE;
-    this->current_y_scale += (this->target_y_scale - this->current_y_scale) * ZOOM_RATE;
 }
 
 void Engine::collisionStep(ObjectList* all_objects){
@@ -397,18 +384,17 @@ void Engine::collisionStep(ObjectList* all_objects){
 }
 
 void Engine::drawStep(EntityList* all_entities){
-    SDL_Renderer* renderer = this->camera->getRenderer();
+    //Reset native scale (in case of resolution change)
+    int renderer_x, renderer_y;
+    SDL_GetRendererOutputSize(renderer, &renderer_x, &renderer_y);
+    this->native_scale = ((double)renderer_y) / DESIGN_SCREEN_HEIGHT;
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    camera->setScale(current_x_scale, current_y_scale);
-
     //Draw operation
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
-
-    camera->setScale(1.0, 1.0);
 
     all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
@@ -522,28 +508,20 @@ SDL_Window* Engine::getWindow(){
     return this->window;
 }
 
+double Engine::getNativeScale(){
+    return this->native_scale;
+}
+
+SDL_Renderer* Engine::getRenderer(){
+    return this->renderer;
+}
+
 bool Engine::checkState(uint64_t chk_state){
     return (this->state & chk_state) != 0;
 }
 
 void Engine::setState(uint64_t state){
     this->state = state;
-}
-
-void Engine::setGlobalXScale(double x_scale){
-    this->target_x_scale = x_scale;
-}
-
-void Engine::setGlobalYScale(double y_scale){
-    this->target_y_scale = y_scale;
-}
-
-float Engine::getGlobalXScale(){
-    return this->target_x_scale;
-}
-
-float Engine::getGlobalYScale(){
-    return this->target_y_scale;
 }
 
 void Engine::handleDefaultCollision(Object* obj1, Hitbox* box1, Object* obj2, Hitbox* box2){

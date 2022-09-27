@@ -17,6 +17,7 @@ Animation::Animation(const char* name, uint16_t num_sprite_sets){
 	this->sprite_set_counter = 0;
 	this->curr_sprite_set = 0;
 	this->num_sprite_sets = num_sprite_sets;
+	this->scale = 1.0;
 
 	this->next_animation = nullptr;
 }
@@ -431,7 +432,7 @@ void Animation::start(){
 	time_counter = 0;
 }
 
-void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_off){
+void Animation::draw(uint64_t delta, int x_off, int y_off){
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -448,12 +449,16 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 	}
 
 	//Update the sprite position
+	Engine* engine = Engine::getInstance();
+	SDL_Renderer* renderer = engine->getRenderer();
+	double native_scale = engine->getNativeScale();
 	SDL_Rect curr_rect;
-	curr_rect.x = x_off + sprite->x_offset;
-	curr_rect.y = y_off + sprite->y_offset;
+	curr_rect.x = (x_off + sprite->x_offset) * native_scale;
+	curr_rect.y = (y_off + sprite->y_offset) * native_scale;
 
-	curr_rect.w = sprite->surface->w;
-	curr_rect.h = sprite->surface->h;
+	double obj_scale = native_scale * this->scale;
+	curr_rect.w = sprite->surface->w * obj_scale;
+	curr_rect.h = sprite->surface->h * obj_scale;
 
 	if(sprite->texture == NULL && sprite->surface != NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
@@ -558,7 +563,9 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, int x_off, int y_of
 }
 
 
-void Animation::draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area){
+void Animation::draw(uint64_t delta, const SDL_Rect& draw_area){
+	SDL_Renderer* renderer = Engine::getInstance()->getRenderer();
+
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
@@ -582,15 +589,16 @@ void Animation::draw(SDL_Renderer* renderer, uint64_t delta, SDL_Rect& draw_area
 	draw_rect.x = draw_area.x + sprite->x_offset;
 	draw_rect.y = draw_area.y + sprite->y_offset;
 
+	//If draw area is given, follow it exactly (not scaled). Otherwise, guess from the surface size * scale.
 	if(draw_area.w == -1){
-		draw_rect.w = sprite->surface->w;
+		draw_rect.w = sprite->surface->w * this->scale;
 	}
 	else{
 		draw_rect.w = draw_area.w;
 	}
 
 	if(draw_area.h == -1){
-		draw_rect.h = sprite->surface->h;
+		draw_rect.h = sprite->surface->h * this->scale;
 	}
 	else{
 		draw_rect.h = draw_area.h;

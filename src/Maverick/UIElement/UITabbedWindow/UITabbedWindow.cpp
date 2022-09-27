@@ -26,25 +26,26 @@ void UITabbedWindow::_process(uint64_t delta, unsigned int steps){
     }
 }
 
-void UITabbedWindow::_draw(SDL_Renderer* renderer, uint64_t delta, int camera_x, int camera_y){
-    updateDrawArea();
-    this->draw(renderer, delta, camera_x, camera_y);
+void UITabbedWindow::drawSubelements(uint64_t delta, const SDL_Rect& draw_scope){
+    float tab_width = (this->view_width * draw_scope.w) / this->subelements.size();
 
-    int win_width, win_height;
-    SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
-    float tab_width = this->view_width / this->subelements.size();
+    SDL_Rect child_draw = draw_scope;
+    child_draw.w = tab_width;
+    child_draw.h = tab_height;
 
     for(int i = 0; i < subelements.size(); i++){
         draw_text.setText(subelements[i]->getName());
-        draw_text._draw(renderer, delta, (-1 * camera_x) + (tab_width * i), -1 * camera_y);
+        draw_text._draw(delta, child_draw);
+
+        child_draw.x += tab_width;
     }
 
-    subelements[current_tab]->_draw(renderer, delta, -1 * camera_x, -1 * camera_y);
+    subelements[current_tab]->_draw(delta, draw_scope);
 }
 
 void UITabbedWindow::_action(Control* control){
     int win_width, win_height;
-    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
+    SDL_GetRendererOutputSize(Engine::getInstance()->getRenderer(), &win_width, &win_height);
 
     const MouseState* mouse = control->getMouse();
     if(isMouseInside(control) && mouse->button_state & SDL_BUTTON_LMASK){
@@ -61,7 +62,7 @@ void UITabbedWindow::_action(Control* control){
 
 int UITabbedWindow::getTabNumber(Control* control){
     int win_width, win_height;
-    SDL_GetRendererOutputSize(Engine::getInstance()->getCamera()->getRenderer(), &win_width, &win_height);
+    SDL_GetRendererOutputSize(Engine::getInstance()->getRenderer(), &win_width, &win_height);
     double tab_width = this->view_width / this->subelements.size();
     const MouseState* mouse = control->getMouse();
 

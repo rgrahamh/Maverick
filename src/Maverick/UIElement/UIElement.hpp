@@ -80,21 +80,17 @@ class UIElement{
          */
 		virtual void action(Control* control);
 
-        /** Draws this UIElement and all children UIElements
-         * @param renderer The SDL_Renderer we're drawing to
+        /** Draws this UIElement and all subelements
          * @param delta The time passed since last draw (in ms)
-         * @param camera_x The X location of the camera
-         * @param camera_y The Y location of the camera
+         * @param draw_scope The area that the UIElement is allowed to draw in
          */
-        virtual void _draw(SDL_Renderer* renderer, uint64_t delta, int x_offset, int y_offset);
+        virtual void _draw(uint64_t delta, const SDL_Rect& draw_scope);
 
         /** Draws this UIElement
-         * @param renderer The SDL_Renderer we're drawing to
          * @param delta The time passed since last draw (in ms)
-         * @param camera_x The X offset of the draw area
-         * @param camera_y The Y offset of the draw area
+         * @param draw_scope The area that the UIElement is allowed to draw in
          */
-        virtual void draw(SDL_Renderer* renderer, uint64_t delta, int x_offset, int y_offset);
+        virtual void draw(uint64_t delta, const SDL_Rect& draw_scope);
 
         /** Serializing UI Elements (WIP)
          * @param file An open file to write to
@@ -156,14 +152,14 @@ class UIElement{
 		void setVisible(bool visible);
 
         /** Sets the vertical buffer of the UI element
-         * @param vertical_buffer The vertical buffer of the UI element applied on both top & bottom (as a view; 0.0 is no buffer, 0.1 is a tenth of the screen)
+         * @param vertical_buffer The height buffer of the UI element applied on both top & bottom
          */
-        void setVerticalBuffer(double vertical_buffer);
+        void setHeightBuffer(double height_buff);
 
         /** Sets the horizontal buffer of the UI element
-         * @param horizontal_buffer The horizontal buffer of the UI element applied on both top & bottom (as a view; 0.0 is no buffer, 0.1 is a tenth of the screen)
+         * @param width_buff The horizontal buffer of the UI element applied on both top & bottom (as a view; 0.0 is no buffer, 0.1 is a tenth of the screen)
          */
-        void setHorizontalBuffer(double horizontal_buffer);
+        void setWidthBuffer(double horizontal_buffer);
 
 		/** Gets if the current entity is active (can be interacted with)
 		 * @return If the entity is active
@@ -212,6 +208,12 @@ class UIElement{
          */
         std::vector<UIElement*>& getSubelements();
 
+        /** Draws all subelements (may be overridden for child behavior)
+         * @param delta The amount of time that has passed (in ms) since the last draw operation
+         * @param draw_scope The allowed draw area for the UIElement
+         */
+        virtual void drawSubelements(uint64_t delta, const SDL_Rect& draw_scope);
+
         /** Gets the width of the UI element (in pixels)
          * @return The width of the UI element (in pixels)
          */
@@ -232,16 +234,6 @@ class UIElement{
          */
         double getViewHeight();
 
-        /** Gets the vertical buffer of the UI element
-         * @return The vertical buffer of the UI element
-         */
-        double getVerticalBuffer();
-
-        /** Gets the horizontal buffer of the UI element
-         * @return The horizontal buffer of the UI element
-         */
-        double getHorizontalBuffer();
-
     protected:
 		//UIElement name
 		char* name;
@@ -255,12 +247,12 @@ class UIElement{
         double view_width;
         double view_height;
 
+        //Element buffers (applied to THIS element, not children)
+        double width_buff;
+        double height_buff;
+
         //The draw area (used for drawing & action calculations; recalculated every draw step)
         SDL_Rect draw_area;
-
-        //Buffer elements (in viewnits)
-        double vertical_buffer;
-        double horizontal_buffer;
 
 		//Draw layer tracking
 		int16_t draw_layer;
@@ -279,10 +271,6 @@ class UIElement{
          * @return If the mouse is within the draw area
          */
         virtual bool isMouseInside(Control* control);
-
-        /** Updates the draw area to be current
-         */
-        void updateDrawArea();
 };
 
 #endif

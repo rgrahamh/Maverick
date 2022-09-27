@@ -15,7 +15,7 @@ SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style){
         return type_textures[style][value];
     }
 
-    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(Engine::getInstance()->getCamera()->getRenderer(), typesetter[style][value]);
+    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(Engine::getInstance()->getRenderer(), typesetter[style][value]);
     
     //Store & return the new texture
     type_textures[style][value] = new_texture;
