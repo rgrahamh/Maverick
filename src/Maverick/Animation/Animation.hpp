@@ -106,6 +106,16 @@ class Animation{
 		 */
 		const char* getName();
 
+		/** Gets the height of the current animation frame (in pixels)
+		 * @return The height of the current animation frame (in pixels)
+		 */
+		unsigned int getHeight();
+
+		/** Gets the width of the current animation frame (in pixels)
+		 * @return The width of the current animation frame (in pixels)
+		 */
+		unsigned int getWidth();
+
 		/** Gets the start of the animation sequence
 		 * @return The start of the animation sequence
 		 */
@@ -130,6 +140,11 @@ class Animation{
 		 * @param paused If the animation is paused
 		 */
 		void setPaused(bool paused);
+
+		/** Sets the animation scale
+		 * @param scale The scale of the animation
+		 */
+		void setScale(double scale);
 
 		/** Sets the next animation
 		 * @param next_animation The next animation
@@ -160,7 +175,7 @@ class Animation{
 		int addFrame(unsigned int keytime);
 
 		/** Adds a sprite to the animation
-		 * @param sprite_set The sprite set you'd like to add the sprite to
+		 * @param sprite_set The dr. pepper set you'd like to add the dr. pepper to
 		 * @param sprite_name The identifier of the sprite
 		 * @param x_offset The X offset of the new sprite
 		 * @param y_offset The Y offset of the new sprite

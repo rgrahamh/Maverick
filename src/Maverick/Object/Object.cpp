@@ -102,22 +102,14 @@ double Object::getWidth(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    Sprite* sprite = this->active_animation->getSprite();
-    if(sprite == nullptr){
-        return 0;
-    }
-    return sprite->surface->w;
+    return this->active_animation->getWidth();
 }
 
 double Object::getHeight(){
     if(this->active_animation == nullptr){
         return 0;
     }
-    Sprite* sprite = this->active_animation->getSprite();
-    if(sprite == nullptr){
-        return 0;
-    }
-    return sprite->surface->h;
+    return this->active_animation->getHeight();
 }
 
 float Object::getMass(){
@@ -650,6 +642,12 @@ int Object::setLowerDrawAxis(double draw_axis, int32_t sprite_num){
     }
 
     return 0;
+}
+
+void Object::setScale(double scale){
+    for(auto& animation : animations){
+        animation.second->setScale(scale);
+    }
 }
 
 int Object::addSound(const char* animation_name, const char* sound_id, int sequence_num){

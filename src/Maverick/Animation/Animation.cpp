@@ -122,7 +122,7 @@ double Animation::getLowerDrawAxis(double y_base){
 		}
 		//Otherwise, interpolate from the sequence
 		else{
-			return y_base + sprite->surface->h;
+			return y_base + sprite->surface->h * this->scale;
 		}
 	}
 	//If we can't find the draw axis any other way
@@ -148,6 +148,22 @@ uint32_t Animation::getTimeLeft(){
 
 bool Animation::getPaused(){
 	return this->paused;
+}
+
+unsigned int Animation::getWidth(){
+	if(this->sequence == nullptr || this->sequence->sprite != nullptr || this->sequence->sprite[curr_sprite_set] != nullptr || this->sequence->sprite[curr_sprite_set]->surface != nullptr){
+		return 0;
+	}
+
+	return sequence->sprite[curr_sprite_set]->surface->w * this->scale;
+}
+
+unsigned int Animation::getHeight(){
+	if(this->sequence == nullptr || this->sequence->sprite != nullptr || this->sequence->sprite[curr_sprite_set] != nullptr || this->sequence->sprite[curr_sprite_set]->surface != nullptr){
+		return 0;
+	}
+
+	return sequence->sprite[curr_sprite_set]->surface->h * this->scale;
 }
 
 void Animation::setPaused(bool paused){
@@ -396,6 +412,10 @@ void Animation::setLowerDrawAxis(double lower_draw_axis, int32_t sprite_num){
 			}
 		}
 	}
+}
+
+void Animation::setScale(double scale){
+	this->scale = scale;
 }
 
 void Animation::advance(uint64_t delta){

@@ -416,6 +416,11 @@ class Object{
 		 */
 		int setLowerDrawAxis(double draw_axis, int32_t sprite_num);
 
+		/** Sets the scale of all animations within an object
+		 * @param scale The scale that you wish to set for the object
+		 */
+		void setScale(double scale);
+
 		/** Checks immunity against the hitbox of another entity
 		 * @param other The other entity (that owns the passed-in hitbox; needed for hitbox group checks)
 		 * @param hitbox The hitbox to check immunity for

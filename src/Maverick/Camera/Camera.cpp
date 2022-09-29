@@ -34,10 +34,8 @@ void Camera::recenter(){
         return;
     }
 
-    int win_width, win_height;
-    SDL_GetRendererOutputSize(Engine::getInstance()->getRenderer(), &win_width, &win_height);
-    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((win_width / 2) / zoom);
-    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((win_height / 2) / zoom);
+    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((DESIGN_SCREEN_WIDTH / 2) / zoom);
+    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((DESIGN_SCREEN_HEIGHT / 2) / zoom);
     if(follow_mode == CAMERA_FOLLOW_MODE::FIXED_FOLLOW){
         this->current_x = obj_x;
         this->current_y = obj_y;
@@ -58,9 +56,9 @@ void Camera::_draw(ObjectList* obj_lst, uint64_t delta){
 
     while(obj_lst != NULL){
         //If visible and on-screen
-        if(obj_lst->obj->isVisible() &&
+        if(obj_lst->obj->isVisible()/* &&
            !(obj_lst->obj->getX() > this->current_x + win_width || obj_lst->obj->getX() + obj_lst->obj->getWidth() < this->current_x) &&
-           !(obj_lst->obj->getY() - obj_lst->obj->getZ() > this->current_y + win_height || obj_lst->obj->getY() - obj_lst->obj->getZ() + obj_lst->obj->getHeight() < this->current_y)){
+           !(obj_lst->obj->getY() - obj_lst->obj->getZ() > this->current_y + win_height || obj_lst->obj->getY() - obj_lst->obj->getZ() + obj_lst->obj->getHeight() < this->current_y)*/){
             obj_lst->obj->_draw(delta, current_x, current_y);
         }
         obj_lst = obj_lst->next;

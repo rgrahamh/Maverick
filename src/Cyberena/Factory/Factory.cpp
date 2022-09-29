@@ -101,6 +101,8 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
 
     player->setUpperDrawAxis(40, -1);
 
+    player->setScale(0.25);
+
     //Setting the starting animation
     player->setAnimation("neutral_down");
 
