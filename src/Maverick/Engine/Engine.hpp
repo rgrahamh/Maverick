@@ -262,6 +262,12 @@ class Engine{
 		 */
 		ObjectList* drawSort(ObjectList* all_objects);
 
+		/** Recursively sorts the UIElements in the order of draw
+		 * @param curr_obj The current UIElement that you're sorting through
+		 * @return The current draw UIElement
+		 */
+		UIElementList* drawSort(UIElementList* new_elements);
+
 		/** The collision step of the game engine
 		 * @param all_objects All of the objects that collisions should be checked for
 		 */
