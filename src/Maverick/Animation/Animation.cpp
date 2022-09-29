@@ -470,7 +470,6 @@ void Animation::draw(uint64_t delta, int x_off, int y_off){
 
 	//Update the sprite position
 	Engine* engine = Engine::getInstance();
-	SDL_Renderer* renderer = engine->getRenderer();
 	double native_scale = engine->getNativeScale();
 	SDL_Rect curr_rect;
 	curr_rect.x = (x_off + sprite->x_offset) * native_scale;
@@ -480,7 +479,8 @@ void Animation::draw(uint64_t delta, int x_off, int y_off){
 	curr_rect.w = sprite->surface->w * obj_scale;
 	curr_rect.h = sprite->surface->h * obj_scale;
 
-	if(sprite->texture == NULL && sprite->surface != NULL){
+	SDL_Renderer* renderer = engine->getRenderer();
+	if(sprite->texture == NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 
@@ -584,24 +584,24 @@ void Animation::draw(uint64_t delta, int x_off, int y_off){
 
 
 void Animation::draw(uint64_t delta, const SDL_Rect& draw_area){
-	SDL_Renderer* renderer = Engine::getInstance()->getRenderer();
-
 	// Check to see if we've been initialized
 	if(this->sequence == NULL){
 		return;
 	}
 
 	//Advance the animation if not paused
-	if(!Engine::getInstance()->checkState(GAME_STATE::PAUSE)){
+	Engine* engine = Engine::getInstance();
+	if(!engine->checkState(GAME_STATE::PAUSE)){
 		this->advance(delta);
 	}
 
 	Sprite* sprite = this->sequence->sprite[curr_sprite_set];
-	if(sprite == nullptr){
+	if(sprite == nullptr || sprite->surface != NULL){
 		return;
 	}
 
-	if(sprite->texture == NULL && sprite->surface != NULL){
+	SDL_Renderer* renderer = engine->getRenderer();
+	if(sprite->texture == NULL){
 		sprite->texture = SDL_CreateTextureFromSurface(renderer, sprite->surface);
 	}
 

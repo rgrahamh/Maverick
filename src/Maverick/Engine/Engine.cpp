@@ -396,7 +396,7 @@ void Engine::drawStep(EntityList* all_entities){
     all_entities->obj = this->drawSort(all_entities->obj);
     this->camera->_draw(all_entities->obj, this->delta);
 
-    all_entities->ui = (UIElementList*)this->drawSort((ObjectList*)all_entities->ui);
+    all_entities->ui = (UIElementList*)this->drawSort(all_entities->ui);
     this->camera->_draw(all_entities->ui, this->delta);
 
     SDL_RenderPresent(renderer);
@@ -407,6 +407,30 @@ inline static bool checkDrawOverlap(Object* obj1, Object* obj2){
            (obj1->getUpperDrawAxis() >= obj2->getUpperDrawAxis() && obj1->getUpperDrawAxis() <= obj2->getLowerDrawAxis()) ||
            (obj2->getLowerDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getLowerDrawAxis() <= obj1->getLowerDrawAxis()) ||
            (obj2->getUpperDrawAxis() >= obj1->getUpperDrawAxis() && obj2->getUpperDrawAxis() <= obj1->getLowerDrawAxis());
+}
+
+inline UIElementList* Engine::drawSort(UIElementList* curr_element){
+    if(unlikely(curr_element == nullptr)){
+        return nullptr;
+    }
+
+    if(curr_element->next == nullptr){
+        return curr_element;
+    }
+
+    UIElementList* next_element = this->drawSort(curr_element->next);
+    UIElement* nxt = next_element->element;
+    UIElement* cur = curr_element->element;
+    if(nxt->getDrawLayer() < cur->getDrawLayer()){
+        //Swap node positions & send curr_obj up the draw chain
+        curr_element->next = next_element->next;
+        next_element->next = this->drawSort(curr_element);
+        return next_element;
+    }
+    else{
+        curr_element->next = next_element;
+        return curr_element;
+    }
 }
 
 inline ObjectList* Engine::drawSort(ObjectList* curr_obj){
