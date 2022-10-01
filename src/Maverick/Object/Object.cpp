@@ -334,8 +334,8 @@ void Object::_process(uint64_t delta, unsigned int steps){
     this->env_bump = false;
 
     this->xV += this->xA;
-    if(this->xV != 0){
-        xV -= this->xV * friction;
+    if(this->xV != 0 && this->terminal_velocity != 0){
+        xV -= (this->xV / this->terminal_velocity) * friction * steps;
         if(this->xV < 0.01 && this->xV > -0.01){
             this->xV = 0;
         }
@@ -354,8 +354,8 @@ void Object::_process(uint64_t delta, unsigned int steps){
 
     //Updating Y values
     this->yV += this->yA;
-    if(this->yV != 0){
-        this->yV -= this->yV * friction;
+    if(this->yV != 0 && this->terminal_velocity != 0){
+        this->yV -= (this->yV / this->terminal_velocity) * friction * steps;
         if(this->yV < 0.01 && this->yV > -0.01){
             this->yV = 0;
         }

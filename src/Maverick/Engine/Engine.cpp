@@ -47,17 +47,12 @@ Engine::Engine(){
     //Initialization of control system
     control = new Control();
 
-	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	this->window = SDL_CreateWindow("Cyberena", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_OPENGL);
     if(window == nullptr){
         printf("Could not create window; exiting");
         fflush(stdout);
         exit(-1);
     }
-
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-
-    int win_width, win_height;
-    SDL_GetWindowSize(this->window, &win_width, &win_height);
 
     //Get rid of SDL_RENDERER_PRESENTVSYNC if we want to take the frame cap off
     this->renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -136,7 +131,7 @@ void Engine::gameLoop(){
         physics_step_accumulator %= PHYSICS_STEP_SIZE;
 
         //No need to do anything if a step hasn't occurred
-        if(delta > 0){
+        if(physics_step > 0){
             fps_counter += delta;
             fps++;
             if(fps_counter >= 1000){

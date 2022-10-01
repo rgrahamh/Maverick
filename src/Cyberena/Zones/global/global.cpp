@@ -27,7 +27,7 @@ void buildGlobal(){
     engine->addSurface("shade", SDL_LoadBMP("./assets/sprites/ui/shade.bmp"));
 
     //Create the player
-    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
+    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.975, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     global->addObject(player);
     engine->getCamera()->setReference(player);
 

@@ -20,23 +20,12 @@ class UIBorders: public UIElement{
          * @param view_y_offset The viewport X offset of the UIElement
          * @param view_width The viewport width of the UIElement
          * @param view_height The viewport height of the UIElement
-         * @param animation_num The animation number of the UIElement (use for multiple would be blinking cursors)
          * @param draw_layer The draw layer of the UIElement (all child elements will be drawn directly on top)
          * @param border_pattern The pattern for the border texture files you wish to use
          * @param border_types The border locations
          */
         UIBorders(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height,
                   int draw_layer, const char* border_pattern = "", BORDER_TYPE border_types = BORDER_TYPE::ALL_BORDERS);
-
-        /** Returns the height buffer for this set of borders
-         * @return The height buffer for this set of borders
-         */
-        unsigned int getHeightBuff();
-
-        /** Returns the width buffer for this set of borders
-         * @return The width buffer for this set of borders
-         */
-        unsigned int getWidthBuff();
 
         /** Sets the border pattern
          * @param border_pattern The border pattern to use
@@ -54,10 +43,13 @@ class UIBorders: public UIElement{
          */
         void addBorders();
 
-    private:
-        unsigned int height_buff;
-        unsigned int width_buff;
+        /** Draws the borders
+         * @param delta The time passed since last draw (in ms)
+         * @param draw_scope The area that the UIElement is allowed to draw in
+         */
+        virtual void draw(uint64_t delta, const SDL_Rect& draw_scope);
 
+    private:
         UIElement* borders[4];
 
         char* border_pattern;

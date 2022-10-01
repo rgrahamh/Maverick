@@ -85,7 +85,7 @@ void buildEditor(){
     level_group->setVisible(true);
 
     //Object Ediror
-    UITabbedWindow* tabbed_window = new UITabbedWindow("selector_pane", 0.0, 0.0, 0.25, 0.9, 1, 0.05, "mavwhite", 1);
+    /*UITabbedWindow* tabbed_window = new UITabbedWindow("selector_pane", 0.0, 0.0, 0.25, 0.9, 1, 0.05, "mavwhite", 1);
     tabbed_window->setBackground(black_box);
 
     UITextBox* first_tab = new UITextBox("first", 0.0, 0.05, 0.25, 0.85, 1, "mavwhite", "first", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::STANDARD_ALIGN);
@@ -96,7 +96,7 @@ void buildEditor(){
     second_tab->setBackground(blue_box);
     tabbed_window->addSubelement(second_tab);
 
-    led->addUIElement(tabbed_window);
+    led->addUIElement(tabbed_window);*/
 
     //CameraReference* cam_ref = new CameraReference("cam_ref", 0.0, 0.0);
     //led->addObject(cam_ref);

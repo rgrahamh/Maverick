@@ -5,8 +5,6 @@ UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offse
                      int draw_layer, const char* border_pattern, BORDER_TYPE border_type)
     : UIElement(name, view_x_offset, view_y_offset, view_width, view_height, draw_layer){
     this->type = UI_ELEMENT_TYPE::BORDERS;
-    this->height_buff = 0;
-    this->width_buff = 0;
 
     this->border_pattern = StrDeepCopy(border_pattern);
     this->border_type = border_type;
@@ -14,18 +12,7 @@ UIBorders::UIBorders(const char* name, double view_x_offset, double view_y_offse
     addBorders();
 }
 
-unsigned int UIBorders::getHeightBuff(){
-    return this->height_buff;
-}
-
-unsigned int UIBorders::getWidthBuff(){
-    return this->width_buff;
-}
-
 void UIBorders::addBorders(){
-    this->height_buff = 0;
-    this->width_buff = 0;
-    
     if(border_pattern != nullptr && strlen(border_pattern) != 0){
         //The patterns we look for while building borders
         char* file_patterns[4] = {"_top.bmp", "_bottom.bmp", "_left.bmp", "_right.bmp"};
@@ -121,6 +108,7 @@ void UIBorders::setBorderPattern(const char* border_pattern){
             borders[i] = nullptr;
         }
     }
+
     addBorders();
 }
 

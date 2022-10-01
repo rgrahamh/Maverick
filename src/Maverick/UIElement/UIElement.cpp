@@ -92,8 +92,8 @@ void UIElement::_draw(uint64_t delta, const SDL_Rect& draw_scope){
         return;
     }
 
-    this->draw_area.w = (draw_scope.w * this->view_width) - width_mod;
-    this->draw_area.h = (draw_scope.h * this->view_height) - height_mod;
+    this->draw_area.w = ceil(((double)draw_scope.w) * this->view_width) - width_mod;
+    this->draw_area.h = ceil(((double)draw_scope.h) * this->view_height) - height_mod;
 
     //Draw the background, if present
     if(this->background != nullptr){
@@ -107,7 +107,7 @@ void UIElement::_draw(uint64_t delta, const SDL_Rect& draw_scope){
 }
 
 void UIElement::draw(uint64_t delta, const SDL_Rect& draw_scope){
-    //Draw logic goes here
+    //Any custom UIElement logic goes here
 }
 
 const char* UIElement::getName(){
@@ -165,7 +165,7 @@ void UIElement::setVisible(bool visible){
 }
 
 void UIElement::addSubelement(UIElement* element){
-    if(element != nullptr){
+    if(element != nullptr && element != this){
         subelements.push_back(element);
     }
 }

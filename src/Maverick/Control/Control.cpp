@@ -100,8 +100,6 @@ int Control::updateControllers(){
 }
 
 void Control::updateKeyboard(){
-    SDL_PumpEvents();
-
     int num_elements;
     const uint8_t* keyboard = SDL_GetKeyboardState(&num_elements);
 
