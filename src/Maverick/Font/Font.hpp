@@ -26,7 +26,7 @@ class Font{
          * @param surface The surface you wish to map to the char
          * @param style The style set you'd like to add this character to
          */
-        void setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style = STANDARD_STYLE);
+        void setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style = STANDARD_STYLE);
 
         /** Sets the character spacing (consistent between characters)
          * @param spacing The spacing that should be included between characters (in scaled pixels)
@@ -38,19 +38,24 @@ class Font{
          * @param style The style you're using
          * @return The texture for the character
          */
-        SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE);
+        SDL_Texture* getCharacterTexture(unsigned char val, FONT_STYLE style = STANDARD_STYLE);
 
         /** Gets the surface for a character
          * @param val The character you'd like to look up
          * @param style The style you're using
          * @return The surface for the character
          */
-        SDL_Surface* getCharacterSurface(unsigned char val, uint8_t style = STANDARD_STYLE);
+        SDL_Surface* getCharacterSurface(unsigned char val, FONT_STYLE style = STANDARD_STYLE);
         
         /** Gets the character spacing for this font
          * @return The character spacing for this font
          */
         uint16_t getSpacing();
+
+        /** Gets the height of a character in current config (assumes all letters are the same height)
+         * @return The letter height, or 0 if no letters were found
+         */
+        unsigned int getCharHeight(FONT_STYLE style);
 
         /** Removes a character from the map
          * @param value The character you'd like to clear out
@@ -70,6 +75,7 @@ class Font{
         uint8_t num_chars[NUM_STYLES];
         SDL_Texture* type_textures[NUM_STYLES][MAX_CHARS];
         uint16_t spacing;
+        unsigned int char_height[NUM_STYLES];
 };
 
 #endif

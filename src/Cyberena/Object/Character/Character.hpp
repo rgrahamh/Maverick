@@ -12,7 +12,7 @@
 #include "Style/Style.hpp"
 #include "Maverick/Control/Control.hpp"
 
-#define WALK_SPEED 2.0
+#define WALK_SPEED 1.5
 #define JUMP_SPEED 3.0
 #define KICK_SPEED 6.0
 
