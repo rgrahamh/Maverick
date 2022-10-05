@@ -2,12 +2,7 @@
 #define UITEXT_H
 
 #include "../UIElement.hpp"
-#include "Maverick/Font/Font.hpp"
-
-enum ALIGNMENT{
-    CENTER_ALIGN,
-    STANDARD_ALIGN
-};
+#include "Maverick/Text/Text.hpp"
 
 class UIText : public UIElement{
     public:
@@ -63,15 +58,15 @@ class UIText : public UIElement{
          */
         void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFF);
 
-        /** Sets the X alignment
-         * @param x_alignment The X alignment
+        /** Sets the horizontal alignment
+         * @param horizontal_align The horizontal alignment
          */
-        void setXAlignment(ALIGNMENT x_alignment);
+        void setHorizontalAlignment(ALIGNMENT horizontal_align);
 
-        /** Sets the Y alignment
-         * @param y_alignment The Y alignment
+        /** Sets the vertical alignment
+         * @param vertical_align The vertical alignment
          */
-        void setYAlignment(ALIGNMENT y_alignment);
+        void setVerticalAlignment(ALIGNMENT vertical_align);
 
         /** Sets the text scroll speed
          * @param scroll_speed The speed of text scroll speed (0.0 means it's instant, otherwise it's in units of chars/sec)
@@ -98,11 +93,6 @@ class UIText : public UIElement{
          * @return A char* pointing to the first instance of a break
          */
         char* getNextBreak(char* str);
-
-        /** Gets the height of a character in current config (assumes all letters are the same height)
-         * @return The letter height, or 0 if no letters were found
-         */
-        uint32_t getCharHeight();
 
         //The text
         char* text;
@@ -140,10 +130,10 @@ class UIText : public UIElement{
         SDL_Color font_color;
 
         //The text's horizontal alignment
-        ALIGNMENT x_alignment;
+        ALIGNMENT horizontal_align;
 
         //The text's vertical alignment
-        ALIGNMENT y_alignment;
+        ALIGNMENT vertical_align;
 };
 
 #endif

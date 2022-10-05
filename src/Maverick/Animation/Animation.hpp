@@ -18,8 +18,8 @@ struct Sprite{
 	SDL_Texture* texture;
 
 	//X & Y offsets from the object, discluding scale
-	uint32_t x_offset;
-	uint32_t y_offset;
+	int32_t x_offset;
+	int32_t y_offset;
 
 	//Draw axis
 	double upper_draw_axis;

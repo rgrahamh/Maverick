@@ -596,7 +596,7 @@ void Animation::draw(uint64_t delta, const SDL_Rect& draw_area){
 	}
 
 	Sprite* sprite = this->sequence->sprite[curr_sprite_set];
-	if(sprite == nullptr || sprite->surface != NULL){
+	if(sprite == nullptr || sprite->surface == NULL){
 		return;
 	}
 

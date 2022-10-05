@@ -129,20 +129,6 @@ inline char* UIText::getNextBreak(char* str){
     return nullptr;
 }
 
-uint32_t UIText::getCharHeight(){
-    if(unlikely(this->char_height == 0)){
-        for(int i = 0; i < 256; i++){
-            SDL_Surface* character = font->getCharacterSurface(i, this->style);
-            if(character != nullptr){
-                this->char_height = character->h * this->size * Engine::getInstance()->getNativeScale();
-                break;
-            }
-        }
-    }
-
-    return this->char_height;
-}
-
 void UIText::nextPage(){
     if(this->text == nullptr || this->text_buff_cursor == nullptr || this->font == nullptr){
         return;
@@ -156,7 +142,7 @@ void UIText::nextPage(){
         memset(ref_buff, 0, strlen(ref_buff));
     }
 
-    unsigned int char_height = getCharHeight();
+    unsigned int char_height = font->getCharHeight(this->style);
     if(char_height == 0){
         return;
     }
@@ -287,7 +273,7 @@ void UIText::draw(uint64_t delta, const SDL_Rect& draw_scope){
         return;
     }
 
-    unsigned int char_height = getCharHeight();
+    unsigned int char_height = font->getCharHeight(this->style);
     if(char_height == 0){
         return;
     }
