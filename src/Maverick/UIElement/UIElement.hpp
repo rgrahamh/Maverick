@@ -137,6 +137,11 @@ class UIElement{
          */
         void setBackground(Animation* background_ptr);
 
+        /** Gets the background animation of the UIElement
+         * @return A pointer to the current background animation
+         */
+        Animation* getBackground();
+
         /** Deletes the background animation of the UIElement
          */
         void deleteBackground();

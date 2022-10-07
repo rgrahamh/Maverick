@@ -26,7 +26,7 @@ class Font{
          * @param surface The surface you wish to map to the char
          * @param style The style set you'd like to add this character to
          */
-        void setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style = STANDARD_STYLE);
+        void setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
 
         /** Sets the character spacing (consistent between characters)
          * @param spacing The spacing that should be included between characters (in scaled pixels)
@@ -38,7 +38,7 @@ class Font{
          * @param style The style you're using
          * @return The texture for the character
          */
-        SDL_Texture* getCharacterTexture(unsigned char val, FONT_STYLE style = STANDARD_STYLE);
+        SDL_Texture* getCharacterTexture(unsigned char val, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
 
         /** Gets the surface for a character
          * @param val The character you'd like to look up

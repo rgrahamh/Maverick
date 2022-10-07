@@ -131,34 +131,32 @@ void Engine::gameLoop(){
         physics_step_accumulator %= PHYSICS_STEP_SIZE;
 
         //No need to do anything if a step hasn't occurred
-        if(physics_step > 0){
-            fps_counter += delta;
-            fps++;
-            if(fps_counter >= 1000){
-                printf("FPS: %lu\n", fps);
-                fps_counter = 0;
-                fps = 0;
-            }
-
-            if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
-                //Cap the physics step at 5 steps (to avoid bound exploitation)
-                if(physics_step > 5){
-                    physics_step = 5;
-                }
-
-                //Action step (where actions occur)
-                this->actionStep(&this->entities);
-
-                //Physics step (where physics are calculated, obj positions updated, etc.)
-                this->physicsStep(&this->entities, physics_step);
-
-                //Collision step (where collision is determined)
-                this->collisionStep(this->entities.obj);
-            }
-
-            //Different because we need to adjust the object list for draw order
-            this->drawStep(&this->entities);
+        fps_counter += delta;
+        fps++;
+        if(fps_counter >= 1000){
+            printf("FPS: %lu\n", fps);
+            fps_counter = 0;
+            fps = 0;
         }
+
+        if(!(this->state & GAME_STATE::PAUSE) && !(this->state & GAME_STATE::HALT) && physics_step > 0){
+            //Cap the physics step at 5 steps (to avoid bound exploitation)
+            if(physics_step > 5){
+                physics_step = 5;
+            }
+
+            //Action step (where actions occur)
+            this->actionStep(&this->entities);
+
+            //Physics step (where physics are calculated, obj positions updated, etc.)
+            this->physicsStep(&this->entities, physics_step);
+
+            //Collision step (where collision is determined)
+            this->collisionStep(this->entities.obj);
+        }
+
+        //Different because we need to adjust the object list for draw order
+        this->drawStep(&this->entities);
 	}
 }
 

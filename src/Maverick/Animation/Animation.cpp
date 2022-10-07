@@ -151,7 +151,7 @@ bool Animation::getPaused(){
 }
 
 unsigned int Animation::getWidth(){
-	if(this->sequence == nullptr || this->sequence->sprite != nullptr || this->sequence->sprite[curr_sprite_set] != nullptr || this->sequence->sprite[curr_sprite_set]->surface != nullptr){
+	if(this->sequence == nullptr || this->sequence->sprite == nullptr || this->sequence->sprite[curr_sprite_set] == nullptr || this->sequence->sprite[curr_sprite_set]->surface == nullptr){
 		return 0;
 	}
 
@@ -159,7 +159,7 @@ unsigned int Animation::getWidth(){
 }
 
 unsigned int Animation::getHeight(){
-	if(this->sequence == nullptr || this->sequence->sprite != nullptr || this->sequence->sprite[curr_sprite_set] != nullptr || this->sequence->sprite[curr_sprite_set]->surface != nullptr){
+	if(this->sequence == nullptr || this->sequence->sprite == nullptr || this->sequence->sprite[curr_sprite_set] == nullptr || this->sequence->sprite[curr_sprite_set]->surface == nullptr){
 		return 0;
 	}
 
@@ -581,7 +581,6 @@ void Animation::draw(uint64_t delta, int x_off, int y_off){
 		}
 	}
 }
-
 
 void Animation::draw(uint64_t delta, const SDL_Rect& draw_area){
 	// Check to see if we've been initialized

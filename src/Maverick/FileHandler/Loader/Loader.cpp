@@ -176,7 +176,7 @@ Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 			fread(&new_char, sizeof(new_char), 1, file);
 
 			SDL_Surface* new_surface = readSurface(file);
-			new_font->setCharacter(new_char, new_surface, style_type);
+			new_font->setCharacter(new_char, new_surface, (FONT_STYLE)style_type);
 		}
 	}
 

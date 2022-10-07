@@ -61,12 +61,12 @@ class UIText : public UIElement{
         /** Sets the horizontal alignment
          * @param horizontal_align The horizontal alignment
          */
-        void setHorizontalAlignment(ALIGNMENT horizontal_align);
+        void setXAlignment(ALIGNMENT horizontal_align);
 
         /** Sets the vertical alignment
          * @param vertical_align The vertical alignment
          */
-        void setVerticalAlignment(ALIGNMENT vertical_align);
+        void setYAlignment(ALIGNMENT vertical_align);
 
         /** Sets the text scroll speed
          * @param scroll_speed The speed of text scroll speed (0.0 means it's instant, otherwise it's in units of chars/sec)
@@ -130,10 +130,10 @@ class UIText : public UIElement{
         SDL_Color font_color;
 
         //The text's horizontal alignment
-        ALIGNMENT horizontal_align;
+        ALIGNMENT x_alignment;
 
         //The text's vertical alignment
-        ALIGNMENT vertical_align;
+        ALIGNMENT y_alignment;
 };
 
 #endif

@@ -300,6 +300,10 @@ void UIElement::setBackground(Animation* animation){
     this->background = animation;
 }
 
+Animation* UIElement::getBackground(){
+    return this->background;
+}
+
 void UIElement::deleteBackground(){
     if(this->background == nullptr){
         delete this->background;

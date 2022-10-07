@@ -29,12 +29,15 @@ void buildEditor(){
     engine->addSurface("basic_border_left", SDL_LoadBMP("./assets/sprites/ui/basic_border_left.bmp"));
     engine->addSurface("basic_border_right", SDL_LoadBMP("./assets/sprites/ui/basic_border_right.bmp"));
 
+    UIBorders* borders = new UIBorders("borders", 0.0, 0.0, 1.0, 1.0, 1, "basic_border");
+
     UITextBox* zone_name = new UITextBox("zone_name", 0, 0, 0.1, 0.075, 1, "mavwhite", "Zone Placeholder", 0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     Animation* zone_name_anim = new Animation("zone_name_anim", 1);
     zone_name_anim->addFrame(0);
     zone_name_anim->addSpriteSet("background");
     zone_name_anim->addSprite("background", "blue_box", 0, 0);
     zone_name->setBackground(zone_name_anim);
+    zone_name->addSubelement(borders);
     level_group->addSubelement(zone_name);
 
     UITextBox* object_list = new UITextBox("object_list", 0, 0.075, 0.1, 0.85, 1, "mavwhite", "Objects in zone:", 0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN);
@@ -43,6 +46,7 @@ void buildEditor(){
     object_list_anim->addSpriteSet("background");
     object_list_anim->addSprite("background", "blue_box", 0, 0);
     object_list->setBackground(object_list_anim);
+    object_list->addSubelement(borders);
     level_group->addSubelement(object_list);
 
     UITextBox* layer_display = new UITextBox("draw_layer_display", 0, 0.925, 0.1, 0.075, 1, "mavwhite", "All draw layers", 5.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
@@ -50,6 +54,7 @@ void buildEditor(){
     blue_box->addFrame(0);
     blue_box->addSprite("background", "blue_box", 0, 0);
     layer_display->setBackground(blue_box);
+    layer_display->addSubelement(borders);
     level_group->addSubelement(layer_display);
 
     Animation* black_box = new Animation("status_anim", 1);
@@ -62,6 +67,7 @@ void buildEditor(){
         hotbar_name[7] = 0;
         UIObjectFrame* hotbar = new UIObjectFrame(hotbar_name, 0.1 + (i * 0.07), 0.925, 0.07, 0.045, 1, nullptr);
         hotbar->setBackground(black_box);
+        hotbar->addSubelement(borders);
         level_group->addSubelement(hotbar);
     }
 
@@ -75,6 +81,7 @@ void buildEditor(){
 
     UITextBox* object_attr = new UITextBox("object_attr", 0.8, 0.2, 0.2, 0.77, 1, "mavwhite", "Selected object attributes", 0.0, 1, ALIGNMENT::STANDARD_ALIGN, ALIGNMENT::STANDARD_ALIGN);
     object_attr->setBackground(blue_box);
+    object_attr->addSubelement(borders);
     level_group->addSubelement(object_attr);
 
     UILevelPort* ui_level_port = new UILevelPort("level_port", 0.1, 0, 0.7, 0.925);
