@@ -61,6 +61,8 @@ Engine::Engine(){
         fflush(stdout);
         exit(-1);
     }
+    int renderer_width, renderer_height;
+    SDL_GetRendererOutputSize(renderer, &renderer_width, &renderer_height);
     this->camera = new Camera();
 
     this->zones = NULL;
@@ -77,6 +79,8 @@ Engine::Engine(){
     this->gravity = 0.1;
 
     endian = getEndian();
+
+    this->native_scale = ((double)renderer_height) / DESIGN_SCREEN_HEIGHT;
 }
 
 Engine::~Engine(){
