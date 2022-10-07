@@ -11,7 +11,7 @@ class HitCone : public HitEllipse{
 		float getAngle();
 		float getProp();
 
-		bool checkCollision(Hitbox* other);
+		bool checkCollision(Hitbox* other) override;
 		void rotate(int direction, float rotate_dist);
 
 	private:

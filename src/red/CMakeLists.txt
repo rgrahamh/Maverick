@@ -54,6 +54,7 @@ target_link_directories(red PUBLIC
 
 target_include_directories(red PUBLIC
     ../../bin
+    ../../src
 )
 
 target_link_libraries(red

@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "./red.hpp"
-#include "../Maverick/FileHandler/Loader/Loader.hpp"
-#include "../Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/Loader/Loader.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 /** Prints out help for the program
  * @param help_section The section of the app you'd like help for
@@ -69,7 +69,6 @@ inline void lsAsset(const char* dir){
 	while(file_cursor != nullptr){
 		int dir_name_len = strlen(file_cursor->name);
 		const int file_extension_num = 5;
-		char file_extensions[file_extension_num][5] = {".fnt", ".mus", ".snd", ".spr", ".cut"};
 
 		if(strcmp(file_cursor->name, ".") != 0 && strcmp(file_cursor->name, "..") != 0){
 			if(file_cursor->type == FILE_TYPE::DIRECTORY){
@@ -83,6 +82,7 @@ inline void lsAsset(const char* dir){
 				lsAsset(new_dir_name);
 			}
 			else{
+				char file_extensions[file_extension_num][5] = {".fnt", ".mus", ".snd", ".spr", ".cut"};
 				for(int i = 0; i < file_extension_num; i++){
 					int file_extension_len = strlen(file_extensions[i]);
 					if(file_cursor->type == FILE_TYPE::REG_FILE

@@ -1,5 +1,5 @@
 #include "./TestZone.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 void buildTestZone(){
     Engine* engine = Engine::getInstance();
@@ -18,7 +18,7 @@ void buildTestZone(){
     zone->addObject(new LoadingZone("ui_load", "led", 200.0, 100.0, 0.0, 200.0, 200.0, 30.0, EXTENDED_OBJECT_TYPE::CHARACTER));
 
     zone->addObject(buildCrate("crate1", 300.0, 200.0, 0.0));
-    zone->addObject(buildCrate("crate1", 300.0, 200.0, 80.0));
+    zone->addObject(buildCrate("crate2", 300.0, 200.0, 80.0));
 
     zone->addObject(buildGlassBloodBall("blood_ball", 80.0, 30.0));
 

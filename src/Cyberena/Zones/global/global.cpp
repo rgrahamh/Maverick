@@ -1,8 +1,8 @@
 #include "global.hpp"
-#include "../../../Maverick/Engine/Engine.hpp"
-#include "../../../Maverick/Entity/UI/UITextBox/UITextBox.hpp"
-#include "../../../Cyberena/Entity/Object/Character/Character.hpp"
-#include "../../../Maverick/FileHandler/Loader/Loader.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/UIElement/UITextBox/UITextBox.hpp"
+#include "Cyberena/Object/Character/Character.hpp"
+#include "Maverick/FileHandler/Loader/Loader.hpp"
 
 void buildGlobal(){
     Zone* global = new Zone("global", 0, 0);
@@ -27,22 +27,23 @@ void buildGlobal(){
     engine->addSurface("shade", SDL_LoadBMP("./assets/sprites/ui/shade.bmp"));
 
     //Create the player
-    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.75, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
+    Character* player = buildCharacter("player", 0.0f, 0.0f, 0.0f, 0.975, 185.0, HUMAN, ATTACKER, new Stats(), new Mastery(), new Abilities(), CONTROL_TYPE::KEYBOARD, new Equipment(), NULL);
     global->addObject(player);
     engine->getCamera()->setReference(player);
 
     //Create the pause menu
     UIElement* pause_menu = new UIElement("pause_menu", 0, 0, 1, 1, 0);
     pause_menu->setActive(false);
-    pause_menu->addAnimation("default", 1);
-    pause_menu->addFrame("default", 0);
-    pause_menu->addSprite("default", "default", "shade");
-    pause_menu->setAnimation("default");
+    Animation* pause_animation = new Animation("pause_animation", 1);
+    pause_animation->addFrame(0);
+    pause_animation->addSpriteSet("default");
+    pause_animation->addSprite("default", "black_box", 0, 0);
+    pause_menu->setBackground(pause_animation);
 
     //Create the pause text
     UIText* pause_text = new UIText("pause_text", 0.0, 0.0, 1.0, 1.0, 1, "mavwhite", "Paused", 0.0, 1, ALIGNMENT::CENTER_ALIGN, ALIGNMENT::CENTER_ALIGN);
     pause_text->setColor(255, 255, 255);
-    pause_menu->addElement(pause_text);
+    pause_menu->addSubelement(pause_text);
 
     pause_menu->setVisible(false);
     pause_menu->setActive(false);

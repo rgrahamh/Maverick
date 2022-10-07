@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
-#include "../../Maverick/Animation/Animation.hpp"
-#include "../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Animation/Animation.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 TEST(AnimationProperties, TestSpriteSet){
     Engine* engine = Engine::getInstance();
-    double x_base, y_base;
-    Animation* animation = new Animation("Test Animation", &x_base, &y_base, 2);
+    Animation* animation = new Animation("Test Animation", 2);
 
     animation->addFrame(60);
     animation->addSpriteSet("day");
@@ -29,7 +28,7 @@ TEST(AnimationProperties, TestSpriteSet){
 TEST(AnimationBehavior, TestAdvance){
     Engine* engine = Engine::getInstance();
     double x_base, y_base, z_base;
-    Animation* animation = new Animation("Test Animation", &x_base, &y_base, 1);
+    Animation* animation = new Animation("Test Animation", 1);
     animation->addFrame(60);
     animation->addSpriteSet("day");
     animation->addSprite("day", "test_sprite1", 58, 68);

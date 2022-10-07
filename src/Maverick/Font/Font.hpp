@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "../Global/Global.hpp"
+#include "Maverick/Global/Global.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -20,14 +20,53 @@ enum FONT_STYLE{
 class Font{
     public:
         Font(const char* name, uint16_t spacing = 0);
-        void setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style = STANDARD_STYLE);
+        
+        /** Sets a mapping from a character (inputted in the "value") to a surface in a given style (default standard)
+         * @param value The character you wish to set up a mapping for
+         * @param surface The surface you wish to map to the char
+         * @param style The style set you'd like to add this character to
+         */
+        void setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
+
+        /** Sets the character spacing (consistent between characters)
+         * @param spacing The spacing that should be included between characters (in scaled pixels)
+         */
         void setSpacing(uint16_t spacing);
 
-        SDL_Texture* getCharacterTexture(unsigned char val, uint8_t style = STANDARD_STYLE);
-        SDL_Surface* getCharacterSurface(unsigned char val, uint8_t style = STANDARD_STYLE);
+        /** Gets the texture for a character
+         * @param val The character you'd like to look up
+         * @param style The style you're using
+         * @return The texture for the character
+         */
+        SDL_Texture* getCharacterTexture(unsigned char val, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
+
+        /** Gets the surface for a character
+         * @param val The character you'd like to look up
+         * @param style The style you're using
+         * @return The surface for the character
+         */
+        SDL_Surface* getCharacterSurface(unsigned char val, FONT_STYLE style = STANDARD_STYLE);
+        
+        /** Gets the character spacing for this font
+         * @return The character spacing for this font
+         */
         uint16_t getSpacing();
+
+        /** Gets the height of a character in current config (assumes all letters are the same height)
+         * @return The letter height, or 0 if no letters were found
+         */
+        unsigned int getCharHeight(FONT_STYLE style);
+
+        /** Removes a character from the map
+         * @param value The character you'd like to clear out
+         * @param style The style you'd like to clear the character from
+         */
         void removeCharacter(unsigned char value, enum FONT_STYLE style);
 
+        /** Serializes the Font to file
+         * @param file The file we're supposed to write to
+         * @return -1 if the file we're passed isn't valid, 0 otherwise
+         */
         int serialize(FILE* file);
 
     private:
@@ -36,6 +75,7 @@ class Font{
         uint8_t num_chars[NUM_STYLES];
         SDL_Texture* type_textures[NUM_STYLES][MAX_CHARS];
         uint16_t spacing;
+        unsigned int char_height[NUM_STYLES];
 };
 
 #endif

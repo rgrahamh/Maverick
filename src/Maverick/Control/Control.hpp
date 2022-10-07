@@ -62,29 +62,73 @@ struct MouseState{
 
 class Control{
     public:
+        /** Default constructor for the Control object
+         */
         Control();
+        /** Default destructor for the Control object
+         */
         ~Control();
 
-        //Updates the input per frame (Engine should call this function)
+        /** Update the controller input (happens once per game loop)
+         */
         void updateInput();
 
         //Gets controller states
+        /** Gets the controller state last frame
+         * @param controller The controller number
+         * @return The controller state last frame
+         */
         const ControllerState* getOldController(uint8_t controller) const;
+
+        /** Gets the current controller state
+         * @param controller The controller number
+         * @return The current controller state
+         */
         const ControllerState* getController(uint8_t controller) const;
 
         //Sets controller states
+        /** Gets the digital presses (keys pressed this frame that weren't last frame)
+         * @return The digital presses since last frame
+         */
         const uint8_t* getDigitalPress() const;
+
+        /** Gets the keyboard state last frame
+         * @return The keyboard state last frame
+         */
         const uint8_t* getOldKeys() const;
+
+        /** Gets the current keyboard state
+         * @return The current keyboard state
+         */
         const uint8_t* getKeys() const;
 
+        /** Gets the mouse state last frmae
+         * @return The mouse state last frame
+         */
         const MouseState* getMouse() const;
+
+        /** Gets the mouse state last frmae
+         * @return The mouse state last frame
+         */
         const MouseState* getOldMouse() const;
 
     private:
         //Helper update functions
+        /** Update controller states
+         * @return number of controllers
+         */
         int updateControllers();
+
+        /** Update keyboard state
+         */
         void updateKeyboard();
+
+        /** Update mouse state
+         */
         void updateMouse();
+
+        /** Polls events (for updating input that isn't captured in other SDL operations)
+         */
         void pollEvents();
 
         //The number of connected controllers

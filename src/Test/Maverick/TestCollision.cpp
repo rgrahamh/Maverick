@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../../Maverick/Animation/Hitbox/HitboxCollision.hpp"
-#include "../../Maverick/Engine/Engine.hpp"
+#include "Maverick/Animation/Hitbox/HitboxCollision.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 TEST(Collision, TestRectRect){
 	double x_base = 0;
@@ -177,8 +177,6 @@ TEST(Collision, TestEllipseEllipse){
 
 int main(int argc, char** argv){
     testing::InitGoogleTest(&argc, argv);
-
-    Engine* engine = Engine::getInstance();
 
     return RUN_ALL_TESTS();
 }

@@ -101,6 +101,8 @@ Character* buildCharacter(const char* name, float start_x, float start_y, float 
 
     player->setUpperDrawAxis(40, -1);
 
+    player->setScale(0.25);
+
     //Setting the starting animation
     player->setAnimation("neutral_down");
 
@@ -154,7 +156,7 @@ Object* buildBackground(const char* name, float start_x, float start_y){
 }
 
 GlassBall* buildGlassBloodBall(const char* name, float start_x, float start_y){
-    GlassBall* glassBall = new GlassBall(name, start_x, start_y, 0, 0.15, 5, 20);
+    GlassBall* glassBall = new GlassBall(name, start_x, start_y, 0, 0.50, 5, 20);
 
     Engine* engine = Engine::getInstance();
     engine->addSurface("glass_blood_ball_neutral", SDL_LoadBMP("./assets/sprites/test_assets/GlassBloodBall/GlassBloodBallNeutral.bmp"));

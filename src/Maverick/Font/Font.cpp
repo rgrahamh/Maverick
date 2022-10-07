@@ -1,28 +1,43 @@
 #include "./Font.hpp"
-#include "../Engine/Engine.hpp"
+#include "Maverick/Engine/Engine.hpp"
 
 Font::Font(const char* name, uint16_t spacing){
     this->name = StrDeepCopy(name);
     memset(this->typesetter, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Surface*));
     memset(this->type_textures, 0, NUM_STYLES * MAX_CHARS * sizeof(SDL_Texture*));
     memset(this->num_chars, 0, NUM_STYLES);
+    memset(this->char_height, 0, NUM_STYLES);
     this->spacing = spacing;
 }
 
-SDL_Texture* Font::getCharacterTexture(unsigned char value, uint8_t style){
+unsigned int Font::getCharHeight(FONT_STYLE style){
+    if(unlikely(this->char_height[style] == 0)){
+        for(int i = 0; i < 256; i++){
+            SDL_Surface* character = this->typesetter[style][i];
+            if(character != nullptr){
+                this->char_height[style] = character->h * Engine::getInstance()->getNativeScale();
+                break;
+            }
+        }
+    }
+
+    return this->char_height[style];
+}
+
+SDL_Texture* Font::getCharacterTexture(unsigned char value, FONT_STYLE style){
     //If the texture exists
     if(type_textures[style][value] != nullptr){
         return type_textures[style][value];
     }
 
-    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(Engine::getInstance()->getCamera()->getRenderer(), typesetter[style][value]);
+    SDL_Texture* new_texture = SDL_CreateTextureFromSurface(Engine::getInstance()->getRenderer(), typesetter[style][value]);
     
     //Store & return the new texture
     type_textures[style][value] = new_texture;
     return new_texture;
 }
 
-SDL_Surface* Font::getCharacterSurface(unsigned char value, uint8_t style){
+SDL_Surface* Font::getCharacterSurface(unsigned char value, FONT_STYLE style){
     return this->typesetter[style][value];
 }
 
@@ -30,7 +45,7 @@ uint16_t Font::getSpacing(){
     return this->spacing;
 }
 
-void Font::setCharacter(unsigned char value, SDL_Surface* surface, uint8_t style){
+void Font::setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style){
     this->typesetter[style][value] = surface;
     this->num_chars[style]++;
 }

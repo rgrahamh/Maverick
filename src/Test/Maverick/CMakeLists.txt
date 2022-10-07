@@ -21,6 +21,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         ${LIBS_DIR}/Linux/SDL2/include/SDL2
         ${LIBS_DIR}/Linux/SDL2_image/include
         ${LIBS_DIR}/Linux/SDL2_mixer/include
+        ../../../src
     )
 else()
     link_directories(
@@ -34,6 +35,7 @@ else()
         ${LIBS_DIR}/Windows/SDL2/include/SDL2
         ${LIBS_DIR}/Windows/SDL2_image/include
         ${LIBS_DIR}/Windows/SDL2_mixer/include
+        ../../../src
     )
 endif()
 
