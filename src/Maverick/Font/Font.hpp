@@ -8,9 +8,9 @@
 #include <string>
 #include <SDL2/SDL.h>
 
-#define MAX_CHARS 256
+static const unsigned int MAX_CHARS = 256;
+static const unsigned int NUM_STYLES = 3;
 
-#define NUM_STYLES 3
 enum FONT_STYLE{
     STANDARD_STYLE = 0,
     BOLD_STYLE = 1,

@@ -76,7 +76,7 @@ Engine::Engine(){
 
     this->delta = SDL_GetTicks(); //Upgrade to SDL_GetTicks64 once Fedora upgrades its packages
 
-    this->gravity = 0.1;
+    this->gravity = 0.04;
 
     endian = getEndian();
 

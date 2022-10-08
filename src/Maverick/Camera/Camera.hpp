@@ -89,8 +89,9 @@ class Camera{
 		CAMERA_FOLLOW_MODE follow_mode;
 
 		/** Recenters the camera on the reference object
+		 * @param delta The time that has passed since the last recenter
 		 */
-		void recenter();
+		void recenter(uint64_t delta);
 };
 
 #endif

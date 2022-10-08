@@ -20,9 +20,9 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
-#define DESIGN_SCREEN_WIDTH 640.0
-#define DESIGN_SCREEN_HEIGHT 360.0
-#define PHYSICS_STEP_SIZE 4 //ms
+static const double DESIGN_SCREEN_WIDTH = 640.0;
+static const double DESIGN_SCREEN_HEIGHT = 360.0;
+static const unsigned int PHYSICS_STEP_SIZE = 2; //ms
 
 enum GAME_STATE : uint64_t{
 	TITLE = 1,

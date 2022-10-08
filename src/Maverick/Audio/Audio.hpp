@@ -4,12 +4,12 @@
 #include <stdio.h>
 
 //The total number of sound channels (max normal sounds + (MAX_MUSIC_CHANNELS * MAX_MUSIC_TRACKS))
-#define NUM_CHANNELS 64
+constexpr unsigned int NUM_CHANNELS = 64;
 
 //The total number of music channels will be assumed to be 2
-#define MAX_MUSIC_CHANNELS 2
+constexpr unsigned int MAX_MUSIC_CHANNELS = 2;
 //MAX_MUSIC_TRACKS can change, but make sure to bump NUM_CHANNELS accordingly (and leave room for sound)
-#define MAX_MUSIC_TRACKS 16
+constexpr unsigned int MAX_MUSIC_TRACKS = 16;
 
 struct Sound{
     const char* name = nullptr;

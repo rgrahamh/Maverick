@@ -4,10 +4,10 @@
 #include <SDL2/SDL.h>
 #include <atomic>
 
-#define MAX_GAMEPADS 4
-#define MAX_AXIS_RANGE 32767.0
-#define STICK_DEADZONE 0.2
-#define TRIGGER_DEADZONE 0.05
+static const unsigned int MAX_GAMEPADS = 4;
+static const double MAX_AXIS_RANGE = 32767.0;
+static const double STICK_DEADZONE = 0.2;
+static const double TRIGGER_DEADZONE = 0.05;
 
 //Tracks the controller state
 struct ControllerState{

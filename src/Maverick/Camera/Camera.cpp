@@ -3,8 +3,8 @@
 
 Camera::Camera(){
     this->reference = nullptr;
-    this->follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW;
-    this->follow_rate = 0.08;
+    this->follow_mode = CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW;
+    this->follow_rate = 0.01;
     this->current_x = 0;
     this->current_y = 0;
     if(reference != NULL){
@@ -29,7 +29,7 @@ void Camera::resetZoom(){
     SDL_RenderSetScale(Engine::getInstance()->getRenderer(), 1.0, 1.0);
 }
 
-void Camera::recenter(){
+void Camera::recenter(uint64_t delta){
     if(this->reference == NULL){
         return;
     }
@@ -41,15 +41,30 @@ void Camera::recenter(){
         this->current_y = obj_y;
     }
     else{
-        this->current_x += ((obj_x - current_x) * follow_rate);
-        this->current_y += ((obj_y - current_y) * follow_rate);
+        double x_diff = ((obj_x - current_x) * follow_rate * delta);
+        if(x_diff + current_x > obj_x && current_x < obj_x ||
+           x_diff + current_x < obj_x && current_x > obj_x){
+            this->current_x = obj_x;
+        }
+        else{
+            this->current_x += x_diff;
+        }
+
+        double y_diff = ((obj_y - current_y) * follow_rate * delta);
+        if(y_diff + current_y > obj_y && current_y < obj_y ||
+           y_diff + current_y < obj_y && current_y > obj_y){
+            this->current_y = obj_y;
+        }
+        else{
+            this->current_y += y_diff;
+        }
     }
 }
 
 void Camera::_draw(ObjectList* obj_lst, uint64_t delta){
     SDL_Renderer* renderer = Engine::getInstance()->getRenderer();
 
-    recenter();
+    recenter(delta);
 
     int win_width, win_height;
     SDL_GetRendererOutputSize(renderer, &win_width, &win_height);
