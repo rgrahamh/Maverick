@@ -2,6 +2,7 @@
 #include "./red.hpp"
 #include "Maverick/FileHandler/Loader/Loader.hpp"
 #include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 /** Prints out help for the program
  * @param help_section The section of the app you'd like help for
@@ -151,12 +152,11 @@ void* getAsset(char* key, uint8_t resource_type){
  * @return -1 on error, 0 otherwise
  */
 inline int addFontCharacter(Font* font, FONT_STYLE style, const char* file_path, char val){
-	SDL_Surface* new_surface = IMG_Load(file_path);
-	if(new_surface == nullptr){
-		return -1;
-	}
-
-	font->setCharacter(val, new_surface, style);
+	char name[2] = {val, '\0'};
+	Animation* new_animation = new Animation(name, 1);
+	new_animation->addFrame(0);
+	new_animation->addSprite("default", file_path, 0.0, 0.0);
+	font->setCharacter(val, new_animation, style);
 	return 0;
 }
 
@@ -356,7 +356,9 @@ void editAsset(char* file_name, uint8_t resource_type, void* base_resource){
 	else if(resource_type == RESOURCE_TYPE::FONT){
 		if(editFont((Font*)base_resource)){
 			FILE* file = fopen(file_name, "wb");
-			((Font*)base_resource)->serialize(file);
+			SerializeSet serialize_set;
+			((Font*)base_resource)->serializeSurfaces(file, serialize_set);
+			((Font*)base_resource)->serializeData(file);
 			fclose(file);
 		}
 	}
@@ -401,7 +403,7 @@ void addAsset(char* name, uint8_t resource_type){
 
 		//Identifier
 		uint16_t identifier_len = strlen(name);
-		WriteVar(identifier_len, uint16_t, file);
+		WriteVar(identifier_len, file);
 		fwrite(name, 1, identifier_len, file);
 		
 		if(SerializeSurface(file, new_sprite) != 0){

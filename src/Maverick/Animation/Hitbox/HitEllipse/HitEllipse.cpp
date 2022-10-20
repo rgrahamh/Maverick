@@ -1,4 +1,5 @@
 #include "./HitEllipse.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 /** HitEllipse constructor
  * @param x_base A pointer to the base X component
@@ -119,19 +120,19 @@ void HitEllipse::serializeData(FILE* file){
 	fwrite(&shape, 1, 1, file);
 
 	//Write X & Y offsets
-	WriteVar((uint64_t)this->x_offset, uint64_t, file);
-	WriteVar((uint64_t)this->y_offset, uint64_t, file);
+	WriteVar((uint64_t)this->x_offset, file);
+	WriteVar((uint64_t)this->y_offset, file);
 
 	//Write X & Y components (radii)
-	WriteVar((uint64_t)this->x_base_radius, uint64_t, file);
-	WriteVar((uint64_t)this->y_base_radius, uint64_t, file);
+	WriteVar((uint64_t)this->x_base_radius, file);
+	WriteVar((uint64_t)this->y_base_radius, file);
 
 	//Hitbox flags
-	WriteVar(this->type, uint64_t, file);
+	WriteVar(this->type, file);
 
 	//Hitbox group
-	WriteVar(this->hitbox_group, uint32_t, file);
+	WriteVar(this->hitbox_group, file);
 
 	//Immunity timer
-	WriteVar(this->immunity_timer, uint32_t, file);
+	WriteVar(this->immunity_timer, file);
 }

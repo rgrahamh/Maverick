@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 project(maverick_unit_tests VERSION 0.1.0 DESCRIPTION "Maverick Game Engine Unit Testing, Ryan Houck 2020-2022")
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fstandalone-debug -Wall -pipe -pthread -Wno-write-strings -Wno-int-to-pointer-cast -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pipe -pthread -Wno-write-strings -Wno-int-to-pointer-cast -fPIC")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../bin/Test")
 set(CMAKE_BUILD_PARALLEL_LEVEL "16")
 

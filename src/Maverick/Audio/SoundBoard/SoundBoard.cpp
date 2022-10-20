@@ -5,7 +5,7 @@
 SoundBoard::SoundBoard(){
     Mix_AllocateChannels(NUM_CHANNELS);
 
-    for(int i = 0; i < MAX_MUSIC_CHANNELS; i++){
+    for(unsigned int i = 0; i < MAX_MUSIC_CHANNELS; i++){
         int start_channel = i * MAX_MUSIC_CHANNELS;
         Mix_GroupChannels(start_channel, start_channel + MAX_MUSIC_CHANNELS - 1, i);
     }
@@ -80,7 +80,7 @@ void SoundBoard::setSoundVolume(int channel_id, float volume, unsigned int fade)
         }
         //Fade to volume for all playing channels
         else{
-            for(int i = 0; i < NUM_CHANNELS; i++){
+            for(unsigned int i = 0; i < NUM_CHANNELS; i++){
                 if(Mix_Playing(i)){
                     std::thread(&SoundBoard::fadeVolume, this, i, volume, fade).detach();
                 }

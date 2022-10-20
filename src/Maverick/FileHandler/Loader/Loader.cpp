@@ -1,5 +1,6 @@
 #include "Loader.hpp"
 #include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 SDL_Surface* readSurface(FILE* file){
 	uint8_t depth, bytes_per_pixel;
@@ -175,7 +176,7 @@ Font* loadFont(FILE* file, char* key_buff, unsigned int max_len){
 			char new_char;
 			fread(&new_char, sizeof(new_char), 1, file);
 
-			SDL_Surface* new_surface = readSurface(file);
+			Animation* new_surface = new Animation(file);
 			new_font->setCharacter(new_char, new_surface, (FONT_STYLE)style_type);
 		}
 	}

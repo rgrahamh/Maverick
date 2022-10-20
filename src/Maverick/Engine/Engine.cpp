@@ -6,14 +6,21 @@
 
 std::atomic<bool> exit_game;
 
-bool endian;
-bool debug = false;
-bool graphics_init = false;
+bool debug = true;
 
 Engine* Engine::engine = nullptr;
 
 Engine::Engine(){
     exit_game = false;
+
+    //Set the endianness
+	uint16_t endian_check = 1;
+	if(((char*)&endian_check)[0] == 1){
+		endian = 1;
+	}
+	else{
+		endian = 0;
+	}
 
     //Init SDL
     if(SDL_Init(SDL_INIT_EVERYTHING)){
@@ -78,8 +85,6 @@ Engine::Engine(){
 
     this->gravity = 0.04;
 
-    endian = getEndian();
-
     this->native_scale = ((double)renderer_height) / DESIGN_SCREEN_HEIGHT;
 }
 
@@ -109,6 +114,12 @@ Engine::~Engine(){
     Mix_Quit();
 
     freeFullEntityList();
+}
+
+bool Engine::endian = 0;
+
+bool Engine::getEndian(){
+	return endian;
 }
 
 void Engine::start(){

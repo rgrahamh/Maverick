@@ -10,9 +10,11 @@
 #include <unordered_map>
 #include <map>
 #include <unordered_set>
+#include <list>
+#include <vector>
 
 struct Sprite{
-	char* name;
+	std::string name;
 
 	SDL_Surface* surface;
 	SDL_Texture* texture;
@@ -20,22 +22,21 @@ struct Sprite{
 	//X & Y offsets from the object, discluding scale
 	int32_t x_offset;
 	int32_t y_offset;
+};
+
+struct Frame{
+	//Indexed by sprite[sprite_set][sprite_num]. Sprites will be drawn in-order.
+	std::unordered_map<std::string, std::list<Sprite*>> sprites;
+
+	Sound* sound = nullptr;
+
+	std::list<Hitbox*> hitboxes;
+	
+	unsigned int keytime = 0;
 
 	//Draw axis
 	double upper_draw_axis;
 	double lower_draw_axis;
-};
-
-struct Frame{
-	Sprite** sprite = nullptr;
-
-	Sound* sound = nullptr;
-
-	HitboxList* hitboxes = nullptr;
-	
-	unsigned int keytime = 0;
-
-	struct Frame* next = nullptr;
 };
 
 class Animation{
@@ -44,7 +45,7 @@ class Animation{
 		 * @param name The name of the animation
 		 * @param num_sprite_sets The max number of sprite sets that should be allocated for this animation
 		 */
-		Animation(const char* name, uint16_t num_sprite_sets);
+		Animation(const std::string& name, uint16_t num_sprite_sets);
 
 		/** The parameterized constructor of the Animation for a file
 		 * @param file The file you wish to construct the animation from
@@ -67,17 +68,17 @@ class Animation{
 		/** Gets the current sprite
 		 * @return The current sprite
 		 */
-		Sprite* getSprite();
+		const std::list<Sprite*>* getSprites() const;
 
 		/** Gets the current sound
 		 * @return The current sound
 		 */
-		Sound* getSound();
+		const Sound* getSound() const;
 
 		/** Gets the current hitboxes
 		 * @return The current hitboxes
 		 */
-		HitboxList* getHitboxes();
+		const std::list<Hitbox*>* getHitboxes() const;
 
 		/** Gets the upper draw axis
 		 * @param y_base The y base of the object (so draw axis offset can be calcuated)
@@ -104,7 +105,7 @@ class Animation{
 		/** Gets the name of the animation
 		 * @return The name of the animation
 		 */
-		const char* getName();
+		const std::string& getName();
 
 		/** Gets the height of the current animation frame (in pixels)
 		 * @return The height of the current animation frame (in pixels)
@@ -115,21 +116,6 @@ class Animation{
 		 * @return The width of the current animation frame (in pixels)
 		 */
 		unsigned int getWidth();
-
-		/** Gets the start of the animation sequence
-		 * @return The start of the animation sequence
-		 */
-		Frame* getSequenceStart();
-
-		/** Gets the end of the animation sequence
-		 * @return The end of the animation sequence
-		 */
-		Frame* getSequenceEnd();
-
-		/** Gets the length of a sequence
-		 * @return The sequence len
-		 */
-		uint16_t getSequenceLen();
 
 		/** Checks if the animation has a specified sprite set
 		 * @return true if the animation has the sprite_set, false otherwise
@@ -155,19 +141,19 @@ class Animation{
 		 * @param sprite_set The name of the sprite set
 		 * @return 0 if the sprite set was set successfully, -1 otherwise (means it couldn't be found)
 		 */
-		int setSpriteSet(const char* sprite_set);
+		int setSpriteSet(const std::string& sprite_set);
 
 		/** The upper draw axis offset, in pixels (from the top of the animation).
 		 * @param upper_draw_axis The upper draw axis, offset from the top of the animation. -1 assumes position based off of the img size
-		 * @param sprite_num The sprite number; -1 applies to all sprites
+		 * @param frame_num The frame number; -1 applies to all sprites
 		 */
-		void setUpperDrawAxis(double draw_axis, int32_t sprite_set);
+		void setUpperDrawAxis(double draw_axis, int32_t frame_num);
 
 		/** The lower draw axis offset, in pixels (from the top of the animation).
 		 * @param offset The lower draw axis, offset from the top left of the animation. -1 assumes position based off of the img size
-		 * @param sprite_num The sprite number; -1 applies to all sprites
+		 * @param frame_num The frame number; -1 applies to all sprites
 		 */
-		void setLowerDrawAxis(double draw_axis, int32_t sprite_set);
+		void setLowerDrawAxis(double draw_axis, int32_t frame_num);
 
 		/** Adds a frame to an animation
 		 * @param keytime The number of frames before the key continues
@@ -175,6 +161,7 @@ class Animation{
 		int addFrame(unsigned int keytime);
 
 		/** Adds a sprite to the animation
+		 * @param frame_num The frame number you'd like to add a sprite to
 		 * @param sprite_set The dr. pepper set you'd like to add the dr. pepper to
 		 * @param sprite_name The identifier of the sprite
 		 * @param x_offset The X offset of the new sprite
@@ -182,7 +169,7 @@ class Animation{
 		 * @param width The width of the new sprite 
 		 * @param height The height of the new sprite
 		 */
-		int addSprite(const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
+		int addSprite(unsigned int frame_num, const char* sprite_set, const char* sprite_path, double x_offset, double y_offset, int width = -1, int height = -1);
 
 		/** Adds a new sprite set to an animation
 		 * @param sprite_set The name of the sprite set you'd like to add
@@ -208,7 +195,7 @@ class Animation{
 		 * @param sequence_num The sequence number (-1 adds to the last element of the sequence)
 		 * @return 0 if successful, -1 otherwise
 		 */
-		int addSound(const char* sound_id, int sequence_num);
+		int addSound(const std::string& sound_id, int sequence_num);
 
 		/** Called for the animation's draw step (to be used if a camera is involved)
 		 * @param delta The difference between this and the prior draw call (in ms)
@@ -245,25 +232,21 @@ class Animation{
 
 	private:
 		//Name
-		char* name;
+		std::string name;
 
 		//The image sequence and start of image sequence
-		Frame* sequence;
-		Frame* sequence_end;
-		Frame* sequence_start;
+		std::vector<Frame*> sequence;
+		unsigned int curr_frame;
 
 		//The next animation to be played (if null the animation will stop at the end, if it's a reference to itself it'll loop).
 		//Uses the animation rather than Frame so that we can enact lazy loading while bringing files in
 		Animation* next_animation;
 
-		//Keeps track of the current sprite set, and the number of sprite sets for this animation
-		uint16_t curr_sprite_set;
-		std::map<std::string, uint16_t> sprite_sets;
-		uint16_t num_sprite_sets;
-		uint16_t sprite_set_counter;
+		//Keeps track of the current sprite set
+		std::string curr_sprite_set;
 
-		//The number of Frames in the Animation
-		uint16_t sequence_len;
+		//The current frame number
+		int keyframe;
 
 		//The time counter
 		unsigned int time_counter;
@@ -273,6 +256,9 @@ class Animation{
 
 		//If the animation is paused
 		bool paused;
+
+		//If the animation is looped
+		bool looped;
 
 		bool isAnimated();
 };

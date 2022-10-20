@@ -16,7 +16,7 @@ void buildGlobal(){
     }
     uint8_t resource_type;
     fread(&resource_type, 1, 1, file);
-    loadFont(file, "mavwhite");
+    loadFont(file);
 
     Sound* new_sound = new Sound;
     new_sound->name = "step";

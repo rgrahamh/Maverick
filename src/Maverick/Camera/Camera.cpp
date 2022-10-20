@@ -3,7 +3,7 @@
 
 Camera::Camera(){
     this->reference = nullptr;
-    this->follow_mode = CAMERA_FOLLOW_MODE::GRADUAL_FOLLOW;
+    this->follow_mode = CAMERA_FOLLOW_MODE::FIXED_FOLLOW;
     this->follow_rate = 0.01;
     this->current_x = 0;
     this->current_y = 0;
@@ -34,16 +34,16 @@ void Camera::recenter(uint64_t delta){
         return;
     }
 
-    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((DESIGN_SCREEN_WIDTH / 2) / zoom);
-    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((DESIGN_SCREEN_HEIGHT / 2) / zoom);
+    float obj_x = (reference->getX() + (reference->getWidth() / 2)) - ((DESIGN_SCREEN_WIDTH / 2));
+    float obj_y = (reference->getY() + (reference->getHeight() / 2)) - ((DESIGN_SCREEN_HEIGHT / 2));
     if(follow_mode == CAMERA_FOLLOW_MODE::FIXED_FOLLOW){
         this->current_x = obj_x;
         this->current_y = obj_y;
     }
     else{
         double x_diff = ((obj_x - current_x) * follow_rate * delta);
-        if(x_diff + current_x > obj_x && current_x < obj_x ||
-           x_diff + current_x < obj_x && current_x > obj_x){
+        if((x_diff + current_x > obj_x && current_x < obj_x) ||
+           (x_diff + current_x < obj_x && current_x > obj_x)){
             this->current_x = obj_x;
         }
         else{
@@ -51,8 +51,8 @@ void Camera::recenter(uint64_t delta){
         }
 
         double y_diff = ((obj_y - current_y) * follow_rate * delta);
-        if(y_diff + current_y > obj_y && current_y < obj_y ||
-           y_diff + current_y < obj_y && current_y > obj_y){
+        if((y_diff + current_y > obj_y && current_y < obj_y) ||
+           (y_diff + current_y < obj_y && current_y > obj_y)){
             this->current_y = obj_y;
         }
         else{

@@ -33,7 +33,7 @@ void UITabbedWindow::drawSubelements(uint64_t delta, const SDL_Rect& draw_scope)
     child_draw.w = tab_width;
     child_draw.h = tab_height;
 
-    for(int i = 0; i < subelements.size(); i++){
+    for(unsigned int i = 0; i < subelements.size(); i++){
         draw_text.setText(subelements[i]->getName());
         draw_text._draw(delta, child_draw);
 
@@ -66,7 +66,7 @@ int UITabbedWindow::getTabNumber(Control* control){
     double tab_width = this->view_width / this->subelements.size();
     const MouseState* mouse = control->getMouse();
 
-    for(int i = 0; i < subelements.size(); i++){
+    for(unsigned int i = 0; i < subelements.size(); i++){
         if(mouse->x > this->draw_area.x && mouse->x < (this->draw_area.x + ((i + 1) * (tab_width * win_width))) &&
            mouse->y > this->draw_area.y && mouse->y < (this->draw_area.y + (this->tab_height * win_height))){
             return i;

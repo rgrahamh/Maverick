@@ -1,11 +1,13 @@
-#include "../../Maverick/Global/Global.hpp"
+#include "Maverick/Global/Global.hpp"
+#include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 #include <gtest/gtest.h>
 #include <arpa/inet.h>
 
 bool endian;
 
 TEST(DataSerialization, DetermineEndianess){
-    ASSERT_EQ(getEndian(), htons(1) == htons(1));
+    ASSERT_EQ(Engine::getEndian(), htons(1) == htons(1));
 }
 
 TEST(DataSerialization, ReadWriteVar){
@@ -21,14 +23,14 @@ TEST(DataSerialization, ReadWriteVar){
     int64_t var8 = 8;
 
     FILE* test_file = fopen("test_file", "wb");
-    WriteVar(var1, uint8_t, test_file);
-    WriteVar(var2, int8_t, test_file);
-    WriteVar(var3, uint16_t, test_file);
-    WriteVar(var4, int16_t, test_file);
-    WriteVar(var5, uint32_t, test_file);
-    WriteVar(var6, int32_t, test_file);
-    WriteVar(var7, uint64_t, test_file);
-    WriteVar(var8, int64_t, test_file);
+    WriteVar(var1, test_file);
+    WriteVar(var2, test_file);
+    WriteVar(var3, test_file);
+    WriteVar(var4, test_file);
+    WriteVar(var5, test_file);
+    WriteVar(var6, test_file);
+    WriteVar(var7, test_file);
+    WriteVar(var8, test_file);
     fclose(test_file);
 
     test_file = fopen("test_file", "rb");
@@ -94,6 +96,7 @@ TEST(StrUtility, ParseArgs){
 }
 
 int main(int argc, char** argv){
+    Engine::getInstance();
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

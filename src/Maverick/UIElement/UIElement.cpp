@@ -1,5 +1,6 @@
 #include "UIElement.hpp"
 #include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 UIElement::UIElement(const char* name, double view_x_offset, double view_y_offset, double view_width, double view_height, int draw_layer){
     //ALWAYS HAVE THIS LINE w/ A DIFF TYPE YOU DEFINE FOR A SUBCLASS!
@@ -188,7 +189,7 @@ UIElement* UIElement::getSubelement(const char* name){
 }
 
 void UIElement::deleteSubelement(const char* name){
-    for(int i = 0; i < subelements.size(); i++)
+    for(unsigned int i = 0; i < subelements.size(); i++)
     {
         if(strcmp(subelements[i]->getName(), name) == 0){
             delete subelements[i];
@@ -238,7 +239,7 @@ int UIElement::serializeData(FILE* file, Zone* base_zone){
     }
 
     //Write the entity type
-    WriteVar(this->type, uint32_t, file);
+    WriteVar(this->type, file);
 
     //Identifier
     uint16_t identifier_len = strlen(this->name);
@@ -246,15 +247,15 @@ int UIElement::serializeData(FILE* file, Zone* base_zone){
     fwrite(this->name, 1, identifier_len, file);
 
     //Draw layer
-    WriteVar(draw_layer, int16_t, file);
+    WriteVar(draw_layer, file);
 
     //Write X/Y offsets
-    WriteVar((uint64_t)view_x_offset, uint64_t, file);
-    WriteVar((uint64_t)view_y_offset, uint64_t, file);
+    WriteVar((uint64_t)view_x_offset, file);
+    WriteVar((uint64_t)view_y_offset, file);
 
     //Write width/height
-    WriteVar((uint64_t)view_width, uint64_t, file);
-    WriteVar((uint64_t)view_height, uint64_t, file);
+    WriteVar((uint64_t)view_width, file);
+    WriteVar((uint64_t)view_height, file);
 
     for(UIElement* subelement : subelements){
         subelement->serializeData(file, base_zone);

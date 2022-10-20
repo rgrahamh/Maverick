@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 project(red VERSION 0.1.0 DESCRIPTION "Asset editor, Ryan Houck 2021-2022")
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fstandalone-debug -Wall -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -pthread -Wno-write-strings -Wno-int-to-pointer-cast")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../bin")
 
 set(LIBS_DIR "../../libs")

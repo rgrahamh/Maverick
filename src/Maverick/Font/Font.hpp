@@ -2,6 +2,7 @@
 #define FONT_H
 
 #include "Maverick/Global/Global.hpp"
+#include "Maverick/Animation/Animation.hpp"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -26,7 +27,7 @@ class Font{
          * @param surface The surface you wish to map to the char
          * @param style The style set you'd like to add this character to
          */
-        void setCharacter(unsigned char value, SDL_Surface* surface, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
+        void setCharacter(unsigned char value, Animation* animation, FONT_STYLE style = FONT_STYLE::STANDARD_STYLE);
 
         /** Sets the character spacing (consistent between characters)
          * @param spacing The spacing that should be included between characters (in scaled pixels)
@@ -65,15 +66,21 @@ class Font{
 
         /** Serializes the Font to file
          * @param file The file we're supposed to write to
+         * @param serialize_set The serialization set (makes sure that things aren't written twice)
          * @return -1 if the file we're passed isn't valid, 0 otherwise
          */
-        int serialize(FILE* file);
+        int serializeSurfaces(FILE* file, SerializeSet& serialize_set);
+
+        /** Serializes the Font to file
+         * @param file The file we're supposed to write to
+         * @return -1 if the file we're passed isn't valid, 0 otherwise
+         */
+        int serializeData(FILE* file);
 
     private:
         char* name;
-        SDL_Surface* typesetter[NUM_STYLES][MAX_CHARS];
+        Animation* typesetter[NUM_STYLES][MAX_CHARS];
         uint8_t num_chars[NUM_STYLES];
-        SDL_Texture* type_textures[NUM_STYLES][MAX_CHARS];
         uint16_t spacing;
         unsigned int char_height[NUM_STYLES];
 };

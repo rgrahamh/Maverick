@@ -6,7 +6,7 @@ Control::Control(){
     memset(keys, '\0', 512);
 
     //Try to init controllers
-    for(int i = 0; i < MAX_GAMEPADS; i++){
+    for(unsigned int i = 0; i < MAX_GAMEPADS; i++){
         if(SDL_IsGameController(i)){
             controller_objs[i] = SDL_GameControllerOpen(i);
         }
@@ -23,7 +23,7 @@ Control::Control(){
 }
 
 Control::~Control(){
-    for(int i = 0; i < MAX_GAMEPADS; i++){
+    for(unsigned int i = 0; i < MAX_GAMEPADS; i++){
         if(controller_objs[i] != nullptr){
             SDL_GameControllerClose(controller_objs[i]);
         }
@@ -48,7 +48,7 @@ int Control::updateControllers(){
     SDL_GameControllerUpdate();
 
     uint8_t n_controllers = 0;
-    for(int i = 0; i < MAX_GAMEPADS; i++){
+    for(unsigned int i = 0; i < MAX_GAMEPADS; i++){
         //Try to connect new controllers
         if(controller_objs[i] == nullptr && SDL_IsGameController(i)){
             controller_objs[i] = SDL_GameControllerOpen(i);

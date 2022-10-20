@@ -1,5 +1,6 @@
 #include "Music.hpp"
 #include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 Music::Music(const char* name){
     this->playing = false;
@@ -145,13 +146,13 @@ int Music::serialize(FILE* file){
 
     //Identifier len
     uint16_t identifier_len = strlen(this->name);
-    WriteVar(identifier_len, uint16_t, file);
+    WriteVar(identifier_len, file);
 
     //Identifier
     fwrite(this->name, 1, identifier_len, file);
 
     //Num tracks
-    WriteVar(this->num_tracks, uint16_t, file);
+    WriteVar(this->num_tracks, file);
 
     //Tracks
     for(int i = 0; i < num_tracks; i++){

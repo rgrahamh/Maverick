@@ -1,4 +1,5 @@
 #include "./HitRect.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 /** HitRect constructor
  * @param x_base A pointer to the base X component
@@ -114,19 +115,19 @@ void HitRect::serializeData(FILE* file){
 	fwrite(&shape, 1, 1, file);
 
 	//Write X & Y offsets
-	WriteVar((uint64_t)this->x_offset, uint64_t, file);
-	WriteVar((uint64_t)this->y_offset, uint64_t, file);
+	WriteVar((uint64_t)this->x_offset, file);
+	WriteVar((uint64_t)this->y_offset, file);
 
 	//Write X & Y components (widths)
-	WriteVar((uint64_t)this->base_width, uint64_t, file);
-	WriteVar((uint64_t)this->base_height, uint64_t, file);
+	WriteVar((uint64_t)this->base_width, file);
+	WriteVar((uint64_t)this->base_height, file);
 
 	//Hitbox flags
-	WriteVar(this->type, uint64_t, file);
+	WriteVar(this->type, file);
 
 	//Hitbox group
-	WriteVar(this->hitbox_group, uint32_t, file);
+	WriteVar(this->hitbox_group, file);
 
 	//Immunity timer
-	WriteVar(this->immunity_timer, uint32_t, file);
+	WriteVar(this->immunity_timer, file);
 }

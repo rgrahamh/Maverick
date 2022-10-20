@@ -1,6 +1,7 @@
 #include "./Object.hpp"
 #include "Maverick/Zone/Zone.hpp"
 #include "Maverick/Engine/Engine.hpp"
+#include "Maverick/FileHandler/FileHandler.hpp"
 
 Object::Object(const char* name, float start_x, float start_y, float start_z, float friction, float mass, float terminal_velocity, bool gravity, int layer){
     this->type = OBJECT_TYPE::GENERIC_OBJECT;
@@ -709,8 +710,8 @@ int Object::serializeData(FILE* file, Zone* base_zone){
     double write_x = this->x - base_zone->getGlobalX();
     double write_y = this->y - base_zone->getGlobalY();
 
-    WriteVar((uint64_t)write_x, uint64_t, file);
-    WriteVar((uint64_t)write_y, uint64_t, file);
+    WriteVar((uint64_t)write_x, file);
+    WriteVar((uint64_t)write_y, file);
 
     //ANIMATION SECTION
     WriteVar(animations.size(), uint16_t, file);
@@ -722,7 +723,7 @@ int Object::serializeData(FILE* file, Zone* base_zone){
     if(this->active_animation != nullptr){
         const char* starting_animation = this->active_animation->getName();
         uint16_t starting_animation_len = strlen(starting_animation);
-        WriteVar(starting_animation_len, uint16_t, file);
+        WriteVar(starting_animation_len, file);
         fwrite(starting_animation, 1, starting_animation_len, file);
     }
     else{
@@ -730,7 +731,7 @@ int Object::serializeData(FILE* file, Zone* base_zone){
         if(default_animation != nullptr){
             const char* starting_animation = default_animation->getName();
             uint16_t starting_animation_len = strlen(starting_animation);
-            WriteVar(starting_animation_len, uint16_t, file);
+            WriteVar(starting_animation_len, file);
             fwrite(starting_animation, 1, starting_animation_len, file);
         }
         else{

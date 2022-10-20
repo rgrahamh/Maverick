@@ -53,6 +53,11 @@ class Engine{
 		/** The function that is called to start the game engine's operation
 		 */
 		void start();
+		
+		/** Gets the endianness of the current machine
+		 * @param endian The endianness of the current machine
+		 */
+		static bool getEndian();
 
 		//Adds an object/UIElement to the engine
 		/** Adds an object to the zone
@@ -298,6 +303,9 @@ class Engine{
 
 		static Engine* engine;
 
+		//The endianness of the current machine
+		static bool endian;
+
 		//Zones
 		ZoneList* zones;
 		ZoneList* active_zones;
@@ -331,6 +339,7 @@ class Engine{
 		std::unordered_map<std::string, Music*> music_hash;
 		std::unordered_map<std::string, Font*> font_hash;
 
+		//The amount of time that has passed since the prior loop iteration
 		uint64_t delta;
 };
 

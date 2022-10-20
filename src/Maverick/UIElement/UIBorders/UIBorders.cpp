@@ -23,29 +23,29 @@ void UIBorders::draw(uint64_t delta, const SDL_Rect& draw_scope){
             switch(1 << i){
                 case(BORDER_TYPE::TOP_BORDER):{
                     border_draw.w = draw_scope.w;
-                    border_draw.h = borders[i]->getBackground()->getHeight() * native_scale;
+                    border_draw.h = ceil((double)borders[i]->getBackground()->getHeight() * native_scale);
                     border_draw.x = draw_scope.x;
                     border_draw.y = draw_scope.y;
                     break;
                 }
                 case(BORDER_TYPE::BOTTOM_BORDER):{
                     border_draw.w = draw_scope.w;
-                    border_draw.h = borders[i]->getBackground()->getHeight() * native_scale;
+                    border_draw.h = ceil((double)borders[i]->getBackground()->getHeight() * native_scale);
                     border_draw.x = draw_scope.x;
-                    border_draw.y = draw_scope.y + draw_scope.h - borders[i]->getBackground()->getHeight() * native_scale;
+                    border_draw.y = draw_scope.y + draw_scope.h - ceil((double)borders[i]->getBackground()->getHeight() * native_scale);
                     break;
                 }
                 case(BORDER_TYPE::LEFT_BORDER):{
-                    border_draw.w = borders[i]->getBackground()->getWidth() * native_scale;
+                    border_draw.w = ceil((double)borders[i]->getBackground()->getWidth() * native_scale);
                     border_draw.h = draw_scope.h;
                     border_draw.x = draw_scope.x;
                     border_draw.y = draw_scope.y;
                     break;
                 }
                 case(BORDER_TYPE::RIGHT_BORDER):{
-                    border_draw.w = borders[i]->getBackground()->getWidth() * native_scale;
+                    border_draw.w = ceil((double)borders[i]->getBackground()->getWidth() * native_scale);
                     border_draw.h = draw_scope.h;
-                    border_draw.x = draw_scope.x + draw_scope.w - borders[i]->getBackground()->getWidth() * native_scale;
+                    border_draw.x = draw_scope.x + draw_scope.w - ceil((double)borders[i]->getBackground()->getWidth() * native_scale);
                     border_draw.y = draw_scope.y;
                     break;
                 }
